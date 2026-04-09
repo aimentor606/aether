@@ -5,13 +5,13 @@ upstreams:
   - name: upstream-aether-api
     algorithm: round-robin
     targets:
-      - target: newapi:3000
+      - target: llm-proxy:${{ env "DECK_LLM_PROXY_PORT" }}
         weight: 100
 
   - name: upstream-aether-frontend
     algorithm: round-robin
     targets:
-      - target: newapi:3000
+      - target: llm-proxy:${{ env "DECK_LLM_PROXY_PORT" }}
         weight: 100
 
 services:
@@ -109,6 +109,13 @@ services:
           - web-route
 
     plugins:
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - "X-Forwarded-Host:${{ env "DECK_PUBLIC_HOST" }}"
+              - "X-Forwarded-Proto:${{ env "DECK_FORWARDED_PROTO" }}"
+      
       - name: proxy-cache
         config:
           content_type:

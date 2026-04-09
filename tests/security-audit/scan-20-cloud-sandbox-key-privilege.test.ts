@@ -1,8 +1,8 @@
 /**
  * Security Scan: Sandbox Key Privilege Escalation
  *
- * FINDING K-3: Sandbox keys (kortix_sb_*) have the same access level
- * as user keys (kortix_*) in all routes that use combinedAuth or apiKeyAuth.
+ * FINDING K-3: Sandbox keys (acme_sb_*) have the same access level
+ * as user keys (acme_*) in all routes that use combinedAuth or apiKeyAuth.
  *
  * The middleware does NOT check key type — a sandbox agent can:
  * - Access /v1/tunnel/* (create/manage tunnels)
@@ -18,12 +18,12 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.acme.dev';
 
 describe('Code Review: Sandbox Key Privilege Escalation', () => {
 
   describe('[MEDIUM] No key type enforcement in middleware', () => {
-    test('apiKeyAuth accepts both kortix_ and kortix_sb_ tokens', () => {
+    test('apiKeyAuth accepts both acme_ and acme_sb_ tokens', () => {
       // auth.ts apiKeyAuth: calls validateSecretKey which returns { type, accountId, sandboxId }
       // But the middleware does NOT check result.type
       // Both 'user' and 'sandbox' types pass through identically
@@ -49,7 +49,7 @@ describe('Code Review: Sandbox Key Privilege Escalation', () => {
 
     for (const route of routesWithCombinedAuth) {
       test(`${route} uses combinedAuth — sandbox key would be accepted`, () => {
-        // A sandbox agent (which has a kortix_sb_ key) can access these routes
+        // A sandbox agent (which has a acme_sb_ key) can access these routes
         // This gives the sandbox access to user-level operations
         expect(true).toBe(true);
       });

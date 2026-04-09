@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { eq, and, desc } from 'drizzle-orm';
-import { tunnelPermissions, tunnelConnections } from '@kortix/db';
+import { tunnelPermissions, tunnelConnections } from '@acme/db';
 import { db } from '../../shared/db';
 import { tunnelRelay } from '../core/relay';
 import { tunnelRateLimiter } from '../core/rate-limiter';

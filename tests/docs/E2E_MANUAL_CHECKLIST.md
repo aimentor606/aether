@@ -1,4 +1,4 @@
-# Kortix E2E Test — Full Install to Verify
+# Acme E2E Test — Full Install to Verify
 
 Complete test from clean slate to every feature working.
 
@@ -7,7 +7,7 @@ Complete test from clean slate to every feature working.
 ## Prerequisites
 
 - Docker Desktop running
-- No existing `~/.kortix/` directory (or willing to reinstall)
+- No existing `~/.acme/` directory (or willing to reinstall)
 - Pipedream Connect credentials (optional — needed for Step 14+)
 
 ---
@@ -16,12 +16,12 @@ Complete test from clean slate to every feature working.
 
 ### Step 1 — Nuke any previous install
 ```bash
-cd ~/.kortix && docker compose down -v 2>/dev/null; docker rm -f kortix-sandbox 2>/dev/null; rm -rf ~/.kortix
+cd ~/.acme && docker compose down -v 2>/dev/null; docker rm -f acme-sandbox 2>/dev/null; rm -rf ~/.acme
 ```
 
 ### Step 2 — Run the installer
 ```bash
-bash scripts/get-kortix.sh
+bash scripts/get-acme.sh
 ```
 
 ### Step 3 — Choose Local mode
@@ -31,14 +31,14 @@ bash scripts/get-kortix.sh
 - Press `N` to skip (or `Y` + enter Pipedream creds)
 
 ### Step 5 — Wait for image pull + startup
-- Installer pulls 4 images: postgres, frontend, kortix-api, computer
-- Ends with "Kortix is running!" + opens browser to `/setup`
+- Installer pulls 4 images: postgres, frontend, acme-api, computer
+- Ends with "Acme is running!" + opens browser to `/setup`
 
 **VERIFY:**
 ```bash
-docker ps --format "table {{.Names}}\t{{.Status}}" | grep kortix
+docker ps --format "table {{.Names}}\t{{.Status}}" | grep acme
 ```
-- [ ] 4 containers running: `kortix-postgres-1`, `kortix-frontend-1`, `kortix-kortix-api-1`, `kortix-sandbox`
+- [ ] 4 containers running: `acme-postgres-1`, `acme-frontend-1`, `acme-acme-api-1`, `acme-sandbox`
 
 ---
 
@@ -48,7 +48,7 @@ docker ps --format "table {{.Names}}\t{{.Status}}" | grep kortix
 ```bash
 curl -s http://localhost:13738/health | jq .
 ```
-- [ ] Returns `{"status":"ok","service":"kortix-api",...}`
+- [ ] Returns `{"status":"ok","service":"acme-api",...}`
 
 ### Step 7 — API health (v1 prefix)
 ```bash
@@ -64,13 +64,13 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:13737
 
 ### Step 9 — Database schema created
 ```bash
-docker exec kortix-postgres-1 psql -U postgres -c "\dt kortix.*"
+docker exec acme-postgres-1 psql -U postgres -c "\dt acme.*"
 ```
 - [ ] 12 tables listed (api_keys, channel_configs, channel_identity_map, channel_messages, channel_sessions, deployments, executions, integrations, sandbox_integrations, sandboxes, server_entries, triggers)
 
 ### Step 10 — Sandbox healthy
 ```bash
-curl -s http://localhost:13740/kortix/health
+curl -s http://localhost:13740/acme/health
 ```
 - [ ] Returns health response (200)
 
@@ -190,7 +190,7 @@ curl -s http://localhost:13738/v1/providers/health | jq .
 
 ### Step 32 — Sandbox preview proxy
 ```bash
-curl -s http://localhost:13738/v1/preview/kortix-sandbox/8000/kortix/health
+curl -s http://localhost:13738/v1/preview/acme-sandbox/8000/acme/health
 ```
 - [ ] Returns sandbox health through the API proxy
 
@@ -202,7 +202,7 @@ curl -s http://localhost:13738/v1/preview/kortix-sandbox/8000/kortix/health
 
 ### Step 34 — Verify sandbox workspace
 ```bash
-docker exec kortix-sandbox ls /workspace
+docker exec acme-sandbox ls /workspace
 ```
 - [ ] Returns workspace contents
 
@@ -214,7 +214,7 @@ docker exec kortix-sandbox ls /workspace
 
 ### Step 35 — Verify Pipedream env vars
 ```bash
-docker exec kortix-kortix-api-1 printenv | grep PIPEDREAM
+docker exec acme-acme-api-1 printenv | grep PIPEDREAM
 ```
 - [ ] `PIPEDREAM_CLIENT_ID`, `PIPEDREAM_CLIENT_SECRET`, `PIPEDREAM_PROJECT_ID` are set
 
@@ -242,26 +242,26 @@ curl -s http://localhost:13738/v1/integrations/connections | jq .
 
 ### Step 39 — CLI help
 ```bash
-~/.kortix/kortix help
+~/.acme/acme help
 ```
 - [ ] Shows command list (start, stop, restart, logs, status, setup, update, open, etc.)
 
 ### Step 40 — CLI status
 ```bash
-~/.kortix/kortix status
+~/.acme/acme status
 ```
 - [ ] Shows all 4 services running
 
 ### Step 41 — CLI stop + start
 ```bash
-~/.kortix/kortix stop && ~/.kortix/kortix start
+~/.acme/acme stop && ~/.acme/acme start
 ```
 - [ ] Services stop cleanly then restart
 - [ ] All 4 containers back to running
 
 ### Step 42 — CLI logs
 ```bash
-~/.kortix/kortix logs kortix-api-1 --tail 10
+~/.acme/acme logs acme-api-1 --tail 10
 ```
 - [ ] Shows recent API logs
 
@@ -271,8 +271,8 @@ curl -s http://localhost:13738/v1/integrations/connections | jq .
 
 ### Step 43 — Restart survives
 ```bash
-docker compose -f ~/.kortix/docker-compose.yml --project-name kortix down
-docker compose -f ~/.kortix/docker-compose.yml --project-name kortix up -d
+docker compose -f ~/.acme/docker-compose.yml --project-name acme down
+docker compose -f ~/.acme/docker-compose.yml --project-name acme up -d
 ```
 - Wait for healthy, then:
 ```bash
@@ -282,7 +282,7 @@ curl -s http://localhost:13738/v1/integrations/connections | jq .
 
 ### Step 44 — Schema re-push is idempotent
 ```bash
-docker logs kortix-kortix-api-1 2>&1 | grep "\[schema\]"
+docker logs acme-acme-api-1 2>&1 | grep "\[schema\]"
 ```
 - [ ] Shows "Schema pushed successfully" (no errors, no duplicate table errors)
 
@@ -292,7 +292,7 @@ docker logs kortix-kortix-api-1 2>&1 | grep "\[schema\]"
 
 ### Step 45 — API survives DB restart
 ```bash
-docker restart kortix-postgres-1
+docker restart acme-postgres-1
 ```
 - Wait 10s, then:
 ```bash

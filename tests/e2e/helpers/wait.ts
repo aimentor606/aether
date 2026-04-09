@@ -23,7 +23,7 @@ export async function waitForUrl(
  * Poll the sandbox health endpoint until it reports opencode ready.
  */
 export async function waitForSandboxReady(
-  healthUrl = 'http://localhost:14000/kortix/health',
+  healthUrl = 'http://localhost:14000/acme/health',
   maxMs = 480_000,
 ): Promise<void> {
   const deadline = Date.now() + maxMs;

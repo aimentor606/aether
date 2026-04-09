@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Billing Bypass & Free Resource Abuse
  *
- * LIVE scan against https://computer-preview-api.kortix.com
+ * LIVE scan against https://computer-preview-api.acme.dev
  * Tests whether billing controls can be bypassed to get free resources.
  *
  * FINDINGS:
@@ -27,7 +27,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.acme.dev';
 
 async function probe(method: string, path: string, body?: any, headers?: Record<string, string>): Promise<{
   status: number;
@@ -65,7 +65,7 @@ describe('Cloud Scan: Billing Bypass & Resource Abuse', () => {
         model: 'gpt-4',
         messages: [{ role: 'user', content: 'test' }],
       }, {
-        'Authorization': 'Bearer kortix_fake123456789012345678901234',
+        'Authorization': 'Bearer acme_fake123456789012345678901234',
       });
       expect(r.status).toBe(401);
     });

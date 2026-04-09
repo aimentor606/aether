@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { accounts, accountMembers, accountUser, billingCustomers, creditAccounts } from '@kortix/db';
+import { accounts, accountMembers, accountUser, billingCustomers, creditAccounts } from '@acme/db';
 import { db } from './db';
 
 async function syncLegacySubscription(accountId: string): Promise<void> {

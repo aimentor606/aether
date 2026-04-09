@@ -1,0 +1,94 @@
+name: Upstream Sync
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force sync even with conflicts (will create conflict markers)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/kortix-ai/suna.git || true
+          git fetch upstream main
+
+      - name: Check for upstream changes
+        id: check
+        run: |
+          LOCAL=$(git rev-parse HEAD)
+          UPSTREAM=$(git rev-parse upstream/main)
+          echo "local=$LOCAL" >> $GITHUB_OUTPUT
+          echo "upstream=$UPSTREAM" >> $GITHUB_OUTPUT
+          if [ "$LOCAL" = "$UPSTREAM" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create sync branch
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          git checkout -b sync/upstream-$(date +%Y-%m-%d)
+
+      - name: Merge upstream
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then
+            git merge upstream/main --no-edit || git merge upstream/main --no-edit --allow-unrelated-histories
+          else
+            git merge upstream/main --no-edit
+          fi
+
+      - name: Re-apply rebrand
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          if [ -f scripts/rebrand.sh ]; then
+            BRAND=acme bash scripts/rebrand.sh
+          fi
+
+      - name: Push sync branch
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          git add -A
+          git commit -m "chore: re-apply brand after upstream sync" --allow-empty
+          git push origin sync/upstream-$(date +%Y-%m-%d)
+
+      - name: Create Pull Request
+        if: steps.check.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "chore: upstream sync $(date +%Y-%m-%d)" \
+            --body "Automated upstream sync from kortix-ai/suna main branch.
+
+          ## What this does
+          - Merges the latest upstream changes
+          - Re-applies the rebrand codemod
+
+          ## Review checklist
+          - [ ] Check for merge conflicts
+          - [ ] Verify build passes (\`pnpm install && pnpm build\`)
+          - [ ] Review any new files from upstream that might need rebranding" \
+            --base main \
+            --head sync/upstream-$(date +%Y-%m-%d)

@@ -6,7 +6,7 @@
 
 import { Hono } from 'hono';
 import { eq, and, desc, count } from 'drizzle-orm';
-import { tunnelAuditLogs, tunnelConnections } from '@kortix/db';
+import { tunnelAuditLogs, tunnelConnections } from '@acme/db';
 import { db } from '../../shared/db';
 
 export function createAuditRouter(): Hono {

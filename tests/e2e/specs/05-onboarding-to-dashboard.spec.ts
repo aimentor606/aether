@@ -23,7 +23,7 @@ test.describe('05 — Onboarding wizard to dashboard', () => {
       await page.waitForTimeout(1_500);
     }
 
-    await expect(page.getByRole('heading', { name: 'Sign in to Kortix' })).toBeVisible({
+    await expect(page.getByRole('heading', { name: 'Sign in to Acme' })).toBeVisible({
       timeout: 15_000,
     });
 
@@ -38,7 +38,7 @@ test.describe('05 — Onboarding wizard to dashboard', () => {
 
     // ── 4. Wait for sandbox to be fully ready ──────────────────────
     const sandboxHealthUrl =
-      process.env.E2E_SANDBOX_HEALTH_URL || 'http://localhost:14000/kortix/health';
+      process.env.E2E_SANDBOX_HEALTH_URL || 'http://localhost:14000/acme/health';
     await waitForSandboxReady(sandboxHealthUrl);
 
     // ── 5. Click "Configure LLM Provider" ──────────────────────────

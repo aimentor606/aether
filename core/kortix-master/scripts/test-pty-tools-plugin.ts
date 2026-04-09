@@ -18,7 +18,7 @@ const fakeClient = {
 const ctx = {
   sessionID: 'ses_test_pty_tools',
   messageID: 'msg_test_pty_tools',
-  agent: 'kortix',
+  agent: 'acme',
   directory: '/workspace',
   worktree: '/workspace',
   abort: new AbortController().signal,

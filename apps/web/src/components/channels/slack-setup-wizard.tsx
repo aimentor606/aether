@@ -44,14 +44,14 @@ const BOT_NAMES = [
 function defaultBotName(seed: string): string {
   let hash = 0;
   for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return `Kortix ${BOT_NAMES[hash % BOT_NAMES.length]}`;
+  return `Acme ${BOT_NAMES[hash % BOT_NAMES.length]}`;
 }
 
 export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
   const botNameSeed = useId();
   const [step, setStep] = useState(1);
   const [botName, setBotName] = useState(() => defaultBotName(botNameSeed));
-  const [agentName, setAgentName] = useState<string | null>('kortix');
+  const [agentName, setAgentName] = useState<string | null>('acme');
   const [selectedModel, setSelectedModel] = useState<{ providerID: string; modelID: string } | null>(null);
   const [manifest, setManifest] = useState<Record<string, unknown> | null>(null);
   const [webhookUrl, setWebhookUrl] = useState('');
@@ -74,7 +74,7 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
         toast.error('No active sandbox');
         return;
       }
-      const res = await authenticatedFetch(`${baseUrl}/kortix/channels/slack-manifest`, {
+      const res = await authenticatedFetch(`${baseUrl}/acme/channels/slack-manifest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ publicUrl: '', botName: botName.trim() || undefined }),
@@ -192,7 +192,7 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
               <Label htmlFor="slack-bot-name">Bot Name</Label>
               <Input
                 id="slack-bot-name"
-                placeholder="Kortix Agent"
+                placeholder="Acme Agent"
                 value={botName}
                 onChange={(e) => setBotName(e.target.value)}
               />

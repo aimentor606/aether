@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { billingCustomers } from '@kortix/db';
+import { billingCustomers } from '@acme/db';
 import { db } from '../../shared/db';
 
 export async function getCustomerByAccountId(accountId: string) {

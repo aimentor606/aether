@@ -328,7 +328,7 @@ async function revertToFree(accountId: string, subscriptionId?: string) {
   // Check if the user still has other active subscriptions.
   // If so, keep the highest tier. Otherwise revert to free.
   const { db } = await import('../../shared/db');
-  const { sandboxes } = await import('@kortix/db');
+  const { sandboxes } = await import('@acme/db');
   const { eq, and, inArray } = await import('drizzle-orm');
 
   const activeSandboxes = await db

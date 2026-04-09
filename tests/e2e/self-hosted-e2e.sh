@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Kortix — Full Self-Hosted E2E Test                                        ║
+# ║  Acme — Full Self-Hosted E2E Test                                        ║
 # ║                                                                            ║
 # ║  Runs the complete flow a real user would experience:                      ║
 # ║    1. Clean slate (nuke any existing install)                              ║
 # ║    2. Build local Docker images                                            ║
-# ║    3. Run get-kortix.sh installer                                          ║
+# ║    3. Run get-acme.sh installer                                          ║
 # ║    4. Wait for all services to be healthy                                  ║
 # ║    5. Run Playwright browser tests (auth, wizard, dashboard)               ║
 # ║                                                                            ║
@@ -20,16 +20,16 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-INSTALL_DIR="$HOME/.kortix"
+INSTALL_DIR="$HOME/.acme"
 INSTALL_LOG="$REPO_ROOT/test-results/install.log"
 
 # ── Config ────────────────────────────────────────────────────────────────────
-export E2E_OWNER_EMAIL="${E2E_OWNER_EMAIL:-test-e2e@kortix.ai}"
+export E2E_OWNER_EMAIL="${E2E_OWNER_EMAIL:-test-e2e@acme.ai}"
 export E2E_OWNER_PASSWORD="${E2E_OWNER_PASSWORD:-e2e-testpass-123}"
 export E2E_BASE_URL="${E2E_BASE_URL:-http://localhost:13737}"
 export E2E_API_URL="${E2E_API_URL:-http://localhost:13738/v1}"
 export E2E_SUPABASE_URL="${E2E_SUPABASE_URL:-http://localhost:13740}"
-export E2E_SANDBOX_HEALTH_URL="${E2E_SANDBOX_HEALTH_URL:-http://localhost:14000/kortix/health}"
+export E2E_SANDBOX_HEALTH_URL="${E2E_SANDBOX_HEALTH_URL:-http://localhost:14000/acme/health}"
 
 # ── Flags ─────────────────────────────────────────────────────────────────────
 SKIP_BUILD=false
@@ -60,7 +60,7 @@ mkdir -p test-results
 echo ""
 echo "${BOLD}${CYAN}"
 echo "  ╔═══════════════════════════════════════════════╗"
-echo "  ║  Kortix Self-Hosted E2E Test Suite            ║"
+echo "  ║  Acme Self-Hosted E2E Test Suite            ║"
 echo "  ╚═══════════════════════════════════════════════╝"
 echo "${NC}"
 
@@ -70,13 +70,13 @@ echo "${NC}"
 if [ "$BROWSER_ONLY" = "false" ] && [ "$SKIP_INSTALL" = "false" ]; then
   step "PHASE 1: Clean slate"
 
-  info "Stopping existing Kortix containers..."
-  docker ps -a --format '{{.Names}}' | grep -E '^kortix-' | xargs -r docker rm -f 2>/dev/null || true
+  info "Stopping existing Acme containers..."
+  docker ps -a --format '{{.Names}}' | grep -E '^acme-' | xargs -r docker rm -f 2>/dev/null || true
 
   info "Removing Docker volumes..."
-  docker volume ls --format '{{.Name}}' | grep -E 'kortix' | xargs -r docker volume rm -f 2>/dev/null || true
+  docker volume ls --format '{{.Name}}' | grep -E 'acme' | xargs -r docker volume rm -f 2>/dev/null || true
 
-  info "Removing Kortix installation dir..."
+  info "Removing Acme installation dir..."
   rm -rf "$INSTALL_DIR"
 
   info "Freeing ports..."
@@ -100,17 +100,17 @@ if [ "$SKIP_BUILD" = "false" ]; then
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PHASE 3: Run get-kortix.sh installer
+# PHASE 3: Run get-acme.sh installer
 # ═══════════════════════════════════════════════════════════════════════════════
 if [ "$SKIP_INSTALL" = "false" ]; then
-  step "PHASE 3: Run get-kortix.sh installer"
+  step "PHASE 3: Run get-acme.sh installer"
 
-  export KORTIX_OWNER_EMAIL="$E2E_OWNER_EMAIL"
-  export KORTIX_OWNER_PASSWORD="$E2E_OWNER_PASSWORD"
+  export ACME_OWNER_EMAIL="$E2E_OWNER_EMAIL"
+  export ACME_OWNER_PASSWORD="$E2E_OWNER_PASSWORD"
 
   info "Running installer (local mode, Docker DB, skip integrations)..."
   # stdin: 1=local, 1=docker db, testpass123=confirm password, n=skip integrations
-  printf "1\n1\n${E2E_OWNER_PASSWORD}\nn\n" | bash scripts/get-kortix.sh --local >"$INSTALL_LOG" 2>&1 || {
+  printf "1\n1\n${E2E_OWNER_PASSWORD}\nn\n" | bash scripts/get-acme.sh --local >"$INSTALL_LOG" 2>&1 || {
     fail "Installer failed. Log: $INSTALL_LOG"
     tail -30 "$INSTALL_LOG"
     exit 1

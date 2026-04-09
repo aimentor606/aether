@@ -7,16 +7,16 @@ import { ErrorResponse } from '../schemas/common'
 const pipedreamRouter = new Hono()
 
 /**
- * Derive the v1 API base URL from KORTIX_API_URL.
- * KORTIX_API_URL may contain a path suffix (e.g. "/v1/router") used by other
+ * Derive the v1 API base URL from ACME_API_URL.
+ * ACME_API_URL may contain a path suffix (e.g. "/v1/router") used by other
  * subsystems. We only need the origin (scheme + host + port) for direct API calls.
  */
 function getApiV1(): string {
   try {
-    return new URL(config.KORTIX_API_URL).origin + '/v1'
+    return new URL(config.ACME_API_URL).origin + '/v1'
   } catch {
     // Fallback: strip any path and append /v1
-    return config.KORTIX_API_URL.replace(/\/+$/, '').replace(/\/v1\/.*$/, '') + '/v1'
+    return config.ACME_API_URL.replace(/\/+$/, '').replace(/\/v1\/.*$/, '') + '/v1'
   }
 }
 
@@ -38,15 +38,15 @@ function getPipedreamHeaders(): Record<string, string> {
 // always enforces INTERNAL_SERVICE_KEY on all routes (auto-generated if not set).
 
 /**
- * Guard: ensure KORTIX_TOKEN is available before proxying to kortix-api.
+ * Guard: ensure ACME_TOKEN is available before proxying to kortix-api.
  * The bootstrap-env service restores it at boot if needed, so this should
  * only fire if something went seriously wrong.
  */
 pipedreamRouter.use('*', async (c, next) => {
-  if (!config.KORTIX_TOKEN) {
-    console.error('[Pipedream] KORTIX_TOKEN is not set — cannot authenticate to kortix-api.')
+  if (!config.ACME_TOKEN) {
+    console.error('[Pipedream] ACME_TOKEN is not set — cannot authenticate to kortix-api.')
     return c.json({
-      error: 'Pipedream unavailable: KORTIX_TOKEN is not configured. Restart the sandbox.',
+      error: 'Pipedream unavailable: ACME_TOKEN is not configured. Restart the sandbox.',
     }, 503)
   }
 
@@ -80,7 +80,7 @@ pipedreamRouter.post('/token',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         body: JSON.stringify(body),
@@ -121,7 +121,7 @@ pipedreamRouter.post('/proxy',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         body: JSON.stringify(body),
@@ -159,7 +159,7 @@ pipedreamRouter.get('/list',
       const apiUrl = getApiV1()
       const res = await fetch(`${apiUrl}/pipedream/list`, {
         headers: {
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         signal: AbortSignal.timeout(15_000),
@@ -204,7 +204,7 @@ pipedreamRouter.get('/actions',
       const apiUrl = getApiV1()
       const res = await fetch(`${apiUrl}/pipedream/actions?${params.toString()}`, {
         headers: {
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         signal: AbortSignal.timeout(15_000),
@@ -243,7 +243,7 @@ pipedreamRouter.post('/connect',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         body: JSON.stringify(body),
@@ -287,7 +287,7 @@ pipedreamRouter.get('/search-apps',
       const apiUrl = getApiV1()
       const res = await fetch(`${apiUrl}/pipedream/search-apps?${params.toString()}`, {
         headers: {
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         signal: AbortSignal.timeout(15_000),
@@ -326,7 +326,7 @@ pipedreamRouter.post('/run-action',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         body: JSON.stringify(body),
@@ -364,7 +364,7 @@ pipedreamRouter.get('/triggers/available', async (c) => {
       const apiUrl = getApiV1()
       const res = await fetch(`${apiUrl}/pipedream/triggers/available?${params.toString()}`, {
         headers: {
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         signal: AbortSignal.timeout(15_000),
@@ -388,7 +388,7 @@ pipedreamRouter.post('/triggers/deploy', async (c) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         body: JSON.stringify(body),
@@ -412,7 +412,7 @@ pipedreamRouter.get('/triggers/deployed', async (c) => {
       const apiUrl = getApiV1()
       const res = await fetch(`${apiUrl}/pipedream/triggers/deployed`, {
         headers: {
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         signal: AbortSignal.timeout(15_000),
@@ -435,7 +435,7 @@ pipedreamRouter.delete('/triggers/deployed/:id', async (c) => {
       const res = await fetch(`${apiUrl}/pipedream/triggers/deployed/${id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         signal: AbortSignal.timeout(15_000),
@@ -460,7 +460,7 @@ pipedreamRouter.put('/triggers/deployed/:id', async (c) => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+          Authorization: `Bearer ${config.ACME_TOKEN}`,
           ...getPipedreamHeaders(),
         },
         body: JSON.stringify(body),
@@ -487,7 +487,7 @@ pipedreamRouter.put('/credentials', async (c) => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+        Authorization: `Bearer ${config.ACME_TOKEN}`,
       },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(15_000),
@@ -505,7 +505,7 @@ pipedreamRouter.get('/credentials', async (c) => {
   try {
     const apiUrl = getApiV1()
     const res = await fetch(`${apiUrl}/pipedream/credentials`, {
-      headers: { Authorization: `Bearer ${config.KORTIX_TOKEN}` },
+      headers: { Authorization: `Bearer ${config.ACME_TOKEN}` },
       signal: AbortSignal.timeout(15_000),
     })
     const data = await res.json()
@@ -526,8 +526,8 @@ export async function pushPipedreamCredsToApi(): Promise<void> {
     console.log('[Pipedream] No local creds to push to API')
     return
   }
-  if (!config.KORTIX_TOKEN || !config.KORTIX_API_URL) {
-    console.log('[Pipedream] No KORTIX_TOKEN/API_URL — skipping cred push')
+  if (!config.ACME_TOKEN || !config.ACME_API_URL) {
+    console.log('[Pipedream] No ACME_TOKEN/API_URL — skipping cred push')
     return
   }
 
@@ -537,7 +537,7 @@ export async function pushPipedreamCredsToApi(): Promise<void> {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.KORTIX_TOKEN}`,
+        Authorization: `Bearer ${config.ACME_TOKEN}`,
       },
       body: JSON.stringify({
         client_id: PIPEDREAM_CLIENT_ID,
@@ -573,7 +573,7 @@ pipedreamRouter.post('/connector-sync', async (c) => {
     const { mkdirSync } = await import('node:fs')
     const { randomUUID } = await import('node:crypto')
 
-    const root = process.env.KORTIX_WORKSPACE || '/workspace'
+    const root = process.env.ACME_WORKSPACE || '/workspace'
     mkdirSync(`${root}/.kortix`, { recursive: true })
     const db = new Database(`${root}/.kortix/kortix.db`)
     db.exec("PRAGMA journal_mode=DELETE; PRAGMA busy_timeout=5000")

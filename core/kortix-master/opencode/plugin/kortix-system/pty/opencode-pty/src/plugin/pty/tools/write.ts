@@ -93,6 +93,6 @@ export const ptyWrite = tool({
       .replace(/\r/g, '\\r')
     
     const inner = `Sent ${args.data.length} bytes to ${args.id}: "${displayPreview}"`
-    return `<kortix_system type="pty-write" source="opencode-pty">\n${inner}\n</kortix_system>`
+    return `<acme_system type="pty-write" source="opencode-pty">\n${inner}\n</acme_system>`
   },
 })

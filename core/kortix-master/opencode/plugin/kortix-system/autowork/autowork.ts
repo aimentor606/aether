@@ -50,7 +50,7 @@ try {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function wrapSystemPrompt(text: string, type: string): string {
-	return `<kortix_system type="${type}" source="kortix-autowork">\n${text}\n</kortix_system>`
+	return `<acme_system type="${type}" source="kortix-autowork">\n${text}\n</acme_system>`
 }
 
 type LogFn = (level: "info" | "warn" | "error", message: string) => void
@@ -77,7 +77,7 @@ function cleanTextForKeywordDetection(text: string): string {
 function isInternalMessage(text: string): boolean {
 	if (text.includes(INTERNAL_MARKER)) return true
 	if (text.includes("[SYSTEM REMINDER")) return true
-	if (text.includes("<kortix_system")) return true
+	if (text.includes("<acme_system")) return true
 	return false
 }
 
@@ -238,7 +238,7 @@ const KortixAutoworkPlugin: Plugin = async ({ client }) => {
 				const cleanText = cleanTextForKeywordDetection(messageText)
 
 				// ── /autowork-cancel ──
-				if (messageText.includes("KORTIX_AUTOWORK_CANCEL") || /\/autowork-cancel\b/.test(messageText)) {
+				if (messageText.includes("ACME_AUTOWORK_CANCEL") || /\/autowork-cancel\b/.test(messageText)) {
 					if (loopState.active) loopState = stopLoop(loopState)
 					loopState = markStopped(loopState)
 					loopStates.set(sessionId, loopState)
@@ -251,7 +251,7 @@ const KortixAutoworkPlugin: Plugin = async ({ client }) => {
 				const pending = pendingCommand.get(sessionId)
 				const autoworkMatch = pending?.command === "autowork"
 					|| pending?.command === "autowork-team"
-					|| messageText.includes("KORTIX_AUTOWORK")
+					|| messageText.includes("ACME_AUTOWORK")
 					|| /\/autowork(?:-team)?\b/.test(messageText)
 
 				if (autoworkMatch) {
@@ -306,7 +306,7 @@ const KortixAutoworkPlugin: Plugin = async ({ client }) => {
 				// autowork on the lead session even though user meant a background worker).
 				// Autowork now ONLY activates via:
 				//   1. /autowork or /autowork-team command (pendingCommand)
-				//   2. KORTIX_AUTOWORK marker in message text (system-injected)
+				//   2. ACME_AUTOWORK marker in message text (system-injected)
 				//   3. /autowork prefix in worker session assignment
 
 				// ── Active loop absorbs user message ──

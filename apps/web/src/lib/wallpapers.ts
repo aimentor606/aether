@@ -19,10 +19,10 @@ export const DEFAULT_WALLPAPER_ID = 'brandmark';
 export const WALLPAPERS: Wallpaper[] = [
   {
     id: 'brandmark',
-    name: 'Kortix',
+    name: 'Acme',
     type: 'svg',
-    svgUrl: '/kortix-brandmark-bg.svg',
-    thumbnailUrl: '/kortix-brandmark-bg.svg',
+    svgUrl: '/acme-brandmark-bg.svg',
+    thumbnailUrl: '/acme-brandmark-bg.svg',
   },
 ];
 

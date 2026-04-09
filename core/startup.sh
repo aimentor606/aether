@@ -16,7 +16,7 @@
 #
 # The s6 init scripts then:
 #   - Restore secrets → s6 env dir (97-secrets-to-s6-env.sh)
-#   - Set up git, tool deps, env guards (98-kortix-env.sh)
+#   - Set up git, tool deps, env guards (98-acme-env.sh)
 #   - Restore user-installed apk/pip/npm packages (99-restore-packages.sh)
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -27,7 +27,7 @@ set -e
 WORKSPACE_UID="$(id -u abc 2>/dev/null || echo 911)"
 WORKSPACE_GID="$(id -g abc 2>/dev/null || echo 911)"
 
-echo "[startup] Preparing Kortix sandbox..."
+echo "[startup] Preparing Acme sandbox..."
 
 # ── Persistent dirs (all under /workspace/) ─────────────────────────────────
 # /workspace is the ONLY persistent volume. Everything outside /workspace
@@ -46,9 +46,9 @@ mkdir -p \
   /workspace/.local/lib \
   /workspace/.npm-global/bin \
   /workspace/.npm-global/lib \
-  /workspace/.kortix \
-  /workspace/.kortix/packages \
-  /workspace/.kortix-state \
+  /workspace/.acme \
+  /workspace/.acme/packages \
+  /workspace/.acme-state \
   /workspace/.secrets \
   /workspace/.config \
   /workspace/.XDG \
@@ -57,7 +57,7 @@ mkdir -p \
   /workspace/.ocx
 
 # ── Migrate legacy symlinks to real dirs ────────────────────────────────────
-# Old images created /workspace/.opencode as a symlink to /workspace/.kortix/.opencode.
+# Old images created /workspace/.opencode as a symlink to /workspace/.acme/.opencode.
 # New model: /workspace/.opencode IS the real dir. Migrate data if needed.
 if [ -L /workspace/.opencode ]; then
   LINK_TARGET=$(readlink /workspace/.opencode 2>/dev/null || true)
@@ -70,7 +70,7 @@ if [ -L /workspace/.opencode ]; then
   fi
 fi
 
-# Old images created /workspace/.secrets as a symlink to /workspace/.kortix/secrets.
+# Old images created /workspace/.secrets as a symlink to /workspace/.acme/secrets.
 # New model: /workspace/.secrets IS the real dir. Migrate data if needed.
 if [ -L /workspace/.secrets ]; then
   LINK_TARGET=$(readlink /workspace/.secrets 2>/dev/null || true)
@@ -95,7 +95,7 @@ fi
 
 # ── Exclude opencode internal dirs from git (prevents 16K+ snapshot diffs) ──
 # Only refresh info/exclude when the git repo already exists (container restart).
-# For fresh workspaces, kortix-env-setup.sh writes info/exclude AFTER git init
+# For fresh workspaces, acme-env-setup.sh writes info/exclude AFTER git init
 # (git init overwrites info/exclude with its default template, so writing it here
 # on fresh repos is pointless — it gets clobbered).
 if [ -f /workspace/.git/HEAD ]; then
@@ -106,8 +106,8 @@ if [ -f /workspace/.git/HEAD ]; then
 .cache/
 .config/
 .opencode/
-.kortix/
-.kortix-state/
+.acme/
+.acme-state/
 .secrets/
 .browser-profile/
 .agent-browser/
@@ -158,7 +158,7 @@ if command -v ocx >/dev/null 2>&1; then
     su -s /bin/sh abc -c 'ocx init --cwd /workspace' 2>/dev/null || echo "[startup] WARNING: ocx init failed (non-fatal)"
   fi
   # Always ensure registry aliases exist (idempotent)
-  su -s /bin/sh abc -c 'ocx registry add https://master.kortix-registry.pages.dev --name kortix --cwd /workspace -q' 2>/dev/null || true
+  su -s /bin/sh abc -c 'ocx registry add https://master.acme-registry.pages.dev --name acme --cwd /workspace -q' 2>/dev/null || true
   su -s /bin/sh abc -c 'ocx registry add https://registry.kdco.dev --name kdco --cwd /workspace -q' 2>/dev/null || true
 fi
 
@@ -185,15 +185,15 @@ if [ ! -L /config ] && [ ! -d /config ]; then
 fi
 
 # ── Verify runtime exists ───────────────────────────────────────────────────
-if [ ! -e /ephemeral/kortix-master ]; then
-  echo "[startup] WARNING: /ephemeral/kortix-master not found! Rebuild the Docker image."
+if [ ! -e /ephemeral/acme-master ]; then
+  echo "[startup] WARNING: /ephemeral/acme-master not found! Rebuild the Docker image."
 fi
 
 # ── Install stable channel CLI wrappers ─────────────────────────────────────
 # Runtime-facing commands (ktelegram/kslack/kchannel) should always resolve
 # from immutable /ephemeral code, never /workspace.
-if [ -x /ephemeral/kortix-master/scripts/install-channel-clis.sh ]; then
-  /ephemeral/kortix-master/scripts/install-channel-clis.sh || echo "[startup] WARNING: channel CLI install failed"
+if [ -x /ephemeral/acme-master/scripts/install-channel-clis.sh ]; then
+  /ephemeral/acme-master/scripts/install-channel-clis.sh || echo "[startup] WARNING: channel CLI install failed"
 fi
 
 echo "[startup] Starting s6-overlay via PID namespace..."

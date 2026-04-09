@@ -88,7 +88,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
-const DEPLOYMENTS_ENABLED = process.env.NEXT_PUBLIC_KORTIX_DEPLOYMENTS_ENABLED === 'true';
+const DEPLOYMENTS_ENABLED = process.env.NEXT_PUBLIC_ACME_DEPLOYMENTS_ENABLED === 'true';
 
 // ============================================================================
 // Types

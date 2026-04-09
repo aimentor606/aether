@@ -11,7 +11,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useAuth } from '@/components/AuthProvider';
 import { Reveal } from '@/components/home/reveal';
 
-const INSTALL_CMD = 'curl -fsSL https://kortix.com/install | bash';
+const INSTALL_CMD = 'curl -fsSL https://acme.dev/install | bash';
 
 /* ─── Google Favicon helper ─── */
 const favicon = (domain: string) =>
@@ -103,7 +103,7 @@ export default function Home() {
                 className="h-12 px-8 text-sm rounded-full transition-colors"
                 onClick={handleLaunch}
               >
-                Launch Your Kortix<ArrowRight className="ml-1.5 size-3.5" />
+                Launch Your Acme<ArrowRight className="ml-1.5 size-3.5" />
               </Button>
               <button
                 onClick={handleCopy}
@@ -152,7 +152,7 @@ export default function Home() {
               <div className="relative aspect-video bg-black">
                 <iframe
                   src="https://www.youtube.com/embed/Eu5mYMavctM"
-                  title="Kortix launch video"
+                  title="Acme launch video"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="absolute inset-0 w-full h-full"
@@ -163,7 +163,7 @@ export default function Home() {
           </Reveal>
           */}
 
-        {/* ═══════════════ WHAT IS KORTIX ═══════════════ */}
+        {/* ═══════════════ WHAT IS ACME ═══════════════ */}
         <section className="max-w-3xl mx-auto px-6 py-10 sm:py-14">
           <Reveal>
           <p className="text-2xl sm:text-3xl md:text-4xl font-medium text-foreground leading-snug tracking-tight">
@@ -172,7 +172,7 @@ export default function Home() {
           </Reveal>
           <Reveal delay={0.1}>
           <p className="mt-3 text-base sm:text-lg text-muted-foreground/60 leading-relaxed max-w-2xl">
-            A Kortix is a cloud computer where AI agents do the actual work of running a company. You connect your tools, define your agents, set their schedules and triggers — and the machine operates whether you&apos;re there or not. Persistent memory that compounds. A workforce that never stops.
+            A Acme is a cloud computer where AI agents do the actual work of running a company. You connect your tools, define your agents, set their schedules and triggers — and the machine operates whether you&apos;re there or not. Persistent memory that compounds. A workforce that never stops.
           </p>
           </Reveal>
         </section>
@@ -231,7 +231,7 @@ export default function Home() {
                 <span className="text-sm text-foreground/70">Connect everything</span>
               </div>
               <p className="text-sm text-muted-foreground/60 leading-relaxed mb-4 max-w-xl">
-                Every tool your company uses — OAuth apps, MCP servers, REST APIs, CLI tools, environment variables. If it has an interface, Kortix connects to it. 3,000+ integrations available, and custom ones are trivial to add.
+                Every tool your company uses — OAuth apps, MCP servers, REST APIs, CLI tools, environment variables. If it has an interface, Acme connects to it. 3,000+ integrations available, and custom ones are trivial to add.
               </p>
               <div className="flex flex-wrap gap-2">
                 <IntegrationPill domain="gmail.com" name="Gmail" />
@@ -322,7 +322,7 @@ export default function Home() {
             className="group hidden sm:flex items-center gap-2 h-8 px-3 rounded-full hover:bg-foreground/[0.04] transition-colors cursor-pointer"
           >
             <span className="font-mono text-[11px] text-muted-foreground/40 select-none">$</span>
-            <code className="text-[11px] font-mono text-foreground/60 tracking-tight">curl -fsSL kortix.com/install</code>
+            <code className="text-[11px] font-mono text-foreground/60 tracking-tight">curl -fsSL acme.dev/install</code>
             {copied
               ? <Check className="size-3 text-emerald-500" />
               : <Copy className="size-3 text-muted-foreground/30 group-hover:text-muted-foreground/50 transition-colors" />
@@ -330,7 +330,7 @@ export default function Home() {
           </button>
           <span className="hidden sm:block w-px h-5 bg-border/40" />
           <a
-            href="https://github.com/kortix-ai/suna"
+            href="https://github.com/aimentor606/aether"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center size-8 rounded-full hover:bg-foreground/[0.05] transition-colors"
@@ -343,7 +343,7 @@ export default function Home() {
             className="px-5 text-xs rounded-full font-medium"
             onClick={handleLaunch}
           >
-            Launch Your Kortix<ArrowRight className="ml-1.5 size-3" />
+            Launch Your Acme<ArrowRight className="ml-1.5 size-3" />
           </Button>
         </div>
       </div>

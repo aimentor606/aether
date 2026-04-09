@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { eq, and, ne } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@acme/db';
 import { config } from '../config';
 import { combinedAuth } from '../middleware/auth';
 import { preview, proxyToDaytona } from './routes/preview';
@@ -20,7 +20,7 @@ sandboxProxyApp.route('/auth', getAuthToken);
 sandboxProxyApp.route('/share', shareApp);
 
 // ── Path-based proxy ────────────────────────────────────────────────────────
-// Auth middleware for both modes (Supabase JWT, kortix_ tokens, cookies).
+// Auth middleware for both modes (Supabase JWT, acme_ tokens, cookies).
 sandboxProxyApp.use('/:sandboxId/:port/*', combinedAuth);
 sandboxProxyApp.use('/:sandboxId/:port', combinedAuth);
 
@@ -79,7 +79,7 @@ export async function resolveProvider(externalId: string): Promise<{ provider: C
           },
           body: JSON.stringify({
             machine_id: externalId,
-            label: `kortix-sandbox-${externalId}`,
+            label: `acme-sandbox-${externalId}`,
             expires_in_seconds: 7 * 24 * 60 * 60,
           }),
         });
@@ -156,7 +156,7 @@ if (enabledCount === 1 && config.isDaytonaEnabled()) {
 
   sandboxProxyApp.route('/', localOnlyProxy);
 } else if (enabledCount === 1 && config.isJustAVPSEnabled()) {
-  // JustAVPS-only: route through CF Worker proxy at {port}--{slug}.kortix.cloud
+  // JustAVPS-only: route through CF Worker proxy at {port}--{slug}.acme.cloud
   const justavpsOnlyProxy = new Hono();
 
   justavpsOnlyProxy.all('/:sandboxId/:port/*', async (c) => {
@@ -189,7 +189,7 @@ if (enabledCount === 1 && config.isDaytonaEnabled()) {
 
     const origin = c.req.header('Origin') || '';
 
-    // Auth: proxy token for CF Worker, service key for core/kortix-master
+    // Auth: proxy token for CF Worker, service key for core/acme-master
     const extraHeaders: Record<string, string> = {};
     if (resolved.proxyToken) {
       extraHeaders['X-Proxy-Token'] = resolved.proxyToken;

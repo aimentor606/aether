@@ -1,0 +1,21 @@
+{
+  "brandName": "yourbrand",
+  "brandDomain": "yourbrand.com",
+  "brandTitle": "YourBrand",
+  "brandTwitter": "@yourbrand",
+  "description": "Brand configuration for rebrand.sh. Override with env vars: BRAND, BRAND_DOMAIN, BRAND_TITLE, BRAND_TWITTER",
+  "replacementRules": {
+    "keepDirectoryNames": [
+      "core/acme-master",
+      "packages/acme-ocx-registry"
+    ],
+    "skipPatterns": [
+      "node_modules",
+      ".next",
+      "dist",
+      ".git",
+      "pnpm-lock.yaml",
+      "coverage"
+    ]
+  }
+}

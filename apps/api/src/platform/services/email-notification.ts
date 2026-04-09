@@ -35,7 +35,7 @@ export async function sendWorkspaceReadyEmail(opts: {
     }
 
     const email = data.user.email;
-    const frontendUrl = config.FRONTEND_URL || 'https://app.kortix.com';
+    const frontendUrl = config.FRONTEND_URL || 'https://app.acme.dev';
     const instanceUrl = `${frontendUrl}/instances/${sandboxId}`;
 
     const html = `
@@ -63,7 +63,7 @@ export async function sendWorkspaceReadyEmail(opts: {
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">Kortix</div>
+      <div class="logo">Acme</div>
     </div>
     <div class="body">
       <div class="check">
@@ -76,7 +76,7 @@ export async function sendWorkspaceReadyEmail(opts: {
       <a href="${escapeHtml(instanceUrl)}" class="btn">Open Workspace</a>
     </div>
     <div class="footer">
-      <p>Kortix &mdash; The Autonomous Company Operating System</p>
+      <p>Acme &mdash; The Autonomous Company Operating System</p>
     </div>
   </div>
 </body>

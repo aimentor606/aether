@@ -72,7 +72,7 @@ const OPENCODE_TAG_RULES: Array<{ prefix: string; tag: string }> = [
 // Sandbox Gateway tags (from kortix-master describeRoute)
 const GATEWAY_TAGS: Array<{ name: string; description: string }> = [
   { name: 'GW: System',       description: 'Health checks, version info, and sandbox updates' },
-  { name: 'GW: Secrets',      description: 'Environment variable / secret management (encrypted at rest via KORTIX_TOKEN)' },
+  { name: 'GW: Secrets',      description: 'Environment variable / secret management (encrypted at rest via ACME_TOKEN)' },
   { name: 'GW: Files',        description: 'Sandbox filesystem — list, read, upload, download, delete, mkdir, rename' },
   { name: 'GW: Search',       description: 'Local Semantic Search (LSS) — BM25 + embeddings over workspace files' },
   { name: 'GW: Deployments',  description: 'Deploy, manage, and monitor apps running inside the sandbox' },
@@ -216,7 +216,7 @@ export async function buildMergedSpec(
         'The dashboard authenticates via Supabase Auth (ES256 JWT, ~900 chars). Handled automatically by the UI.\n\n' +
         '```\nAuthorization: Bearer eyJhbGciOiJFUzI1NiIs...\n```\n\n' +
         '### Sandbox Token (agents inside the sandbox)\n\n' +
-        'Each sandbox gets an auto-generated token (`kortix_sb_` prefix, 42 chars) injected as the `KORTIX_TOKEN` environment variable. ' +
+        'Each sandbox gets an auto-generated token (`acme_sb_` prefix, 42 chars) injected as the `ACME_TOKEN` environment variable. ' +
         'AI agents use this to authenticate back to the platform API.\n\n' +
         '### What does NOT work\n\n' +
         '- **Supabase service role key** — rejected by all endpoints (not a valid user token)\n' +
@@ -234,7 +234,7 @@ export async function buildMergedSpec(
         'The `INTERNAL_SERVICE_KEY` env var adds a second layer: when set, the sandbox gateway rejects requests without a matching Bearer token. ' +
         'In local development, both the firewall and service key are typically absent — all sandbox ports are open on localhost.',
     },
-    servers: [{ url: 'https://YOUR_KORTIX_API/v1/p/{sandboxId}/8000', description: 'Replace with your Kortix API base URL' }],
+    servers: [{ url: 'https://YOUR_ACME_API/v1/p/{sandboxId}/8000', description: 'Replace with your Kortix API base URL' }],
     tags: [],
     paths: {},
     components: {

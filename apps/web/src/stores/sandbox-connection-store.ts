@@ -20,7 +20,7 @@ interface SandboxConnectionStore {
 	reconnectAttempts: number;
 	/** Timestamp when status changed to unreachable/connecting (for "down since") */
 	disconnectedAt: number | null;
-	/** Current sandbox version from /kortix/health (e.g. "0.5.1") */
+	/** Current sandbox version from /acme/health (e.g. "0.5.1") */
 	sandboxVersion: string | null;
 	/** OpenCode server version from /global/health (e.g. "1.2.10") */
 	openCodeVersion: string | null;
@@ -32,8 +32,8 @@ interface SandboxConnectionStore {
 // On hard refresh, wasConnected resets to false which triggers a full-screen
 // blocking overlay. By persisting it, users who were previously connected
 // see the lightweight reconnect pill instead, making reconnection feel instant.
-const STORAGE_KEY = "kortix-sandbox-was-connected";
-const PROVISION_VERIFIED_KEY = "kortix-sandbox-provision-verified";
+const STORAGE_KEY = "acme-sandbox-was-connected";
+const PROVISION_VERIFIED_KEY = "acme-sandbox-provision-verified";
 
 function loadWasConnected(): boolean {
 	try {

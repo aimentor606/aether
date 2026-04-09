@@ -11,7 +11,7 @@ export const ptyList = tool({
 
     if (sessions.length === 0) {
       const inner = '<pty_list>\nNo active PTY sessions.\n</pty_list>'
-      return `<kortix_system type="pty-list" source="opencode-pty">\n${inner}\n</kortix_system>`
+      return `<acme_system type="pty-list" source="opencode-pty">\n${inner}\n</acme_system>`
     }
 
     const lines = ['<pty_list>']
@@ -22,6 +22,6 @@ export const ptyList = tool({
     lines.push('</pty_list>')
     
     const inner = lines.join('\n')
-    return `<kortix_system type="pty-list" source="opencode-pty">\n${inner}\n</kortix_system>`
+    return `<acme_system type="pty-list" source="opencode-pty">\n${inner}\n</acme_system>`
   },
 })

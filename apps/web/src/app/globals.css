@@ -13,7 +13,7 @@
 @source "../node_modules/streamdown/dist/*.js";
 @source "../node_modules/fumadocs-ui/dist/**/*.js";
 
-/* ─── Fumadocs → Kortix brand overrides ─── */
+/* ─── Fumadocs → Acme brand overrides ─── */
 :root {
   --color-fd-background: oklch(0.985 0 0);
   --color-fd-foreground: oklch(0.145 0 0);
@@ -412,7 +412,7 @@
 }
 
 /* ============================================================
-   KORTIX THEMES — Black & White + 1 Accent Color
+   ACME THEMES — Black & White + 1 Accent Color
    Philosophy: All backgrounds, surfaces, borders, text = pure neutral.
    Only primary, ring, sidebar-primary, and charts carry the accent hue.
    Light variant: .theme-{name}
@@ -1409,22 +1409,22 @@
   animation: stream-word-pop 200ms ease-out forwards;
 }
 
-.kortix-markdown [data-streamdown-animating="true"] > * {
+.acme-markdown [data-streamdown-animating="true"] > * {
   animation: stream-fade-in 200ms ease-out forwards;
 }
 
-.kortix-markdown [data-streamdown-animating="true"] p,
-.kortix-markdown [data-streamdown-animating="true"] li,
-.kortix-markdown [data-streamdown-animating="true"] h1,
-.kortix-markdown [data-streamdown-animating="true"] h2,
-.kortix-markdown [data-streamdown-animating="true"] h3,
-.kortix-markdown [data-streamdown-animating="true"] h4,
-.kortix-markdown [data-streamdown-animating="true"] h5,
-.kortix-markdown [data-streamdown-animating="true"] h6 {
+.acme-markdown [data-streamdown-animating="true"] p,
+.acme-markdown [data-streamdown-animating="true"] li,
+.acme-markdown [data-streamdown-animating="true"] h1,
+.acme-markdown [data-streamdown-animating="true"] h2,
+.acme-markdown [data-streamdown-animating="true"] h3,
+.acme-markdown [data-streamdown-animating="true"] h4,
+.acme-markdown [data-streamdown-animating="true"] h5,
+.acme-markdown [data-streamdown-animating="true"] h6 {
   animation: stream-word-pop 180ms ease-out forwards;
 }
 
-.kortix-markdown [data-streamdown-animating="true"] code {
+.acme-markdown [data-streamdown-animating="true"] code {
   animation: stream-char-reveal 150ms ease-out forwards;
 }
 
@@ -1446,17 +1446,17 @@
   }
 }
 
-.kortix-markdown.streaming-active {
+.acme-markdown.streaming-active {
   position: relative;
 }
 
-.kortix-markdown.streaming-active p:last-child,
-.kortix-markdown.streaming-active li:last-child,
-.kortix-markdown.streaming-active div:last-child:not(:has(table)) {
+.acme-markdown.streaming-active p:last-child,
+.acme-markdown.streaming-active li:last-child,
+.acme-markdown.streaming-active div:last-child:not(:has(table)) {
   display: inline;
 }
 
-.kortix-markdown[data-streaming="true"] > *:last-child {
+.acme-markdown[data-streaming="true"] > *:last-child {
   animation: stream-fade-in 180ms ease-out;
 }
 
@@ -1486,7 +1486,7 @@
   }
 }
 
-.kortix-markdown[data-streaming="true"] > *:last-child {
+.acme-markdown[data-streaming="true"] > *:last-child {
   animation: blur-fade-in 0.3s ease-out forwards;
 }
 
@@ -1527,7 +1527,7 @@
   display: inline;
 }
 
-/* Pulse heartbeat animation for reasoning section Kortix icon */
+/* Pulse heartbeat animation for reasoning section Acme icon */
 @keyframes pulse-heartbeat {
   0%, 100% {
     transform: scale(1);
@@ -1626,8 +1626,8 @@
   animation: setting-up-fade-in 0.4s ease-out forwards;
 }
 
-/* ─── Kortix Loader keyframe ─── */
-@keyframes kortix-spin {
+/* ─── Acme Loader keyframe ─── */
+@keyframes acme-spin {
   to { transform: rotate(360deg); }
 }
 /* ─── Instance page animations ─── */

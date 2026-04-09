@@ -3,7 +3,7 @@ import { ToolViewProps } from '../types';
 import { formatTimestamp, getToolTitle } from '../utils';
 import { getToolIcon } from '../../utils';
 import { CheckCircle, AlertCircle } from 'lucide-react';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { AcmeLoader } from '@/components/ui/acme-loader';
 import { cn } from '@/lib/utils';
 
 export interface ToolViewWrapperProps extends ToolViewProps {
@@ -95,7 +95,7 @@ export function ToolViewWrapper({
 
             {isStreaming && showStatus && (
               <div className="flex items-center gap-2">
-                <KortixLoader customSize={14} />
+                <AcmeLoader customSize={14} />
                 <span>{customStatus?.streaming || "Processing..."}</span>
               </div>
             )}

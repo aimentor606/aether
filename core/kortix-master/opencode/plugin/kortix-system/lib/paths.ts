@@ -17,7 +17,7 @@ function findWorkspaceRoot(startDir: string): string | null {
 }
 
 export function resolveKortixWorkspaceRoot(anchorDir?: string): string {
-	const explicitWorkspace = process.env.KORTIX_WORKSPACE?.trim()
+	const explicitWorkspace = process.env.ACME_WORKSPACE?.trim()
 	if (explicitWorkspace) return normalizeAbsolutePath(explicitWorkspace)
 
 	const storageBase = process.env.OPENCODE_STORAGE_BASE?.trim()
@@ -40,7 +40,7 @@ export function resolveKortixWorkspaceRoot(anchorDir?: string): string {
 }
 
 export function resolveKortixDir(anchorDir?: string): string {
-	const explicitDir = process.env.KORTIX_DIR?.trim()
+	const explicitDir = process.env.ACME_DIR?.trim()
 	if (explicitDir) return normalizeAbsolutePath(explicitDir)
 	return join(resolveKortixWorkspaceRoot(anchorDir), ".kortix")
 }

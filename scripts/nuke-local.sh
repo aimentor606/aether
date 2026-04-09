@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ─── Kortix Local Dev — Full Nuke & Reset ────────────────────────────────────
+# ─── Acme Local Dev — Full Nuke & Reset ────────────────────────────────────
 #
 # Destroys ALL local state and starts fresh:
 #   1. Kills local dev processes bound to common ports
@@ -22,7 +22,7 @@ import pathlib, re
 import sys
 text = pathlib.Path(sys.argv[1]).read_text()
 match = re.search(r'^project_id\s*=\s*"([^"]+)"', text, re.MULTILINE)
-print(match.group(1) if match else 'kortix-local')
+print(match.group(1) if match else 'acme-local')
 PY
 )"
 
@@ -53,7 +53,7 @@ echo "[2/5] Removing repo Docker containers..."
 if ! $DOCKER_AVAILABLE; then
   echo "  WARNING: Docker daemon unavailable — repo containers not removed"
 else
-  CONTAINERS=$(docker ps -a --format "{{.Names}}" | grep -E "^kortix-|^kortix-sandbox$|^supabase_.*_${SUPABASE_PROJECT_ID}$" || true)
+  CONTAINERS=$(docker ps -a --format "{{.Names}}" | grep -E "^acme-|^acme-sandbox$|^supabase_.*_${SUPABASE_PROJECT_ID}$" || true)
   if [[ -n "$CONTAINERS" ]]; then
     printf '%s\n' "$CONTAINERS" | xargs docker rm -f >/dev/null 2>&1 || true
     echo "  removed: $(printf '%s ' "$CONTAINERS")"
@@ -67,7 +67,7 @@ echo "[3/5] Removing repo Docker volumes..."
 if ! $DOCKER_AVAILABLE; then
   echo "  WARNING: Docker daemon unavailable — repo volumes not removed"
 else
-  VOLS=$(docker volume ls --format "{{.Name}}" | grep -E "sandbox|^kortix_supabase-db-data$|^supabase_(db|storage)_" || true)
+  VOLS=$(docker volume ls --format "{{.Name}}" | grep -E "sandbox|^acme_supabase-db-data$|^supabase_(db|storage)_" || true)
   if [[ -n "$VOLS" ]]; then
     printf '%s\n' "$VOLS" | xargs docker volume rm -f >/dev/null 2>&1 || true
     echo "  removed: $(printf '%s ' "$VOLS")"
@@ -79,7 +79,7 @@ fi
 # ── 4. Verify sandbox image exists ──────────────────────────────────────────
 echo "[4/5] Checking sandbox image..."
 cd "$ROOT_DIR"
-SANDBOX_IMAGE="${SANDBOX_IMAGE:-kortix/computer:latest}"
+SANDBOX_IMAGE="${SANDBOX_IMAGE:-acme/computer:latest}"
 
 if docker image inspect "$SANDBOX_IMAGE" >/dev/null 2>&1; then
   echo "  $SANDBOX_IMAGE exists locally"

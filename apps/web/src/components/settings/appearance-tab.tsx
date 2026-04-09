@@ -9,7 +9,7 @@ import { FilterBar, FilterBarItem } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { transitionFromElement } from '@/lib/view-transition';
 import { useUserPreferencesStore } from '@/stores/user-preferences-store';
-import { THEMES, DEFAULT_THEME_ID, type KortixTheme } from '@/lib/themes';
+import { THEMES, DEFAULT_THEME_ID, type AcmeTheme } from '@/lib/themes';
 import { WALLPAPERS, DEFAULT_WALLPAPER_ID, type Wallpaper } from '@/lib/wallpapers';
 
 function ThemeItem({
@@ -17,7 +17,7 @@ function ThemeItem({
   isActive,
   onSelect,
 }: {
-  theme: KortixTheme;
+  theme: AcmeTheme;
   isActive: boolean;
   onSelect: () => void;
 }) {

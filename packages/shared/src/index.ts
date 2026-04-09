@@ -1,7 +1,7 @@
 /**
- * @kortix/shared
+ * @acme/shared
  *
- * Shared TypeScript code for Kortix frontend applications.
+ * Shared TypeScript code for Acme frontend applications.
  * Contains utilities, error classes, and tool metadata.
  */
 

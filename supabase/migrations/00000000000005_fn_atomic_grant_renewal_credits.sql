@@ -45,17 +45,17 @@ BEGIN
     )
     SELECT p_account_id, p_period_start, p_period_end, stripe_subscription_id,
            p_processed_by, p_credits, p_stripe_event_id
-    FROM kortix.credit_accounts
+    FROM acme.credit_accounts
     WHERE account_id = p_account_id;
 
     SELECT non_expiring_credits INTO v_current_non_expiring
-    FROM kortix.credit_accounts WHERE account_id = p_account_id;
+    FROM acme.credit_accounts WHERE account_id = p_account_id;
 
     v_current_non_expiring := COALESCE(v_current_non_expiring, 0);
     v_new_total := p_credits + v_current_non_expiring;
     v_expires_at := TO_TIMESTAMP(p_period_end);
 
-    UPDATE kortix.credit_accounts
+    UPDATE acme.credit_accounts
     SET
         expiring_credits = p_credits,
         balance = v_new_total,
@@ -66,7 +66,7 @@ BEGIN
         updated_at = NOW()
     WHERE account_id = p_account_id;
 
-    INSERT INTO kortix.credit_ledger (
+    INSERT INTO acme.credit_ledger (
         account_id, amount, balance_after, type, description,
         is_expiring, expires_at, stripe_event_id, processing_source
     ) VALUES (

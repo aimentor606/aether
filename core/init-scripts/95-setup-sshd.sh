@@ -244,10 +244,10 @@ BASHRC
 fi
 
 # Add common aliases and shell improvements if not already present
-if ! grep -q 'kortix-shell-defaults' /config/.bashrc 2>/dev/null; then
+if ! grep -q 'acme-shell-defaults' /config/.bashrc 2>/dev/null; then
   cat >> /config/.bashrc <<'BASHRC'
 
-# ── kortix-shell-defaults ──
+# ── acme-shell-defaults ──
 # Common aliases
 alias ll='ls -lAh --color=auto'
 alias la='ls -A --color=auto'

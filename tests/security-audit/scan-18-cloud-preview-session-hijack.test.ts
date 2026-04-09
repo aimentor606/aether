@@ -9,7 +9,7 @@
  * for 4 hours regardless of who is making them.
  *
  * This means:
- * 1. User A authenticates to p3000-sandbox123.kortix.cloud
+ * 1. User A authenticates to p3000-sandbox123.acme.cloud
  * 2. User B (or unauthenticated attacker) can now access it
  * 3. The session is NOT tied to the authenticating user
  *
@@ -53,7 +53,7 @@ describe('Code Review: Preview Subdomain Session Hijacking', () => {
     });
 
     test('attacker only needs to know sandboxId and port', () => {
-      // The subdomain format is: p{port}-{sandboxId}.kortix.cloud
+      // The subdomain format is: p{port}-{sandboxId}.acme.cloud
       // sandboxId is a UUID that might be leaked via:
       // - shared URLs
       // - error messages

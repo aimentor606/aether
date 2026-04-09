@@ -11,8 +11,8 @@ import {
 } from 'drizzle-orm/pg-core';
 
 // NOTE: Credit/billing tables (creditAccounts, creditLedger, creditUsage,
-// creditPurchases, accountDeletionRequests) have been moved to kortix.ts
-// under the 'kortix' schema. Do NOT re-add them here.
+// creditPurchases, accountDeletionRequests) have been moved to acme.ts
+// under the 'acme' schema. Do NOT re-add them here.
 
 // ─── Basejump schema (read-only reference — NOT pushed by drizzle-kit) ──────
 const basejump = pgSchema('basejump');

@@ -5,7 +5,7 @@ import defaultSuggestions from '../data/default-suggestions.json'
 import { z } from 'zod'
 
 const suggestionsRouter = new Hono()
-const WORKSPACE_ROOT = process.env.KORTIX_WORKSPACE_ROOT || '/workspace'
+const WORKSPACE_ROOT = process.env.ACME_WORKSPACE_ROOT || '/workspace'
 const GLOBAL_MEMORY_PATH = `${WORKSPACE_ROOT}/.kortix/MEMORY.md`
 
 interface Suggestion {

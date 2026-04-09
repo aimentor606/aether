@@ -108,7 +108,7 @@ describe('Telegram Webhook E2E', () => {
 
     // Register the route
     webhookServer.setRoutes([{
-      agentName: 'kortix',
+      agentName: 'acme',
       trigger: {
         name: `telegram-${CONFIG_ID}`,
         source: { type: 'webhook', path: WEBHOOK_PATH, secret: SECRET_TOKEN },

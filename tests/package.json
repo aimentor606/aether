@@ -1,8 +1,8 @@
 {
-  "name": "@kortix/tests",
+  "name": "@acme/tests",
   "version": "0.1.0",
   "private": true,
-  "description": "Unified Kortix test suite — E2E, shell, security, installer",
+  "description": "Unified Acme test suite — E2E, shell, security, installer",
   "scripts": {
     "test": "bash shell/run-all.sh && npx playwright test -c playwright.config.ts",
     "test:e2e": "bash e2e/self-hosted-e2e.sh",

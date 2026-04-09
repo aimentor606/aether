@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 
-const QUEUE_STORAGE_KEY = 'kortix_message_queue_v1';
+const QUEUE_STORAGE_KEY = 'acme_message_queue_v1';
 
 function loadStoredMessages(): QueuedMessage[] {
   if (typeof window === 'undefined') return [];

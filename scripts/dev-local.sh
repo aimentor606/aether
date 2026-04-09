@@ -49,9 +49,9 @@ sys.exit(1)
 PY
 
 echo "[dev] Starting frontend..."
-pnpm --filter Kortix-Computer-Frontend dev &
+pnpm --filter Acme-Computer-Frontend dev &
 FRONTEND_PID=$!
 
 echo "[dev] Starting API..."
 cd "$ROOT_DIR"
-KORTIX_SKIP_ENSURE_SCHEMA=1 pnpm --filter kortix-api dev
+ACME_SKIP_ENSURE_SCHEMA=1 pnpm --filter acme-api dev

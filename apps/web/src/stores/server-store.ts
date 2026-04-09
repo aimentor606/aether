@@ -120,7 +120,7 @@ interface ServerStore {
 
 /**
  * The default sandbox URL routes through the backend's unified preview proxy.
- * Uses the container name ('kortix-sandbox') as the sandbox ID — the backend
+ * Uses the container name ('acme-sandbox') as the sandbox ID — the backend
  * resolves this via Docker DNS on the shared network.
  * Same URL pattern for all providers: /v1/p/{sandboxId}/{port}/*
  */
@@ -129,7 +129,7 @@ function getBackendUrl(): string {
 }
 
 function getDefaultSandboxUrl(): string {
-  const sandboxId = getEnv().SANDBOX_ID || 'kortix-sandbox';
+  const sandboxId = getEnv().SANDBOX_ID || 'acme-sandbox';
   return `${getBackendUrl()}/p/${sandboxId}/8000`;
 }
 
@@ -630,7 +630,7 @@ export function getBackendPort(): number {
 
 /**
  * Get the sandboxId for the active server.
- * - Local mode: defaults to 'kortix-sandbox' (the Docker container name)
+ * - Local mode: defaults to 'acme-sandbox' (the Docker container name)
  * - Cloud mode: uses the server's sandboxId from the store (empty if not yet loaded)
  */
 export function getActiveSandboxId(): string | undefined {
@@ -664,7 +664,7 @@ export function getInstanceSubdomainOpts(
 ): { sandboxId: string; backendPort: number; apiBaseUrl?: string } | undefined {
   if (isCloudMode()) return undefined;
   return {
-    sandboxId: getActiveSandboxId() ?? getEnv().SANDBOX_ID ?? 'kortix-sandbox',
+    sandboxId: getActiveSandboxId() ?? getEnv().SANDBOX_ID ?? 'acme-sandbox',
     backendPort,
     apiBaseUrl: getBackendUrl(),
   };
@@ -687,10 +687,10 @@ export function deriveSubdomainOpts(
   // Cloud providers use their own URL scheme — no subdomain proxy.
   if (server?.provider === 'daytona' || server?.provider === 'justavps') return undefined;
   // For all local/self-hosted modes (local_docker, null server, unknown provider),
-  // fall back to the configured sandbox ID (from runtime env) or 'kortix-sandbox'.
+  // fall back to the configured sandbox ID (from runtime env) or 'acme-sandbox'.
   // This ensures proxy rewriting NEVER silently degrades to raw localhost URLs
   // just because the store hasn't hydrated the sandboxId yet.
-  const sandboxId = server?.sandboxId || getEnv().SANDBOX_ID || 'kortix-sandbox';
+  const sandboxId = server?.sandboxId || getEnv().SANDBOX_ID || 'acme-sandbox';
   return {
     sandboxId,
     backendPort: getBackendPort(),

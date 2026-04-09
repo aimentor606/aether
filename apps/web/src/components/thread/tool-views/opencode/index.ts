@@ -1,5 +1,5 @@
 /**
- * OpenCode ToolView components for KortixComputer.
+ * OpenCode ToolView components for AcmeComputer.
  *
  * These are registered in the ToolViewRegistry under the "oc-" prefix
  * to avoid collision with AgentPress tool names.
@@ -154,7 +154,7 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-task': OcTaskToolView,
   'task': OcTaskToolView,
 
-  // Kortix orchestrator session spawning
+  // Acme orchestrator session spawning
   'oc-session_spawn': OcSessionSpawnToolView,
   'oc-session-spawn': OcSessionSpawnToolView,
   'session_spawn': OcSessionSpawnToolView,
@@ -190,7 +190,7 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-plan_enter': OcPlanToolView,
   'oc-plan-enter': OcPlanToolView,
 
-  // Memory tools (kortix-memory)
+  // Memory tools (acme-memory)
   'oc-mem_search': OcMemSearchToolView,
   'oc-mem-search': OcMemSearchToolView,
   'mem_search': OcMemSearchToolView,
@@ -202,7 +202,7 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-mem_save': OcMemSaveToolView,
   'oc-mem-save': OcMemSaveToolView,
 
-  // Session tools (kortix-sessions + kortix-orchestrator)
+  // Session tools (acme-sessions + acme-orchestrator)
   'oc-session_list': OcSessionListToolView,
   'oc-session-list': OcSessionListToolView,
   'session_list': OcSessionListToolView,
@@ -228,7 +228,7 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-session-list-spawned': OcSessionListToolView,
   'session_list_spawned': OcSessionListToolView,
 
-  // Project tools (kortix-orchestrator)
+  // Project tools (acme-orchestrator)
   'oc-project_list': OcProjectListToolView,
   'oc-project-list': OcProjectListToolView,
   'project_list': OcProjectListToolView,
@@ -248,7 +248,7 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-project-delete': OcProjectGetToolView,
   'project_delete': OcProjectGetToolView,
 
-  // Connector tools (kortix-connectors plugin)
+  // Connector tools (acme-connectors plugin)
   'oc-connector_list': OcConnectorListToolView,
   'oc-connector-list': OcConnectorListToolView,
   'connector_list': OcConnectorListToolView,

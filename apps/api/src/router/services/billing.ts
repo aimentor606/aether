@@ -38,7 +38,7 @@ export async function checkCredits(
 }
 
 /**
- * Deduct credits for a Kortix tool call.
+ * Deduct credits for a Acme tool call.
  *
  * Uses direct DB atomic deduction via Drizzle. Requires DATABASE_URL to be configured.
  */
@@ -57,7 +57,7 @@ export async function deductToolCredits(
 
   const baseDescription =
     description ||
-    `Kortix ${toolName.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}`;
+    `Acme ${toolName.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}`;
   const deductDescription = sessionId ? `${baseDescription} [session:${sessionId}]` : baseDescription;
 
   if (!config.DATABASE_URL) {

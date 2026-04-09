@@ -41,7 +41,7 @@ import {
 } from 'lucide-react';
 import { useTransactions, useTransactionsSummary } from '@/hooks/billing/use-transactions';
 import { cn } from '@/lib/utils';
-import { formatCredits, formatCreditsWithSign } from '@kortix/shared';
+import { formatCredits, formatCreditsWithSign } from '@acme/shared';
 
 interface Props {
   accountId?: string;

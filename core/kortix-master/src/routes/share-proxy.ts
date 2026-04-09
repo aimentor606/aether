@@ -5,7 +5,7 @@
  * then proxies to the target port on localhost.
  *
  * This is the route that shared URLs point to:
- *   https://8000--slug.kortix.cloud/s/{token}/path?__proxy_token=xxx
+ *   https://8000--slug.acme.cloud/s/{token}/path?__proxy_token=xxx
  *
  * The __proxy_token authenticates to the CF Worker → kortix-master.
  * The share token authenticates the specific share (port + TTL).

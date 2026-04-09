@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Information Disclosure
  *
- * LIVE scan against https://computer-preview-api.kortix.com
+ * LIVE scan against https://computer-preview-api.acme.dev
  * Checks what information is exposed via public endpoints, error messages,
  * and version endpoints.
  *
@@ -24,7 +24,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.acme.dev';
 
 async function get(path: string): Promise<{ status: number; body: any }> {
   try {
@@ -89,8 +89,8 @@ describe('Cloud Scan: Information Disclosure', () => {
       const hasInternalDetails =
         changelogStr.includes('localhost') ||
         changelogStr.includes('OpenCode') ||
-        changelogStr.includes('KORTIX_TOKEN') ||
-        changelogStr.includes('KORTIX_API_URL');
+        changelogStr.includes('ACME_TOKEN') ||
+        changelogStr.includes('ACME_API_URL');
       // The changelog reveals internal env var names and architecture
       expect(hasInternalDetails).toBe(true);
     });

@@ -18,8 +18,8 @@ import { useWebNotifications } from "@/hooks/use-web-notifications";
 import { backendApi } from "@/lib/api-client";
 import { getClient } from "@/lib/opencode-sdk";
 import { Button } from "@/components/ui/button";
-import { KortixLogo } from "@/components/sidebar/kortix-logo";
-import { KortixLoader } from "@/components/ui/kortix-loader";
+import { AcmeLogo } from "@/components/sidebar/acme-logo";
+import { AcmeLoader } from "@/components/ui/acme-loader";
 import { featureFlags } from "@/lib/feature-flags";
 import { buildInstancePath, getActiveInstanceIdFromCookie, getCurrentInstanceIdFromPathname } from "@/lib/instance-routes";
 import { cn } from "@/lib/utils";
@@ -242,13 +242,13 @@ function DashboardSkeleton() {
 		<div className="fixed inset-0 flex items-center justify-center bg-background px-6">
 			<div className="flex w-full max-w-[360px] flex-col items-center gap-6 text-center">
 				<div className="mb-2 flex flex-col items-center gap-3">
-					<KortixLogo size={22} />
+					<AcmeLogo size={22} />
 					<p className="text-[15px] font-normal uppercase tracking-[0.15em] text-foreground/30">
 						Connecting to Workspace
 					</p>
 				</div>
 
-				<KortixLoader size="medium" />
+				<AcmeLoader size="medium" />
 
 				<p className="max-w-[300px] text-sm leading-relaxed text-muted-foreground/60">
 					Checking sandbox health and restoring your session.
@@ -257,10 +257,10 @@ function DashboardSkeleton() {
 				<p className="max-w-[300px] text-xs leading-relaxed text-muted-foreground/50">
 					Having problems? Email{" "}
 					<a
-						href="mailto:support@kortix.com"
+						href="mailto:support@acme.dev"
 						className="underline underline-offset-4 hover:text-foreground/80"
 					>
-						support@kortix.com
+						support@acme.dev
 					</a>
 					.
 				</p>
@@ -578,11 +578,11 @@ export default function DashboardLayoutContent({
 		// Persist skip/redo intent in sessionStorage so it survives auth redirects.
 		// The auth callback strips query params, so we stash the intent before redirect
 		// and check it after login when we land back on the dashboard.
-		if (wantsSkip) sessionStorage.setItem("kortix-onboarding-skip", "1");
-		if (wantsRedo) sessionStorage.setItem("kortix-onboarding-redo", "1");
+		if (wantsSkip) sessionStorage.setItem("acme-onboarding-skip", "1");
+		if (wantsRedo) sessionStorage.setItem("acme-onboarding-redo", "1");
 
-		const storedSkip = sessionStorage.getItem("kortix-onboarding-skip") === "1";
-		const storedRedo = sessionStorage.getItem("kortix-onboarding-redo") === "1";
+		const storedSkip = sessionStorage.getItem("acme-onboarding-skip") === "1";
+		const storedRedo = sessionStorage.getItem("acme-onboarding-redo") === "1";
 		const shouldSkip = wantsSkip || storedSkip;
 		const shouldRedo = wantsRedo || storedRedo;
 
@@ -599,7 +599,7 @@ export default function DashboardLayoutContent({
 			if (shouldSkip) {
 				const ok = await persistEnv("ONBOARDING_COMPLETE", "true");
 				if (!ok) return; // sandbox unreachable — keep intent, retry on next activeServerId change
-				sessionStorage.removeItem("kortix-onboarding-skip");
+				sessionStorage.removeItem("acme-onboarding-skip");
 				// Clean URL and let the normal check pass through
 				const clean = new URL(window.location.href);
 				clean.searchParams.delete("onboarding-skip");
@@ -611,7 +611,7 @@ export default function DashboardLayoutContent({
 				if (!ok) return; // sandbox unreachable — keep intent, retry on next activeServerId change
 				await persistEnv("ONBOARDING_SESSION_ID", "");
 				await persistEnv("ONBOARDING_COMMAND_FIRED", "");
-				sessionStorage.removeItem("kortix-onboarding-redo");
+				sessionStorage.removeItem("acme-onboarding-redo");
 				const clean = new URL(window.location.href);
 				clean.searchParams.delete("onboarding-redo");
 				window.history.replaceState({}, "", clean.pathname + clean.search);
@@ -692,7 +692,7 @@ export default function DashboardLayoutContent({
 				}
 
 				if (!sid) {
-					const s = await createSessionRef.current.mutateAsync({ title: "Kortix Onboarding" });
+					const s = await createSessionRef.current.mutateAsync({ title: "Acme Onboarding" });
 					persistEnv("ONBOARDING_SESSION_ID", s.id);
 					sid = s.id;
 					needsCmd = true;
@@ -706,7 +706,7 @@ export default function DashboardLayoutContent({
 				}
 
 				ob.setSessionId(sid);
-				useTabStore.getState().openTab({ id: sid, title: "Kortix Onboarding", type: "session", href: `/sessions/${sid}` });
+				useTabStore.getState().openTab({ id: sid, title: "Acme Onboarding", type: "session", href: `/sessions/${sid}` });
 			} catch (err) {
 				obCreating.current = false;
 				obRetries.current++;
@@ -945,7 +945,7 @@ export default function DashboardLayoutContent({
 						{ob.active && !ob.sessionId && !ob.showBoot && !ob.showSetup && (
 							<div className="absolute inset-0 z-10 flex items-center justify-center bg-background">
 								<div className="flex flex-col items-center gap-3">
-									<KortixLoader size="medium" />
+									<AcmeLoader size="medium" />
 									<p className="text-xs text-muted-foreground">Setting up your workspace…</p>
 								</div>
 							</div>

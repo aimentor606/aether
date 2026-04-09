@@ -159,7 +159,7 @@ async function handleChannelCommand(
         text: [
           `${channel.name} (${channel.platform})`,
           `Bot: @${channel.bot_username || '?'}`,
-          `Agent: ${channel.default_agent || 'kortix'}`,
+          `Agent: ${channel.default_agent || 'acme'}`,
           `Model: ${channel.default_model || '(default)'}`,
           `Session: ${state.currentId || 'none'}`,
           `Enabled: ${channel.enabled ? 'yes' : 'no'}`,
@@ -170,7 +170,7 @@ async function handleChannelCommand(
 
     case 'agent': {
       if (!arg) {
-        return { handled: true, text: `Current agent: ${channel.default_agent || 'kortix'}\nUsage: ${p}agent <name>` }
+        return { handled: true, text: `Current agent: ${channel.default_agent || 'acme'}\nUsage: ${p}agent <name>` }
       }
       const updated = updateChannel(channel.id, { default_agent: arg })
       clearSession(event.session_key)
@@ -301,7 +301,7 @@ async function dispatchToOpenCode(
         const parts = channel.default_model.split('/')
         return parts.length >= 2
           ? { providerID: parts[0], modelID: parts.slice(1).join('/') }
-          : { providerID: 'kortix', modelID: channel.default_model }
+          : { providerID: 'acme', modelID: channel.default_model }
       })()
     : undefined
 
@@ -334,7 +334,7 @@ async function dispatchToOpenCode(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      agent: channel.default_agent || 'kortix',
+      agent: channel.default_agent || 'acme',
       ...(channel.instructions ? { systemPrompt: channel.instructions } : {}),
     }),
     signal: AbortSignal.timeout(15_000),
@@ -350,7 +350,7 @@ async function dispatchToOpenCode(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       parts: [{ type: 'text', text: event.prompt }],
-      agent: channel.default_agent || 'kortix',
+      agent: channel.default_agent || 'acme',
     }),
     signal: AbortSignal.timeout(30_000),
   })

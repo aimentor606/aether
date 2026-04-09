@@ -32,7 +32,7 @@ describe('TriggerStore', () => {
         source_config: { cron_expr: '0 0 9 * * *', timezone: 'UTC' },
         action_type: 'prompt',
         action_config: { prompt: 'Generate the daily report' },
-        agent_name: 'kortix',
+        agent_name: 'acme',
         model_id: 'anthropic/claude-sonnet-4-20250514',
         session_mode: 'new',
       })

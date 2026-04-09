@@ -1,5 +1,5 @@
 import { eq, sql } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@acme/db';
 import { db } from '../shared/db';
 import type { UpdateStatus, UpdatePhase } from './types';
 import { IDLE_STATUS } from './types';

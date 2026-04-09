@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { getEnv } from '@/lib/env-config';
 import { UnifiedMarkdown } from '@/components/markdown/unified-markdown';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { AcmeLoader } from '@/components/ui/acme-loader';
 import {
   AlertTriangle,
   Copy,
@@ -66,7 +66,7 @@ interface ShareData {
 
 import { getActiveOpenCodeUrl } from '@/stores/server-store';
 
-const FALLBACK_BASE_URL = `${getEnv().BACKEND_URL.replace(/\/+$/, '')}/p/kortix-sandbox/8000`;
+const FALLBACK_BASE_URL = `${getEnv().BACKEND_URL.replace(/\/+$/, '')}/p/acme-sandbox/8000`;
 
 function getOpenCodeBaseUrl(): string {
   // Use the active server URL if available (resolves correct sandboxId).
@@ -142,7 +142,7 @@ export function ShareViewer({ shareId }: { shareId: string }) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
-          <KortixLoader size="medium" />
+          <AcmeLoader size="medium" />
           <p className="text-sm text-muted-foreground">Loading shared session...</p>
         </div>
       </div>
@@ -304,12 +304,12 @@ function AssistantBlock({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      {/* Agent header — Kortix logomark (matches Suna AgentHeader for name="Kortix") */}
+      {/* Agent header — Acme logomark (matches Suna AgentHeader for name="Acme") */}
       <div className="flex items-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/kortix-logomark-white.svg"
-          alt="Kortix"
+          src="/acme-logomark-white.svg"
+          alt="Acme"
           className="dark:invert-0 invert flex-shrink-0"
           style={{ height: '12px', width: 'auto' }}
         />

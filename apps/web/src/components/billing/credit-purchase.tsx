@@ -15,7 +15,7 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 import { billingApi } from '@/lib/api/billing';
 import { AutoTopupCard } from '@/components/billing/auto-topup-card';
 import { toast } from '@/lib/toast';
-import { formatCredits } from '@kortix/shared';
+import { formatCredits } from '@acme/shared';
 import { useUserCurrency } from '@/hooks/use-user-currency';
 import { formatPrice } from '@/lib/utils/currency';
 import { cn } from '@/lib/utils';

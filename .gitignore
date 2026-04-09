@@ -76,3 +76,6 @@ core/kortix-master/opencode/.kortix/
 .pulumi
 .pulumi/
 .vercel
+
+# Web-only: skip mobile app (re-introduced by upstream merges)
+apps/mobile/

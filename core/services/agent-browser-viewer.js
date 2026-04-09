@@ -13,7 +13,7 @@ const socketDirs = Array.from(new Set([
 // These are always shown if their stream port is responding.
 const KNOWN_SESSIONS = [
   {
-    name: process.env.AGENT_BROWSER_PRIMARY_SESSION || "kortix",
+    name: process.env.AGENT_BROWSER_PRIMARY_SESSION || "acme",
     port: parseInt(process.env.AGENT_BROWSER_STREAM_PORT || "9223", 10),
   },
 ];

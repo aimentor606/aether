@@ -4,14 +4,14 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { CircleDashed, Plus, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useKortixComputerStore } from '@/stores/kortix-computer-store';
+import { useAcmeComputerStore } from '@/stores/acme-computer-store';
 import { useServerStore } from '@/stores/server-store';
 import { useOpenCodePtyList, useCreatePty, useRemovePty } from '@/hooks/opencode/use-opencode-pty';
 import { useTabStore, openTabAndNavigate } from '@/stores/tab-store';
 
 // Lazy-load terminal components to avoid SSR issues with xterm.js
 const SSHTerminal = dynamic(
-  () => import('@/components/thread/kortix-computer/components/SSHTerminal').then(mod => ({ default: mod.SSHTerminal })),
+  () => import('@/components/thread/acme-computer/components/SSHTerminal').then(mod => ({ default: mod.SSHTerminal })),
   { ssr: false }
 );
 
@@ -36,7 +36,7 @@ interface TerminalTabContentProps {
  * For sandbox mode, renders SSHTerminal instead (shared across all terminal tabs).
  */
 export function TerminalTabContent({ ptyId, tabId, hidden = false }: TerminalTabContentProps) {
-  const currentSandboxId = useKortixComputerStore((s) => s.currentSandboxId);
+  const currentSandboxId = useAcmeComputerStore((s) => s.currentSandboxId);
   const serverUrl = useServerStore((s) => {
     const server = s.servers.find((srv) => srv.id === s.activeServerId);
     return server?.url ?? s.getActiveServerUrl();

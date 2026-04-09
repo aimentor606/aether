@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { useTransactions } from '@/hooks/billing/use-transactions';
 import { cn } from '@/lib/utils';
-import { creditsToDollars, formatCredits } from '@kortix/shared';
+import { creditsToDollars, formatCredits } from '@acme/shared';
 
 type FilterTab = 'all' | 'topups' | 'subscription' | 'refunds';
 

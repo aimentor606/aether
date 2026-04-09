@@ -5,23 +5,23 @@ export * as schema from './schema';
 // Re-export frequently used schemas and types for convenience
 export {
   // Schema namespace
-  kortixSchema,
+  acmeSchema,
   // Enums
   sandboxStatusEnum,
   deploymentStatusEnum,
   deploymentSourceEnum,
   apiKeyStatusEnum,
   apiKeyTypeEnum,
-  // Kortix tables — accounts
+  // Acme tables — accounts
   accounts,
   accountMembers,
   accountRoleEnum,
   accountsRelations,
   accountMembersRelations,
-  // Kortix tables
+  // Acme tables
   sandboxes,
   deployments,
-  kortixApiKeys,
+  acmeApiKeys,
   integrationCredentials,
   integrations,
   sandboxIntegrations,
@@ -31,10 +31,10 @@ export {
   // Relations
   sandboxesRelations,
   deploymentsRelations,
-  kortixApiKeysRelations,
+  acmeApiKeysRelations,
   integrationsRelations,
   sandboxIntegrationsRelations,
-  // Billing / Credits (moved from public → kortix schema)
+  // Billing / Credits (moved from public → acme schema)
   billingCustomers,
   creditAccounts,
   creditLedger,
@@ -72,7 +72,7 @@ export {
   // Pool
   poolResources,
   poolSandboxes,
-} from './schema/kortix';
+} from './schema/acme';
 
 export type {
   TunnelMachineInfo,
@@ -80,7 +80,7 @@ export type {
   TunnelShellScope,
   TunnelNetworkScope,
   TunnelPermissionScope,
-} from './schema/kortix';
+} from './schema/acme';
 
 // Public/basejump tables
 export {
@@ -100,8 +100,8 @@ export type {
   AccountUser,
   NewApiKey,
   SandboxSelect,
-  KortixApiKey,
-  NewKortixApiKey,
+  AcmeApiKey,
+  NewAcmeApiKey,
   IntegrationCredential,
   NewIntegrationCredential,
   Integration,

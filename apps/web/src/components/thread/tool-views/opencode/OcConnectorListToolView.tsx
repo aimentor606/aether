@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ToolViewIconTitle } from '../shared/ToolViewIconTitle';
 import { ToolViewFooter } from '../shared/ToolViewFooter';
 import { LoadingState } from '../shared/LoadingState';
-import { parseConnectorListOutput, type ConnectorEntry } from '@/lib/utils/kortix-tool-output';
+import { parseConnectorListOutput, type ConnectorEntry } from '@/lib/utils/acme-tool-output';
 import { cn } from '@/lib/utils';
 
 export function OcConnectorListToolView({

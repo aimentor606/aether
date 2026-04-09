@@ -26,7 +26,7 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { AcmeLoader } from '@/components/ui/acme-loader';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,7 +38,7 @@ import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import ColorThief from 'colorthief';
 import { AgentAvatar } from '@/components/thread/content/agent-avatar';
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { AcmeLogo } from '@/components/sidebar/acme-logo';
 
 interface MarketplaceTemplate {
   template_id: string;
@@ -50,7 +50,7 @@ interface MarketplaceTemplate {
   agentpress_tools: Record<string, any>;
   tags: string[];
   is_public: boolean;
-  is_kortix_team: boolean;
+  is_acme_team: boolean;
   marketplace_published_at: string | null;
   download_count: number;
   created_at: string;
@@ -264,7 +264,7 @@ export default function TemplateSharePage() {
     return (
       <div className="min-h-screen">
         <div className="flex items-center justify-center h-screen">
-          <KortixLoader size="large" />
+          <AcmeLoader size="large" />
         </div>
       </div>
     );
@@ -341,7 +341,7 @@ export default function TemplateSharePage() {
             <div className="flex h-14 items-center">
               <div className="flex items-center">
                 <Link href="/" className="flex items-center">
-                  <KortixLogo size={24} />
+                  <AcmeLogo size={24} />
                 </Link>
               </div>
               <div className="flex items-center space-x-3 ml-auto">
@@ -420,7 +420,7 @@ export default function TemplateSharePage() {
               <div className="space-y-4">
                 <div>
                   <h1 className="text-3xl font-medium tracking-tight">{template.name}</h1>
-                  {template.is_kortix_team && (
+                  {template.is_acme_team && (
                     <Badge variant="secondary" className="mt-2 bg-primary/10 text-primary">
                       <Sparkles className="w-3 h-3 mr-1" />
                       Official Template

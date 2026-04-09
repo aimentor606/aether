@@ -1,7 +1,7 @@
 /**
  * Secrets routes — raw KV CRUD for sandbox environment variables.
  *
- * Pure proxy to kortix-master's /env API. That's the single source of truth.
+ * Pure proxy to acme-master's /env API. That's the single source of truth.
  * Template keys are seeded at container startup (Dockerfile / init script),
  * not here.
  *
@@ -14,11 +14,11 @@ import { config } from '../config';
 
 export const secretsApp = new Hono<AppEnv>();
 
-// ─── kortix-master proxy helpers ────────────────────────────────────────────
+// ─── acme-master proxy helpers ────────────────────────────────────────────
 
 function getMasterUrlCandidates(): string[] {
   const candidates: string[] = [];
-  const explicit = process.env.KORTIX_MASTER_URL;
+  const explicit = process.env.ACME_MASTER_URL;
   if (explicit && explicit.trim()) candidates.push(explicit.trim());
   candidates.push('http://sandbox:8000');
   candidates.push(`http://localhost:${config.SANDBOX_PORT_BASE || 14000}`);
@@ -47,7 +47,7 @@ async function fetchMaster(path: string, init: RequestInit = {}, timeoutMs = 500
       lastErr = e;
     }
   }
-  throw lastErr instanceof Error ? lastErr : new Error('Failed to reach kortix-master');
+  throw lastErr instanceof Error ? lastErr : new Error('Failed to reach acme-master');
 }
 
 function maskValue(val: string): string {
@@ -60,7 +60,7 @@ const HIDDEN_KEYS = new Set([
   'ONBOARDING_COMPLETE', 'ONBOARDING_SESSION_ID', 'ONBOARDING_USER_NAME',
   'ONBOARDING_USER_SUMMARY', 'ONBOARDING_COMPLETED_AT',
   'SANDBOX_ID', 'PROJECT_ID', 'ENV_MODE',
-  'KORTIX_API_URL', 'KORTIX_TOKEN',
+  'ACME_API_URL', 'ACME_TOKEN',
 ]);
 
 // ─── Routes ─────────────────────────────────────────────────────────────────
@@ -103,7 +103,7 @@ secretsApp.put('/:key', async (c) => {
 
     if (!res.ok) {
       const detail = await res.text().catch(() => '');
-      return c.json({ ok: false, error: `kortix-master returned ${res.status}`, details: detail }, 500);
+      return c.json({ ok: false, error: `acme-master returned ${res.status}`, details: detail }, 500);
     }
     return c.json({ ok: true });
   } catch (e: any) {
@@ -119,7 +119,7 @@ secretsApp.delete('/:key', async (c) => {
     const res = await fetchMaster(`/env/${key}`, { method: 'DELETE' }, 5000);
     if (!res.ok) {
       const detail = await res.text().catch(() => '');
-      return c.json({ ok: false, error: `kortix-master returned ${res.status}`, details: detail }, 500);
+      return c.json({ ok: false, error: `acme-master returned ${res.status}`, details: detail }, 500);
     }
     return c.json({ ok: true });
   } catch (e: any) {

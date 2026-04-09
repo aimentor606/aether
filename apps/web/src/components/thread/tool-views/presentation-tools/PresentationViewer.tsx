@@ -27,7 +27,7 @@ import {
   ExternalLink,
   ChevronDown,
 } from 'lucide-react';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { AcmeLoader } from '@/components/ui/acme-loader';
 import { ToolViewProps } from '../types';
 import { formatTimestamp, getToolTitle } from '../utils';
 import { downloadPresentation, handleGoogleSlidesUpload } from '../utils/presentation-utils';
@@ -760,7 +760,7 @@ export function PresentationViewer({
                       disabled={isDownloading}
                     >
                       {isDownloading ? (
-                        <KortixLoader customSize={14} />
+                        <AcmeLoader customSize={14} />
                       ) : (
                         <Download className="h-3.5 w-3.5" />
                       )}

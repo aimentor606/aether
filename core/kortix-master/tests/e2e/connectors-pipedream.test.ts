@@ -13,7 +13,7 @@ describe("connectors plugin + pipedream script e2e", () => {
 
   beforeEach(() => {
     if (dir) rmSync(dir, { recursive: true, force: true })
-    dir = mkdtempSync(join(tmpdir(), "kortix-connectors-"))
+    dir = mkdtempSync(join(tmpdir(), "acme-connectors-"))
   })
 
   afterAll(() => {
@@ -39,7 +39,7 @@ describe("connectors plugin + pipedream script e2e", () => {
     )
 
     process.env.OPENCODE_CONFIG_DIR = cfg
-    process.env.KORTIX_WORKSPACE = ""
+    process.env.ACME_WORKSPACE = ""
 
     const mod = await import(pluginPath)
     const plugin = await mod.default()
@@ -84,7 +84,7 @@ describe("integration.ts end-to-end through kortix-master", () => {
 
     app.use("*", async (c, next) => {
       const auth = c.req.header("authorization")
-      if (auth && auth !== "Bearer test-kortix-token") {
+      if (auth && auth !== "Bearer test-acme-token") {
         return c.text("bad auth", 401)
       }
       await next()
@@ -142,8 +142,8 @@ describe("integration.ts end-to-end through kortix-master", () => {
     open = await startDummyOpenCode(masterPort + 1000)
     master = await startKortixMaster(masterPort, fx, {
       INTERNAL_SERVICE_KEY: key,
-      KORTIX_TOKEN: "test-kortix-token",
-      KORTIX_API_URL: `http://127.0.0.1:${apiPort}`,
+      ACME_TOKEN: "test-acme-token",
+      ACME_API_URL: `http://127.0.0.1:${apiPort}`,
       PIPEDREAM_CLIENT_ID: "pd-client",
       PIPEDREAM_CLIENT_SECRET: "pd-secret",
       PIPEDREAM_PROJECT_ID: "proj_test",
@@ -162,7 +162,7 @@ describe("integration.ts end-to-end through kortix-master", () => {
     const proc = Bun.spawn(["bun", "run", scriptPath, cmd, ...(json ? [JSON.stringify(json)] : [])], {
       env: {
         ...process.env,
-        KORTIX_MASTER_URL: `http://127.0.0.1:${masterPort}`,
+        ACME_MASTER_URL: `http://127.0.0.1:${masterPort}`,
         INTERNAL_SERVICE_KEY: key,
       },
       stdout: "pipe",

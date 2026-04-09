@@ -24,27 +24,27 @@ mock.module('../shared/resolve-account', () => ({
 
 mock.module('../repositories/api-keys', () => ({
   validateSecretKey: async (token: string) => {
-    if (token === 'kortix_owner') {
+    if (token === 'acme_owner') {
       return { isValid: true, accountId: 'acct-owner' };
     }
-    if (token === 'kortix_other') {
+    if (token === 'acme_other') {
       return { isValid: true, accountId: 'acct-other' };
     }
-    return { isValid: false, error: 'Invalid Kortix token' };
+    return { isValid: false, error: 'Invalid Acme token' };
   },
 }));
 
 mock.module('../shared/crypto', () => ({
-  isKortixToken: (token: string) => token.startsWith('kortix_'),
+  isAcmeToken: (token: string) => token.startsWith('acme_'),
 }));
 
 mock.module('../shared/jwt-verify', () => ({
   verifySupabaseJwt: async (token: string) => {
     if (token === 'jwt-owner') {
-      return { ok: true, userId: 'user-owner', email: 'owner@kortix.dev' };
+      return { ok: true, userId: 'user-owner', email: 'owner@acme.dev' };
     }
     if (token === 'jwt-other') {
-      return { ok: true, userId: 'user-other', email: 'other@kortix.dev' };
+      return { ok: true, userId: 'user-other', email: 'other@acme.dev' };
     }
     if (token === 'jwt-fallback-owner' || token === 'jwt-fallback-other') {
       return { ok: false, reason: 'no-keys' };
@@ -93,42 +93,42 @@ describe('preview auth ownership', () => {
     expect(res.status).toBe(401);
   });
 
-  test('allows owner via Bearer kortix token', async () => {
+  test('allows owner via Bearer acme token', async () => {
     const app = createApp();
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
-      headers: { Authorization: 'Bearer kortix_owner' },
+      headers: { Authorization: 'Bearer acme_owner' },
     });
     expect(res.status).toBe(200);
   });
 
-  test('allows owner via X-Kortix-Token header', async () => {
+  test('allows owner via X-Acme-Token header', async () => {
     const app = createApp();
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
-      headers: { 'X-Kortix-Token': 'kortix_owner' },
+      headers: { 'X-Acme-Token': 'acme_owner' },
     });
     expect(res.status).toBe(200);
   });
 
-  test('allows owner via preview session cookie with kortix token', async () => {
+  test('allows owner via preview session cookie with acme token', async () => {
     const app = createApp();
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
-      headers: { Cookie: '__preview_session=kortix_owner' },
+      headers: { Cookie: '__preview_session=acme_owner' },
     });
     expect(res.status).toBe(200);
   });
 
-  test('rejects non-owner kortix token', async () => {
+  test('rejects non-owner acme token', async () => {
     const app = createApp();
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
-      headers: { Authorization: 'Bearer kortix_other' },
+      headers: { Authorization: 'Bearer acme_other' },
     });
     expect(res.status).toBe(403);
   });
 
-  test('rejects invalid X-Kortix-Token', async () => {
+  test('rejects invalid X-Acme-Token', async () => {
     const app = createApp();
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
-      headers: { 'X-Kortix-Token': 'kortix_invalid' },
+      headers: { 'X-Acme-Token': 'acme_invalid' },
     });
     expect(res.status).toBe(401);
   });
@@ -163,7 +163,7 @@ describe('preview auth ownership', () => {
   test('allows jwt owner via Supabase fallback path', async () => {
     const app = createApp();
     mockResolvedAccountId = 'acct-owner';
-    mockSupabaseUser = { id: 'user-fallback-owner', email: 'fallback@kortix.dev' };
+    mockSupabaseUser = { id: 'user-fallback-owner', email: 'fallback@acme.dev' };
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
       headers: { Authorization: 'Bearer jwt-fallback-owner' },
     });
@@ -173,7 +173,7 @@ describe('preview auth ownership', () => {
   test('rejects jwt via Supabase fallback without ownership', async () => {
     const app = createApp();
     mockResolvedAccountId = 'acct-other';
-    mockSupabaseUser = { id: 'user-fallback-other', email: 'other@kortix.dev' };
+    mockSupabaseUser = { id: 'user-fallback-other', email: 'other@acme.dev' };
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
       headers: { Authorization: 'Bearer jwt-fallback-other' },
     });
@@ -184,7 +184,7 @@ describe('preview auth ownership', () => {
     const app = createApp();
     mockSandboxAccountId = null;
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
-      headers: { Authorization: 'Bearer kortix_owner' },
+      headers: { Authorization: 'Bearer acme_owner' },
     });
     expect(res.status).toBe(403);
   });

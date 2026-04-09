@@ -16,7 +16,7 @@ export function useSlackConnect() {
     }) => {
       const baseUrl = getActiveOpenCodeUrl();
       if (!baseUrl) throw new Error('No active instance');
-      const res = await authenticatedFetch(`${baseUrl}/kortix/channels/setup/slack`, {
+      const res = await authenticatedFetch(`${baseUrl}/acme/channels/setup/slack`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ botToken, signingSecret, publicUrl, name, createdBy, channelId, defaultAgent, defaultModel }),

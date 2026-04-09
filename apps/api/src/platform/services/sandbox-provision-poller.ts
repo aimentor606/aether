@@ -14,7 +14,7 @@
  */
 
 import { eq, and } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@acme/db';
 import { db } from '../../shared/db';
 import { config } from '../../config';
 import { sandboxEventBus } from './sandbox-events';
@@ -226,7 +226,7 @@ async function pollSingleSandbox(sandbox: typeof sandboxes.$inferSelect): Promis
       const proxyToken = meta.justavpsProxyToken as string | undefined;
       const serviceKey = ((sandbox.config as Record<string, unknown> | null)?.serviceKey as string | undefined) || '';
       if (slug && proxyToken) {
-        const proxyDomain = config.JUSTAVPS_PROXY_DOMAIN || 'kortix.cloud';
+        const proxyDomain = config.JUSTAVPS_PROXY_DOMAIN || 'acme.cloud';
         const publicBaseUrl = `https://8000--${slug}.${proxyDomain}?__proxy_token=${proxyToken}`;
         try {
           const envRes = await fetch(`https://8000--${slug}.${proxyDomain}/env/PUBLIC_BASE_URL`, {

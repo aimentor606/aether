@@ -16,7 +16,7 @@ export interface ModelConfig {
 }
 
 /**
- * Kortix model registry — maps model IDs exposed through the Kortix provider
+ * Acme model registry — maps model IDs exposed through the Acme provider
  * to their OpenRouter equivalents with pricing.
  *
  * Model IDs use the real provider/model format (e.g. "moonshotai/kimi-k2.5")
@@ -61,7 +61,7 @@ export const MODELS: Record<string, ModelConfig> = {
 };
 
 /**
- * Default model for Kortix-managed contexts (cron, memory, etc.)
+ * Default model for Acme-managed contexts (cron, memory, etc.)
  * that need a sensible default without user input.
  */
 export const DEFAULT_MODEL_ID = 'minimax/minimax-m2.7';
@@ -132,7 +132,7 @@ export function getAllModels() {
   return Object.entries(MODELS).map(([id, cfg]) => ({
     id,
     object: 'model' as const,
-    owned_by: 'kortix',
+    owned_by: 'acme',
     context_window: cfg.contextWindow,
     pricing: {
       input: cfg.inputPer1M,

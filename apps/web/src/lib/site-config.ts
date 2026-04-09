@@ -1,5 +1,5 @@
 export const siteConfig = {
-  url: process.env.KORTIX_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
+  url: process.env.ACME_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
   nav: {
     links: [
       { id: 1, name: 'OS', href: '/' },
@@ -10,18 +10,18 @@ export const siteConfig = {
   },
   hero: {
     description:
-      'Kortix – open-source platform to build, manage and train your AI Workforce.',
+      'Acme – open-source platform to build, manage and train your AI Workforce.',
   },
   footerLinks: [
     {
-      title: 'Kortix',
+      title: 'Acme',
       links: [
         { id: 1, title: 'About', url: '/about' },
         { id: 2, title: 'Careers', url: '/careers' },
         // { id: 3, title: 'Partnerships', url: '/partnerships' },
         { id: 4, title: 'Support', url: '/support' },
-        { id: 5, title: 'Contact', url: 'mailto:hey@kortix.com' },
-        { id: 13, title: 'Status', url: 'https://status.kortix.com' },
+        { id: 5, title: 'Contact', url: 'mailto:hey@acme.dev' },
+        { id: 13, title: 'Status', url: 'https://status.acme.dev' },
       ],
     },
     {
@@ -30,7 +30,7 @@ export const siteConfig = {
         { id: 6, title: 'Tutorials', url: '/tutorials' },
         { id: 7, title: 'Documentation', url: '/docs' },
         { id: 8, title: 'Discord', url: 'https://discord.com/invite/RvFhXUdZ9H' },
-        { id: 9, title: 'GitHub', url: 'https://github.com/kortix-ai/suna' },
+        { id: 9, title: 'GitHub', url: 'https://github.com/aimentor606/aether' },
       ],
     },
     {
@@ -38,7 +38,7 @@ export const siteConfig = {
       links: [
         { id: 10, title: 'Privacy Policy', url: '/legal?tab=privacy' },
         { id: 11, title: 'Terms of Service', url: '/legal?tab=terms' },
-        { id: 12, title: 'License', url: 'https://github.com/kortix-ai/suna/blob/main/LICENSE' },
+        { id: 12, title: 'License', url: 'https://github.com/aimentor606/aether/blob/main/LICENSE' },
       ],
     },
   ],

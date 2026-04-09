@@ -24,7 +24,7 @@ import { Daytona } from '@daytonaio/sdk';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
-const OLD_SUNA_SNAPSHOT = 'kortix/suna:0.1.3.30';
+const OLD_SUNA_SNAPSHOT = 'acme/suna:0.1.3.30';
 
 const DUMMY_FILES = [
   { path: '/workspace/uploads/report.pdf', content: 'fake-pdf-content-here' },

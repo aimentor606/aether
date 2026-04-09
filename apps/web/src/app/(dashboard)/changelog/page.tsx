@@ -255,7 +255,7 @@ function VersionEntryCard({ entry, isCurrent, isLatestInChannel, onInstall, isIn
         {isDevVersion && entry.sha && (
           <div className="mt-2">
             <a
-              href={`https://github.com/kortix-ai/suna/commit/${entry.sha}`}
+              href={`https://github.com/aimentor606/aether/commit/${entry.sha}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors"
@@ -385,7 +385,7 @@ export default function ChangelogPage() {
                     )}
                   </>
                 ) : (
-                  'Version history for Kortix Computer'
+                  'Version history for Acme Computer'
                 )}
                 {latestVersion && currentVersion && latestVersion !== currentVersion && (
                   <>

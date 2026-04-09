@@ -1,5 +1,5 @@
 import { db } from './db';
-import { platformSettings, accessAllowlist } from '@kortix/db';
+import { platformSettings, accessAllowlist } from '@acme/db';
 import { eq } from 'drizzle-orm';
 
 const REFRESH_INTERVAL_MS = 60_000;

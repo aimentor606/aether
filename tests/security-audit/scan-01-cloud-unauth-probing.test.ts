@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Unauthenticated Route Probing
  *
- * LIVE scan against https://computer-preview-api.kortix.com
+ * LIVE scan against https://computer-preview-api.acme.dev
  * Verifies every protected endpoint rejects unauthenticated requests (401)
  * and public endpoints do not leak sensitive information.
  *
@@ -14,7 +14,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.acme.dev';
 
 async function probe(method: string, path: string, body?: any): Promise<{
   status: number;

@@ -73,7 +73,7 @@ export async function pullImage(endpoint: ResolvedEndpoint, image: string): Prom
   // 2. Clean up ALL stale pull units from any previous attempts
   await execOnHost(
     endpoint,
-    'for u in $(systemctl list-units --all --no-legend "kortix-pull-*" | awk "{print \\$1}"); do systemctl stop "$u" 2>/dev/null; systemctl reset-failed "$u" 2>/dev/null; done; true',
+    'for u in $(systemctl list-units --all --no-legend "acme-pull-*" | awk "{print \\$1}"); do systemctl stop "$u" 2>/dev/null; systemctl reset-failed "$u" 2>/dev/null; done; true',
     10,
   );
 
@@ -81,7 +81,7 @@ export async function pullImage(endpoint: ResolvedEndpoint, image: string): Prom
   await execOnHost(endpoint, 'docker image prune -f >/dev/null 2>&1 || true', 15);
 
   // 4. Start pull in background via systemd-run (CF proxy times out on long operations)
-  const unitName = `kortix-pull-${Date.now()}`;
+  const unitName = `acme-pull-${Date.now()}`;
   const startPull = await execOnHost(
     endpoint,
     `systemd-run --unit=${unitName} --description="Pull ${image}" -- docker pull ${image} 2>&1`,
@@ -185,7 +185,7 @@ export async function stopAndStartContainer(
   const scriptLines = [
     '#!/bin/bash',
     'systemctl disable --now justavps-docker 2>/dev/null || true',
-    'systemctl disable --now kortix-sandbox 2>/dev/null || true',
+    'systemctl disable --now acme-sandbox 2>/dev/null || true',
     `docker stop -t 10 ${containerName} 2>/dev/null || true`,
     `docker rm -f ${containerName} 2>/dev/null || true`,
     `for i in $(seq 1 10); do docker inspect ${containerName} >/dev/null 2>&1 || break; sleep 1; done`,
@@ -193,17 +193,17 @@ export async function stopAndStartContainer(
   ].join('\n');
 
   const b64 = Buffer.from(scriptLines).toString('base64');
-  const unitName = `kortix-update-${Date.now()}`;
+  const unitName = `acme-update-${Date.now()}`;
 
   await execOnHost(
     endpoint,
-    `echo '${b64}' | base64 -d > /tmp/kortix-update.sh && chmod +x /tmp/kortix-update.sh`,
+    `echo '${b64}' | base64 -d > /tmp/acme-update.sh && chmod +x /tmp/acme-update.sh`,
     5,
   );
 
   const result = await execOnHost(
     endpoint,
-    `systemctl reset-failed ${unitName} 2>/dev/null || true; systemd-run --unit=${unitName} --description="Kortix sandbox update" /tmp/kortix-update.sh`,
+    `systemctl reset-failed ${unitName} 2>/dev/null || true; systemd-run --unit=${unitName} --description="Acme sandbox update" /tmp/acme-update.sh`,
     15,
   );
 

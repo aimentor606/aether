@@ -65,7 +65,7 @@ interface ApiKeyRegenerateEnvelope {
   sandbox_updated: boolean;
 }
 
-// API Key Management API (sandbox-scoped, kortix schema)
+// API Key Management API (sandbox-scoped, acme schema)
 export const apiKeysApi = {
   /**
    * Create a new user API key for a sandbox.

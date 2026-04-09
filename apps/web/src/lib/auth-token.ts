@@ -167,7 +167,7 @@ async function fetchToken(): Promise<string | null> {
 /**
  * Unified auth token getter.
  *
- * Returns the Supabase JWT. All requests go through kortix-api which
+ * Returns the Supabase JWT. All requests go through acme-api which
  * authenticates via Supabase JWT — no additional sandbox lock/key needed.
  */
 export async function getAuthToken(): Promise<string | null> {

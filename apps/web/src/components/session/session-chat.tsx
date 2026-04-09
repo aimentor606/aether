@@ -62,7 +62,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { KortixLoader } from "@/components/ui/kortix-loader";
+import { AcmeLoader } from "@/components/ui/acme-loader";
 import { AnimatedThinkingText } from "@/components/ui/animated-thinking-text";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -95,12 +95,12 @@ import { getClient } from "@/lib/opencode-sdk";
 // billingApi / invalidateAccountState / useQueryClient removed — billing is handled server-side by the router
 import { playSound } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import { stripKortixSystemTags, extractSessionReport, type SessionReport } from "@/lib/utils/kortix-system-tags";
+import { stripAcmeSystemTags, extractSessionReport, type SessionReport } from "@/lib/utils/acme-system-tags";
 import { SubSessionModal } from "@/components/session/sub-session-modal";
 import { ChatMinimap } from "@/components/session/chat-minimap";
 import { useMessageJumpStore } from "@/stores/message-jump-store";
 import { toast as sonnerToast } from "sonner";
-import { useKortixComputerStore } from "@/stores/kortix-computer-store";
+import { useAcmeComputerStore } from "@/stores/acme-computer-store";
 import { useMessageQueueStore } from "@/stores/message-queue-store";
 import { usePendingFilesStore } from "@/stores/pending-files-store";
 import { useOpenCodePendingStore } from "@/stores/opencode-pending-store";
@@ -708,7 +708,7 @@ function parsePtyExitedNotifications(text: string): {
 
 function stripSystemPtyText(text: string): string {
 	if (!text) return "";
-	return stripKortixSystemTags(text)
+	return stripAcmeSystemTags(text)
 		.replace(PTY_EXITED_BLOCK_REGEX, " ")
 		.replace(PTY_FAILURE_HINT_REGEX, " ")
 		.replace(AGENT_COMPLETED_BLOCK_REGEX, " ")
@@ -1393,7 +1393,7 @@ function UserMessageRow({
 	commandInfo?: { name: string; args?: string };
 	commands?: Command[];
 }) {
-	const openFileInComputer = useKortixComputerStore(
+	const openFileInComputer = useAcmeComputerStore(
 		(s) => s.openFileInComputer,
 	);
 	const openPreview = useFilePreviewStore((s) => s.openPreview);
@@ -2099,7 +2099,7 @@ function ReasoningPartCard({
 
 			<CollapsibleContent>
 				<div className="mt-1.5 mb-2 rounded-lg bg-muted/20 border border-border/30 text-xs overflow-hidden">
-					<div className="p-3 text-muted-foreground/65 [&_.kortix-markdown]:italic [&_.kortix-markdown_div]:!text-[13px] [&_.kortix-markdown_div]:!leading-[1.45] [&_.kortix-markdown_div]:!text-muted-foreground/65 [&_.kortix-markdown_li]:!text-[13px] [&_.kortix-markdown_li]:!leading-[1.45] [&_.kortix-markdown_li]:!text-muted-foreground/65 [&_.kortix-markdown_strong]:!text-muted-foreground/70 [&_.kortix-markdown_em]:!text-muted-foreground/70">
+					<div className="p-3 text-muted-foreground/65 [&_.acme-markdown]:italic [&_.acme-markdown_div]:!text-[13px] [&_.acme-markdown_div]:!leading-[1.45] [&_.acme-markdown_div]:!text-muted-foreground/65 [&_.acme-markdown_li]:!text-[13px] [&_.acme-markdown_li]:!leading-[1.45] [&_.acme-markdown_li]:!text-muted-foreground/65 [&_.acme-markdown_strong]:!text-muted-foreground/70 [&_.acme-markdown_em]:!text-muted-foreground/70">
 						<ThrottledMarkdown content={part.text} isStreaming={false} />
 					</div>
 				</div>
@@ -2681,7 +2681,7 @@ function SessionTurn({
 	//
 	// Structure:
 	//   1. User message + actions
-	//   2. Kortix logo
+	//   2. Acme logo
 	//   3. Steps trigger (spinner/chevron + status + duration) — if working || hasSteps
 	//   4. Collapsible steps (if expanded): all parts EXCEPT response part
 	//   5. Answered question parts (if collapsed + has answered questions)
@@ -2799,13 +2799,13 @@ function SessionTurn({
 			</div>
 			)}
 
-			{/* Kortix logo header */}
+			{/* Acme logo header */}
 			{(working || hasSteps || hasReasoning) && (
 				<div className="flex items-center gap-2 mt-3">
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
-						src="/kortix-logomark-white.svg"
-						alt="Kortix"
+						src="/acme-logomark-white.svg"
+						alt="Acme"
 						className="dark:invert-0 invert flex-shrink-0 h-[14px] w-auto"
 					/>
 				</div>
@@ -2913,13 +2913,13 @@ function SessionTurn({
 					</div>
 			)}
 
-			{/* Kortix logo — shown when there are no steps and not working (otherwise logo is already above the steps trigger) */}
+			{/* Acme logo — shown when there are no steps and not working (otherwise logo is already above the steps trigger) */}
 			{!hasSteps && !hasReasoning && !working && (response || answeredQuestionParts.length > 0 || turnError) && (
 				<div className="flex items-center gap-2 mt-3 mb-3">
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
-						src="/kortix-logomark-white.svg"
-						alt="Kortix"
+						src="/acme-logomark-white.svg"
+						alt="Acme"
 						className="dark:invert-0 invert flex-shrink-0 h-[14px] w-auto"
 					/>
 				</div>
@@ -3179,9 +3179,9 @@ export function SessionChat({
 		window.getSelection()?.removeAllRanges();
 	}, [selectionPopup]);
 
-	// ---- KortixComputer side panel ----
+	// ---- AcmeComputer side panel ----
 	const { isSidePanelOpen, setIsSidePanelOpen, openFileInComputer } =
-		useKortixComputerStore();
+		useAcmeComputerStore();
 	const openPreview = useFilePreviewStore((s) => s.openPreview);
 	const handleTogglePanel = useCallback(() => {
 		setIsSidePanelOpen(!isSidePanelOpen);
@@ -5006,7 +5006,7 @@ export function SessionChat({
 			{/* Content area — loading, not-found, or actual messages */}
 			{isDataLoading ? (
 				<div className="flex-1 flex items-center justify-center min-h-0">
-					<KortixLoader size="small" />
+					<AcmeLoader size="small" />
 				</div>
 			) : isNotFound ? (
 				<div className="flex-1 flex items-center justify-center min-h-0 text-sm text-muted-foreground">
@@ -5091,8 +5091,8 @@ export function SessionChat({
 										<div className="flex items-center gap-3">
 											{/* eslint-disable-next-line @next/next/no-img-element */}
 											<img
-												src="/kortix-logomark-white.svg"
-												alt="Kortix"
+												src="/acme-logomark-white.svg"
+												alt="Acme"
 												className="dark:invert-0 invert flex-shrink-0 h-[14px] w-auto"
 											/>
 											{isRetrying && (
@@ -5119,8 +5119,8 @@ export function SessionChat({
 												<div className="flex items-center gap-3">
 													{/* eslint-disable-next-line @next/next/no-img-element */}
 													<img
-														src="/kortix-logomark-white.svg"
-														alt="Kortix"
+														src="/acme-logomark-white.svg"
+														alt="Acme"
 														className="dark:invert-0 invert flex-shrink-0 h-[14px] w-auto"
 													/>
 													<div className="text-sm text-muted-foreground">
@@ -5187,8 +5187,8 @@ export function SessionChat({
 									<div className="flex items-center gap-3">
 										{/* eslint-disable-next-line @next/next/no-img-element */}
 										<img
-											src="/kortix-logomark-white.svg"
-											alt="Kortix"
+											src="/acme-logomark-white.svg"
+											alt="Acme"
 											className="dark:invert-0 invert flex-shrink-0 h-[14px] w-auto"
 										/>
 									</div>

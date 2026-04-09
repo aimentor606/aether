@@ -42,7 +42,7 @@ function findRepoRoot(): string | null {
 
 function getMasterUrlCandidates(): string[] {
   const candidates: string[] = [];
-  const explicit = process.env.KORTIX_MASTER_URL;
+  const explicit = process.env.ACME_MASTER_URL;
   if (explicit && explicit.trim()) candidates.push(explicit.trim());
   candidates.push('http://sandbox:8000');
   candidates.push(`http://localhost:${config.SANDBOX_PORT_BASE || 14000}`);
@@ -74,7 +74,7 @@ async function fetchMasterJson<T>(path: string, init: RequestInit = {}, timeoutM
     const url = `${base}${path}`;
     try {
       const res = await fetchWithTimeout(url, init, timeoutMs);
-      // 503 from /kortix/health means "starting" — still return the JSON body
+      // 503 from /acme/health means "starting" — still return the JSON body
       // so callers can inspect the status/opencode fields.
       if (!res.ok && res.status !== 503) {
         lastErr = new Error(`Master ${url} returned ${res.status}`);
@@ -323,7 +323,7 @@ providersApp.put('/:id/connect', async (c) => {
     if (existsSync(examplePath)) {
       writeFileSync(rootEnvPath, readFileSync(examplePath, 'utf-8'));
     } else {
-      writeFileSync(rootEnvPath, '# Kortix Environment Configuration\nENV_MODE=local\n');
+      writeFileSync(rootEnvPath, '# Acme Environment Configuration\nENV_MODE=local\n');
     }
   }
 
@@ -346,13 +346,13 @@ providersApp.put('/:id/connect', async (c) => {
       if (existsSync(examplePath)) {
         writeFileSync(sandboxEnvPath, readFileSync(examplePath, 'utf-8'));
       } else {
-        writeFileSync(sandboxEnvPath, '# Kortix Sandbox Environment\nENV_MODE=local\n');
+        writeFileSync(sandboxEnvPath, '# Acme Sandbox Environment\nENV_MODE=local\n');
       }
     }
     sandboxData.ENV_MODE = 'local';
     sandboxData.SANDBOX_ID = config.SANDBOX_CONTAINER_NAME;
     sandboxData.PROJECT_ID = 'local';
-    sandboxData.KORTIX_API_URL = 'http://kortix-api:8008';
+    sandboxData.ACME_API_URL = 'http://acme-api:8008';
     writeEnvFile(sandboxEnvPath, sandboxData);
   }
 
@@ -422,7 +422,7 @@ providersApp.get('/health', async (c) => {
   if (!repoRoot) {
     // Docker mode: check sandbox via HTTP
     try {
-      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/kortix/health', {}, 5000);
+      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/acme/health', {}, 5000);
       checks.sandbox = { ok: true };
       checks.docker = { ok: true };
       if (health.status === 'starting' || health.runtimeReady === false) {

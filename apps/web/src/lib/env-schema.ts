@@ -7,7 +7,7 @@ const RuntimeEnvSchema = z.object({
   ENV_MODE: z.enum(['local', 'cloud']).default('local'),
   APP_URL: z.string().url('APP_URL must be a valid URL').default('http://localhost:3000'),
   /** Default sandbox container name — used as fallback before the store hydrates */
-  SANDBOX_ID: z.string().optional().default('kortix-sandbox'),
+  SANDBOX_ID: z.string().optional().default('acme-sandbox'),
 })
 
 export type RuntimeEnv = z.infer<typeof RuntimeEnvSchema>

@@ -4,7 +4,7 @@ export const revalidate = 300; // cache for 5 minutes
 
 export async function GET() {
   try {
-    const res = await fetch('https://api.github.com/repos/kortix-ai/suna', {
+    const res = await fetch('https://api.github.com/repos/aimentor606/aether', {
       headers: { 'Accept': 'application/vnd.github.v3+json' },
       next: { revalidate: 300 },
     });

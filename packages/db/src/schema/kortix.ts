@@ -15,9 +15,9 @@ import {
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 
-export const kortixSchema = pgSchema('kortix');
+export const acmeSchema = pgSchema('acme');
 
-export const sandboxStatusEnum = kortixSchema.enum('sandbox_status', [
+export const sandboxStatusEnum = acmeSchema.enum('sandbox_status', [
   'provisioning',
   'active',
   'stopped',
@@ -26,13 +26,13 @@ export const sandboxStatusEnum = kortixSchema.enum('sandbox_status', [
   'error',
 ]);
 
-export const sandboxProviderEnum = kortixSchema.enum('sandbox_provider', [
+export const sandboxProviderEnum = acmeSchema.enum('sandbox_provider', [
   'daytona',
   'local_docker',
   'justavps',
 ]);
 
-export const deploymentStatusEnum = kortixSchema.enum('deployment_status', [
+export const deploymentStatusEnum = acmeSchema.enum('deployment_status', [
   'pending',
   'building',
   'deploying',
@@ -41,7 +41,7 @@ export const deploymentStatusEnum = kortixSchema.enum('deployment_status', [
   'stopped',
 ]);
 
-export const deploymentSourceEnum = kortixSchema.enum('deployment_source', [
+export const deploymentSourceEnum = acmeSchema.enum('deployment_source', [
   'git',
   'code',
   'files',
@@ -49,18 +49,18 @@ export const deploymentSourceEnum = kortixSchema.enum('deployment_source', [
 ]);
 
 
-export const apiKeyStatusEnum = kortixSchema.enum('api_key_status', [
+export const apiKeyStatusEnum = acmeSchema.enum('api_key_status', [
   'active',
   'revoked',
   'expired',
 ]);
 
-export const apiKeyTypeEnum = kortixSchema.enum('api_key_type', [
+export const apiKeyTypeEnum = acmeSchema.enum('api_key_type', [
   'user',
   'sandbox',
 ]);
 
-export const integrationStatusEnum = kortixSchema.enum('integration_status', [
+export const integrationStatusEnum = acmeSchema.enum('integration_status', [
   'active',
   'revoked',
   'expired',
@@ -70,13 +70,13 @@ export const integrationStatusEnum = kortixSchema.enum('integration_status', [
 // ─── Accounts & Members ─────────────────────────────────────────────────────
 // Replaces basejump.account_user. Fully kortix-native.
 
-export const accountRoleEnum = kortixSchema.enum('account_role', [
+export const accountRoleEnum = acmeSchema.enum('account_role', [
   'owner',
   'admin',
   'member',
 ]);
 
-export const accounts = kortixSchema.table(
+export const accounts = acmeSchema.table(
   'accounts',
   {
     accountId: uuid('account_id').defaultRandom().primaryKey(),
@@ -89,7 +89,7 @@ export const accounts = kortixSchema.table(
   },
 );
 
-export const accountMembers = kortixSchema.table(
+export const accountMembers = acmeSchema.table(
   'account_members',
   {
     userId: uuid('user_id').notNull(),
@@ -106,7 +106,7 @@ export const accountMembers = kortixSchema.table(
   ],
 );
 
-export const sandboxes = kortixSchema.table(
+export const sandboxes = acmeSchema.table(
   'sandboxes',
   {
     sandboxId: uuid('sandbox_id').defaultRandom().primaryKey(),
@@ -134,7 +134,7 @@ export const sandboxes = kortixSchema.table(
 
 // ─── Pool Resources ─────────────────────────────────────────────────────────
 
-export const poolResources = kortixSchema.table(
+export const poolResources = acmeSchema.table(
   'pool_resources',
   {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -151,7 +151,7 @@ export const poolResources = kortixSchema.table(
   ],
 );
 
-export const poolSandboxes = kortixSchema.table(
+export const poolSandboxes = acmeSchema.table(
   'pool_sandboxes',
   {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -172,7 +172,7 @@ export const poolSandboxes = kortixSchema.table(
   ],
 );
 
-export const deployments = kortixSchema.table(
+export const deployments = acmeSchema.table(
   'deployments',
   {
     deploymentId: uuid('deployment_id').defaultRandom().primaryKey(),
@@ -214,7 +214,7 @@ export const deployments = kortixSchema.table(
 
 // ─── API Keys (sandbox-scoped) ──────────────────────────────────────────────
 
-export const kortixApiKeys = kortixSchema.table(
+export const acmeApiKeys = acmeSchema.table(
   'api_keys',
   {
     keyId: uuid('key_id').defaultRandom().primaryKey(),
@@ -244,7 +244,7 @@ export const kortixApiKeys = kortixSchema.table(
 // Stores Pipedream (or future provider) credentials per account.
 // Resolution order: request headers → account DB → API env defaults.
 
-export const integrationCredentials = kortixSchema.table(
+export const integrationCredentials = acmeSchema.table(
   'integration_credentials',
   {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -263,7 +263,7 @@ export const integrationCredentials = kortixSchema.table(
 
 // ─── Integrations (account-level OAuth connections) ─────────────────────────
 
-export const integrations = kortixSchema.table(
+export const integrations = acmeSchema.table(
   'integrations',
   {
     integrationId: uuid('integration_id').defaultRandom().primaryKey(),
@@ -289,7 +289,7 @@ export const integrations = kortixSchema.table(
   ],
 );
 
-export const sandboxIntegrations = kortixSchema.table(
+export const sandboxIntegrations = acmeSchema.table(
   'sandbox_integrations',
   {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -311,7 +311,7 @@ export const sandboxIntegrations = kortixSchema.table(
 // User-configured server/instance entries (persisted from the frontend).
 // Auth tokens are NOT stored — they remain in the browser's localStorage.
 
-export const serverEntries = kortixSchema.table(
+export const serverEntries = acmeSchema.table(
   'server_entries',
   {
     /** Auto-generated row PK. */
@@ -338,7 +338,7 @@ export const serverEntries = kortixSchema.table(
 
 // ─── OAuth2 Provider ──────────────────────────────────────────────────────
 
-export const oauthClients = kortixSchema.table(
+export const oauthClients = acmeSchema.table(
   'oauth_clients',
   {
     clientId: uuid('client_id').defaultRandom().primaryKey(),
@@ -351,7 +351,7 @@ export const oauthClients = kortixSchema.table(
   },
 );
 
-export const oauthAuthorizationCodes = kortixSchema.table(
+export const oauthAuthorizationCodes = acmeSchema.table(
   'oauth_authorization_codes',
   {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -374,7 +374,7 @@ export const oauthAuthorizationCodes = kortixSchema.table(
   ],
 );
 
-export const oauthAccessTokens = kortixSchema.table(
+export const oauthAccessTokens = acmeSchema.table(
   'oauth_access_tokens',
   {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -394,7 +394,7 @@ export const oauthAccessTokens = kortixSchema.table(
   ],
 );
 
-export const oauthRefreshTokens = kortixSchema.table(
+export const oauthRefreshTokens = acmeSchema.table(
   'oauth_refresh_tokens',
   {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -419,7 +419,7 @@ export const sandboxesRelations = relations(sandboxes, ({ one, many }) => ({
     references: [accounts.accountId],
   }),
   deployments: many(deployments),
-  apiKeys: many(kortixApiKeys),
+  apiKeys: many(acmeApiKeys),
   sandboxIntegrationLinks: many(sandboxIntegrations),
 }));
 
@@ -430,9 +430,9 @@ export const deploymentsRelations = relations(deployments, ({ one }) => ({
   }),
 }));
 
-export const kortixApiKeysRelations = relations(kortixApiKeys, ({ one }) => ({
+export const acmeApiKeysRelations = relations(acmeApiKeys, ({ one }) => ({
   sandbox: one(sandboxes, {
-    fields: [kortixApiKeys.sandboxId],
+    fields: [acmeApiKeys.sandboxId],
     references: [sandboxes.sandboxId],
   }),
 }));
@@ -468,7 +468,7 @@ export const accountMembersRelations = relations(accountMembers, ({ one }) => ({
 
 // ─── Billing / Credits ─────────────────────────────────────────────────────
 
-export const billingCustomers = kortixSchema.table(
+export const billingCustomers = acmeSchema.table(
   'billing_customers',
   {
     accountId: uuid('account_id').notNull(),
@@ -482,7 +482,7 @@ export const billingCustomers = kortixSchema.table(
   ],
 );
 
-export const creditAccounts = kortixSchema.table(
+export const creditAccounts = acmeSchema.table(
   'credit_accounts',
   {
     accountId: uuid('account_id').primaryKey().notNull(),
@@ -538,7 +538,7 @@ export const creditAccounts = kortixSchema.table(
   ],
 );
 
-export const creditLedger = kortixSchema.table(
+export const creditLedger = acmeSchema.table(
   'credit_ledger',
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -559,14 +559,14 @@ export const creditLedger = kortixSchema.table(
     processingSource: text('processing_source'),
   },
   (table) => [
-    unique('kortix_unique_stripe_event').on(table.stripeEventId),
+    unique('acme_unique_stripe_event').on(table.stripeEventId),
     index('idx_kortix_credit_ledger_idempotency')
       .on(table.idempotencyKey)
       .where(sql`${table.idempotencyKey} IS NOT NULL`),
   ],
 );
 
-export const creditUsage = kortixSchema.table('credit_usage', {
+export const creditUsage = acmeSchema.table('credit_usage', {
   id: uuid().defaultRandom().primaryKey().notNull(),
   accountId: uuid('account_id').notNull(),
   amountDollars: numeric('amount_dollars', { precision: 10, scale: 2 }).notNull(),
@@ -577,7 +577,7 @@ export const creditUsage = kortixSchema.table('credit_usage', {
   metadata: jsonb().default({}),
 });
 
-export const accountDeletionRequests = kortixSchema.table('account_deletion_requests', {
+export const accountDeletionRequests = acmeSchema.table('account_deletion_requests', {
   id: uuid().defaultRandom().primaryKey().notNull(),
   accountId: uuid('account_id').notNull(),
   userId: uuid('user_id').notNull(),
@@ -589,7 +589,7 @@ export const accountDeletionRequests = kortixSchema.table('account_deletion_requ
   cancelledAt: timestamp('cancelled_at', { withTimezone: true, mode: 'string' }),
 });
 
-export const creditPurchases = kortixSchema.table('credit_purchases', {
+export const creditPurchases = acmeSchema.table('credit_purchases', {
   id: uuid().defaultRandom().primaryKey().notNull(),
   accountId: uuid('account_id').notNull(),
   amountDollars: numeric('amount_dollars', { precision: 10, scale: 2 }).notNull(),
@@ -607,13 +607,13 @@ export const creditPurchases = kortixSchema.table('credit_purchases', {
 
 // ─── Tunnel (Reverse-Tunnel to Local Machine) ──────────────────────────────
 
-export const tunnelStatusEnum = kortixSchema.enum('tunnel_status', [
+export const tunnelStatusEnum = acmeSchema.enum('tunnel_status', [
   'online',
   'offline',
   'connecting',
 ]);
 
-export const tunnelCapabilityEnum = kortixSchema.enum('tunnel_capability', [
+export const tunnelCapabilityEnum = acmeSchema.enum('tunnel_capability', [
   'filesystem',
   'shell',
   'network',
@@ -623,13 +623,13 @@ export const tunnelCapabilityEnum = kortixSchema.enum('tunnel_capability', [
   'gpu',
 ]);
 
-export const tunnelPermissionStatusEnum = kortixSchema.enum('tunnel_permission_status', [
+export const tunnelPermissionStatusEnum = acmeSchema.enum('tunnel_permission_status', [
   'active',
   'revoked',
   'expired',
 ]);
 
-export const tunnelPermissionRequestStatusEnum = kortixSchema.enum('tunnel_permission_request_status', [
+export const tunnelPermissionRequestStatusEnum = acmeSchema.enum('tunnel_permission_request_status', [
   'pending',
   'approved',
   'denied',
@@ -676,7 +676,7 @@ export type TunnelPermissionScope =
   | TunnelNetworkScope
   | Record<string, unknown>;
 
-export const tunnelConnections = kortixSchema.table(
+export const tunnelConnections = acmeSchema.table(
   'tunnel_connections',
   {
     tunnelId: uuid('tunnel_id').defaultRandom().primaryKey(),
@@ -698,7 +698,7 @@ export const tunnelConnections = kortixSchema.table(
   ],
 );
 
-export const tunnelPermissions = kortixSchema.table(
+export const tunnelPermissions = acmeSchema.table(
   'tunnel_permissions',
   {
     permissionId: uuid('permission_id').defaultRandom().primaryKey(),
@@ -721,7 +721,7 @@ export const tunnelPermissions = kortixSchema.table(
   ],
 );
 
-export const tunnelPermissionRequests = kortixSchema.table(
+export const tunnelPermissionRequests = acmeSchema.table(
   'tunnel_permission_requests',
   {
     requestId: uuid('request_id').defaultRandom().primaryKey(),
@@ -743,7 +743,7 @@ export const tunnelPermissionRequests = kortixSchema.table(
   ],
 );
 
-export const tunnelAuditLogs = kortixSchema.table(
+export const tunnelAuditLogs = acmeSchema.table(
   'tunnel_audit_logs',
   {
     logId: uuid('log_id').defaultRandom().primaryKey(),
@@ -768,14 +768,14 @@ export const tunnelAuditLogs = kortixSchema.table(
   ],
 );
 
-export const tunnelDeviceAuthStatusEnum = kortixSchema.enum('tunnel_device_auth_status', [
+export const tunnelDeviceAuthStatusEnum = acmeSchema.enum('tunnel_device_auth_status', [
   'pending',
   'approved',
   'denied',
   'expired',
 ]);
 
-export const tunnelDeviceAuthRequests = kortixSchema.table(
+export const tunnelDeviceAuthRequests = acmeSchema.table(
   'tunnel_device_auth_requests',
   {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -839,13 +839,13 @@ export const tunnelAuditLogsRelations = relations(tunnelAuditLogs, ({ one }) => 
 // ─── Platform User Roles ────────────────────────────────────────────────────
 // Platform-level roles (not account-scoped). Controls admin access to the platform.
 
-export const platformRoleEnum = kortixSchema.enum('platform_role', [
+export const platformRoleEnum = acmeSchema.enum('platform_role', [
   'user',
   'admin',
   'super_admin',
 ]);
 
-export const platformUserRoles = kortixSchema.table(
+export const platformUserRoles = acmeSchema.table(
   'platform_user_roles',
   {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -862,13 +862,13 @@ export const platformUserRoles = kortixSchema.table(
 
 // ─── Access Control ─────────────────────────────────────────────────────────
 
-export const accessRequestStatusEnum = kortixSchema.enum('access_request_status', [
+export const accessRequestStatusEnum = acmeSchema.enum('access_request_status', [
   'pending',
   'approved',
   'rejected',
 ]);
 
-export const platformSettings = kortixSchema.table(
+export const platformSettings = acmeSchema.table(
   'platform_settings',
   {
     key: varchar('key', { length: 255 }).primaryKey(),
@@ -877,7 +877,7 @@ export const platformSettings = kortixSchema.table(
   },
 );
 
-export const accessAllowlist = kortixSchema.table(
+export const accessAllowlist = acmeSchema.table(
   'access_allowlist',
   {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -891,7 +891,7 @@ export const accessAllowlist = kortixSchema.table(
   ],
 );
 
-export const accessRequests = kortixSchema.table(
+export const accessRequests = acmeSchema.table(
   'access_requests',
   {
     id: uuid('id').defaultRandom().primaryKey(),

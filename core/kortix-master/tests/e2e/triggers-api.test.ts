@@ -198,7 +198,7 @@ describe('Triggers API E2E', () => {
         name: 'Daily Report',
         description: 'Generates daily report',
         source: { type: 'cron', cron_expr: '0 0 9 * * *', timezone: 'UTC' },
-        action: { type: 'prompt', prompt: 'Generate the daily report', agent: 'kortix' },
+        action: { type: 'prompt', prompt: 'Generate the daily report', agent: 'acme' },
       })
       expect(createStatus).toBe(201)
       expect(createJson.success).toBe(true)

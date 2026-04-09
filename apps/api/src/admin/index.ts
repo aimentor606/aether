@@ -1,5 +1,5 @@
 /**
- * Admin Panel — self-contained admin dashboard served by kortix-api.
+ * Admin Panel — self-contained admin dashboard served by acme-api.
  *
  * Serves an embedded HTML admin UI at /v1/admin and exposes JSON API endpoints
  * for managing platform-level .env credentials and listing all sandbox instances.
@@ -112,7 +112,7 @@ function writeEnvFile(path: string, data: Record<string, string>): void {
 
 function getMasterUrlCandidates(): string[] {
   const candidates: string[] = [];
-  const explicit = process.env.KORTIX_MASTER_URL;
+  const explicit = process.env.ACME_MASTER_URL;
   if (explicit && explicit.trim()) candidates.push(explicit.trim());
   candidates.push('http://sandbox:8000');
   candidates.push(`http://localhost:${config.SANDBOX_PORT_BASE || 14000}`);
@@ -141,7 +141,7 @@ async function fetchMasterJson<T>(path: string, init: RequestInit = {}, timeoutM
     const url = `${base}${path}`;
     try {
       const res = await fetchWithTimeout(url, init, timeoutMs);
-      // 503 from /kortix/health means "starting" — still return the JSON body
+      // 503 from /acme/health means "starting" — still return the JSON body
       // so callers can inspect the status/opencode fields.
       if (!res.ok && res.status !== 503) { lastErr = new Error(`Master ${url} returned ${res.status}`); continue; }
       return (await res.json()) as T;
@@ -165,7 +165,7 @@ async function setSandboxEnv(keys: Record<string, string>): Promise<void> {
 
 // ─── Extended key groups (beyond provider registry) ─────────────────────────
 // These are platform-level keys not in the provider registry but configured
-// during get-kortix.sh setup.
+// during get-acme.sh setup.
 
 interface KeyGroup {
   title: string;
@@ -345,7 +345,7 @@ adminApp.post('/api/env', async (c) => {
     if (existsSync(examplePath)) {
       writeFileSync(rootEnvPath, readFileSync(examplePath, 'utf-8'));
     } else {
-      writeFileSync(rootEnvPath, '# Kortix Environment Configuration\nENV_MODE=local\n');
+      writeFileSync(rootEnvPath, '# Acme Environment Configuration\nENV_MODE=local\n');
     }
   }
 
@@ -358,7 +358,7 @@ adminApp.post('/api/env', async (c) => {
       if (existsSync(examplePath)) {
         writeFileSync(sandboxEnvPath, readFileSync(examplePath, 'utf-8'));
       } else {
-        writeFileSync(sandboxEnvPath, '# Kortix Sandbox Environment\nENV_MODE=local\n');
+        writeFileSync(sandboxEnvPath, '# Acme Sandbox Environment\nENV_MODE=local\n');
       }
     }
     writeEnvFile(sandboxEnvPath, sandboxData);
@@ -378,7 +378,7 @@ adminApp.post('/api/env', async (c) => {
 adminApp.get('/api/instances', async (c) => {
   try {
     const { db } = await import('../shared/db');
-    const { sandboxes } = await import('@kortix/db');
+    const { sandboxes } = await import('@acme/db');
 
     const rows = await db
       .select()
@@ -407,7 +407,7 @@ adminApp.get('/api/instances', async (c) => {
 adminApp.get('/api/sandboxes', async (c) => {
   try {
     const { db } = await import('../shared/db');
-    const { sandboxes, accounts } = await import('@kortix/db');
+    const { sandboxes, accounts } = await import('@acme/db');
     const { desc, eq, sql, and, ilike, or } = await import('drizzle-orm');
 
     const q       = c.req.query('search')   || '';
@@ -435,7 +435,7 @@ adminApp.get('/api/sandboxes', async (c) => {
         ilike(accounts.name, `%${q}%`),
         sql`EXISTS (
           SELECT 1 FROM auth.users au
-          INNER JOIN kortix.account_members am ON am.user_id = au.id
+          INNER JOIN acme.account_members am ON am.user_id = au.id
           WHERE am.account_id = ${sandboxes.accountId}
           AND au.email ILIKE ${'%' + q + '%'}
           LIMIT 1
@@ -447,7 +447,7 @@ adminApp.get('/api/sandboxes', async (c) => {
 
     const ownerEmailSub = sql<string>`(
       SELECT au.email FROM auth.users au
-      INNER JOIN kortix.account_members am ON am.user_id = au.id
+      INNER JOIN acme.account_members am ON am.user_id = au.id
       WHERE am.account_id = ${sandboxes.accountId}
       LIMIT 1
     )`;
@@ -493,7 +493,7 @@ adminApp.delete('/api/sandboxes/:id', async (c) => {
   try {
     const sandboxId = c.req.param('id');
     const { db } = await import('../shared/db');
-    const { sandboxes } = await import('@kortix/db');
+    const { sandboxes } = await import('@acme/db');
     const { eq } = await import('drizzle-orm');
 
     const [row] = await db.select().from(sandboxes).where(eq(sandboxes.sandboxId, sandboxId)).limit(1);
@@ -528,7 +528,7 @@ adminApp.get('/api/health', async (c) => {
 
   if (!repoRoot) {
     try {
-      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/kortix/health', {}, 5000);
+      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/acme/health', {}, 5000);
       checks.sandbox = { ok: true };
       checks.docker = { ok: true };
       // If runtime isn't ready, sandbox is reachable but not fully operational
@@ -566,11 +566,11 @@ adminApp.get('/api/status', async (c) => {
   const root = getProjectRoot();
   return c.json({
     envMode: config.ENV_MODE,
-    internalEnv: config.INTERNAL_KORTIX_ENV,
+    internalEnv: config.INTERNAL_ACME_ENV,
     port: config.PORT,
     sandboxVersion: (await import('../config')).SANDBOX_VERSION,
     allowedProviders: config.ALLOWED_SANDBOX_PROVIDERS,
-    billingEnabled: config.KORTIX_BILLING_INTERNAL_ENABLED,
+    billingEnabled: config.ACME_BILLING_INTERNAL_ENABLED,
     daytonaEnabled: config.isDaytonaEnabled(),
     localDockerEnabled: config.isLocalDockerEnabled(),
     databaseConfigured: !!config.DATABASE_URL,
@@ -591,7 +591,7 @@ function getAdminHTML(): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kortix Admin</title>
+  <title>Acme Admin</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1047,7 +1047,7 @@ function getAdminHTML(): string {
   <!-- Auth overlay -->
   <div id="auth-overlay" class="auth-overlay" style="display: none;">
     <div class="auth-box">
-      <h2>Kortix Admin</h2>
+      <h2>Acme Admin</h2>
       <p>Enter your Supabase JWT or sign in to access the admin panel.</p>
       <input type="password" id="auth-token" placeholder="Bearer token" />
       <div id="auth-error" class="auth-error" style="display: none;"></div>
@@ -1058,7 +1058,7 @@ function getAdminHTML(): string {
   <!-- Main app -->
   <div class="app" id="main-app">
     <header>
-      <h1>Kortix Admin</h1>
+      <h1>Acme Admin</h1>
       <div class="status-bar" id="status-bar">
         <span><span class="status-dot loading" id="dot-api"></span>API</span>
         <span><span class="status-dot loading" id="dot-docker"></span>Docker</span>
@@ -1111,11 +1111,11 @@ function getAdminHTML(): string {
 
     // ─── Auth ───────────────────────────────────────────────────
     function getStoredToken() {
-      return localStorage.getItem('kortix_admin_token') || '';
+      return localStorage.getItem('acme_admin_token') || '';
     }
 
     function setStoredToken(t) {
-      localStorage.setItem('kortix_admin_token', t);
+      localStorage.setItem('acme_admin_token', t);
     }
 
     async function authenticate() {

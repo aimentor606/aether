@@ -1,1 +1,1 @@
-ALTER TYPE kortix.sandbox_provider ADD VALUE IF NOT EXISTS 'justavps';
+ALTER TYPE acme.sandbox_provider ADD VALUE IF NOT EXISTS 'justavps';

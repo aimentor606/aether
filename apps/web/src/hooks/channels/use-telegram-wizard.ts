@@ -56,7 +56,7 @@ export function useTelegramConnect() {
       if (!baseUrl) throw new Error('No active instance');
 
       // Try sandbox setup endpoint
-      const res = await authenticatedFetch(`${baseUrl}/kortix/channels/setup/telegram`, {
+      const res = await authenticatedFetch(`${baseUrl}/acme/channels/setup/telegram`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ botToken, publicUrl, createdBy, defaultAgent, defaultModel }),

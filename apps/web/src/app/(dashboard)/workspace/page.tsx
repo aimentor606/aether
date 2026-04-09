@@ -47,11 +47,11 @@ import {
   type Command,
   type McpStatus,
 } from '@/hooks/opencode/use-opencode-sessions';
-import { useKortixProjects, type KortixProject } from '@/hooks/kortix/use-kortix-projects';
-import { useKortixConnectors, type KortixConnector } from '@/hooks/kortix/use-kortix-connectors';
+import { useAcmeProjects, type AcmeProject } from '@/hooks/acme/use-acme-projects';
+import { useAcmeConnectors, type AcmeConnector } from '@/hooks/acme/use-acme-connectors';
 
 // Re-export as Project for backward compat in this file
-type Project = KortixProject;
+type Project = AcmeProject;
 import { useSkills } from '@/features/skills/hooks';
 import { getSkillSource, type Skill } from '@/features/skills/types';
 import { openTabAndNavigate } from '@/stores/tab-store';
@@ -190,7 +190,7 @@ function DetailSheet({
     }
   }
   if (item?.kind === 'connector' && item.raw) {
-    const c = item.raw as KortixConnector;
+    const c = item.raw as AcmeConnector;
     if (c.source) rows.push({ label: 'Source', value: c.source });
     if (c.pipedream_slug) rows.push({ label: 'Pipedream', value: c.pipedream_slug, mono: true });
     if (c.env_keys?.length) rows.push({ label: 'Env', value: c.env_keys.join(', '), mono: true });
@@ -412,8 +412,8 @@ export default function WorkspacePage() {
     }
   }, [createSession]);
 
-  // Data — Kortix projects are the source of truth
-  const { data: projects,  isLoading: lProjects, error: projectsError  } = useKortixProjects();
+  // Data — Acme projects are the source of truth
+  const { data: projects,  isLoading: lProjects, error: projectsError  } = useAcmeProjects();
   // Debug: log to browser console if projects fail to load
   if (typeof window !== 'undefined') {
     if (projectsError) console.error('[workspace] projects error:', projectsError);
@@ -424,7 +424,7 @@ export default function WorkspacePage() {
   const { data: commands,  isLoading: lCommands  } = useOpenCodeCommands();
   const { data: toolIds,   isLoading: lTools     } = useOpenCodeToolIds();
   const { data: mcpStatus, isLoading: lMcp       } = useOpenCodeMcpStatus();
-  const { data: connectors, isLoading: lConnectors } = useKortixConnectors();
+  const { data: connectors, isLoading: lConnectors } = useAcmeConnectors();
 
   const isLoading = lProjects || lAgents || lSkills || lCommands || lTools || lMcp || lConnectors;
 

@@ -5,7 +5,7 @@
 
 import { eq, and } from 'drizzle-orm';
 import { db } from '../shared/db';
-import { integrationCredentials } from '@kortix/db';
+import { integrationCredentials } from '@acme/db';
 
 export interface PipedreamCreds {
   client_id: string;

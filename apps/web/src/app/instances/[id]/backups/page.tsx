@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { useQuery } from '@tanstack/react-query';
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { AcmeLogo } from '@/components/sidebar/acme-logo';
 import { getSandboxById, type BackupInfo } from '@/lib/platform-client';
 import { useBackups } from '@/hooks/instance/use-backups';
 import { toast as sonnerToast } from 'sonner';
@@ -217,7 +217,7 @@ export default function BackupsPage() {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Top bar */}
       <div className="flex items-center justify-between px-6 py-4 shrink-0">
-        <KortixLogo size={20} />
+        <AcmeLogo size={20} />
       </div>
 
       {/* Content */}

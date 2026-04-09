@@ -11,7 +11,7 @@
 
 import { Hono } from 'hono';
 import { eq, and, or, desc } from 'drizzle-orm';
-import { tunnelConnections } from '@kortix/db';
+import { tunnelConnections } from '@acme/db';
 import { db } from '../../shared/db';
 import { tunnelRelay } from '../core/relay';
 import { generateTunnelToken, hashSecretKey } from '../../shared/crypto';

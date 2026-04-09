@@ -4,7 +4,7 @@ import { devtools } from 'zustand/middleware';
 import { AccountState } from '@/lib/api/billing';
 import { useAccountState } from '@/hooks/billing';
 import { useAuth } from '@/components/AuthProvider';
-import { dollarsToCredits } from '@kortix/shared';
+import { dollarsToCredits } from '@acme/shared';
 import React from 'react';
 
 interface SubscriptionStore {

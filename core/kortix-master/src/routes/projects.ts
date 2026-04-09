@@ -31,7 +31,7 @@ let _db: Database | null = null
 function getDb(): Database {
   if (_db) return _db
 
-  const workspace = process.env.KORTIX_WORKSPACE?.trim()
+  const workspace = process.env.ACME_WORKSPACE?.trim()
     || process.env.OPENCODE_CONFIG_DIR?.replace(/\/opencode\/?$/, '')
     || '/workspace'
   const dbPath = join(workspace, '.kortix', 'kortix.db')
@@ -69,7 +69,7 @@ function getDb(): Database {
     );
     CREATE TABLE IF NOT EXISTS delegations (
       session_id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id),
-      prompt TEXT NOT NULL, agent TEXT NOT NULL DEFAULT 'kortix',
+      prompt TEXT NOT NULL, agent TEXT NOT NULL DEFAULT 'acme',
       parent_session_id TEXT NOT NULL, parent_agent TEXT NOT NULL DEFAULT '',
       status TEXT NOT NULL DEFAULT 'running', result TEXT,
       created_at TEXT NOT NULL, completed_at TEXT

@@ -5,9 +5,9 @@ import { ensureKortixDir } from "../lib/paths"
 import { AUTOWORK_LOOP_CONFIG, INTERNAL_MARKER, createInitialLoopState, type AutoworkAlgorithm, type LoopState } from "../lib/autowork-config"
 import { evaluateTodos, formatRemainingWork } from "../lib/todo-enforcer"
 
-const KORTIX_DIR = ensureKortixDir(import.meta.dir)
-const LOOP_STATE_DIR = `${KORTIX_DIR}/loop-states`
-const LEGACY_LOOP_STATE_PATH = `${KORTIX_DIR}/loop-state.json`
+const ACME_DIR = ensureKortixDir(import.meta.dir)
+const LOOP_STATE_DIR = `${ACME_DIR}/loop-states`
+const LEGACY_LOOP_STATE_PATH = `${ACME_DIR}/loop-state.json`
 
 function loopStatePath(sessionId: string): string {
 	return join(LOOP_STATE_DIR, `${sessionId}.json`)

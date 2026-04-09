@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Test Suite: get-kortix.sh (unified installer)                             ║
+# ║  Test Suite: get-acme.sh (unified installer)                             ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 ROOT_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
-SCRIPT="$ROOT_DIR/scripts/get-kortix.sh"
+SCRIPT="$ROOT_DIR/scripts/get-acme.sh"
 
 PASS=0; FAIL=0; TOTAL=0
 
@@ -12,16 +12,16 @@ pass() { PASS=$((PASS+1)); TOTAL=$((TOTAL+1)); printf "\033[0;32m  ✓ %s\033[0m
 fail() { FAIL=$((FAIL+1)); TOTAL=$((TOTAL+1)); printf "\033[0;31m  ✗ %s\033[0m\n" "$1"; }
 
 echo ""
-echo "  Testing get-kortix.sh structure"
+echo "  Testing get-acme.sh structure"
 echo "  ════════════════════════════════"
 echo ""
 
 # ── Core structure ──
 
 if [ -f "$SCRIPT" ]; then
-  pass "get-kortix.sh exists"
+  pass "get-acme.sh exists"
 else
-  fail "get-kortix.sh exists"
+  fail "get-acme.sh exists"
 fi
 
 if grep -q 'banner()' "$SCRIPT"; then
@@ -68,7 +68,7 @@ else
   fail "supports local and VPS deploy modes"
 fi
 
-if grep -q -- '--local' "$SCRIPT" && grep -q 'KORTIX_LOCAL_IMAGES' "$SCRIPT"; then
+if grep -q -- '--local' "$SCRIPT" && grep -q 'ACME_LOCAL_IMAGES' "$SCRIPT"; then
   pass "supports local installer image mode"
 else
   fail "supports local installer image mode"
@@ -96,7 +96,7 @@ fi
 
 # ── PostgreSQL ──
 
-if grep -q 'POSTGRES_IMAGE\|kortix/postgres' "$SCRIPT"; then
+if grep -q 'POSTGRES_IMAGE\|acme/postgres' "$SCRIPT"; then
   pass "references postgres image"
 else
   fail "references postgres image"
@@ -109,9 +109,9 @@ else
 fi
 
 if grep -q 'DATABASE_URL.*postgres' "$SCRIPT"; then
-  pass "compose sets DATABASE_URL for kortix-api"
+  pass "compose sets DATABASE_URL for acme-api"
 else
-  fail "compose sets DATABASE_URL for kortix-api"
+  fail "compose sets DATABASE_URL for acme-api"
 fi
 
 if grep -q 'supabase-db-data' "$SCRIPT"; then
@@ -252,7 +252,7 @@ else
   fail "no git clone/pull (Docker-only)"
 fi
 
-if grep -q 'kortix/kortix-frontend' "$SCRIPT" && grep -q 'kortix/kortix-api' "$SCRIPT"; then
+if grep -q 'acme/acme-frontend' "$SCRIPT" && grep -q 'acme/acme-api' "$SCRIPT"; then
   pass "uses pre-built Docker images"
 else
   fail "uses pre-built Docker images"
@@ -261,15 +261,15 @@ fi
 # ── Old scripts deleted ──
 
 if [ ! -f "$ROOT_DIR/scripts/install.sh" ]; then
-  pass "install.sh deleted (unified into get-kortix.sh)"
+  pass "install.sh deleted (unified into get-acme.sh)"
 else
-  fail "install.sh deleted (unified into get-kortix.sh)"
+  fail "install.sh deleted (unified into get-acme.sh)"
 fi
 
-if [ ! -f "$ROOT_DIR/scripts/kortix.sh" ]; then
-  pass "kortix.sh deleted (unified into get-kortix.sh)"
+if [ ! -f "$ROOT_DIR/scripts/acme.sh" ]; then
+  pass "acme.sh deleted (unified into get-acme.sh)"
 else
-  fail "kortix.sh deleted (unified into get-kortix.sh)"
+  fail "acme.sh deleted (unified into get-acme.sh)"
 fi
 
 # ── Summary ──

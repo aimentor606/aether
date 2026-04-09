@@ -17,12 +17,12 @@ services:
     profiles: [frontend, all]
     restart: unless-stopped
 
-  kortix-api:
+  acme-api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
       args:
-        SERVICE: kortix-api
+        SERVICE: acme-api
     ports:
       - "8008:8008"
     env_file:

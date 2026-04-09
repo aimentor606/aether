@@ -36,14 +36,14 @@ function randomAlphanumeric(length: number): string {
 function generateApiKeyPair() {
   return {
     publicKey: `pk_${randomAlphanumeric(32)}`,
-    secretKey: `kortix_${randomAlphanumeric(32)}`,
+    secretKey: `acme_${randomAlphanumeric(32)}`,
   };
 }
 
 function generateSandboxKeyPair() {
   return {
     publicKey: `pk_${randomAlphanumeric(32)}`,
-    secretKey: `kortix_sb_${randomAlphanumeric(32)}`,
+    secretKey: `acme_sb_${randomAlphanumeric(32)}`,
   };
 }
 
@@ -56,13 +56,13 @@ describe('Security Audit: API Key Security', () => {
   describe('Key generation entropy', () => {
     test('secret key has 32 random characters (user key)', () => {
       const { secretKey } = generateApiKeyPair();
-      const randomPart = secretKey.replace('kortix_', '');
+      const randomPart = secretKey.replace('acme_', '');
       expect(randomPart.length).toBe(32);
     });
 
     test('secret key has 32 random characters (sandbox key)', () => {
       const { secretKey } = generateSandboxKeyPair();
-      const randomPart = secretKey.replace('kortix_sb_', '');
+      const randomPart = secretKey.replace('acme_sb_', '');
       expect(randomPart.length).toBe(32);
     });
 
@@ -87,19 +87,19 @@ describe('Security Audit: API Key Security', () => {
       const { publicKey, secretKey } = generateApiKeyPair();
       expect(publicKey).not.toBe(secretKey);
       expect(publicKey.startsWith('pk_')).toBe(true);
-      expect(secretKey.startsWith('kortix_')).toBe(true);
+      expect(secretKey.startsWith('acme_')).toBe(true);
     });
   });
 
   describe('Key format validation', () => {
     test('user secret key matches expected pattern', () => {
       const { secretKey } = generateApiKeyPair();
-      expect(secretKey).toMatch(/^kortix_[A-Za-z0-9]{32}$/);
+      expect(secretKey).toMatch(/^acme_[A-Za-z0-9]{32}$/);
     });
 
     test('sandbox secret key matches expected pattern', () => {
       const { secretKey } = generateSandboxKeyPair();
-      expect(secretKey).toMatch(/^kortix_sb_[A-Za-z0-9]{32}$/);
+      expect(secretKey).toMatch(/^acme_sb_[A-Za-z0-9]{32}$/);
     });
 
     test('public key matches expected pattern', () => {
@@ -108,8 +108,8 @@ describe('Security Audit: API Key Security', () => {
     });
 
     test('tunnel token matches expected pattern', () => {
-      const tunnelToken = `kortix_tnl_${randomAlphanumeric(32)}`;
-      expect(tunnelToken).toMatch(/^kortix_tnl_[A-Za-z0-9]{32}$/);
+      const tunnelToken = `acme_tnl_${randomAlphanumeric(32)}`;
+      expect(tunnelToken).toMatch(/^acme_tnl_[A-Za-z0-9]{32}$/);
     });
   });
 
@@ -184,7 +184,7 @@ describe('Security Audit: API Key Security', () => {
 
   describe('Hash storage security', () => {
     test('HMAC hash is stored, not plain SHA-256', () => {
-      const key = 'kortix_test';
+      const key = 'acme_test';
       const secret = 'api-key-secret';
       const hmac = createHmac('sha256', secret).update(key).digest('hex');
       // HMAC requires knowledge of the secret — even with DB access,
@@ -193,7 +193,7 @@ describe('Security Audit: API Key Security', () => {
     });
 
     test('different API_KEY_SECRET produces different hash for same key', () => {
-      const key = 'kortix_test';
+      const key = 'acme_test';
       const hash1 = createHmac('sha256', 'secret-1').update(key).digest('hex');
       const hash2 = createHmac('sha256', 'secret-2').update(key).digest('hex');
       expect(hash1).not.toBe(hash2);
@@ -223,7 +223,7 @@ describe('Security Audit: API Key Security', () => {
 
   describe('Brute force resistance', () => {
     test('key space is large enough to prevent brute force', () => {
-      // kortix_ prefix (7 chars) + 32 random chars from 62-char alphabet
+      // acme_ prefix (7 chars) + 32 random chars from 62-char alphabet
       // Entropy: 32 * log2(62) ≈ 190 bits
       const entropyBits = 32 * Math.log2(62);
       expect(entropyBits).toBeGreaterThan(128); // AES-128 equivalent

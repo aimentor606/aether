@@ -11,7 +11,7 @@
 
 import { Hono } from 'hono';
 import { validateSecretKey } from '../../repositories/api-keys';
-import { isKortixToken } from '../../shared/crypto';
+import { isAcmeToken } from '../../shared/crypto';
 import { getSupabase } from '../../shared/supabase';
 
 const PREVIEW_SESSION_COOKIE = '__preview_session';
@@ -32,10 +32,10 @@ getAuthToken.post('/', async (c) => {
   }
 
   // Validate token
-  if (isKortixToken(token)) {
+  if (isAcmeToken(token)) {
     const result = await validateSecretKey(token);
     if (!result.isValid) {
-      return c.json({ error: result.error || 'Invalid Kortix token' }, 401);
+      return c.json({ error: result.error || 'Invalid Acme token' }, 401);
     }
   } else {
     try {

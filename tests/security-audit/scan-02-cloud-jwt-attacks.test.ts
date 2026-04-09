@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - JWT & Token Attack Vectors
  *
- * LIVE scan against https://computer-preview-api.kortix.com
+ * LIVE scan against https://computer-preview-api.acme.dev
  * Tests various forged, malformed, and expired tokens to ensure
  * the cloud API rejects them all.
  *
@@ -10,14 +10,14 @@
  * - "none" algorithm JWT correctly rejected
  * - HS256 signed with "secret" correctly rejected
  * - Expired tokens correctly rejected
- * - Fake kortix_ and kortix_sb_ tokens correctly rejected
+ * - Fake acme_ and acme_sb_ tokens correctly rejected
  * - Basic auth scheme correctly rejected
  * - Error messages are consistent and do not leak token type info
  */
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.acme.dev';
 
 async function probeWithAuth(path: string, authHeader: string): Promise<{
   status: number;
@@ -101,24 +101,24 @@ describe('Cloud Scan: JWT & Token Attack Vectors', () => {
     });
   });
 
-  describe('Fake Kortix token attacks', () => {
-    test('random kortix_ token is rejected', async () => {
-      const r = await probeWithAuth(TARGET, 'Bearer kortix_faketoken12345678901234567890');
+  describe('Fake Acme token attacks', () => {
+    test('random acme_ token is rejected', async () => {
+      const r = await probeWithAuth(TARGET, 'Bearer acme_faketoken12345678901234567890');
       expect(r.status).toBe(401);
     });
 
-    test('random kortix_sb_ sandbox token is rejected', async () => {
-      const r = await probeWithAuth(TARGET, 'Bearer kortix_sb_faketoken1234567890123456');
+    test('random acme_sb_ sandbox token is rejected', async () => {
+      const r = await probeWithAuth(TARGET, 'Bearer acme_sb_faketoken1234567890123456');
       expect(r.status).toBe(401);
     });
 
-    test('random kortix_tnl_ tunnel token is rejected', async () => {
-      const r = await probeWithAuth(TARGET, 'Bearer kortix_tnl_faketoken123456789012345');
+    test('random acme_tnl_ tunnel token is rejected', async () => {
+      const r = await probeWithAuth(TARGET, 'Bearer acme_tnl_faketoken123456789012345');
       expect(r.status).toBe(401);
     });
 
-    test('FINDING: random kortix_oat_ token on /v1/oauth/userinfo returns 500', async () => {
-      const r = await probeWithAuth('/v1/oauth/userinfo', 'Bearer kortix_oat_faketoken123456789012345');
+    test('FINDING: random acme_oat_ token on /v1/oauth/userinfo returns 500', async () => {
+      const r = await probeWithAuth('/v1/oauth/userinfo', 'Bearer acme_oat_faketoken123456789012345');
       // BUG: oauthTokenAuth middleware crashes on fake token hash lookup
       // Should return 401 but currently returns 500
       expect([401, 500]).toContain(r.status);
@@ -174,14 +174,14 @@ describe('Cloud Scan: JWT & Token Attack Vectors', () => {
 
   describe('Cross-route token type confusion', () => {
     test('JWT token on apiKey-only route (/v1/router/models) returns 401', async () => {
-      // JWT doesn't have kortix_ prefix so apiKeyAuth rejects it
+      // JWT doesn't have acme_ prefix so apiKeyAuth rejects it
       const r = await probeWithAuth('/v1/router/models', 'Bearer fake.jwt.here');
       expect(r.status).toBe(401);
     });
 
-    test('kortix_ token on supabaseAuth-only route still returns 401', async () => {
-      // combinedAuth would accept kortix_ but supabaseAuth won't
-      const r = await probeWithAuth('/v1/accounts', 'Bearer kortix_fake123');
+    test('acme_ token on supabaseAuth-only route still returns 401', async () => {
+      // combinedAuth would accept acme_ but supabaseAuth won't
+      const r = await probeWithAuth('/v1/accounts', 'Bearer acme_fake123');
       expect(r.status).toBe(401);
     });
   });

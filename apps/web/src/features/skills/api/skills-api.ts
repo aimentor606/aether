@@ -2,8 +2,8 @@
  * Skills API — CRUD operations for SKILL.md files.
  *
  * - List: uses `client.app.skills()` (GET /skill)
- * - Create/Update: writes SKILL.md via kortix-master /file/upload
- * - Delete: removes the skill directory via kortix-master DELETE /file
+ * - Create/Update: writes SKILL.md via acme-master /file/upload
+ * - Delete: removes the skill directory via acme-master DELETE /file
  *
  * Skills are created in .opencode/skills/<name>/SKILL.md (project-relative).
  * After any mutation, `instance.dispose()` is called to force the OpenCode
@@ -76,7 +76,7 @@ export async function listSkills(): Promise<Skill[]> {
  * Upload content to a specific file path (project-relative).
  *
  * Uses the FormData field-name-as-path convention (same as the files feature).
- * Posts directly to kortix-master's /file/upload endpoint.
+ * Posts directly to acme-master's /file/upload endpoint.
  */
 async function uploadToPath(
   filePath: string,

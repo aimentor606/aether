@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Path Traversal & Route Discovery
  *
- * LIVE scan against https://computer-preview-api.kortix.com
+ * LIVE scan against https://computer-preview-api.acme.dev
  * Tests for path traversal vulnerabilities, hidden routes, and
  * directory traversal in URL paths.
  *
@@ -14,7 +14,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.acme.dev';
 
 async function probe(path: string): Promise<{ status: number; body: any }> {
   try {

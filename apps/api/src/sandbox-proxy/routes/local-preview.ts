@@ -1,5 +1,5 @@
 /**
- * Sandbox Preview Proxy — transparent pipe to Kortix Master inside the sandbox.
+ * Sandbox Preview Proxy — transparent pipe to Acme Master inside the sandbox.
  *
  * TRUE TRANSPARENT PROXY:
  *   - decompress: false — raw bytes pass through untouched
@@ -16,7 +16,7 @@
 import { config } from '../../config';
 import { execSync } from 'child_process';
 
-const KORTIX_MASTER_PORT = 8000;
+const ACME_MASTER_PORT = 8000;
 const FETCH_TIMEOUT_MS = 30_000;
 
 // ─── Service Key Sync ────────────────────────────────────────────────────────
@@ -47,12 +47,12 @@ function trySyncServiceKey(): boolean {
     execSync(
       `docker exec ${config.SANDBOX_CONTAINER_NAME} bash -c "mkdir -p /run/s6/container_environment && ` +
       `printf '%s' '${ourKey}' > /run/s6/container_environment/INTERNAL_SERVICE_KEY && ` +
-      `sudo s6-svc -r /run/service/svc-kortix-master"`,
+      `sudo s6-svc -r /run/service/svc-acme-master"`,
       { timeout: 15_000, stdio: 'pipe', env },
     );
     _serviceKeySynced = true;
     console.log('[LOCAL-PREVIEW] INTERNAL_SERVICE_KEY synced, waiting for restart...');
-    // Give kortix-master a moment to restart
+    // Give acme-master a moment to restart
     execSync('sleep 2', { stdio: 'pipe' });
     return true;
   } catch (err: any) {
@@ -87,7 +87,7 @@ const STRIP_RESPONSE_HEADERS = new Set([
 ]);
 
 /**
- * Resolve the sandbox's Kortix Master URL.
+ * Resolve the sandbox's Acme Master URL.
  * Inside Docker: http://{sandboxId}:8000 (Docker DNS)
  * On host (pnpm dev): http://localhost:{SANDBOX_PORT_BASE}
  */
@@ -117,7 +117,7 @@ export async function proxyToSandbox(
   extraHeaders?: Record<string, string>,
 ): Promise<Response> {
   const sandboxBaseUrl = baseUrlOverride || getSandboxBaseUrl(sandboxId);
-  const targetUrl = port === KORTIX_MASTER_PORT
+  const targetUrl = port === ACME_MASTER_PORT
     ? `${sandboxBaseUrl}${path}${queryString}`
     : `${sandboxBaseUrl}/proxy/${port}${path}${queryString}`;
 
@@ -240,13 +240,13 @@ export async function proxyToSandbox(
   }
 
   // Fix Location header for redirects.
-  // Kortix Master's proxy rewrites e.g. http://localhost:5173/path → /proxy/5173/path.
+  // Acme Master's proxy rewrites e.g. http://localhost:5173/path → /proxy/5173/path.
   // For subdomain routing (p5173-sandbox.localhost:8008), the client already "is" at
   // the right port — strip the /proxy/{port} prefix so the redirect is just /path.
   // For path-based routing (OpenCode API at port 8000), there's no /proxy/ prefix, so
   // this is a no-op.
   const location = respHeaders.get('location');
-  if (location && port !== KORTIX_MASTER_PORT) {
+  if (location && port !== ACME_MASTER_PORT) {
     const proxyPrefix = `/proxy/${port}`;
     if (location.startsWith(proxyPrefix)) {
       respHeaders.set('location', location.slice(proxyPrefix.length) || '/');

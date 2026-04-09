@@ -1,0 +1,44 @@
+# compose.litellm.yml
+# LiteLLM Proxy Service (alternative to NewAPI)
+# Select via: LLM_PROXY=litellm in ops/.env
+
+services:
+  llm-proxy:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: llm-proxy
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${LITELLM_DB_USER:-litellm}:${LITELLM_DB_PASSWORD:-CHANGE_ME}@postgres:5432/${LITELLM_DB_DATABASE:-litellm}
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:-sk-CHANGE_ME}
+      - LITELLM_SALT_KEY=${LITELLM_SALT_KEY:-sk-CHANGE_ME}
+      - STORE_MODEL_IN_DB=True
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-CHANGE_ME}
+      - TZ=${TZ:-Asia/Shanghai}
+    volumes:
+      - ./config/litellm/config.yaml:/app/config.yaml:ro
+      - /data/logs/litellm:/app/logs
+    ports:
+      - "127.0.0.1:4000:4000"
+    networks:
+      - app-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness')\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command:
+      - "--config"
+      - "/app/config.yaml"
+      - "--port"
+      - "4000"
+
+networks:
+  app-network:
+    external: true
+    name: app-network

@@ -827,7 +827,7 @@ export default function APIKeysPage() {
             <Shield className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
             <div className="text-xs text-muted-foreground space-y-1">
               <p>
-                Pass your secret key as a Bearer token: <code className="bg-muted px-1 py-0.5 rounded text-foreground">Authorization: Bearer kortix_...</code>
+                Pass your secret key as a Bearer token: <code className="bg-muted px-1 py-0.5 rounded text-foreground">Authorization: Bearer acme_...</code>
               </p>
               <p>
                 Keys are hashed server-side and never stored in plain text. The secret is shown once at creation.

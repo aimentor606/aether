@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Check, Plus, Download, CheckCircle, Globe, GlobeLock, GitBranch, Trash2, MoreVertical, User, ArrowRight } from 'lucide-react';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { AcmeLoader } from '@/components/ui/acme-loader';
 import { DynamicIcon } from 'lucide-react/dynamic';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { AcmeLogo } from '@/components/sidebar/acme-logo';
 import { AgentAvatar } from '@/components/thread/content/agent-avatar';
 
 // Unified agent card variants
@@ -57,7 +57,7 @@ export interface BaseAgentData {
   // Marketplace specific
   creator_id?: string;
   creator_name?: string;
-  is_kortix_team?: boolean;
+  is_acme_team?: boolean;
   download_count?: number;
   marketplace_published_at?: string;
   
@@ -177,14 +177,14 @@ const CardAvatar: React.FC<{
 
 // Badge components
 const MarketplaceBadge: React.FC<{ 
-  isKortixTeam?: boolean; 
+  isAcmeTeam?: boolean; 
   isOwner?: boolean;
-}> = ({ isKortixTeam, isOwner }) => (
+}> = ({ isAcmeTeam, isOwner }) => (
   <div className="flex gap-1 flex-wrap">
-    {isKortixTeam && (
+    {isAcmeTeam && (
       <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-0 dark:bg-blue-950 dark:text-blue-300">
         <CheckCircle className="h-3 w-3 mr-1" />
-        Kortix
+        Acme
       </Badge>
     )}
     {isOwner && (
@@ -497,7 +497,7 @@ export const UnifiedAgentCard: React.FC<UnifiedAgentCardProps> = ({
     const renderBadge = () => {
       switch (variant) {
         case 'marketplace':
-          return <MarketplaceBadge isKortixTeam={data.is_kortix_team} isOwner={isOwner} />;
+          return <MarketplaceBadge isAcmeTeam={data.is_acme_team} isOwner={isOwner} />;
         case 'template':
           return <TemplateBadge isPublic={data.is_public} />;
         case 'agent':
@@ -550,7 +550,7 @@ export const UnifiedAgentCard: React.FC<UnifiedAgentCardProps> = ({
             >
               {isActioning ? (
                 <>
-                  <KortixLoader size="small" className="mr-2" />
+                  <AcmeLoader size="small" className="mr-2" />
                   Installing...
                 </>
               ) : (
@@ -598,7 +598,7 @@ export const UnifiedAgentCard: React.FC<UnifiedAgentCardProps> = ({
             >
               {isActioning ? (
                 <>
-                  <KortixLoader size="small" />
+                  <AcmeLoader size="small" />
                   {data.is_public ? 'Unpublishing...' : 'Publishing...'}
                 </>
               ) : (
@@ -675,7 +675,7 @@ export const UnifiedAgentCard: React.FC<UnifiedAgentCardProps> = ({
               >
                 {isActioning ? (
                   <>
-                    <KortixLoader size="small" />
+                    <AcmeLoader size="small" />
                     Deleting...
                   </>
                 ) : (

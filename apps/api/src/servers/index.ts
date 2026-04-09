@@ -13,7 +13,7 @@
 
 import { Hono } from 'hono';
 import { eq, and } from 'drizzle-orm';
-import { serverEntries } from '@kortix/db';
+import { serverEntries } from '@acme/db';
 import type { AppEnv } from '../types';
 import { db } from '../shared/db';
 import { config } from '../config';

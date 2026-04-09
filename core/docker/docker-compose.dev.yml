@@ -16,26 +16,26 @@
 # For pure code changes (TypeScript, agents, skills, tools):
 #   Edit the file → it's already live in the container
 #   Restart the service if needed:
-#     docker exec kortix-sandbox s6-svc -r /run/service/svc-kortix-master
+#     docker exec acme-sandbox s6-svc -r /run/service/svc-acme-master
 #
 # Note: volume host paths are relative to this compose file's directory (core/docker/)
 
 services:
   desktop:
     environment:
-      - KORTIX_DEV_MODE=1
+      - ACME_DEV_MODE=1
     volumes:
       # Bind-mount local source over the prebaked /opt dirs
-      # All packages now live inside core/kortix-master/
-      - ../kortix-master/src:/ephemeral/kortix-master/src:ro
-      - ../kortix-master/opencode/plugin:/ephemeral/kortix-master/opencode/plugin:ro
-      - ../kortix-master/opencode/agents:/ephemeral/kortix-master/opencode/agents:ro
-      - ../kortix-master/opencode/commands:/ephemeral/kortix-master/opencode/commands:ro
-      - ../kortix-master/opencode/skills:/ephemeral/kortix-master/opencode/skills:ro
-      - ../kortix-master/opencode/tools:/ephemeral/kortix-master/opencode/tools:ro
-      - ../kortix-master/opencode/patches:/ephemeral/kortix-master/opencode/patches:ro
-      - ../kortix-master/opencode/opencode.jsonc:/ephemeral/kortix-master/opencode/opencode.jsonc:ro
-      - ../kortix-master/channels/src:/ephemeral/kortix-master/channels/src:ro
-      - ../kortix-master/triggers/src:/ephemeral/kortix-master/triggers/src:ro
+      # All packages now live inside core/acme-master/
+      - ../acme-master/src:/ephemeral/acme-master/src:ro
+      - ../acme-master/opencode/plugin:/ephemeral/acme-master/opencode/plugin:ro
+      - ../acme-master/opencode/agents:/ephemeral/acme-master/opencode/agents:ro
+      - ../acme-master/opencode/commands:/ephemeral/acme-master/opencode/commands:ro
+      - ../acme-master/opencode/skills:/ephemeral/acme-master/opencode/skills:ro
+      - ../acme-master/opencode/tools:/ephemeral/acme-master/opencode/tools:ro
+      - ../acme-master/opencode/patches:/ephemeral/acme-master/opencode/patches:ro
+      - ../acme-master/opencode/opencode.jsonc:/ephemeral/acme-master/opencode/opencode.jsonc:ro
+      - ../acme-master/channels/src:/ephemeral/acme-master/channels/src:ro
+      - ../acme-master/triggers/src:/ephemeral/acme-master/triggers/src:ro
       # Service scripts (baked-in JS for static-web, agent-browser-viewer)
       - ../services:/ephemeral/services:ro

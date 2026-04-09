@@ -29,7 +29,7 @@ Usage: build-local-images.sh [options]
 Options:
   --tag <tag>          Image tag to build (default: latest)
   --tag=<tag>          Same as above
-  --include-postgres   Also build `kortix/postgres:<tag>`
+  --include-postgres   Also build `acme/postgres:<tag>`
 EOF
       exit 0
       ;;
@@ -55,20 +55,20 @@ printf "[build-local-images] Building frontend standalone output...\n"
   pnpm run build
 )
 
-printf "[build-local-images] Building kortix/kortix-frontend:%s...\n" "$TAG"
-docker build --no-cache -f "$REPO_ROOT/apps/web/Dockerfile" -t "kortix/kortix-frontend:${TAG}" "$REPO_ROOT"
+printf "[build-local-images] Building acme/acme-frontend:%s...\n" "$TAG"
+docker build --no-cache -f "$REPO_ROOT/apps/web/Dockerfile" -t "acme/acme-frontend:${TAG}" "$REPO_ROOT"
 
-printf "[build-local-images] Building kortix/kortix-api:%s...\n" "$TAG"
-docker build --build-arg SERVICE=apps/api -f "$REPO_ROOT/apps/api/Dockerfile" -t "kortix/kortix-api:${TAG}" "$REPO_ROOT"
+printf "[build-local-images] Building acme/acme-api:%s...\n" "$TAG"
+docker build --build-arg SERVICE=apps/api -f "$REPO_ROOT/apps/api/Dockerfile" -t "acme/acme-api:${TAG}" "$REPO_ROOT"
 
-printf "[build-local-images] Building kortix/computer:%s...\n" "$TAG"
-docker build --build-arg SANDBOX_VERSION="${TAG}" -f "$REPO_ROOT/core/docker/Dockerfile" -t "kortix/computer:${TAG}" "$REPO_ROOT"
+printf "[build-local-images] Building acme/computer:%s...\n" "$TAG"
+docker build --build-arg SANDBOX_VERSION="${TAG}" -f "$REPO_ROOT/core/docker/Dockerfile" -t "acme/computer:${TAG}" "$REPO_ROOT"
 
 printf "[build-local-images] Build a local sandbox with compose via: docker compose -f %s/core/docker/docker-compose.yml up --build\n" "$REPO_ROOT"
 
 if [ "$INCLUDE_POSTGRES" = "1" ]; then
-  printf "[build-local-images] Building kortix/postgres:%s...\n" "$TAG"
-  docker build -f "$REPO_ROOT/services/postgres/Dockerfile" -t "kortix/postgres:${TAG}" "$REPO_ROOT/services/postgres"
+  printf "[build-local-images] Building acme/postgres:%s...\n" "$TAG"
+  docker build -f "$REPO_ROOT/services/postgres/Dockerfile" -t "acme/postgres:${TAG}" "$REPO_ROOT/services/postgres"
 fi
 
 printf "[build-local-images] Done.\n"

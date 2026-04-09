@@ -18,7 +18,7 @@ const anthropic = new Hono<{ Variables: AppContext }>();
  * Anthropic Messages API proxy — forwards to Anthropic's /v1/messages endpoint.
  *
  * Handles:
- * - Model resolution (Kortix model IDs → Anthropic native model IDs)
+ * - Model resolution (Acme model IDs → Anthropic native model IDs)
  * - Credit checking and cache-aware billing
  * - Streaming (SSE) and non-streaming responses
  *

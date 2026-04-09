@@ -68,7 +68,7 @@ export function registerGlobalMocks() {
     config: {
       STRIPE_WEBHOOK_SECRET: 'whsec_test',
       ENV_MODE: 'cloud',
-      INTERNAL_KORTIX_ENV: 'staging',
+      INTERNAL_ACME_ENV: 'staging',
     },
   }));
 
@@ -380,7 +380,7 @@ export function createMockRevenueCatEvent(type: string, overrides: Record<string
     event: {
       type,
       app_user_id: overrides.app_user_id ?? 'acc_test_123',
-      product_id: overrides.product_id ?? 'kortix_pro_monthly',
+      product_id: overrides.product_id ?? 'acme_pro_monthly',
       subscriber_id: overrides.subscriber_id ?? 'sub_rc_123',
       price: overrides.price ?? 50,
       expiration_at_ms: overrides.expiration_at_ms ?? null,

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { type Turn, type MessageWithParts, isTextPart, type TextPart } from '@/ui';
 import { cn } from '@/lib/utils';
-import { stripKortixSystemTags } from '@/lib/utils/kortix-system-tags';
+import { stripAcmeSystemTags } from '@/lib/utils/acme-system-tags';
 
 interface ChatMinimapProps {
   turns: Turn[];
@@ -15,7 +15,7 @@ interface ChatMinimapProps {
 function extractUserText(turn: Turn): string {
   const textParts = turn.userMessage.parts.filter(isTextPart) as TextPart[];
   const raw = textParts.map((p) => p.text).join(' ');
-  const stripped = stripKortixSystemTags(raw);
+  const stripped = stripAcmeSystemTags(raw);
   return stripped.replace(/<[^>]+>/g, '').trim();
 }
 

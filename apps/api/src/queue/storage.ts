@@ -29,8 +29,8 @@ export interface QueuedMessagePersisted {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getDataDir(): string {
-  // Prefer explicit env var, otherwise default to <cwd>/.kortix-data/queue
-  const base = process.env.KORTIX_DATA_DIR || resolve(process.cwd(), '.kortix-data');
+  // Prefer explicit env var, otherwise default to <cwd>/.acme-data/queue
+  const base = process.env.ACME_DATA_DIR || resolve(process.cwd(), '.acme-data');
   const dir = resolve(base, 'queue');
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });

@@ -26,7 +26,7 @@ interface TelegramSetupWizardProps {
 export function TelegramSetupWizard({ onCreated, onBack }: TelegramSetupWizardProps) {
   const [botToken, setBotToken] = useState('');
   const [botInfo, setBotInfo] = useState<{ id: number; username: string; firstName: string } | null>(null);
-  const [agentName, setAgentName] = useState<string | null>('kortix');
+  const [agentName, setAgentName] = useState<string | null>('acme');
   const [selectedModel, setSelectedModel] = useState<{ providerID: string; modelID: string } | null>(null);
 
   const verifyToken = useTelegramVerifyToken();

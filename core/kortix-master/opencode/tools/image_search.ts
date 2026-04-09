@@ -89,10 +89,10 @@ async function describeImage(
 
 async function enrichImages(images: EnrichedImage[]): Promise<EnrichedImage[]> {
   const replicateBaseUrl = getEnv("REPLICATE_API_URL");
-  // When routed through the Kortix proxy (REPLICATE_API_URL is set), use KORTIX_TOKEN
+  // When routed through the Kortix proxy (REPLICATE_API_URL is set), use ACME_TOKEN
   // for auth — the proxy validates it and injects the real Replicate API token.
   const replicateToken = replicateBaseUrl
-    ? getEnv("KORTIX_TOKEN")
+    ? getEnv("ACME_TOKEN")
     : getEnv("REPLICATE_API_TOKEN");
   if (!replicateToken || images.length === 0) return images;
 
@@ -139,13 +139,13 @@ export default tool({
   },
   async execute(args, _context) {
     const serperUrlOverride = getEnv("SERPER_API_URL");
-    // When routed through the Kortix proxy (SERPER_API_URL is set), use KORTIX_TOKEN
+    // When routed through the Kortix proxy (SERPER_API_URL is set), use ACME_TOKEN
     // for auth — the proxy validates it and injects the real Serper API key.
     const apiKey = serperUrlOverride
-      ? getEnv("KORTIX_TOKEN")
+      ? getEnv("ACME_TOKEN")
       : getEnv("SERPER_API_KEY");
     if (!apiKey) return serperUrlOverride
-      ? "Error: KORTIX_TOKEN not set."
+      ? "Error: ACME_TOKEN not set."
       : "Error: SERPER_API_KEY not set.";
 
     const numResults = Math.max(1, Math.min(args.num_results ?? 12, 100));

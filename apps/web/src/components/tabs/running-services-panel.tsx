@@ -101,7 +101,7 @@ function shortenPath(path: string | undefined): string {
   return path.replace(/^\/workspace\/?/, '') || '/';
 }
 
-// ─── ServiceCard (Kortix SpotlightCard pattern) ─────────────────────────────
+// ─── ServiceCard (Acme SpotlightCard pattern) ─────────────────────────────
 
 function ServiceCard({
   service,
@@ -284,7 +284,7 @@ function EmptyState() {
         </div>
         <h3 className="text-lg font-semibold text-foreground mb-2">No services found</h3>
         <p className="text-sm text-muted-foreground text-center leading-relaxed max-w-md">
-          Services will appear here when Kortix Master starts managing them. Register a project app or wait for the built-in services to come online.
+          Services will appear here when Acme Master starts managing them. Register a project app or wait for the built-in services to come online.
         </p>
       </div>
     </div>
@@ -603,7 +603,7 @@ export function RunningServicesPanel() {
             <AlertDialogDescription asChild>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <p><strong>Config Only</strong> — Hot-reload agents, skills, commands, and config. Fast (~2s). Use after editing .md files or opencode.jsonc.</p>
-                <p><strong>Full Restart</strong> — Kill and restart every service (OpenCode, static server, kortix-master). Clears all module caches. Use after editing .ts plugin/route code. Active sessions will be interrupted.</p>
+                <p><strong>Full Restart</strong> — Kill and restart every service (OpenCode, static server, acme-master). Clears all module caches. Use after editing .ts plugin/route code. Active sessions will be interrupted.</p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>

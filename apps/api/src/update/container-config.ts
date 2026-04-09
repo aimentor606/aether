@@ -13,7 +13,7 @@ export interface ContainerConfig {
   securityOpt: string[];
 }
 
-const CONFIG_PATH = '/workspace/.kortix/container.json';
+const CONFIG_PATH = '/workspace/.acme/container.json';
 
 // Port mapping for cloud/JustAVPS sandboxes.
 export const DEFAULT_PORTS = [
@@ -71,7 +71,7 @@ export async function writeContainerConfig(
   const b64 = Buffer.from(json).toString('base64');
   await execOnHost(
     endpoint,
-    `mkdir -p /workspace/.kortix && echo '${b64}' | base64 -d > ${CONFIG_PATH}`,
+    `mkdir -p /workspace/.acme && echo '${b64}' | base64 -d > ${CONFIG_PATH}`,
     5,
   );
 }
@@ -79,7 +79,7 @@ export async function writeContainerConfig(
 export async function buildFromInspect(
   endpoint: ResolvedEndpoint,
 ): Promise<ContainerConfig | null> {
-  const names = [config.SANDBOX_CONTAINER_NAME, 'kortix-sandbox', 'justavps-workload'];
+  const names = [config.SANDBOX_CONTAINER_NAME, 'acme-sandbox', 'justavps-workload'];
   for (const name of names) {
     const result = await execOnHost(
       endpoint,
@@ -108,7 +108,7 @@ export async function buildFromInspect(
       return {
         image: containerConfig.Image || '',
         name,
-        volumes: volumes.length > 0 ? volumes : ['kortix-data:/workspace', 'kortix-data:/config'],
+        volumes: volumes.length > 0 ? volumes : ['acme-data:/workspace', 'acme-data:/config'],
         ports: sanitizePorts(ports).length > 0 ? sanitizePorts(ports) : DEFAULT_PORTS,
         caps: (hostConfig.CapAdd || []) as string[],
         shmSize: formatShmSize(hostConfig.ShmSize),

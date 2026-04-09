@@ -150,7 +150,7 @@ function ConnectButton() {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const apiUrl = `${getEnv().BACKEND_URL}/tunnel`;
-  const command = `npx @kortix/agent-tunnel connect --api-url ${apiUrl}`;
+  const command = `npx @acme/agent-tunnel connect --api-url ${apiUrl}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(command);
@@ -216,7 +216,7 @@ function ConnectButton() {
 function ConnectGuide() {
   const [copied, setCopied] = useState(false);
   const apiUrl = `${getEnv().BACKEND_URL}/tunnel`;
-  const command = `npx @kortix/agent-tunnel connect --api-url ${apiUrl}`;
+  const command = `npx @acme/agent-tunnel connect --api-url ${apiUrl}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(command);
@@ -233,7 +233,7 @@ function ConnectGuide() {
         </div>
         <h3 className="text-lg font-semibold text-foreground mb-2">Connect your machine</h3>
         <p className="text-sm text-muted-foreground text-center leading-relaxed mb-6">
-          Run this command on any machine to connect it to Kortix. You&apos;ll approve the connection in your browser.
+          Run this command on any machine to connect it to Acme. You&apos;ll approve the connection in your browser.
         </p>
 
         <button

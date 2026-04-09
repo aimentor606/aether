@@ -13,7 +13,7 @@ const router = new Hono();
 router.get('/health', (c) => {
   return c.json({
     status: 'ok',
-    service: 'kortix-router',
+    service: 'acme-router',
     timestamp: new Date().toISOString(),
     env: config.ENV_MODE,
   });

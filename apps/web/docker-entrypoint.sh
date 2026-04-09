@@ -1,6 +1,6 @@
 #!/bin/sh
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Kortix Frontend — Docker Entrypoint                                       ║
+# ║  Acme Frontend — Docker Entrypoint                                       ║
 # ║                                                                            ║
 # ║  Rewrites baked-in NEXT_PUBLIC_ values in the Next.js bundle at startup.   ║
 # ║                                                                            ║
@@ -32,11 +32,11 @@ BAKED_BACKEND_HOST="http://localhost:8008"
 DEV_SUPABASE_URLS="127.0.0.1:54321 localhost:54321"
 
 # ── Runtime target values from docker-compose env ─────────────────────────────
-# Support both NEXT_PUBLIC_* (legacy) and KORTIX_PUBLIC_* (current) naming.
-RUNTIME_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-${KORTIX_PUBLIC_SUPABASE_URL:-}}"
-RUNTIME_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-${KORTIX_PUBLIC_SUPABASE_ANON_KEY:-}}"
-RUNTIME_BACKEND_URL="${NEXT_PUBLIC_BACKEND_URL:-${KORTIX_PUBLIC_BACKEND_URL:-}}"
-RUNTIME_BILLING="${NEXT_PUBLIC_BILLING_ENABLED:-${KORTIX_PUBLIC_BILLING_ENABLED:-false}}"
+# Support both NEXT_PUBLIC_* (legacy) and ACME_PUBLIC_* (current) naming.
+RUNTIME_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-${ACME_PUBLIC_SUPABASE_URL:-}}"
+RUNTIME_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-${ACME_PUBLIC_SUPABASE_ANON_KEY:-}}"
+RUNTIME_BACKEND_URL="${NEXT_PUBLIC_BACKEND_URL:-${ACME_PUBLIC_BACKEND_URL:-}}"
+RUNTIME_BILLING="${NEXT_PUBLIC_BILLING_ENABLED:-${ACME_PUBLIC_BILLING_ENABLED:-false}}"
 
 # Derive backend host (strip /v1 suffix)
 RUNTIME_BACKEND_HOST=""
@@ -59,7 +59,7 @@ fi
 
 # Supabase URL (dev builds with local Supabase CLI URLs)
 # Replace FULL URLs first (http://host:port) to avoid leaving stale scheme prefixes.
-# e.g. http://127.0.0.1:54321 -> https://e2e-test.kortix.cloud (not http://https://...)
+# e.g. http://127.0.0.1:54321 -> https://e2e-test.acme.cloud (not http://https://...)
 if [ -n "$RUNTIME_SUPABASE_URL" ]; then
   for dev_url in $DEV_SUPABASE_URLS; do
     for scheme in "https://" "http://"; do

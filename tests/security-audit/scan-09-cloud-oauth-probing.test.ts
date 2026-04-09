@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - OAuth2 Endpoint Probing
  *
- * LIVE scan against https://computer-preview-api.kortix.com
+ * LIVE scan against https://computer-preview-api.acme.dev
  * Tests the OAuth2 provider endpoints for security issues.
  *
  * FINDINGS:
@@ -16,7 +16,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.acme.dev';
 
 async function get(path: string): Promise<{ status: number; body: any }> {
   try {
@@ -129,7 +129,7 @@ describe('Cloud Scan: OAuth2 Endpoint Probing', () => {
 
     test('FINDING: fake OAuth token returns 500 instead of 401', async () => {
       const res = await fetch(`${CLOUD}/v1/oauth/userinfo`, {
-        headers: { 'Authorization': 'Bearer kortix_oat_faketoken123456789012345678901234567890123456' },
+        headers: { 'Authorization': 'Bearer acme_oat_faketoken123456789012345678901234567890123456' },
       });
       // BUG: oauthTokenAuth crashes when token hash lookup returns no row
       // Should return 401 "Invalid access token" but DB query may throw

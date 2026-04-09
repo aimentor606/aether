@@ -19,7 +19,7 @@ export interface KeyboardShortcutPreferences {
 
 export interface UserPreferences {
   keyboard: KeyboardShortcutPreferences;
-  /** Selected Kortix theme ID (e.g. 'default', 'ember', 'aurora') */
+  /** Selected Acme theme ID (e.g. 'default', 'ember', 'aurora') */
   themeId: string;
   /** Selected desktop wallpaper ID */
   wallpaperId: string;
@@ -48,7 +48,7 @@ interface UserPreferencesState {
   /** Update keyboard shortcut preferences (partial merge) */
   setKeyboardPreferences: (prefs: Partial<KeyboardShortcutPreferences>) => void;
 
-  /** Set the active Kortix theme by ID */
+  /** Set the active Acme theme by ID */
   setThemeId: (themeId: string) => void;
 
   /** Set the active desktop wallpaper by ID */
@@ -116,7 +116,7 @@ export const useUserPreferencesStore = create<UserPreferencesState>()(
       },
     }),
     {
-      name: 'kortix-user-preferences',
+      name: 'acme-user-preferences',
       partialize: (state) => ({
         preferences: state.preferences,
       }),

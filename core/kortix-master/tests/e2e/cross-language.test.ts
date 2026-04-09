@@ -19,7 +19,7 @@ describe("Cross-Language Environment Variable Access", () => {
     fixture = createRuntimeFixture("kortix-cross-language-");
     opencode = await startDummyOpenCode(9001);
     serverProcess = await startKortixMaster(8001, fixture, {
-      KORTIX_TOKEN: "e2e-test-token",
+      ACME_TOKEN: "e2e-test-token",
       OPENCODE_PORT: "9001",
     });
   });

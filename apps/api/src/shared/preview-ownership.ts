@@ -1,5 +1,5 @@
 import { and, eq, ne, or, sql } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@acme/db';
 import { db } from './db';
 import { resolveAccountId } from './resolve-account';
 

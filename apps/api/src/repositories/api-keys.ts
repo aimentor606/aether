@@ -1,12 +1,12 @@
 import { eq, and } from 'drizzle-orm';
-import { kortixApiKeys } from '@kortix/db';
+import { acmeApiKeys } from '@acme/db';
 import { db } from '../shared/db';
 import {
   hashSecretKey,
   generateApiKeyPair,
   generateSandboxKeyPair,
   isApiKeySecretConfigured,
-  isKortixToken,
+  isAcmeToken,
 } from '../shared/crypto';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -55,8 +55,8 @@ const lastUsedCache = new Map<string, number>();
  * Create a new API key scoped to a sandbox.
  * Returns the secret key in plaintext ONCE — only the hash is stored.
  *
- * type='user'    → kortix_<32> secret key (user-created, external access)
- * type='sandbox' → kortix_sb_<32> secret key (auto-managed, injected into sandbox)
+ * type='user'    → acme_<32> secret key (user-created, external access)
+ * type='sandbox' → acme_sb_<32> secret key (auto-managed, injected into sandbox)
  */
 export async function createApiKey(params: CreateApiKeyParams): Promise<CreateApiKeyResult> {
   if (!isApiKeySecretConfigured()) {
@@ -70,7 +70,7 @@ export async function createApiKey(params: CreateApiKeyParams): Promise<CreateAp
   const secretKeyHash = hashSecretKey(secretKey);
 
   const [row] = await db
-    .insert(kortixApiKeys)
+    .insert(acmeApiKeys)
     .values({
       sandboxId: params.sandboxId,
       accountId: params.accountId,
@@ -107,19 +107,19 @@ export async function createApiKey(params: CreateApiKeyParams): Promise<CreateAp
 export async function listApiKeys(sandboxId: string) {
   return db
     .select({
-      keyId: kortixApiKeys.keyId,
-      publicKey: kortixApiKeys.publicKey,
-      title: kortixApiKeys.title,
-      description: kortixApiKeys.description,
-      type: kortixApiKeys.type,
-      status: kortixApiKeys.status,
-      sandboxId: kortixApiKeys.sandboxId,
-      expiresAt: kortixApiKeys.expiresAt,
-      lastUsedAt: kortixApiKeys.lastUsedAt,
-      createdAt: kortixApiKeys.createdAt,
+      keyId: acmeApiKeys.keyId,
+      publicKey: acmeApiKeys.publicKey,
+      title: acmeApiKeys.title,
+      description: acmeApiKeys.description,
+      type: acmeApiKeys.type,
+      status: acmeApiKeys.status,
+      sandboxId: acmeApiKeys.sandboxId,
+      expiresAt: acmeApiKeys.expiresAt,
+      lastUsedAt: acmeApiKeys.lastUsedAt,
+      createdAt: acmeApiKeys.createdAt,
     })
-    .from(kortixApiKeys)
-    .where(eq(kortixApiKeys.sandboxId, sandboxId));
+    .from(acmeApiKeys)
+    .where(eq(acmeApiKeys.sandboxId, sandboxId));
 }
 
 /**
@@ -127,16 +127,16 @@ export async function listApiKeys(sandboxId: string) {
  */
 export async function revokeApiKey(keyId: string, accountId: string): Promise<boolean> {
   const result = await db
-    .update(kortixApiKeys)
+    .update(acmeApiKeys)
     .set({ status: 'revoked' })
     .where(
       and(
-        eq(kortixApiKeys.keyId, keyId),
-        eq(kortixApiKeys.accountId, accountId),
-        eq(kortixApiKeys.status, 'active'),
+        eq(acmeApiKeys.keyId, keyId),
+        eq(acmeApiKeys.accountId, accountId),
+        eq(acmeApiKeys.status, 'active'),
       ),
     )
-    .returning({ keyId: kortixApiKeys.keyId });
+    .returning({ keyId: acmeApiKeys.keyId });
 
   return result.length > 0;
 }
@@ -146,14 +146,14 @@ export async function revokeApiKey(keyId: string, accountId: string): Promise<bo
  */
 export async function deleteApiKey(keyId: string, accountId: string): Promise<boolean> {
   const result = await db
-    .delete(kortixApiKeys)
+    .delete(acmeApiKeys)
     .where(
       and(
-        eq(kortixApiKeys.keyId, keyId),
-        eq(kortixApiKeys.accountId, accountId),
+        eq(acmeApiKeys.keyId, keyId),
+        eq(acmeApiKeys.accountId, accountId),
       ),
     )
-    .returning({ keyId: kortixApiKeys.keyId });
+    .returning({ keyId: acmeApiKeys.keyId });
 
   return result.length > 0;
 }
@@ -161,7 +161,7 @@ export async function deleteApiKey(keyId: string, accountId: string): Promise<bo
 // ─── Validation ──────────────────────────────────────────────────────────────
 
 /**
- * Validate a Kortix API key (kortix_ or kortix_sb_ prefix).
+ * Validate a Acme API key (acme_ or acme_sb_ prefix).
  * Single validation path for all key types — returns account_id, sandbox_id, and key type.
  */
 export async function validateSecretKey(secretKey: string): Promise<ApiKeyValidationResult> {
@@ -169,8 +169,8 @@ export async function validateSecretKey(secretKey: string): Promise<ApiKeyValida
     return { isValid: false, error: 'API_KEY_SECRET not configured' };
   }
 
-  if (!isKortixToken(secretKey)) {
-    return { isValid: false, error: 'Invalid API key format — expected kortix_ prefix' };
+  if (!isAcmeToken(secretKey)) {
+    return { isValid: false, error: 'Invalid API key format — expected acme_ prefix' };
   }
 
   try {
@@ -178,24 +178,24 @@ export async function validateSecretKey(secretKey: string): Promise<ApiKeyValida
 
     const [row] = await db
       .select({
-        keyId: kortixApiKeys.keyId,
-        accountId: kortixApiKeys.accountId,
-        sandboxId: kortixApiKeys.sandboxId,
-        type: kortixApiKeys.type,
-        status: kortixApiKeys.status,
-        expiresAt: kortixApiKeys.expiresAt,
+        keyId: acmeApiKeys.keyId,
+        accountId: acmeApiKeys.accountId,
+        sandboxId: acmeApiKeys.sandboxId,
+        type: acmeApiKeys.type,
+        status: acmeApiKeys.status,
+        expiresAt: acmeApiKeys.expiresAt,
       })
-      .from(kortixApiKeys)
+      .from(acmeApiKeys)
       .where(
         and(
-          eq(kortixApiKeys.secretKeyHash, secretKeyHash),
-          eq(kortixApiKeys.status, 'active'),
+          eq(acmeApiKeys.secretKeyHash, secretKeyHash),
+          eq(acmeApiKeys.status, 'active'),
         ),
       )
       .limit(1);
 
     if (!row) {
-      const hasAnyKeys = await db.select({ keyId: kortixApiKeys.keyId }).from(kortixApiKeys).limit(1);
+      const hasAnyKeys = await db.select({ keyId: acmeApiKeys.keyId }).from(acmeApiKeys).limit(1);
       console.warn(`[validateSecretKey] Token not found in DB. hash=${secretKeyHash.slice(0, 8)}... prefix="${secretKey.slice(0, 20)}..." anyKeysInDb=${hasAnyKeys.length > 0}`);
       return { isValid: false, error: 'API key not found or invalid' };
     }
@@ -243,9 +243,9 @@ async function updateLastUsedThrottled(keyId: string): Promise<void> {
 
   try {
     await db
-      .update(kortixApiKeys)
+      .update(acmeApiKeys)
       .set({ lastUsedAt: new Date() })
-      .where(eq(kortixApiKeys.keyId, keyId));
+      .where(eq(acmeApiKeys.keyId, keyId));
   } catch (err) {
     console.warn('Failed to update last_used_at:', err);
   }

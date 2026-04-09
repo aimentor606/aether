@@ -111,7 +111,7 @@ describe('Webhook Fire E2E', () => {
     const response = await fetch(`http://127.0.0.1:${webhookPort}/hooks/deploy`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ repository: 'kortix-ai/suna', branch: 'main' }),
+      body: JSON.stringify({ repository: 'aimentor606/aether', branch: 'main' }),
     })
 
     expect(response.status).toBe(202)
@@ -139,15 +139,15 @@ describe('Webhook Fire E2E', () => {
       source_config: { path: '/hooks/pr', method: 'POST' },
       action_type: 'prompt',
       action_config: { prompt: 'Review PR #{{ number }}: {{ title }}' },
-      agent_name: 'kortix',
+      agent_name: 'acme',
     })
 
     webhookServer.setRoutes([{
-      agentName: 'kortix',
+      agentName: 'acme',
       trigger: {
         name: trigger.name,
         source: { type: 'webhook', path: '/hooks/pr', method: 'POST' },
-        execution: { prompt: 'Review PR', agentName: 'kortix', sessionMode: 'new' },
+        execution: { prompt: 'Review PR', agentName: 'acme', sessionMode: 'new' },
       },
     }])
 

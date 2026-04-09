@@ -2,27 +2,27 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { eq, and, desc, count } from 'drizzle-orm';
 import { db } from '../../shared/db';
-import { deployments } from '@kortix/db';
+import { deployments } from '@acme/db';
 import { NotFoundError, ValidationError } from '../../errors';
 import { config } from '../../config';
 import type { AppEnv } from '../../types';
 
 // ─── Dynamic Freestyle config ────────────────────────────────────────────────
-// The Kortix API runs in a separate container from the sandbox. API keys set
-// via the Secrets Manager are stored in the sandbox's secret store (Kortix
+// The Acme API runs in a separate container from the sandbox. API keys set
+// via the Secrets Manager are stored in the sandbox's secret store (Acme
 // Master /env). We fetch them from there at deploy-time so keys set after
 // startup work without restarting the API service.
 
 function getMasterUrlCandidates(): string[] {
   const candidates: string[] = [];
-  const explicit = process.env.KORTIX_MASTER_URL;
+  const explicit = process.env.ACME_MASTER_URL;
   if (explicit?.trim()) candidates.push(explicit.trim());
   candidates.push('http://sandbox:8000');
   candidates.push(`http://localhost:${config.SANDBOX_PORT_BASE || 14000}`);
   return Array.from(new Set(candidates));
 }
 
-/** Try to read a single secret from the sandbox's Kortix Master /env/:key endpoint. */
+/** Try to read a single secret from the sandbox's Acme Master /env/:key endpoint. */
 async function readSandboxSecret(key: string): Promise<string> {
   const candidates = getMasterUrlCandidates();
   const serviceKey = process.env.INTERNAL_SERVICE_KEY;

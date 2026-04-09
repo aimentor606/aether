@@ -12,7 +12,7 @@ import * as path from "node:path"
 // ─── DB path resolution (same as connectors.ts) ─────────────────────────────
 
 function resolveDbPath(): string {
-  const root = process.env.KORTIX_WORKSPACE?.trim()
+  const root = process.env.ACME_WORKSPACE?.trim()
     || (process.env.OPENCODE_CONFIG_DIR?.trim()
       ? path.dirname(path.resolve(process.env.OPENCODE_CONFIG_DIR))
       : (process.env.HOME ? path.join(process.env.HOME, "") : process.cwd()))
@@ -48,7 +48,7 @@ export function getDb(): Database {
       webhook_path TEXT NOT NULL UNIQUE,
       bot_id TEXT,
       bot_username TEXT,
-      default_agent TEXT DEFAULT 'kortix',
+      default_agent TEXT DEFAULT 'acme',
       default_model TEXT DEFAULT '',
       instructions TEXT,
       created_by TEXT,
@@ -75,7 +75,7 @@ export function getDb(): Database {
           webhook_path TEXT NOT NULL UNIQUE,
           bot_id TEXT,
           bot_username TEXT,
-          default_agent TEXT DEFAULT 'kortix',
+          default_agent TEXT DEFAULT 'acme',
           default_model TEXT DEFAULT '',
           instructions TEXT,
           created_by TEXT,

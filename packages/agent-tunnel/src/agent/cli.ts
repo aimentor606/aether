@@ -101,7 +101,7 @@ async function printStartup(config: { tunnelId: string; apiUrl: string }, capabi
     .map(name => `${c.green}●${c.reset} ${c.white}${name}${c.reset}`)
     .join('   ');
 
-  const brand = 'created by kortix';
+  const brand = 'created by acme';
   const brandFill = W - brand.length - 3;
 
   console.log('');
@@ -114,7 +114,7 @@ async function printStartup(config: { tunnelId: string; apiUrl: string }, capabi
   row(`   ${c.dim}relay${c.reset}     ${c.white}${apiDisplay}${c.reset}`);
   row(`   ${c.dim}machine${c.reset}   ${c.white}${machineDisplay}${c.reset} ${c.dim}(${plat})${c.reset}`);
   blank();
-  console.log(`  ${c.gray}╰${'─'.repeat(brandFill)} ${c.dim}created by ${c.cyan}kortix${c.reset} ${c.gray}─╯${c.reset}`);
+  console.log(`  ${c.gray}╰${'─'.repeat(brandFill)} ${c.dim}created by ${c.cyan}acme${c.reset} ${c.gray}─╯${c.reset}`);
   console.log('');
 }
 
@@ -323,7 +323,7 @@ function showHelp(): void {
   console.log('');
   console.log(`  ${c.dim}Secure bridge between AI agents & local machines${c.reset}`);
   console.log('');
-  console.log(`  ${c.bold}Usage${c.reset}   ${c.dim}npx @kortix/agent-tunnel <command> [options]${c.reset}`);
+  console.log(`  ${c.bold}Usage${c.reset}   ${c.dim}npx @acme/agent-tunnel <command> [options]${c.reset}`);
   console.log('');
   console.log(`${c.gray}  ── Commands ────────────────────────────────────────${c.reset}`);
   console.log(`  ${c.cyan}connect${c.reset}       Connect via device auth (opens browser)`);
@@ -336,7 +336,7 @@ function showHelp(): void {
   console.log(`  ${c.white}--api-url${c.reset} ${c.dim}<url>${c.reset}       API URL ${c.dim}(default: http://localhost:8080)${c.reset}`);
   console.log('');
   console.log(`  ${c.dim}Config: ~/.agent-tunnel/config.json${c.reset}`);
-  console.log(`  ${c.dim}powered by ${c.cyan}kortix${c.reset}`);
+  console.log(`  ${c.dim}powered by ${c.cyan}acme${c.reset}`);
   console.log('');
 }
 

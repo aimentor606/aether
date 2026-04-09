@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@acme/db';
 import { db } from '../../shared/db';
 import { config, SANDBOX_VERSION } from '../../config';
 import type {
@@ -13,7 +13,7 @@ import type {
   ProvisioningStatus,
 } from './index';
 
-const KORTIX_MASTER_PORT = 8000;
+const ACME_MASTER_PORT = 8000;
 const API_TIMEOUT_MS = 300_000;
 const PROVISION_TIMEOUT_MS = 600_000;
 const POLL_INTERVAL_MS = 3_000;
@@ -33,7 +33,7 @@ interface JustAVPSMachine {
   price_monthly: number | null;
   backups_enabled: boolean;
   source: string;
-  kortix_sandbox_id: string | null;
+  acme_sandbox_id: string | null;
   created_at: string;
   ready_at: string | null;
   urls: { vscode: string; pty: string; port_template: string } | null;
@@ -118,7 +118,7 @@ export async function justavpsFetch<T = any>(
 }
 
 // ─── Auto-resolve latest JustAVPS image ──────────────────────────────────────
-// Images follow the naming convention `kortix-computer-v{semver}`.
+// Images follow the naming convention `acme-computer-v{semver}`.
 // We query all images, filter to ready ones matching the prefix, and pick the
 // highest version. Result cached 5 min. JUSTAVPS_IMAGE_ID env var is an override.
 
@@ -132,8 +132,8 @@ interface JustAVPSImage {
 let cachedImageId: string | null = null;
 let cachedImageExpiry = 0;
 const IMAGE_CACHE_TTL_MS = 5 * 60 * 1000;
-const IMAGE_NAME_PREFIX = 'kortix-computer-v';
-const DEV_IMAGE_NAME_PREFIX = 'kortix-computer-vdev-';
+const IMAGE_NAME_PREFIX = 'acme-computer-v';
+const DEV_IMAGE_NAME_PREFIX = 'acme-computer-vdev-';
 
 function parseSemver(version: string): number[] {
   return version.split('.').map(Number).filter((n) => !isNaN(n));
@@ -163,7 +163,7 @@ async function resolveLatestImageId(): Promise<string | null> {
     const data = await justavpsFetch<{ images: JustAVPSImage[] }>('/images');
     const readyImages = (data.images || []).filter((img) => img.status === 'ready');
 
-    // 1. Prefer dev images (kortix-computer-vdev-*) — sorted by creation date, newest first
+    // 1. Prefer dev images (acme-computer-vdev-*) — sorted by creation date, newest first
     const devCandidates = readyImages
       .filter((img) => img.name.startsWith(DEV_IMAGE_NAME_PREFIX))
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -175,7 +175,7 @@ async function resolveLatestImageId(): Promise<string | null> {
       return cachedImageId;
     }
 
-    // 2. Fall back to semver images (kortix-computer-v0.8.*) — sorted by version, highest first
+    // 2. Fall back to semver images (acme-computer-v0.8.*) — sorted by version, highest first
     const semverCandidates = readyImages
       .filter((img) => img.name.startsWith(IMAGE_NAME_PREFIX) && !img.name.startsWith(DEV_IMAGE_NAME_PREFIX))
       .map((img) => ({
@@ -192,7 +192,7 @@ async function resolveLatestImageId(): Promise<string | null> {
       return cachedImageId;
     }
 
-    console.warn('[JUSTAVPS] No images matching kortix-computer-v* found; provisioning without image_id');
+    console.warn('[JUSTAVPS] No images matching acme-computer-v* found; provisioning without image_id');
     return null;
   } catch (err) {
     console.warn('[JUSTAVPS] Failed to resolve latest image, falling back to no image_id:', err);
@@ -254,7 +254,7 @@ async function ensureWebhookRegistered(): Promise<void> {
   const webhookUrl = config.JUSTAVPS_WEBHOOK_URL;
   const webhookSecret = config.JUSTAVPS_WEBHOOK_SECRET;
   if (!webhookUrl) {
-    console.warn('[JUSTAVPS] JUSTAVPS_WEBHOOK_URL not configured — provisioning events will not flow back to Kortix');
+    console.warn('[JUSTAVPS] JUSTAVPS_WEBHOOK_URL not configured — provisioning events will not flow back to Acme');
     webhookRegistered = true;
     return;
   }
@@ -289,8 +289,8 @@ function shellEscape(value: string): string {
   return `'${value.replace(/'/g, `'"'"'`)}'`;
 }
 
-function resolveReachableKortixApiUrl(): string {
-  const directBase = config.KORTIX_URL.replace(/\/v1\/router\/?$/, '');
+function resolveReachableAcmeApiUrl(): string {
+  const directBase = config.ACME_URL.replace(/\/v1\/router\/?$/, '');
 
   try {
     const parsed = new URL(directBase);
@@ -310,9 +310,9 @@ function resolveReachableKortixApiUrl(): string {
 
 export function buildCustomerCloudInitScript(dockerImage: string): string {
   return [
-    'curl -fsSL https://raw.githubusercontent.com/kortix-ai/suna/main/scripts/start-sandbox.sh -o /usr/local/bin/kortix-start-sandbox.sh',
-    'chmod +x /usr/local/bin/kortix-start-sandbox.sh',
-    `/usr/local/bin/kortix-start-sandbox.sh ${shellEscape(dockerImage)}`,
+    'curl -fsSL https://raw.githubusercontent.com/aimentor606/aether/main/scripts/start-sandbox.sh -o /usr/local/bin/acme-start-sandbox.sh',
+    'chmod +x /usr/local/bin/acme-start-sandbox.sh',
+    `/usr/local/bin/acme-start-sandbox.sh ${shellEscape(dockerImage)}`,
   ].join('\n');
 }
 
@@ -378,21 +378,21 @@ export class JustAVPSProvider implements SandboxProvider {
 
     const serverType = opts.serverType || config.JUSTAVPS_DEFAULT_SERVER_TYPE;
     const location = opts.location || config.JUSTAVPS_DEFAULT_LOCATION;
-    const sandboxApiBase = resolveReachableKortixApiUrl().replace(/\/v1\/router\/?$/, '');
+    const sandboxApiBase = resolveReachableAcmeApiUrl().replace(/\/v1\/router\/?$/, '');
     const routerBase = `${sandboxApiBase}/v1/router`;
 
-    const serviceKey = opts.envVars?.KORTIX_TOKEN || '';
+    const serviceKey = opts.envVars?.ACME_TOKEN || '';
     // Inject the API's own version into the sandbox container so the sandbox
     // health endpoint reports the correct version. All components share one
     // version number (set by deploy-zero-downtime.sh from the Docker image tag).
     // This works even when SANDBOX_IMAGE defaults to :latest.
     const envVars: Record<string, string> = {
-      KORTIX_API_URL: sandboxApiBase,
+      ACME_API_URL: sandboxApiBase,
       ENV_MODE: 'cloud',
       INTERNAL_SERVICE_KEY: serviceKey,
-      KORTIX_TOKEN: serviceKey,
+      ACME_TOKEN: serviceKey,
       SANDBOX_VERSION: SANDBOX_VERSION,
-      KORTIX_SANDBOX_VERSION: SANDBOX_VERSION,
+      ACME_SANDBOX_VERSION: SANDBOX_VERSION,
       TUNNEL_API_URL: sandboxApiBase,
       TUNNEL_TOKEN: serviceKey,
       TAVILY_API_URL: `${routerBase}/tavily`,
@@ -408,7 +408,7 @@ export class JustAVPSProvider implements SandboxProvider {
       provider: 'cloud',
       server_type: serverType,
       region: location,
-      name: `kortix-sandbox-${opts.accountId.slice(0, 8)}-${Date.now().toString(36)}`,
+      name: `acme-sandbox-${opts.accountId.slice(0, 8)}-${Date.now().toString(36)}`,
       env_vars: envVars,
       cloud_init_script: buildCustomerCloudInitScript(config.SANDBOX_IMAGE),
       enable_backups: true,
@@ -436,7 +436,7 @@ export class JustAVPSProvider implements SandboxProvider {
         method: 'POST',
         body: {
           machine_id: machine.id,
-          label: `kortix-sandbox-${machine.id}`,
+          label: `acme-sandbox-${machine.id}`,
           expires_in_seconds: 7 * 24 * 60 * 60, // 30 days
         },
       });
@@ -535,7 +535,7 @@ export class JustAVPSProvider implements SandboxProvider {
           method: 'POST',
           body: {
             machine_id: externalId,
-            label: `kortix-sandbox-${externalId}`,
+            label: `acme-sandbox-${externalId}`,
             expires_in_seconds: 7 * 24 * 60 * 60,
           },
         });
@@ -556,7 +556,7 @@ export class JustAVPSProvider implements SandboxProvider {
       headers['X-Proxy-Token'] = proxyToken;
     }
 
-    // Service key for core/kortix-master auth
+    // Service key for core/acme-master auth
     const serviceKey = (row?.config as Record<string, unknown>)?.serviceKey as string | undefined;
     if (serviceKey) {
       headers['Authorization'] = `Bearer ${serviceKey}`;

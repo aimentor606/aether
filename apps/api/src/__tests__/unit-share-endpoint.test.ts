@@ -4,7 +4,7 @@ import { Hono } from 'hono'
 /**
  * Unit tests for /v1/p/share input validation.
  *
- * The real handlers proxy to the sandbox's /kortix/share routes, so these tests
+ * The real handlers proxy to the sandbox's /acme/share routes, so these tests
  * focus on validating the request-shape guards for create/list/revoke.
  */
 

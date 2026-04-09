@@ -151,7 +151,7 @@ export function OcProjectCreateToolView({
 
           {/* Scaffold created hint */}
           <div className="text-xs text-muted-foreground/60 bg-muted/20 rounded-lg p-3">
-            Project scaffold created with .kortix directory and Git initialized
+            Project scaffold created with .acme directory and Git initialized
           </div>
         </div>
       </CardContent>

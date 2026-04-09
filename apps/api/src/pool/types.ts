@@ -1,4 +1,4 @@
-import type { poolResources, poolSandboxes, sandboxes } from '@kortix/db';
+import type { poolResources, poolSandboxes, sandboxes } from '@acme/db';
 
 export type PoolResource = typeof poolResources.$inferSelect;
 export type PoolSandbox = typeof poolSandboxes.$inferSelect;

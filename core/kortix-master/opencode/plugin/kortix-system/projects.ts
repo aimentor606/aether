@@ -330,7 +330,7 @@ export function projectStatusTransform(mgr: ProjectManager, getCurrentSessionId:
 			for (let i = messages.length - 1; i >= 0; i--) {
 				if (messages[i]?.info?.role === "user") {
 					if (!Array.isArray(messages[i].parts)) messages[i].parts = []
-					messages[i].parts.push({ type: "text", text: `<kortix_system type="project-status" source="kortix-system">${statusXml}</kortix_system>` })
+					messages[i].parts.push({ type: "text", text: `<acme_system type="project-status" source="acme-system">${statusXml}</acme_system>` })
 					break
 				}
 			}

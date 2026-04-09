@@ -20,8 +20,8 @@ chown -R "$ABC_UID:$ABC_GID" \
   /workspace/.bun \
   /workspace/.config \
   /workspace/.opencode \
-  /workspace/.kortix \
-  /workspace/.kortix-state \
+  /workspace/.acme \
+  /workspace/.acme-state \
   /workspace/.secrets \
   /workspace/.npm-global \
   /workspace/.XDG \

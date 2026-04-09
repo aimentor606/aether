@@ -1,10 +1,10 @@
 /**
- * Test helpers for kortix-api E2E tests.
+ * Test helpers for acme-api E2E tests.
  *
  * Provides:
  * - createTestApp() — Hono app mimicking the monolith with auth bypassed + injectable mock providers
  * - getTestDb()     — shared Drizzle DB instance for assertions
- * - cleanupTestData() — deletes all test rows from the shared kortix schema
+ * - cleanupTestData() — deletes all test rows from the shared acme schema
  * - Mock provider factories
  * - Request helpers (jsonPost, jsonGet, jsonPatch, jsonDelete)
  *
@@ -15,7 +15,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
-import { createDb, type Database, sandboxes, deployments, kortixApiKeys } from '@kortix/db';
+import { createDb, type Database, sandboxes, deployments, acmeApiKeys } from '@acme/db';
 import { sql } from 'drizzle-orm';
 import { BillingError } from '../errors';
 import type { AuthVariables } from '../types';
@@ -51,9 +51,9 @@ export interface SandboxProvider {
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 export const TEST_USER_ID = '00000000-0000-4000-a000-000000000001';
-export const TEST_USER_EMAIL = 'test@kortix.dev';
+export const TEST_USER_EMAIL = 'test@acme.dev';
 export const OTHER_USER_ID = '00000000-0000-4000-a000-000000000002';
-export const OTHER_USER_EMAIL = 'other@kortix.dev';
+export const OTHER_USER_EMAIL = 'other@acme.dev';
 
 // ─── DB ──────────────────────────────────────────────────────────────────────
 
@@ -107,7 +107,7 @@ export function createMockProvider(
     externalId: `mock-${name}-${Date.now()}`,
     baseUrl:
       name === 'daytona'
-        ? `https://kortix.cloud/mock-daytona-id/8000`
+        ? `https://acme.cloud/mock-daytona-id/8000`
         : `http://localhost:${30000 + Math.floor(Math.random() * 1000)}`,
     metadata: {
       provisionedBy: 'test',
@@ -184,7 +184,7 @@ export function createTestApp(opts: TestAppOptions = {}) {
   app.get('/health', (c) =>
     c.json({
       status: 'ok',
-      service: 'kortix-api',
+      service: 'acme-api',
       timestamp: new Date().toISOString(),
     }),
   );
@@ -192,7 +192,7 @@ export function createTestApp(opts: TestAppOptions = {}) {
   app.get('/v1/health', (c) =>
     c.json({
       status: 'ok',
-      service: 'kortix',
+      service: 'acme',
       timestamp: new Date().toISOString(),
     }),
   );
@@ -329,12 +329,12 @@ export function createTestApp(opts: TestAppOptions = {}) {
 // ─── Cleanup ─────────────────────────────────────────────────────────────────
 
 /**
- * Delete all test data from kortix schema tables.
+ * Delete all test data from acme schema tables.
  * Order respects FK constraints: children before parents.
  */
 export async function cleanupTestData(): Promise<void> {
   const db = getTestDb();
-  await db.delete(kortixApiKeys).execute();
+  await db.delete(acmeApiKeys).execute();
   await db.delete(deployments).execute();
   await db.delete(sandboxes).execute();
 }

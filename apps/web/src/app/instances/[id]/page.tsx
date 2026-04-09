@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { useQuery } from '@tanstack/react-query';
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { AcmeLogo } from '@/components/sidebar/acme-logo';
 import { ProvisioningProgress } from '@/components/provisioning/provisioning-progress';
 import { useSandboxPoller } from '@/hooks/platform/use-sandbox-poller';
 import { getSandboxById } from '@/lib/platform-client';
@@ -274,7 +274,7 @@ export default function InstanceDetailPage() {
 
           {/* Logo + title */}
           <div className="mb-12 flex flex-col items-center gap-3 animate-instance-fade-in">
-            <KortixLogo size={22} />
+            <AcmeLogo size={22} />
             <h1 className="text-[15px] font-normal text-foreground/30 tracking-[0.15em] uppercase">
               {titleText}
             </h1>

@@ -18,7 +18,7 @@ describe("Environment Variable Persistence", () => {
 
   async function startServer(): Promise<StartedServer> {
     return startKortixMaster(8002, fixture, {
-      KORTIX_TOKEN: "persistence-test-token",
+      ACME_TOKEN: "persistence-test-token",
       OPENCODE_PORT: "9002",
     });
   }

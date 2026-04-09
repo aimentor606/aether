@@ -67,7 +67,7 @@ triggers:
       expect(result.triggers[0].source.cron_expr).toBe('0 0 9 * * *')
       expect(result.triggers[0].action.type).toBe('prompt')
       expect(result.triggers[0].action.prompt).toBe('Generate the daily report')
-      expect(result.triggers[0].action.agent).toBe('kortix')
+      expect(result.triggers[0].action.agent).toBe('acme')
 
       expect(result.triggers[1].name).toBe('Deploy Hook')
       expect(result.triggers[1].source.type).toBe('webhook')
@@ -275,7 +275,7 @@ triggers:
         source_config: { cron_expr: '0 0 9 * * *', timezone: 'UTC' },
         action_type: 'prompt',
         action_config: { prompt: 'from DB' },
-        agent_name: 'kortix',
+        agent_name: 'acme',
       })
 
       yamlSync.flushToYaml()

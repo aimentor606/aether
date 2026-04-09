@@ -1,0 +1,232 @@
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { HIDE_BROWSER_TAB } from '@/components/thread/utils';
+import { useFilesStore } from '@/features/files';
+import { openTabAndNavigate } from '@/stores/tab-store';
+
+export type ViewType = 'tools' | 'files' | 'browser' | 'desktop' | 'terminal' | 'changes';
+
+interface AcmeComputerState {
+  // === SANDBOX CONTEXT ===
+  currentSandboxId: string | null;
+  
+  // Main view state
+  activeView: ViewType;
+  
+  // Panel state — per-session so switching tabs preserves each session's panel state
+  shouldOpenPanel: boolean;
+  isSidePanelOpen: boolean;
+  _panelOpenBySession: Record<string, boolean>;
+  _activeSessionId: string | null;
+  isExpanded: boolean;
+  
+  // Tool navigation state (for external tool click triggers)
+  pendingToolNavIndex: number | null;
+  
+  // === ACTIONS ===
+  
+  setSandboxContext: (sandboxId: string | null) => void;
+  setActiveView: (view: ViewType) => void;
+  
+  // For external triggers (clicking file in chat) — delegates to useFilesStore + opens panel
+  openFileInComputer: (filePath: string, filePathList?: string[], targetLine?: number) => void;
+  
+  // Open files browser without selecting a file — delegates to useFilesStore + opens panel
+  openFileBrowser: () => void;
+  
+  // Navigate to a specific tool call (clicking tool in ThreadContent)
+  navigateToToolCall: (toolIndex: number) => void;
+  
+  // Clear pending tool nav after AcmeComputer processes it
+  clearPendingToolNav: () => void;
+  
+  // Panel control
+  clearShouldOpenPanel: () => void;
+  setIsSidePanelOpen: (open: boolean) => void;
+  /** Call when a session tab becomes active — restores that session's panel state */
+  setActiveSession: (sessionId: string | null) => void;
+  openSidePanel: () => void;
+  closeSidePanel: () => void;
+  setIsExpanded: (expanded: boolean) => void;
+  toggleExpanded: () => void;
+  
+  // Reset all state (full reset)
+  reset: () => void;
+}
+
+const initialState = {
+  currentSandboxId: null as string | null,
+  activeView: 'tools' as ViewType,
+  shouldOpenPanel: false,
+  isSidePanelOpen: false,
+  _panelOpenBySession: {} as Record<string, boolean>,
+  _activeSessionId: null as string | null,
+  isExpanded: false,
+  pendingToolNavIndex: null as number | null,
+};
+
+export const useAcmeComputerStore = create<AcmeComputerState>()(
+  devtools(
+    (set, get) => ({
+      ...initialState,
+      
+      setSandboxContext: (sandboxId: string | null) => {
+        const currentSandboxId = get().currentSandboxId;
+        
+        if (currentSandboxId !== sandboxId) {
+          console.log('[AcmeComputerStore] Sandbox context changed:', currentSandboxId, '->', sandboxId);
+          // Reset files store when sandbox changes
+          useFilesStore.getState().reset();
+          set({
+            currentSandboxId: sandboxId,
+            activeView: 'tools',
+          });
+        }
+      },
+      
+      setActiveView: (view: ViewType) => {
+        // If browser tab is hidden and trying to set browser view, default to tools
+        const effectiveView = HIDE_BROWSER_TAB && view === 'browser' ? 'tools' : view;
+        // Terminal and Desktop are now in the right sidebar - redirect to tools
+        const finalView = (effectiveView === 'terminal' || effectiveView === 'desktop' || effectiveView === 'changes') ? 'tools' : effectiveView;
+        set({ activeView: finalView });
+      },
+      
+      openFileInComputer: (filePath: string, _filePathList?: string[], targetLine?: number) => {
+        // Open the file as a new tab (same as clicking a file in the explorer)
+        const fileName = filePath.split('/').pop() || filePath;
+        const tabId = `file:${filePath}`;
+        openTabAndNavigate({
+          id: tabId,
+          title: fileName,
+          type: 'file',
+          href: `/files/${encodeURIComponent(filePath)}`,
+          // Store targetLine in tab metadata so the file viewer can scroll to it
+          ...(targetLine ? { metadata: { targetLine } } : {}),
+        });
+      },
+      
+      openFileBrowser: () => {
+        // Delegate file state to the unified files store
+        useFilesStore.getState().navigateToPath('.');
+        
+        set({
+          activeView: 'tools',
+          shouldOpenPanel: true,
+        });
+      },
+      
+      navigateToToolCall: (toolIndex: number) => {
+        set({
+          activeView: 'tools',
+          pendingToolNavIndex: toolIndex,
+          shouldOpenPanel: true,
+        });
+      },
+      
+      clearPendingToolNav: () => {
+        set({ pendingToolNavIndex: null });
+      },
+      
+      clearShouldOpenPanel: () => {
+        set({ shouldOpenPanel: false });
+      },
+      
+      setIsSidePanelOpen: (open: boolean) => {
+        const sessionId = get()._activeSessionId;
+        const update: Partial<AcmeComputerState> = { isSidePanelOpen: open };
+        if (sessionId) {
+          update._panelOpenBySession = { ...get()._panelOpenBySession, [sessionId]: open };
+        }
+        set(update);
+      },
+
+      setActiveSession: (sessionId: string | null) => {
+        const prev = get()._activeSessionId;
+        if (prev === sessionId) return;
+        // Save current panel state for the previous session
+        const panelMap = { ...get()._panelOpenBySession };
+        if (prev) {
+          panelMap[prev] = get().isSidePanelOpen;
+        }
+        // Restore panel state for the new session (default to false if unseen)
+        const restored = sessionId ? (panelMap[sessionId] ?? false) : false;
+        set({
+          _activeSessionId: sessionId,
+          _panelOpenBySession: panelMap,
+          isSidePanelOpen: restored,
+          // Reset expanded state when switching sessions
+          isExpanded: false,
+        });
+      },
+      
+      openSidePanel: () => {
+        const sessionId = get()._activeSessionId;
+        const update: Partial<AcmeComputerState> = { isSidePanelOpen: true };
+        if (sessionId) {
+          update._panelOpenBySession = { ...get()._panelOpenBySession, [sessionId]: true };
+        }
+        set(update);
+      },
+      
+      closeSidePanel: () => {
+        const sessionId = get()._activeSessionId;
+        const update: Partial<AcmeComputerState> = { isSidePanelOpen: false, isExpanded: false };
+        if (sessionId) {
+          update._panelOpenBySession = { ...get()._panelOpenBySession, [sessionId]: false };
+        }
+        set(update);
+      },
+
+      setIsExpanded: (expanded: boolean) => {
+        set({ isExpanded: expanded });
+      },
+
+      toggleExpanded: () => {
+        set((state) => ({ isExpanded: !state.isExpanded }));
+      },
+      
+      reset: () => {
+        console.log('[AcmeComputerStore] Full reset');
+        useFilesStore.getState().reset();
+        set(initialState);
+      },
+    }),
+    {
+      name: 'acme-computer-store',
+    }
+  )
+);
+
+// === SELECTOR HOOKS ===
+
+// Sandbox context
+export const useAcmeComputerSandboxId = () =>
+  useAcmeComputerStore((state) => state.currentSandboxId);
+
+export const useSetSandboxContext = () =>
+  useAcmeComputerStore((state) => state.setSandboxContext);
+
+// Main view state
+export const useAcmeComputerActiveView = () => 
+  useAcmeComputerStore((state) => state.activeView);
+
+// Individual selectors for pending tool navigation (stable primitives)
+export const useAcmeComputerPendingToolNavIndex = () =>
+  useAcmeComputerStore((state) => state.pendingToolNavIndex);
+
+export const useAcmeComputerClearPendingToolNav = () =>
+  useAcmeComputerStore((state) => state.clearPendingToolNav);
+
+// Side panel state selectors
+export const useIsSidePanelOpen = () =>
+  useAcmeComputerStore((state) => state.isSidePanelOpen);
+
+export const useSetIsSidePanelOpen = () =>
+  useAcmeComputerStore((state) => state.setIsSidePanelOpen);
+
+export const useIsExpanded = () =>
+  useAcmeComputerStore((state) => state.isExpanded);
+
+export const useToggleExpanded = () =>
+  useAcmeComputerStore((state) => state.toggleExpanded);

@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useSandboxConnectionStore } from '@/stores/sandbox-connection-store';
 import { resolveServerUrl, useServerStore } from '@/stores/server-store';
 import { Button } from '@/components/ui/button';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { AcmeLoader } from '@/components/ui/acme-loader';
 import { useRouter } from 'next/navigation';
 import {
   WifiOff,
@@ -137,7 +137,7 @@ function FirstConnectContent({ label, url }: { label: string; url: string }) {
         )}
       </div>
 
-      <KortixLoader size="small" />
+      <AcmeLoader size="small" />
     </>
   );
 }

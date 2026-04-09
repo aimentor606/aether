@@ -146,10 +146,10 @@ mock.module('../router/services/llm', () => ({
             (completion / 1_000_000) * (modelConfig?.outputPer1M || 0)) * 1.2;
   },
   getAllModels: () => [
-    { id: 'minimax/minimax-m2.7', object: 'model', owned_by: 'kortix', context_window: 204800, pricing: { input: 0.30, output: 1.20 }, tier: 'free' },
-    { id: 'z-ai/glm-5-turbo', object: 'model', owned_by: 'kortix', context_window: 202752, pricing: { input: 1.20, output: 4.00 }, tier: 'free' },
-    { id: 'moonshotai/kimi-k2.5', object: 'model', owned_by: 'kortix', context_window: 262144, pricing: { input: 0.45, output: 2.20 }, tier: 'free' },
-    { id: 'minimax/minimax-m2.5', object: 'model', owned_by: 'kortix', context_window: 196608, pricing: { input: 0.20, output: 1.17 }, tier: 'free' },
+    { id: 'minimax/minimax-m2.7', object: 'model', owned_by: 'acme', context_window: 204800, pricing: { input: 0.30, output: 1.20 }, tier: 'free' },
+    { id: 'z-ai/glm-5-turbo', object: 'model', owned_by: 'acme', context_window: 202752, pricing: { input: 1.20, output: 4.00 }, tier: 'free' },
+    { id: 'moonshotai/kimi-k2.5', object: 'model', owned_by: 'acme', context_window: 262144, pricing: { input: 0.45, output: 2.20 }, tier: 'free' },
+    { id: 'minimax/minimax-m2.5', object: 'model', owned_by: 'acme', context_window: 196608, pricing: { input: 0.20, output: 1.17 }, tier: 'free' },
   ],
   getModel: (id: string) => ({
     openrouterId: id,
@@ -217,7 +217,7 @@ describe('Router: health', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.status).toBe('ok');
-    expect(body.service).toBe('kortix-router');
+    expect(body.service).toBe('acme-router');
     expect(body.timestamp).toBeDefined();
     expect(body.env).toBeDefined();
   });
@@ -438,7 +438,7 @@ describe('Router: chat/completions (non-streaming)', () => {
     const res = await app.request('/v1/router/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({ model: 'kortix/basic' }),
+      body: JSON.stringify({ model: 'acme/basic' }),
     });
     expect(res.status).toBe(400);
   });

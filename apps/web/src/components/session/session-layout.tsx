@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import * as ResizablePrimitive from 'react-resizable-panels';
-import { KortixComputer } from '@/components/thread/kortix-computer';
+import { AcmeComputer } from '@/components/thread/acme-computer';
 import { useIsMobile } from '@/hooks/utils';
 import { cn } from '@/lib/utils';
 import {
@@ -11,8 +11,8 @@ import {
   ResizableHandle,
 } from '@/components/ui/resizable';
 import {
-  useKortixComputerStore,
-} from '@/stores/kortix-computer-store';
+  useAcmeComputerStore,
+} from '@/stores/acme-computer-store';
 import {
   useOpenCodeMessages,
   useOpenCodeSession,
@@ -22,7 +22,7 @@ import { useTabStore } from '@/stores/tab-store';
 import {
   adaptMessagesToToolCalls,
   adaptAgentStatus,
-} from '@/lib/adapters/opencode-to-kortix-computer';
+} from '@/lib/adapters/opencode-to-acme-computer';
 import { X } from 'lucide-react';
 
 // ============================================================================
@@ -58,13 +58,13 @@ export const SessionLayout = memo(function SessionLayout({
   // (e.g. currentSandboxId, files store resets). Destructuring the whole store
   // subscribes to ALL properties and causes unnecessary re-renders for every
   // open session tab.
-  const isSidePanelOpen = useKortixComputerStore((s) => s.isSidePanelOpen);
-  const setIsSidePanelOpen = useKortixComputerStore((s) => s.setIsSidePanelOpen);
-  const setActiveSession = useKortixComputerStore((s) => s.setActiveSession);
-  const shouldOpenPanel = useKortixComputerStore((s) => s.shouldOpenPanel);
-  const clearShouldOpenPanel = useKortixComputerStore((s) => s.clearShouldOpenPanel);
-  const isExpanded = useKortixComputerStore((s) => s.isExpanded);
-  const toggleExpanded = useKortixComputerStore((s) => s.toggleExpanded);
+  const isSidePanelOpen = useAcmeComputerStore((s) => s.isSidePanelOpen);
+  const setIsSidePanelOpen = useAcmeComputerStore((s) => s.setIsSidePanelOpen);
+  const setActiveSession = useAcmeComputerStore((s) => s.setActiveSession);
+  const shouldOpenPanel = useAcmeComputerStore((s) => s.shouldOpenPanel);
+  const clearShouldOpenPanel = useAcmeComputerStore((s) => s.clearShouldOpenPanel);
+  const isExpanded = useAcmeComputerStore((s) => s.isExpanded);
+  const toggleExpanded = useAcmeComputerStore((s) => s.toggleExpanded);
 
   // Track active tab to restore per-session panel state on tab switch
   const activeTabId = useTabStore((s) => s.activeTabId);
@@ -206,7 +206,7 @@ export const SessionLayout = memo(function SessionLayout({
         <div className="flex-1 overflow-hidden min-h-0 flex flex-col">
           {children}
         </div>
-        <KortixComputer
+        <AcmeComputer
           isOpen={isSidePanelOpen && hasToolCalls}
           onClose={handleSidePanelClose}
           toolCalls={toolCalls}
@@ -262,7 +262,7 @@ export const SessionLayout = memo(function SessionLayout({
             )}
           />
 
-          {/* Side panel (KortixComputer — Actions only) */}
+          {/* Side panel (AcmeComputer — Actions only) */}
           <ResizablePanel
             ref={sidePanelRef}
             defaultSize={shouldShowPanel ? 50 : 0}
@@ -278,7 +278,7 @@ export const SessionLayout = memo(function SessionLayout({
               "h-full transition-[padding] duration-300 ease-out",
               isExpanded ? "p-0" : "pt-3 pb-6 pr-3 sm:pr-4 pl-1.5"
             )}>
-              <KortixComputer
+              <AcmeComputer
                 isOpen={isSidePanelOpen && hasToolCalls}
                 onClose={handleSidePanelClose}
                 toolCalls={toolCalls}

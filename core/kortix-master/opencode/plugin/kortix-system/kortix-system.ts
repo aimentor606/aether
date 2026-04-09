@@ -7,7 +7,7 @@
  * All native OpenCode tools (task, todowrite, todoread) are disabled.
  * Kortix provides its own: agent_spawn/message/stop/status + task_create/list/update/done/delete.
  *
- * opencode.jsonc: "./plugin/kortix-system/kortix-system.ts"
+ * opencode.jsonc: "./plugin/acme-system/acme-system.ts"
  */
 
 import * as path from "node:path"
@@ -33,7 +33,7 @@ const KortixSystemPlugin: Plugin = async (ctx) => {
 	// ── Load sub-modules ──
 	// Load sub-modules — each wrapped in try/catch so one failure doesn't kill the whole plugin
 	const load = async (name: string, fn: () => Promise<any>) => {
-		try { return await fn() } catch (e) { console.warn(`[kortix-system] ${name} init failed:`, (e as Error).message); return null }
+		try { return await fn() } catch (e) { console.warn(`[acme-system] ${name} init failed:`, (e as Error).message); return null }
 	}
 
 	const sessions = await load("sessions", () => import("./sessions").then(m => m.default(ctx)))
@@ -51,7 +51,7 @@ const KortixSystemPlugin: Plugin = async (ctx) => {
 		return typeof btwRaw === "object" && "server" in btwRaw ? await btwRaw.server(ctx) : await btwRaw(ctx)
 	})
 	
-	console.log("[kortix-system] Plugin initialized. Tools:", Object.keys(projectTools(mgr, db)).length, "project +", Object.keys(taskTools(db, mgr)).length, "task +", Object.keys(agentTools(client, db, mgr)).length, "agent")
+	console.log("[acme-system] Plugin initialized. Tools:", Object.keys(projectTools(mgr, db)).length, "project +", Object.keys(taskTools(db, mgr)).length, "task +", Object.keys(agentTools(client, db, mgr)).length, "agent")
 
 	// ── Merge all tools ──
 	return {
@@ -124,10 +124,10 @@ const KortixSystemPlugin: Plugin = async (ctx) => {
 				if (!tasks.length) return
 				const icon = (s: string) => s === "in_progress" ? "→" : s === "blocked" ? "⊘" : "○"
 				output.context.push([
-					`<kortix_system type="tasks" source="kortix-system">`,
+					`<acme_system type="tasks" source="acme-system">`,
 					`Active tasks for project ${project.name}:`,
 					...tasks.map(t => `${icon(t.status)} [${t.priority}] ${t.id}: ${t.title}`),
-					`</kortix_system>`,
+					`</acme_system>`,
 				].join("\n"))
 			} catch {}
 		},

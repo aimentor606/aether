@@ -1,4 +1,4 @@
-export const DEFAULT_CHANNEL_AGENT = 'kortix';
+export const DEFAULT_CHANNEL_AGENT = 'acme';
 
 export function buildDefaultChannelInstructions(platform: 'telegram' | 'slack', channelName?: string) {
   const label = channelName?.trim() || platform;

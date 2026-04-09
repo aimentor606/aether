@@ -34,8 +34,8 @@ function formatPtyOutput(
     `</pty_output>`,
   ].join('\n')
   
-  // Wrap in kortix_system tags so frontend renders as system/internal component
-  return `<kortix_system type="pty-output" source="opencode-pty">\n${inner}\n</kortix_system>`
+  // Wrap in acme_system tags so frontend renders as system/internal component
+  return `<acme_system type="pty-output" source="opencode-pty">\n${inner}\n</acme_system>`
 }
 
 /**
@@ -81,7 +81,7 @@ function handlePatternRead(
       `Total lines in buffer: ${result.totalLines}`,
       `</pty_output>`,
     ].join('\n')
-    return `<kortix_system type="pty-output" source="opencode-pty">\n${inner}\n</kortix_system>`
+    return `<acme_system type="pty-output" source="opencode-pty">\n${inner}\n</acme_system>`
   }
 
   const formattedLines = result.matches.map((match) =>
@@ -123,7 +123,7 @@ function handlePlainRead(
       `Total lines: ${result.totalLines}`,
       `</pty_output>`,
     ].join('\n')
-    return `<kortix_system type="pty-output" source="opencode-pty">\n${inner}\n</kortix_system>`
+    return `<acme_system type="pty-output" source="opencode-pty">\n${inner}\n</acme_system>`
   }
 
   const formattedLines = result.lines.map((line, index) =>

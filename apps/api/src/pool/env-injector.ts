@@ -1,7 +1,7 @@
 import { config, SANDBOX_VERSION } from '../config';
 import type { PoolSandbox } from './types';
 
-function buildKortixMasterUrl(baseUrl: string): string {
+function buildAcmeMasterUrl(baseUrl: string): string {
   const parsed = new URL(baseUrl);
   return `${parsed.protocol}//8000--${parsed.hostname}/env`;
 }
@@ -24,14 +24,14 @@ function buildHeaders(metadata: Record<string, unknown>): Record<string, string>
 }
 
 function buildEnvPayload(serviceKey: string, metadata?: Record<string, unknown>): Record<string, string> {
-  const sandboxApiBase = config.KORTIX_URL.replace(/\/v1\/router\/?$/, '');
+  const sandboxApiBase = config.ACME_URL.replace(/\/v1\/router\/?$/, '');
   const routerBase = `${sandboxApiBase}/v1/router`;
   const payload: Record<string, string> = {
-    KORTIX_API_URL: sandboxApiBase,
+    ACME_API_URL: sandboxApiBase,
     ENV_MODE: 'cloud',
     INTERNAL_SERVICE_KEY: serviceKey,
-    KORTIX_TOKEN: serviceKey,
-    KORTIX_SANDBOX_VERSION: SANDBOX_VERSION,
+    ACME_TOKEN: serviceKey,
+    ACME_SANDBOX_VERSION: SANDBOX_VERSION,
     TAVILY_API_URL: `${routerBase}/tavily`,
     REPLICATE_API_URL: `${routerBase}/replicate`,
     SERPER_API_URL: `${routerBase}/serper`,
@@ -45,7 +45,7 @@ function buildEnvPayload(serviceKey: string, metadata?: Record<string, unknown>)
   if (metadata) {
     const slug = metadata.justavpsSlug as string | undefined;
     const proxyToken = metadata.justavpsProxyToken as string | undefined;
-    const proxyDomain = config.JUSTAVPS_PROXY_DOMAIN || 'kortix.cloud';
+    const proxyDomain = config.JUSTAVPS_PROXY_DOMAIN || 'acme.cloud';
     if (slug && proxyToken) {
       payload.PUBLIC_BASE_URL = `https://8000--${slug}.${proxyDomain}?__proxy_token=${proxyToken}`;
     }
@@ -62,7 +62,7 @@ function buildEnvPayload(serviceKey: string, metadata?: Record<string, unknown>)
  */
 export async function inject(poolSandbox: PoolSandbox, serviceKey: string): Promise<void> {
   const meta = (poolSandbox.metadata as Record<string, unknown>) ?? {};
-  const url = buildKortixMasterUrl(poolSandbox.baseUrl);
+  const url = buildAcmeMasterUrl(poolSandbox.baseUrl);
   const headers = buildHeaders(meta);
   const keys = buildEnvPayload(serviceKey, meta);
 

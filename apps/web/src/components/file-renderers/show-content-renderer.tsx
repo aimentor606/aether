@@ -215,7 +215,7 @@ export function ShowContentRenderer({
 
   // ── Sandbox file path normalization ──
   // The show tool backend resolves paths to absolute (e.g. /workspace/foo.png).
-  // The /file/raw endpoint on kortix-master accepts absolute paths and validates
+  // The /file/raw endpoint on acme-master accepts absolute paths and validates
   // them against ALLOWED_ROOTS (/workspace, /opt, /tmp, /home).
   // Keep the path absolute — do NOT strip /workspace/ prefix.
   const isLocalPath = path ? isLocalSandboxFilePath(path) : false;

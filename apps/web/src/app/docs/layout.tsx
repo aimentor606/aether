@@ -9,8 +9,8 @@ function DocsLogo() {
     <Link href="/docs" className="flex items-center gap-2.5 no-underline">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/kortix-symbol.svg"
-        alt="Kortix"
+        src="/acme-symbol.svg"
+        alt="Acme"
         className="dark:invert flex-shrink-0"
         style={{ width: 18, height: 18 }}
       />
@@ -40,7 +40,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             },
             {
               text: 'GitHub',
-              url: 'https://github.com/kortix-ai/suna',
+              url: 'https://github.com/aimentor606/aether',
               external: true,
             },
           ],

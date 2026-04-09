@@ -21,17 +21,17 @@ export async function signIn(prevState: any, formData: FormData) {
   const normalizedEmail = email.trim().toLowerCase();
 
   // Use magic link (passwordless) authentication
-  // For desktop app, use custom protocol (kortix://auth/callback) - same as mobile
-  // For web, use standard origin (https://kortix.com/auth/callback)
+  // For desktop app, use custom protocol (acme://auth/callback) - same as mobile
+  // For web, use standard origin (https://acme.dev/auth/callback)
   // Include email in redirect URL so it's available if the link expires
   let emailRedirectTo: string;
-  if (isDesktopApp && origin.startsWith('kortix://')) {
+  if (isDesktopApp && origin.startsWith('acme://')) {
     // Match mobile implementation - simple protocol URL with optional terms_accepted
     const params = new URLSearchParams();
     if (acceptedTerms) {
       params.set('terms_accepted', 'true');
     }
-    emailRedirectTo = `kortix://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
+    emailRedirectTo = `acme://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
   } else {
     emailRedirectTo = `${origin}/auth/callback?returnUrl=${encodeURIComponent(returnUrl || '/instances')}&email=${encodeURIComponent(normalizedEmail)}${acceptedTerms ? '&terms_accepted=true' : ''}`;
   }
@@ -100,12 +100,12 @@ export async function signUp(prevState: any, formData: FormData) {
 
   // Use magic link (passwordless) authentication - auto-creates account
   let emailRedirectTo: string;
-  if (isDesktopApp && origin.startsWith('kortix://')) {
+  if (isDesktopApp && origin.startsWith('acme://')) {
     const params = new URLSearchParams();
     if (acceptedTerms) {
       params.set('terms_accepted', 'true');
     }
-    emailRedirectTo = `kortix://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
+    emailRedirectTo = `acme://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
   } else {
     emailRedirectTo = `${origin}/auth/callback?returnUrl=${encodeURIComponent(returnUrl || '/instances')}&email=${encodeURIComponent(normalizedEmail)}${acceptedTerms ? '&terms_accepted=true' : ''}`;
   }
@@ -228,17 +228,17 @@ export async function resendMagicLink(prevState: any, formData: FormData) {
   const normalizedEmail = email.trim().toLowerCase();
 
   // Use magic link (passwordless) authentication
-  // For desktop app, use custom protocol (kortix://auth/callback) - same as mobile
-  // For web, use standard origin (https://kortix.com/auth/callback)
+  // For desktop app, use custom protocol (acme://auth/callback) - same as mobile
+  // For web, use standard origin (https://acme.dev/auth/callback)
   // Include email in redirect URL so it's available if the link expires
   let emailRedirectTo: string;
-  if (isDesktopApp && origin.startsWith('kortix://')) {
+  if (isDesktopApp && origin.startsWith('acme://')) {
     // Match mobile implementation - simple protocol URL with optional terms_accepted
     const params = new URLSearchParams();
     if (acceptedTerms) {
       params.set('terms_accepted', 'true');
     }
-    emailRedirectTo = `kortix://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
+    emailRedirectTo = `acme://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
   } else {
     emailRedirectTo = `${origin}/auth/callback?returnUrl=${encodeURIComponent(returnUrl || '/instances')}&email=${encodeURIComponent(normalizedEmail)}${acceptedTerms ? '&terms_accepted=true' : ''}`;
   }
@@ -277,8 +277,8 @@ export async function sendOtpCode(prevState: any, formData: FormData) {
   const normalizedEmail = email.trim().toLowerCase();
 
   let emailRedirectTo: string;
-  if (isDesktopApp && origin.startsWith('kortix://')) {
-    emailRedirectTo = 'kortix://auth/callback';
+  if (isDesktopApp && origin.startsWith('acme://')) {
+    emailRedirectTo = 'acme://auth/callback';
   } else {
     emailRedirectTo = `${origin}/auth/callback?returnUrl=${encodeURIComponent(returnUrl || '/instances')}&email=${encodeURIComponent(normalizedEmail)}`;
   }

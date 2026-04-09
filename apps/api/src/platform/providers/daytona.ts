@@ -6,7 +6,7 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@acme/db';
 import { getDaytona } from '../../shared/daytona';
 import { db } from '../../shared/db';
 import { config, SANDBOX_VERSION } from '../../config';
@@ -38,32 +38,32 @@ export class DaytonaProvider implements SandboxProvider {
   async create(opts: CreateSandboxOpts): Promise<ProvisionResult> {
     const snapshot = config.DAYTONA_SNAPSHOT;
     if (!snapshot) {
-      throw new Error('DAYTONA_SNAPSHOT is not configured — set it to the snapshot name (e.g. kortix-sandbox-v0.4.1)');
+      throw new Error('DAYTONA_SNAPSHOT is not configured — set it to the snapshot name (e.g. acme-sandbox-v0.4.1)');
     }
 
     const daytona = getDaytona();
 
-    // Use KORTIX_TOKEN as INTERNAL_SERVICE_KEY — one key for both directions.
-    // KORTIX_TOKEN (sandbox → api) is already in opts.envVars.
+    // Use ACME_TOKEN as INTERNAL_SERVICE_KEY — one key for both directions.
+    // ACME_TOKEN (sandbox → api) is already in opts.envVars.
     // INTERNAL_SERVICE_KEY (api → sandbox) is the same value so the proxy can auth.
-    const serviceKey = opts.envVars?.KORTIX_TOKEN || '';
+    const serviceKey = opts.envVars?.ACME_TOKEN || '';
 
     // Strip /v1/router suffix — opencode.jsonc appends it already.
-    // KORTIX_URL may be "https://new-api.kortix.com/v1/router" but the
-    // sandbox expects the base: "https://new-api.kortix.com".
-    const sandboxApiBase = config.KORTIX_URL.replace(/\/v1\/router\/?$/, '');
+    // ACME_URL may be "https://new-api.acme.dev/v1/router" but the
+    // sandbox expects the base: "https://new-api.acme.dev".
+    const sandboxApiBase = config.ACME_URL.replace(/\/v1\/router\/?$/, '');
     const routerBase = `${sandboxApiBase}/v1/router`;
 
     const daytonaSandbox = await daytona.create(
       {
         snapshot,
         envVars: {
-          KORTIX_API_URL: sandboxApiBase,
+          ACME_API_URL: sandboxApiBase,
           ENV_MODE: 'cloud',
           INTERNAL_SERVICE_KEY: serviceKey,
           TUNNEL_API_URL: sandboxApiBase,
           TUNNEL_TOKEN: serviceKey,
-          // Route tool SDK traffic through the Kortix router proxy for billing/key injection.
+          // Route tool SDK traffic through the Acme router proxy for billing/key injection.
           // If not set, sandbox tools fall back to hitting the real upstream APIs directly.
           TAVILY_API_URL: `${routerBase}/tavily`,
           REPLICATE_API_URL: `${routerBase}/replicate`,
@@ -79,7 +79,7 @@ export class DaytonaProvider implements SandboxProvider {
     );
 
     const externalId = daytonaSandbox.id;
-    const apiBase = config.KORTIX_URL.replace(/\/v1\/router\/?$/, '').replace(/\/v1\/?$/, '');
+    const apiBase = config.ACME_URL.replace(/\/v1\/router\/?$/, '').replace(/\/v1\/?$/, '');
     const baseUrl = `${apiBase}/v1/p/${externalId}/8000`;
 
     return {

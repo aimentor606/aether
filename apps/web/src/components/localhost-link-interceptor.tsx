@@ -107,7 +107,7 @@ export function LocalhostLinkInterceptor() {
       }
 
       // ── Case 2: Already-proxied URL (subdomain or path-based) ──
-      // The href is something like http://p3210-kortix-sandbox.localhost:8008/
+      // The href is something like http://p3210-acme-sandbox.localhost:8008/
       // or http://localhost:8008/v1/p/.../proxy/3210/
       // which would navigate the browser away from the app. Instead, open as tab.
       if (isPreviewUrl(href)) {

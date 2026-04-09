@@ -12,7 +12,7 @@ const llm = new Hono<{ Variables: AppContext }>();
  * OpenAI-compatible chat completions — 1:1 passthrough proxy to OpenRouter.
  *
  * Preserves ALL request fields: tools, tool_choice, response_format, etc.
- * Resolves Kortix model IDs to OpenRouter equivalents and handles billing.
+ * Resolves Acme model IDs to OpenRouter equivalents and handles billing.
  */
 llm.post('/chat/completions', async (c) => {
   const accountId = c.get('accountId');
@@ -115,7 +115,7 @@ llm.post('/chat/completions', async (c) => {
 /**
  * GET /models
  *
- * List available Kortix models with pricing info.
+ * List available Acme models with pricing info.
  */
 llm.get('/models', async (c) => {
   const models = getAllModels();

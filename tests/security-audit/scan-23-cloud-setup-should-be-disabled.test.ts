@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - ALL Setup Routes Should Return 404
  *
- * LIVE scan against https://computer-preview-api.kortix.com
+ * LIVE scan against https://computer-preview-api.acme.dev
  *
  * Setup routes are for local/self-hosted ONLY. They should NOT exist on cloud.
  * Currently they're mounted unconditionally in index.ts:255.
@@ -17,7 +17,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.acme.dev';
 
 async function probe(method: string, path: string, body?: any): Promise<{
   status: number;

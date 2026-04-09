@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { backendApi } from '@/lib/api-client';
 import { accountStateKeys } from './use-account-state';
-import { dollarsToCredits } from '@kortix/shared';
+import { dollarsToCredits } from '@acme/shared';
 
 export interface CreditTransaction {
   id: string;

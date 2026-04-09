@@ -11,7 +11,7 @@
 
 echo "[restore-packages] Checking for packages to restore..."
 
-MANIFEST_DIR="/workspace/.kortix/packages"
+MANIFEST_DIR="/workspace/.acme/packages"
 mkdir -p "$MANIFEST_DIR"
 
 RESTORED=0
@@ -72,7 +72,7 @@ WORKSPACE_GID="$(id -g abc 2>/dev/null || echo 911)"
 chown -R "$WORKSPACE_UID:$WORKSPACE_GID" \
   /workspace/.local \
   /workspace/.npm-global \
-  /workspace/.kortix/packages \
+  /workspace/.acme/packages \
   2>/dev/null || true
 
 if [ $RESTORED -gt 0 ]; then

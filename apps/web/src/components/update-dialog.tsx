@@ -186,7 +186,7 @@ export function UpdateDialog({
 
   const copyCliCommand = async () => {
     try {
-      await navigator.clipboard.writeText('kortix update');
+      await navigator.clipboard.writeText('acme update');
     } catch {
       // no-op
     }
@@ -227,10 +227,10 @@ export function UpdateDialog({
                   <AlertTitle>Self-hosted updates run from the host</AlertTitle>
                   <AlertDescription>
                     <p>
-                      If you installed Kortix via the CLI, updates should be run from your terminal so the full stack updates together.
+                      If you installed Acme via the CLI, updates should be run from your terminal so the full stack updates together.
                     </p>
                     <div className="mt-2 rounded-xl bg-muted/40 px-3 py-2 font-mono text-xs text-foreground/80">
-                      kortix update
+                      acme update
                     </div>
                   </AlertDescription>
                 </Alert>

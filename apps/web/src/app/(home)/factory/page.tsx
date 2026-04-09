@@ -6,30 +6,30 @@ export const metadata: Metadata = {
   description:
     'We build self-driving companies. The playbook for migrating from human-operated to AI-operated. 76% agents, 24% humans.',
   keywords:
-    'Kortix, autonomous company, self-driving company, AI-operated, autonomy factory, agent workforce, playbook, company automation',
+    'Acme, autonomous company, self-driving company, AI-operated, autonomy factory, agent workforce, playbook, company automation',
   openGraph: {
-    title: 'The Autonomy Factory — Kortix',
+    title: 'The Autonomy Factory — Acme',
     description:
       'We build self-driving companies. The playbook for migrating from human-operated to AI-operated. 76% agents, 24% humans.',
-    url: 'https://www.kortix.com/factory',
+    url: 'https://www.acme.dev/factory',
     images: [
       {
         url: '/images/team.webp',
         width: 1200,
         height: 675,
-        alt: 'The Kortix team',
+        alt: 'The Acme team',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'The Autonomy Factory — Kortix',
+    title: 'The Autonomy Factory — Acme',
     description:
       'We build self-driving companies. The playbook for migrating from human-operated to AI-operated. 76% agents, 24% humans.',
     images: ['/images/team.webp'],
   },
   alternates: {
-    canonical: 'https://www.kortix.com/factory',
+    canonical: 'https://www.acme.dev/factory',
   },
 };
 

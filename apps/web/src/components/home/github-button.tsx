@@ -17,7 +17,7 @@ const GithubButton = React.forwardRef<HTMLButtonElement, GithubButtonProps>(
   ({ 
     className, 
     variant = "outline", 
-    href = "https://github.com/kortix-ai/suna", 
+    href = "https://github.com/aimentor606/aether", 
     children, 
     ...props 
   }, ref) => {

@@ -43,7 +43,7 @@ function toOurShareUrl(serverUrl: string): string {
     const appBase =
       (typeof window !== 'undefined' ? window.location.origin : '') ||
       getEnv().APP_URL ||
-      'https://www.kortix.com';
+      'https://www.acme.dev';
     return `${appBase}/share/${shareId}`;
   } catch {
     return serverUrl;

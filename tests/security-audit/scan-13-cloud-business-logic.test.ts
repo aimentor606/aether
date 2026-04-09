@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Business Logic Vulnerabilities
  *
- * LIVE scan against https://computer-preview-api.kortix.com
+ * LIVE scan against https://computer-preview-api.acme.dev
  * Tests for unauthorized resource access, billing bypass, and privilege escalation.
  *
  * CRITICAL FINDINGS:
@@ -40,7 +40,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.acme.dev';
 
 async function probe(method: string, path: string, body?: any, headers?: Record<string, string>): Promise<{
   status: number;

@@ -1,6 +1,6 @@
 import { eq, and, or, asc, lt, sql } from 'drizzle-orm';
 import { randomBytes } from 'crypto';
-import { poolSandboxes } from '@kortix/db';
+import { poolSandboxes } from '@acme/db';
 import { db } from '../shared/db';
 import { getProvider, type ProviderName } from '../platform/providers';
 import { config } from '../config';
@@ -116,7 +116,7 @@ export async function provision(resource: PoolResource): Promise<void> {
     accountId: 'pool',
     userId: 'pool',
     name: `pool-${resource.serverType}-${resource.location}`,
-    envVars: { KORTIX_TOKEN: placeholderToken },
+    envVars: { ACME_TOKEN: placeholderToken },
     serverType: resource.serverType,
     location: resource.location,
   });

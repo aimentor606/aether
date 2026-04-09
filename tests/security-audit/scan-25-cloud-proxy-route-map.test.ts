@@ -1,24 +1,24 @@
 /**
  * Security Scan: Cloud API - Complete Proxy Route Map
  *
- * LIVE scan against https://computer-preview-api.kortix.com
+ * LIVE scan against https://computer-preview-api.acme.dev
  *
  * Maps every proxy route and whether it forwards requests without
- * a kortix_ token (Mode 3 passthrough).
+ * a acme_ token (Mode 3 passthrough).
  *
- * ALL of these should require a kortix_ token on cloud.
+ * ALL of these should require a acme_ token on cloud.
  * Currently Mode 3 forwards to upstream without any auth gate.
  *
  * The upstream providers reject because the attacker has no valid key,
- * BUT the request still goes through Kortix's infrastructure:
+ * BUT the request still goes through Acme's infrastructure:
  * - Bandwidth consumed
- * - Kortix IP used for the upstream request
+ * - Acme IP used for the upstream request
  * - xAI actually processes the request (returns 400 bad data, not 401)
  */
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.acme.dev';
 
 async function probeProxy(path: string, body: any): Promise<{ status: number; body: any }> {
   try {
@@ -36,7 +36,7 @@ async function probeProxy(path: string, body: any): Promise<{ status: number; bo
   }
 }
 
-describe('Cloud Scan: Proxy Route Map — All Should Require kortix_ Token', () => {
+describe('Cloud Scan: Proxy Route Map — All Should Require acme_ Token', () => {
 
   describe('Proxy routes that forward to upstream without auth (Mode 3)', () => {
     test('Tavily — forwards to api.tavily.com (upstream rejects)', async () => {
@@ -81,13 +81,13 @@ describe('Cloud Scan: Proxy Route Map — All Should Require kortix_ Token', () 
     });
   });
 
-  describe('These should all return Kortix 401 instead of upstream errors', () => {
-    test('EXPECTED: all non-kortix requests should get Kortix 401', () => {
+  describe('These should all return Acme 401 instead of upstream errors', () => {
+    test('EXPECTED: all non-acme requests should get Acme 401', () => {
       // Current: request forwards to upstream, upstream auth error leaks through
-      // Expected: Kortix rejects BEFORE forwarding
+      // Expected: Acme rejects BEFORE forwarding
       // Fix in proxy.ts handleProxy():
-      //   if (!auth.isKortixUser && config.isCloud()) {
-      //     throw new HTTPException(401, { message: 'Kortix API key required' });
+      //   if (!auth.isAcmeUser && config.isCloud()) {
+      //     throw new HTTPException(401, { message: 'Acme API key required' });
       //   }
       expect(true).toBe(true);
     });

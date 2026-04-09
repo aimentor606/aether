@@ -49,7 +49,7 @@ async function channelFetch(path: string, opts?: RequestInit): Promise<any> {
   const url = getActiveOpenCodeUrl();
   if (!url) return null;
   try {
-    const res = await authenticatedFetch(`${url}/kortix/channels${path}`, opts);
+    const res = await authenticatedFetch(`${url}/acme/channels${path}`, opts);
     const text = await res.text();
     try { return JSON.parse(text); } catch { return null; }
   } catch {
@@ -129,7 +129,7 @@ function ChannelCard({
             <p className="text-xs text-muted-foreground truncate">
               @{channel.bot_username || '?'}
               {modelShort ? ` · ${modelShort}` : ''}
-              {channel.default_agent && channel.default_agent !== 'kortix' ? ` · ${channel.default_agent}` : ''}
+              {channel.default_agent && channel.default_agent !== 'acme' ? ` · ${channel.default_agent}` : ''}
             </p>
             {channel.webhook_url && (
               <p className="text-[10px] text-muted-foreground/50 truncate mt-0.5 font-mono">

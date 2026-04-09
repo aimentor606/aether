@@ -14,22 +14,22 @@
 # ║    6. WebSocket upgrade path exists                                        ║
 # ║    7. Subdomain proxy is NOT accessible from external (VPS only)           ║
 # ║                                                                            ║
-# ║  Requires: Kortix installed & running with sandbox active                  ║
+# ║  Requires: Acme installed & running with sandbox active                  ║
 # ║                                                                            ║
 # ║  Usage:                                                                    ║
 # ║    bash test-proxy-e2e.sh                                                  ║
 # ║                                                                            ║
 # ║  Environment:                                                              ║
 # ║    PUBLIC_URL       Public-facing URL (default: auto-detect from .env)     ║
-# ║    OWNER_EMAIL      For auto-login (default: e2e@kortix.ai)               ║
+# ║    OWNER_EMAIL      For auto-login (default: e2e@acme.ai)               ║
 # ║    OWNER_PASSWORD   For auto-login (default: e2e-test-pass-42)            ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 set -uo pipefail
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${KORTIX_HOME:-$HOME/.kortix}"
-OWNER_EMAIL="${OWNER_EMAIL:-e2e@kortix.ai}"
+INSTALL_DIR="${ACME_HOME:-$HOME/.acme}"
+OWNER_EMAIL="${OWNER_EMAIL:-e2e@acme.ai}"
 OWNER_PASSWORD="${OWNER_PASSWORD:-e2e-test-pass-42}"
 PUBLIC_URL="${PUBLIC_URL:-}"
 
@@ -72,7 +72,7 @@ get_token() {
 echo ""
 echo "${BOLD}${CYAN}"
 echo "  ╔═══════════════════════════════════════════════╗"
-echo "  ║  Kortix — Proxy URL E2E Test Suite            ║"
+echo "  ║  Acme — Proxy URL E2E Test Suite            ║"
 echo "  ╚═══════════════════════════════════════════════╝"
 echo "${NC}"
 echo "  ${DIM}Public URL:${NC}  ${BOLD}${PUBLIC_URL}${NC}"
@@ -83,7 +83,7 @@ echo ""
 section "PHASE 1: Prerequisites"
 
 # Sandbox running
-if docker ps --format '{{.Names}}' 2>/dev/null | grep -q 'kortix-sandbox\|sandbox'; then
+if docker ps --format '{{.Names}}' 2>/dev/null | grep -q 'acme-sandbox\|sandbox'; then
   pass "Sandbox container running"
 else
   fail "Sandbox container running"
@@ -102,17 +102,17 @@ fi
 # ═══════════════════════════════════════════════════════════════════════════════
 section "PHASE 2: Path-based proxy routing"
 
-SANDBOX_ID="kortix-sandbox"
+SANDBOX_ID="acme-sandbox"
 PROXY_BASE="${PUBLIC_URL}/v1/p/${SANDBOX_ID}"
 
 # Test each key port via the path-based proxy
-# Port 8000 = Kortix Master (internal sandbox orchestrator)
+# Port 8000 = Acme Master (internal sandbox orchestrator)
 # Port 6080 = Desktop (Selkies VNC)
 # Port 9224 = Browser (Chromium CDP)
 # Port 3111 = OpenCode UI
 # Port 3211 = Static file server
 
-for port_name in "8000:Kortix Master" "6080:Desktop VNC" "3111:OpenCode UI" "3211:Static server"; do
+for port_name in "8000:Acme Master" "6080:Desktop VNC" "3111:OpenCode UI" "3211:Static server"; do
   port=$(echo "$port_name" | cut -d: -f1)
   name=$(echo "$port_name" | cut -d: -f2)
 
@@ -177,26 +177,26 @@ else
   fail "Desktop proxy returns content"
 fi
 
-# Kortix Master (8000) health check
+# Acme Master (8000) health check
 MASTER_HEALTH=$(curl -k -sf -H "Authorization: Bearer $TOKEN" "${PROXY_BASE}/8000/health" 2>/dev/null || true)
 if [ -n "$MASTER_HEALTH" ]; then
-  pass "Kortix Master health via proxy"
+  pass "Acme Master health via proxy"
 else
   # /health might not exist — try root
   MASTER_ROOT_CODE=$(curl -k -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $TOKEN" "${PROXY_BASE}/8000/" 2>/dev/null)
   if [ "$MASTER_ROOT_CODE" = "200" ] || [ "$MASTER_ROOT_CODE" = "404" ]; then
-    pass "Kortix Master responds via proxy ($MASTER_ROOT_CODE)"
+    pass "Acme Master responds via proxy ($MASTER_ROOT_CODE)"
   else
-    fail "Kortix Master via proxy (got: $MASTER_ROOT_CODE)"
+    fail "Acme Master via proxy (got: $MASTER_ROOT_CODE)"
   fi
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════════
 section "PHASE 5: Subdomain NOT accessible externally"
 
-# On VPS, p6080-kortix-sandbox.localhost should NOT resolve from the host
+# On VPS, p6080-acme-sandbox.localhost should NOT resolve from the host
 # (it resolves to 127.0.0.1, so curl from VPS hits VPS itself on port 443)
-SUBDOMAIN_CODE=$(curl -s --connect-timeout 3 -o /dev/null -w "%{http_code}" "http://p6080-kortix-sandbox.localhost:8008/" 2>/dev/null || echo "000")
+SUBDOMAIN_CODE=$(curl -s --connect-timeout 3 -o /dev/null -w "%{http_code}" "http://p6080-acme-sandbox.localhost:8008/" 2>/dev/null || echo "000")
 if [ "$SUBDOMAIN_CODE" = "000" ]; then
   pass "Subdomain proxy NOT externally reachable (connection refused/timeout)"
 else
@@ -208,7 +208,7 @@ fi
 section "PHASE 6: URL format validation"
 
 # Verify that path-based URLs follow the expected pattern
-EXPECTED_DESKTOP_URL="${PUBLIC_URL}/v1/p/kortix-sandbox/6080/"
+EXPECTED_DESKTOP_URL="${PUBLIC_URL}/v1/p/acme-sandbox/6080/"
 echo "  ${BLUE}[info]${NC} Expected desktop URL: ${DIM}${EXPECTED_DESKTOP_URL}${NC}"
 
 # Verify URL returns proper content
@@ -220,7 +220,7 @@ else
 fi
 
 # Same for static server
-EXPECTED_STATIC_URL="${PUBLIC_URL}/v1/p/kortix-sandbox/3211/"
+EXPECTED_STATIC_URL="${PUBLIC_URL}/v1/p/acme-sandbox/3211/"
 VALIDATE_STATIC=$(curl -k -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $TOKEN" "$EXPECTED_STATIC_URL" 2>/dev/null)
 if [ "$VALIDATE_STATIC" = "200" ] || [ "$VALIDATE_STATIC" = "404" ] || [ "$VALIDATE_STATIC" = "502" ]; then
   pass "Expected VPS static server URL responds ($EXPECTED_STATIC_URL → $VALIDATE_STATIC)"

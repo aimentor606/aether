@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { AcmeLogo } from '@/components/sidebar/acme-logo';
 
 function isMobileDevice(): boolean {
   if (typeof window === 'undefined') return false;
@@ -58,14 +58,14 @@ export function MobileAppBanner({ shareId }: MobileAppBannerProps) {
   };
 
   const handleOpenInApp = () => {
-    const appUrl = `kortix://share/${shareId}`;
+    const appUrl = `acme://share/${shareId}`;
     window.location.href = appUrl;
 
     setTimeout(() => {
       if (platform === 'ios') {
-        window.location.href = 'https://apps.apple.com/ie/app/kortix/id6754448524';
+        window.location.href = 'https://apps.apple.com/ie/app/acme/id6754448524';
       } else if (platform === 'android') {
-        window.location.href = 'https://play.google.com/store/apps/details?id=com.kortix.app';
+        window.location.href = 'https://play.google.com/store/apps/details?id=com.acme.app';
       }
     }, 2000);
   };
@@ -82,13 +82,13 @@ export function MobileAppBanner({ shareId }: MobileAppBannerProps) {
         <div className="flex items-center gap-3">
           {/* App icon */}
           <div className="shrink-0 w-10 h-10 rounded-xl bg-foreground flex items-center justify-center">
-            <KortixLogo size={20} className="invert dark:invert-0" />
+            <AcmeLogo size={20} className="invert dark:invert-0" />
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-foreground text-sm leading-tight">
-              Kortix
+              Acme
             </h3>
             <p className="text-xs text-muted-foreground leading-tight">
               Open this content in app

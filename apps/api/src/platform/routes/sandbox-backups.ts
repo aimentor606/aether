@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { eq, and } from 'drizzle-orm';
-import { sandboxes, type Database } from '@kortix/db';
+import { sandboxes, type Database } from '@acme/db';
 import { db as defaultDb } from '../../shared/db';
 import { supabaseAuth as authMiddleware } from '../../middleware/auth';
 import { resolveAccountId as defaultResolveAccountId } from '../../shared/resolve-account';

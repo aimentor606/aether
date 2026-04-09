@@ -4,9 +4,9 @@
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "kortix.access_allowlist": {
+    "acme.access_allowlist": {
       "name": "access_allowlist",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -71,9 +71,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.access_requests": {
+    "acme.access_requests": {
       "name": "access_requests",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -103,7 +103,7 @@
         "status": {
           "name": "status",
           "type": "access_request_status",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'pending'"
@@ -162,9 +162,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.account_deletion_requests": {
+    "acme.account_deletion_requests": {
       "name": "account_deletion_requests",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -232,9 +232,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.account_members": {
+    "acme.account_members": {
       "name": "account_members",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "user_id": {
           "name": "user_id",
@@ -251,7 +251,7 @@
         "account_role": {
           "name": "account_role",
           "type": "account_role",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'owner'"
@@ -322,7 +322,7 @@
           "name": "account_members_account_id_accounts_account_id_fk",
           "tableFrom": "account_members",
           "tableTo": "accounts",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "account_id"
           ],
@@ -339,9 +339,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.accounts": {
+    "acme.accounts": {
       "name": "accounts",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "account_id": {
           "name": "account_id",
@@ -399,9 +399,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.billing_customers": {
+    "acme.billing_customers": {
       "name": "billing_customers",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "account_id": {
           "name": "account_id",
@@ -435,8 +435,8 @@
         }
       },
       "indexes": {
-        "idx_kortix_billing_customers_account_id": {
-          "name": "idx_kortix_billing_customers_account_id",
+        "idx_acme_billing_customers_account_id": {
+          "name": "idx_acme_billing_customers_account_id",
           "columns": [
             {
               "expression": "account_id",
@@ -458,9 +458,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.channel_configs": {
+    "acme.channel_configs": {
       "name": "channel_configs",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "channel_config_id": {
           "name": "channel_config_id",
@@ -484,7 +484,7 @@
         "channel_type": {
           "name": "channel_type",
           "type": "channel_type",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true
         },
@@ -594,7 +594,7 @@
           "name": "channel_configs_sandbox_id_sandboxes_sandbox_id_fk",
           "tableFrom": "channel_configs",
           "tableTo": "sandboxes",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "sandbox_id"
           ],
@@ -611,9 +611,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.credit_accounts": {
+    "acme.credit_accounts": {
       "name": "credit_accounts",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "account_id": {
           "name": "account_id",
@@ -917,8 +917,8 @@
         }
       },
       "indexes": {
-        "kortix_credit_accounts_account_id_idx": {
-          "name": "kortix_credit_accounts_account_id_idx",
+        "acme_credit_accounts_account_id_idx": {
+          "name": "acme_credit_accounts_account_id_idx",
           "columns": [
             {
               "expression": "account_id",
@@ -940,9 +940,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.credit_ledger": {
+    "acme.credit_ledger": {
       "name": "credit_ledger",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -1046,8 +1046,8 @@
         }
       },
       "indexes": {
-        "idx_kortix_credit_ledger_idempotency": {
-          "name": "idx_kortix_credit_ledger_idempotency",
+        "idx_acme_credit_ledger_idempotency": {
+          "name": "idx_acme_credit_ledger_idempotency",
           "columns": [
             {
               "expression": "idempotency_key",
@@ -1057,7 +1057,7 @@
             }
           ],
           "isUnique": false,
-          "where": "\"kortix\".\"credit_ledger\".\"idempotency_key\" IS NOT NULL",
+          "where": "\"acme\".\"credit_ledger\".\"idempotency_key\" IS NOT NULL",
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -1066,8 +1066,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "kortix_unique_stripe_event": {
-          "name": "kortix_unique_stripe_event",
+        "acme_unique_stripe_event": {
+          "name": "acme_unique_stripe_event",
           "nullsNotDistinct": false,
           "columns": [
             "stripe_event_id"
@@ -1078,9 +1078,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.credit_purchases": {
+    "acme.credit_purchases": {
       "name": "credit_purchases",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -1174,9 +1174,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.credit_usage": {
+    "acme.credit_usage": {
       "name": "credit_usage",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -1239,9 +1239,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.deployments": {
+    "acme.deployments": {
       "name": "deployments",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "deployment_id": {
           "name": "deployment_id",
@@ -1271,7 +1271,7 @@
         "status": {
           "name": "status",
           "type": "deployment_status",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'pending'"
@@ -1279,7 +1279,7 @@
         "source_type": {
           "name": "source_type",
           "type": "deployment_source",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true
         },
@@ -1444,7 +1444,7 @@
           "name": "deployments_sandbox_id_sandboxes_sandbox_id_fk",
           "tableFrom": "deployments",
           "tableTo": "sandboxes",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "sandbox_id"
           ],
@@ -1461,9 +1461,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.integration_credentials": {
+    "acme.integration_credentials": {
       "name": "integration_credentials",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -1559,9 +1559,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.integrations": {
+    "acme.integrations": {
       "name": "integrations",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "integration_id": {
           "name": "integration_id",
@@ -1609,7 +1609,7 @@
         "status": {
           "name": "status",
           "type": "integration_status",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'active'"
@@ -1731,9 +1731,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.api_keys": {
+    "acme.api_keys": {
       "name": "api_keys",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "key_id": {
           "name": "key_id",
@@ -1781,7 +1781,7 @@
         "type": {
           "name": "type",
           "type": "api_key_type",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'user'"
@@ -1789,7 +1789,7 @@
         "status": {
           "name": "status",
           "type": "api_key_status",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'active'"
@@ -1815,8 +1815,8 @@
         }
       },
       "indexes": {
-        "idx_kortix_api_keys_public_key": {
-          "name": "idx_kortix_api_keys_public_key",
+        "idx_acme_api_keys_public_key": {
+          "name": "idx_acme_api_keys_public_key",
           "columns": [
             {
               "expression": "public_key",
@@ -1830,8 +1830,8 @@
           "method": "btree",
           "with": {}
         },
-        "idx_kortix_api_keys_secret_hash": {
-          "name": "idx_kortix_api_keys_secret_hash",
+        "idx_acme_api_keys_secret_hash": {
+          "name": "idx_acme_api_keys_secret_hash",
           "columns": [
             {
               "expression": "secret_key_hash",
@@ -1845,8 +1845,8 @@
           "method": "btree",
           "with": {}
         },
-        "idx_kortix_api_keys_sandbox": {
-          "name": "idx_kortix_api_keys_sandbox",
+        "idx_acme_api_keys_sandbox": {
+          "name": "idx_acme_api_keys_sandbox",
           "columns": [
             {
               "expression": "sandbox_id",
@@ -1860,8 +1860,8 @@
           "method": "btree",
           "with": {}
         },
-        "idx_kortix_api_keys_account": {
-          "name": "idx_kortix_api_keys_account",
+        "idx_acme_api_keys_account": {
+          "name": "idx_acme_api_keys_account",
           "columns": [
             {
               "expression": "account_id",
@@ -1881,7 +1881,7 @@
           "name": "api_keys_sandbox_id_sandboxes_sandbox_id_fk",
           "tableFrom": "api_keys",
           "tableTo": "sandboxes",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "sandbox_id"
           ],
@@ -1898,9 +1898,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.oauth_access_tokens": {
+    "acme.oauth_access_tokens": {
       "name": "oauth_access_tokens",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -2012,7 +2012,7 @@
           "name": "oauth_access_tokens_client_id_oauth_clients_client_id_fk",
           "tableFrom": "oauth_access_tokens",
           "tableTo": "oauth_clients",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "client_id"
           ],
@@ -2029,9 +2029,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.oauth_authorization_codes": {
+    "acme.oauth_authorization_codes": {
       "name": "oauth_authorization_codes",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -2162,7 +2162,7 @@
           "name": "oauth_authorization_codes_client_id_oauth_clients_client_id_fk",
           "tableFrom": "oauth_authorization_codes",
           "tableTo": "oauth_clients",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "client_id"
           ],
@@ -2179,9 +2179,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.oauth_clients": {
+    "acme.oauth_clients": {
       "name": "oauth_clients",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "client_id": {
           "name": "client_id",
@@ -2239,9 +2239,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.oauth_refresh_tokens": {
+    "acme.oauth_refresh_tokens": {
       "name": "oauth_refresh_tokens",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -2337,7 +2337,7 @@
           "name": "oauth_refresh_tokens_access_token_id_oauth_access_tokens_id_fk",
           "tableFrom": "oauth_refresh_tokens",
           "tableTo": "oauth_access_tokens",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "access_token_id"
           ],
@@ -2351,7 +2351,7 @@
           "name": "oauth_refresh_tokens_client_id_oauth_clients_client_id_fk",
           "tableFrom": "oauth_refresh_tokens",
           "tableTo": "oauth_clients",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "client_id"
           ],
@@ -2368,9 +2368,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.platform_settings": {
+    "acme.platform_settings": {
       "name": "platform_settings",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "key": {
           "name": "key",
@@ -2400,9 +2400,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.platform_user_roles": {
+    "acme.platform_user_roles": {
       "name": "platform_user_roles",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -2420,7 +2420,7 @@
         "role": {
           "name": "role",
           "type": "platform_role",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'user'"
@@ -2478,9 +2478,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.pool_resources": {
+    "acme.pool_resources": {
       "name": "pool_resources",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -2492,7 +2492,7 @@
         "provider": {
           "name": "provider",
           "type": "sandbox_provider",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true
         },
@@ -2573,9 +2573,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.pool_sandboxes": {
+    "acme.pool_sandboxes": {
       "name": "pool_sandboxes",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -2593,7 +2593,7 @@
         "provider": {
           "name": "provider",
           "type": "sandbox_provider",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true
         },
@@ -2693,7 +2693,7 @@
           "name": "pool_sandboxes_resource_id_pool_resources_id_fk",
           "tableFrom": "pool_sandboxes",
           "tableTo": "pool_resources",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "resource_id"
           ],
@@ -2710,9 +2710,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.sandbox_integrations": {
+    "acme.sandbox_integrations": {
       "name": "sandbox_integrations",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -2784,7 +2784,7 @@
           "name": "sandbox_integrations_sandbox_id_sandboxes_sandbox_id_fk",
           "tableFrom": "sandbox_integrations",
           "tableTo": "sandboxes",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "sandbox_id"
           ],
@@ -2798,7 +2798,7 @@
           "name": "sandbox_integrations_integration_id_integrations_integration_id_fk",
           "tableFrom": "sandbox_integrations",
           "tableTo": "integrations",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "integration_id"
           ],
@@ -2815,9 +2815,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.sandboxes": {
+    "acme.sandboxes": {
       "name": "sandboxes",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "sandbox_id": {
           "name": "sandbox_id",
@@ -2841,7 +2841,7 @@
         "provider": {
           "name": "provider",
           "type": "sandbox_provider",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'daytona'"
@@ -2855,7 +2855,7 @@
         "status": {
           "name": "status",
           "type": "sandbox_status",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'provisioning'"
@@ -2968,9 +2968,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.server_entries": {
+    "acme.server_entries": {
       "name": "server_entries",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "entry_id": {
           "name": "entry_id",
@@ -3013,7 +3013,7 @@
         "provider": {
           "name": "provider",
           "type": "sandbox_provider",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": false
         },
@@ -3104,9 +3104,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.tunnel_audit_logs": {
+    "acme.tunnel_audit_logs": {
       "name": "tunnel_audit_logs",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "log_id": {
           "name": "log_id",
@@ -3130,7 +3130,7 @@
         "capability": {
           "name": "capability",
           "type": "tunnel_capability",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true
         },
@@ -3246,7 +3246,7 @@
           "name": "tunnel_audit_logs_tunnel_id_tunnel_connections_tunnel_id_fk",
           "tableFrom": "tunnel_audit_logs",
           "tableTo": "tunnel_connections",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "tunnel_id"
           ],
@@ -3263,9 +3263,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.tunnel_connections": {
+    "acme.tunnel_connections": {
       "name": "tunnel_connections",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "tunnel_id": {
           "name": "tunnel_id",
@@ -3295,7 +3295,7 @@
         "status": {
           "name": "status",
           "type": "tunnel_status",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'offline'"
@@ -3393,7 +3393,7 @@
           "name": "tunnel_connections_sandbox_id_sandboxes_sandbox_id_fk",
           "tableFrom": "tunnel_connections",
           "tableTo": "sandboxes",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "sandbox_id"
           ],
@@ -3410,9 +3410,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.tunnel_device_auth_requests": {
+    "acme.tunnel_device_auth_requests": {
       "name": "tunnel_device_auth_requests",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "id": {
           "name": "id",
@@ -3436,7 +3436,7 @@
         "status": {
           "name": "status",
           "type": "tunnel_device_auth_status",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'pending'"
@@ -3538,7 +3538,7 @@
           "name": "tunnel_device_auth_requests_tunnel_id_tunnel_connections_tunnel_id_fk",
           "tableFrom": "tunnel_device_auth_requests",
           "tableTo": "tunnel_connections",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "tunnel_id"
           ],
@@ -3555,9 +3555,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.tunnel_permission_requests": {
+    "acme.tunnel_permission_requests": {
       "name": "tunnel_permission_requests",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "request_id": {
           "name": "request_id",
@@ -3581,7 +3581,7 @@
         "capability": {
           "name": "capability",
           "type": "tunnel_capability",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true
         },
@@ -3601,7 +3601,7 @@
         "status": {
           "name": "status",
           "type": "tunnel_permission_request_status",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'pending'"
@@ -3673,7 +3673,7 @@
           "name": "tunnel_permission_requests_tunnel_id_tunnel_connections_tunnel_id_fk",
           "tableFrom": "tunnel_permission_requests",
           "tableTo": "tunnel_connections",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "tunnel_id"
           ],
@@ -3690,9 +3690,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "kortix.tunnel_permissions": {
+    "acme.tunnel_permissions": {
       "name": "tunnel_permissions",
-      "schema": "kortix",
+      "schema": "acme",
       "columns": {
         "permission_id": {
           "name": "permission_id",
@@ -3716,7 +3716,7 @@
         "capability": {
           "name": "capability",
           "type": "tunnel_capability",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true
         },
@@ -3730,7 +3730,7 @@
         "status": {
           "name": "status",
           "type": "tunnel_permission_status",
-          "typeSchema": "kortix",
+          "typeSchema": "acme",
           "primaryKey": false,
           "notNull": true,
           "default": "'active'"
@@ -3823,7 +3823,7 @@
           "name": "tunnel_permissions_tunnel_id_tunnel_connections_tunnel_id_fk",
           "tableFrom": "tunnel_permissions",
           "tableTo": "tunnel_connections",
-          "schemaTo": "kortix",
+          "schemaTo": "acme",
           "columnsFrom": [
             "tunnel_id"
           ],
@@ -3842,44 +3842,44 @@
     }
   },
   "enums": {
-    "kortix.access_request_status": {
+    "acme.access_request_status": {
       "name": "access_request_status",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "pending",
         "approved",
         "rejected"
       ]
     },
-    "kortix.account_role": {
+    "acme.account_role": {
       "name": "account_role",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "owner",
         "admin",
         "member"
       ]
     },
-    "kortix.api_key_status": {
+    "acme.api_key_status": {
       "name": "api_key_status",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "active",
         "revoked",
         "expired"
       ]
     },
-    "kortix.api_key_type": {
+    "acme.api_key_type": {
       "name": "api_key_type",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "user",
         "sandbox"
       ]
     },
-    "kortix.channel_type": {
+    "acme.channel_type": {
       "name": "channel_type",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "telegram",
         "slack",
@@ -3891,9 +3891,9 @@
         "sms"
       ]
     },
-    "kortix.deployment_source": {
+    "acme.deployment_source": {
       "name": "deployment_source",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "git",
         "code",
@@ -3901,9 +3901,9 @@
         "tar"
       ]
     },
-    "kortix.deployment_status": {
+    "acme.deployment_status": {
       "name": "deployment_status",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "pending",
         "building",
@@ -3913,9 +3913,9 @@
         "stopped"
       ]
     },
-    "kortix.integration_status": {
+    "acme.integration_status": {
       "name": "integration_status",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "active",
         "revoked",
@@ -3923,27 +3923,27 @@
         "error"
       ]
     },
-    "kortix.platform_role": {
+    "acme.platform_role": {
       "name": "platform_role",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "user",
         "admin",
         "super_admin"
       ]
     },
-    "kortix.sandbox_provider": {
+    "acme.sandbox_provider": {
       "name": "sandbox_provider",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "daytona",
         "local_docker",
         "justavps"
       ]
     },
-    "kortix.sandbox_status": {
+    "acme.sandbox_status": {
       "name": "sandbox_status",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "provisioning",
         "active",
@@ -3953,9 +3953,9 @@
         "error"
       ]
     },
-    "kortix.tunnel_capability": {
+    "acme.tunnel_capability": {
       "name": "tunnel_capability",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "filesystem",
         "shell",
@@ -3966,9 +3966,9 @@
         "gpu"
       ]
     },
-    "kortix.tunnel_device_auth_status": {
+    "acme.tunnel_device_auth_status": {
       "name": "tunnel_device_auth_status",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "pending",
         "approved",
@@ -3976,9 +3976,9 @@
         "expired"
       ]
     },
-    "kortix.tunnel_permission_request_status": {
+    "acme.tunnel_permission_request_status": {
       "name": "tunnel_permission_request_status",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "pending",
         "approved",
@@ -3986,18 +3986,18 @@
         "expired"
       ]
     },
-    "kortix.tunnel_permission_status": {
+    "acme.tunnel_permission_status": {
       "name": "tunnel_permission_status",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "active",
         "revoked",
         "expired"
       ]
     },
-    "kortix.tunnel_status": {
+    "acme.tunnel_status": {
       "name": "tunnel_status",
-      "schema": "kortix",
+      "schema": "acme",
       "values": [
         "online",
         "offline",
@@ -4006,7 +4006,7 @@
     }
   },
   "schemas": {
-    "kortix": "kortix"
+    "acme": "acme"
   },
   "sequences": {},
   "roles": {},

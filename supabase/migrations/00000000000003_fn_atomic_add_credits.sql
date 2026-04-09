@@ -28,7 +28,7 @@ BEGIN
     -- Idempotency: check stripe_event_id
     IF p_stripe_event_id IS NOT NULL THEN
         IF EXISTS (
-            SELECT 1 FROM kortix.credit_ledger
+            SELECT 1 FROM acme.credit_ledger
             WHERE stripe_event_id = p_stripe_event_id
         ) THEN
             RETURN jsonb_build_object(
@@ -42,7 +42,7 @@ BEGIN
     -- Idempotency: check idempotency_key
     IF p_idempotency_key IS NOT NULL THEN
         IF EXISTS (
-            SELECT 1 FROM kortix.credit_ledger
+            SELECT 1 FROM acme.credit_ledger
             WHERE idempotency_key = p_idempotency_key
             AND created_at > NOW() - INTERVAL '1 hour'
         ) THEN
@@ -56,7 +56,7 @@ BEGIN
 
     SELECT expiring_credits, non_expiring_credits, balance, tier
     INTO v_current_expiring, v_current_non_expiring, v_current_balance, v_tier
-    FROM kortix.credit_accounts
+    FROM acme.credit_accounts
     WHERE account_id = p_account_id
     FOR UPDATE;
 
@@ -66,7 +66,7 @@ BEGIN
         v_current_balance := 0;
         v_tier := 'none';
 
-        INSERT INTO kortix.credit_accounts (
+        INSERT INTO acme.credit_accounts (
             account_id, expiring_credits, non_expiring_credits, balance, tier
         ) VALUES (
             p_account_id, 0, 0, 0, v_tier
@@ -83,7 +83,7 @@ BEGIN
 
     v_new_total := v_new_expiring + v_new_non_expiring;
 
-    UPDATE kortix.credit_accounts
+    UPDATE acme.credit_accounts
     SET
         expiring_credits = v_new_expiring,
         non_expiring_credits = v_new_non_expiring,
@@ -91,7 +91,7 @@ BEGIN
         updated_at = NOW()
     WHERE account_id = p_account_id;
 
-    INSERT INTO kortix.credit_ledger (
+    INSERT INTO acme.credit_ledger (
         account_id, amount, balance_after, type, description,
         is_expiring, expires_at, stripe_event_id, idempotency_key, processing_source
     ) VALUES (

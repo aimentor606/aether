@@ -5,7 +5,7 @@ CONTAINER_NAME="${SUPABASE_DB_CONTAINER:-supabase-db}"
 
 if ! docker ps --format '{{.Names}}' | grep -qx "$CONTAINER_NAME"; then
   echo "Container '$CONTAINER_NAME' is not running."
-  echo "Start the local stack first (for example via scripts/get-kortix.sh)."
+  echo "Start the local stack first (for example via scripts/get-acme.sh)."
   exit 1
 fi
 

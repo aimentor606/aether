@@ -29,7 +29,7 @@ import {
     Camera,
     Upload,
 } from 'lucide-react';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { AcmeLoader } from '@/components/ui/acme-loader';
 import { cn } from '@/lib/utils';
 import {
     Tooltip,
@@ -88,7 +88,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHea
 
 import { cancelSandbox, reactivateSandbox } from '@/lib/platform-client';
 
-import { formatCredits } from '@kortix/shared';
+import { formatCredits } from '@acme/shared';
 import { LanguageSwitcher } from './language-switcher';
 import { useTranslations } from 'next-intl';
 // import { ReferralsTab } from '@/components/referrals/referrals-tab';
@@ -517,7 +517,7 @@ function GeneralTab({ onClose }: { onClose: () => void }) {
                                 className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 h-auto"
                             >
                                 {isUploadingAvatar ? (
-                                    <KortixLoader size="small" variant="white" />
+                                    <AcmeLoader size="small" variant="white" />
                                 ) : (
                                     <Camera className="h-5 w-5 text-white" />
                                 )}
@@ -884,7 +884,7 @@ function SoundsTab() {
     const packs: { id: SoundPack; label: string; description: string }[] = [
         { id: 'off', label: 'Off', description: 'All sounds disabled' },
         { id: 'opencode', label: 'Default', description: 'Default sound pack' },
-        { id: 'kortix', label: 'Seshion Pack', description: 'Whistlin' },
+        { id: 'acme', label: 'Seshion Pack', description: 'Whistlin' },
     ];
 
     const events: { id: SoundEvent; label: string; description: string }[] = [
@@ -1070,14 +1070,14 @@ function NotificationsTab() {
                                     <NotificationToggle
                                         icon={HelpCircle}
                                         label="Questions"
-                                        description="When Kortix needs your input to continue"
+                                        description="When Acme needs your input to continue"
                                         enabled={preferences.onQuestion}
                                         onToggle={(v) => setPreference('onQuestion', v)}
                                     />
                                     <NotificationToggle
                                         icon={ShieldCheck}
                                         label="Permission Requests"
-                                        description="When Kortix needs permission to use a tool"
+                                        description="When Acme needs permission to use a tool"
                                         enabled={preferences.onPermission}
                                         onToggle={(v) => setPreference('onPermission', v)}
                                     />
@@ -1190,7 +1190,7 @@ function InstancesSection({ accountState, onRefetch }: { accountState: any; onRe
                         onClick={() => window.location.href = '/instances'}
                     >
                         <Plus className="size-3 mr-1" />
-                        New Kortix
+                        New Acme
                     </Button>
                 )}
             </div>

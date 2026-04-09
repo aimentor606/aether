@@ -2,7 +2,7 @@ import { getRequestConfig } from 'next-intl/server';
 import { cookies, headers } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { locales, defaultLocale, type Locale } from './config';
-import { KORTIX_SUPABASE_AUTH_COOKIE } from '@/lib/supabase/constants';
+import { ACME_SUPABASE_AUTH_COOKIE } from '@/lib/supabase/constants';
 import { getServerPublicEnv } from '@/lib/public-env-server';
 
 export default getRequestConfig(async ({ requestLocale }) => {
@@ -31,7 +31,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       process.env.SUPABASE_ANON_KEY || runtimeEnv.SUPABASE_ANON_KEY,
       {
         cookieOptions: {
-          name: KORTIX_SUPABASE_AUTH_COOKIE,
+          name: ACME_SUPABASE_AUTH_COOKIE,
           path: '/',
           sameSite: 'lax',
         },

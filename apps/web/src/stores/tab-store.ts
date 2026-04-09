@@ -407,15 +407,15 @@ export const useTabStore = create<TabState>()(
         // Save the entire current tab state for the old server
         if (currentServerId) {
           try {
-            const cache = JSON.parse(localStorage.getItem('kortix-tabs-per-server') || '{}');
+            const cache = JSON.parse(localStorage.getItem('acme-tabs-per-server') || '{}');
             cache[currentServerId] = { tabs, tabOrder, activeTabId, tabFocusHistory };
-            localStorage.setItem('kortix-tabs-per-server', JSON.stringify(cache));
+            localStorage.setItem('acme-tabs-per-server', JSON.stringify(cache));
           } catch {}
         }
 
         // Restore the full tab state for the new server
         try {
-          const cache = JSON.parse(localStorage.getItem('kortix-tabs-per-server') || '{}');
+          const cache = JSON.parse(localStorage.getItem('acme-tabs-per-server') || '{}');
           const saved = cache[newServerId];
           if (saved?.tabs && saved?.tabOrder) {
             const ensured = ensureDashboardTab(saved.tabs, saved.tabOrder);
@@ -434,7 +434,7 @@ export const useTabStore = create<TabState>()(
       },
     }),
     {
-      name: 'kortix-tabs',
+      name: 'acme-tabs',
       partialize: (state) => ({
         tabs: state.tabs,
         tabOrder: state.tabOrder,
@@ -510,14 +510,14 @@ useTabStore.subscribe((state) => {
       const serverId = useServerStore.getState().activeServerId;
       if (!serverId) return;
 
-      const cache = JSON.parse(localStorage.getItem('kortix-tabs-per-server') || '{}');
+      const cache = JSON.parse(localStorage.getItem('acme-tabs-per-server') || '{}');
       cache[serverId] = {
         tabs: state.tabs,
         tabOrder: state.tabOrder,
         activeTabId: state.activeTabId,
         tabFocusHistory: state.tabFocusHistory,
       };
-      localStorage.setItem('kortix-tabs-per-server', JSON.stringify(cache));
+      localStorage.setItem('acme-tabs-per-server', JSON.stringify(cache));
     } catch {}
   }, 500);
 });

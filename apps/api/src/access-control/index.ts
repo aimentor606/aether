@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import postgres from 'postgres';
 import { eq, desc, sql as dsql } from 'drizzle-orm';
 import { db } from '../shared/db';
-import { accessRequests, accessAllowlist } from '@kortix/db';
+import { accessRequests, accessAllowlist } from '@acme/db';
 import { areSignupsEnabled, canSignUp } from '../shared/access-control-cache';
 import { config } from '../config';
 import { supabaseAuth } from '../middleware/auth';

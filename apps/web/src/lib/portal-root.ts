@@ -13,15 +13,15 @@ export function getPortalRoot(): HTMLElement | null {
   if (typeof document === 'undefined') return null;
   if (portalRoot && document.body.contains(portalRoot)) return portalRoot;
 
-  const existing = document.getElementById('kortix-portal-root');
+  const existing = document.getElementById('acme-portal-root');
   if (existing) {
     portalRoot = existing;
     return portalRoot;
   }
 
   const el = document.createElement('div');
-  el.id = 'kortix-portal-root';
-  el.setAttribute('data-kortix-portal-root', 'true');
+  el.id = 'acme-portal-root';
+  el.setAttribute('data-acme-portal-root', 'true');
   document.body.appendChild(el);
   portalRoot = el;
   return portalRoot;

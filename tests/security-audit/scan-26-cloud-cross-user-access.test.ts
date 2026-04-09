@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Cross-User Access & Billing Protection
  *
- * LIVE scan against https://computer-preview-api.kortix.com
+ * LIVE scan against https://computer-preview-api.acme.dev
  *
  * Verifies that all sandbox, billing, and account operations
  * properly require authentication. No cross-user access possible
@@ -12,7 +12,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.acme.dev';
 
 async function probe(method: string, path: string, body?: any): Promise<{ status: number; body: any }> {
   const opts: RequestInit = {

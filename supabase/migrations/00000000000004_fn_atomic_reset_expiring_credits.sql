@@ -20,7 +20,7 @@ DECLARE
 BEGIN
     SELECT balance, expiring_credits, non_expiring_credits
     INTO v_current_balance, v_current_expiring, v_current_non_expiring
-    FROM kortix.credit_accounts
+    FROM acme.credit_accounts
     WHERE account_id = p_account_id
     FOR UPDATE;
 
@@ -37,7 +37,7 @@ BEGIN
     v_new_total := p_new_credits + v_actual_non_expiring;
     v_expires_at := DATE_TRUNC('month', NOW() + INTERVAL '1 month') + INTERVAL '1 month';
 
-    UPDATE kortix.credit_accounts
+    UPDATE acme.credit_accounts
     SET
         expiring_credits = p_new_credits,
         non_expiring_credits = v_actual_non_expiring,
@@ -45,7 +45,7 @@ BEGIN
         updated_at = NOW()
     WHERE account_id = p_account_id;
 
-    INSERT INTO kortix.credit_ledger (
+    INSERT INTO acme.credit_ledger (
         account_id, amount, balance_after, type, description,
         is_expiring, expires_at, stripe_event_id, metadata, processing_source
     ) VALUES (

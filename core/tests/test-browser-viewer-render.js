@@ -8,7 +8,7 @@ const { chromium } = require(require.resolve('playwright', {
   ],
 }))
 
-const VIEWER_URL = process.env.AGENT_BROWSER_VIEWER_URL || 'http://localhost:14006/?session=kortix'
+const VIEWER_URL = process.env.AGENT_BROWSER_VIEWER_URL || 'http://localhost:14006/?session=acme'
 
 async function main() {
   const browser = await chromium.launch({ headless: true })
@@ -51,7 +51,7 @@ async function main() {
       const canvasVisible = getComputedStyle(canvas).display !== 'none'
       const emptyVisible = getComputedStyle(emptyState).display !== 'none'
 
-      const ok = status.textContent === 'kortix'
+      const ok = status.textContent === 'acme'
         && status.className === 'connected'
         && frameInfo.textContent.trim().length > 0
         && canvasVisible

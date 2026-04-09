@@ -38,6 +38,6 @@ export const ptyKill = tool({
       `</pty_killed>`,
     ].join('\n')
     
-    return `<kortix_system type="pty-kill" source="opencode-pty">\n${inner}\n</kortix_system>`
+    return `<acme_system type="pty-kill" source="opencode-pty">\n${inner}\n</acme_system>`
   },
 })

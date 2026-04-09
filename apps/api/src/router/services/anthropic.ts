@@ -1,4 +1,4 @@
-import { config, KORTIX_MARKUP } from '../../config';
+import { config, ACME_MARKUP } from '../../config';
 import type { ModelConfig } from '../config/models';
 
 const ANTHROPIC_VERSION = '2023-06-01';
@@ -41,8 +41,8 @@ export async function proxyToAnthropic(
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
       'anthropic-version': ANTHROPIC_VERSION,
-      'HTTP-Referer': config.FRONTEND_URL || 'https://kortix.ai',
-      'X-Title': 'Kortix',
+      'HTTP-Referer': config.FRONTEND_URL || 'https://acme.ai',
+      'X-Title': 'Acme',
     },
     body: JSON.stringify(body),
   });
@@ -73,7 +73,7 @@ export function extractAnthropicUsage(responseBody: any): AnthropicUsage | null 
 export function calculateAnthropicCost(
   modelConfig: ModelConfig,
   usage: AnthropicUsage,
-  markup: number = KORTIX_MARKUP,
+  markup: number = ACME_MARKUP,
 ): number {
   const { inputTokens, outputTokens, cacheCreationInputTokens, cacheReadInputTokens } = usage;
 

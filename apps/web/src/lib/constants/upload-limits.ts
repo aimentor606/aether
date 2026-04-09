@@ -1,6 +1,6 @@
 /**
  * Re-export from shared package for backward compatibility
- * @deprecated Import from '@kortix/shared' instead
+ * @deprecated Import from '@acme/shared' instead
  */
 export {
   UPLOAD_LIMITS,
@@ -10,4 +10,4 @@ export {
   formatFileSize,
   isAllowedFile,
   isExtractableArchive,
-} from '@kortix/shared';
+} from '@acme/shared';

@@ -1,4 +1,4 @@
-# Kortix Frontend
+# Acme Frontend
 
 ## Quick Setup
 

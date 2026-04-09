@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { buildInstancePath } from '@/lib/instance-routes';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { AcmeLoader } from '@/components/ui/acme-loader';
 
 /**
  * Legacy onboarding route — redirects to the dashboard.
@@ -20,7 +20,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-background">
-      <KortixLoader size="medium" />
+      <AcmeLoader size="medium" />
     </div>
   );
 }

@@ -135,7 +135,7 @@ describe('Slack Webhook E2E', () => {
     baseUrl = `http://127.0.0.1:${webhookPort}`
 
     webhookServer.setRoutes([{
-      agentName: 'kortix',
+      agentName: 'acme',
       trigger: {
         name: `slack-${CONFIG_ID}`,
         source: { type: 'webhook', path: WEBHOOK_PATH },

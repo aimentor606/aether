@@ -1,4 +1,4 @@
-# Kortix
+# Acme
 
 **The Autonomous Company Operating System**
 
@@ -9,7 +9,7 @@ A cloud computer where AI agents run your company. Full Linux sandbox, persisten
 Run locally on your laptop or on a VPS/server — the installer handles both.
 
 ```bash
-curl -fsSL https://kortix.com/install | bash
+curl -fsSL https://acme.com/install | bash
 ```
 
 The installer will ask where you're running:
@@ -17,26 +17,26 @@ The installer will ask where you're running:
 1. **Local machine** (laptop/desktop) — binds to `localhost`
 2. **VPS / Server** — binds to `0.0.0.0`, accessible over the network
 
-Kortix works best when it can run 24/7 — even when your laptop is closed. We recommend a server or VPS: [Kortix Cloud](https://kortix.com/) (managed), your own server, or a VPS from [Hetzner](https://hetzner.com/) or [JustAVPS](https://justavps.com/).
+Acme works best when it can run 24/7 — even when your laptop is closed. We recommend a server or VPS: [Acme Cloud](https://acme.com/) (managed), your own server, or a VPS from [Hetzner](https://hetzner.com/) or [JustAVPS](https://justavps.com/).
 
 On any server, just SSH in and run the same install command:
 
 ```bash
 # SSH into your server, then run the same install:
-curl -fsSL https://kortix.com/install | bash
+curl -fsSL https://acme.com/install | bash
 ```
 
-After install, manage everything with the `kortix` CLI:
+After install, manage everything with the `acme` CLI:
 
 ```
-kortix start       Start all services
-kortix stop        Stop all services
-kortix restart     Restart all services
-kortix logs        Tail logs
-kortix status      Show service status
-kortix update      Pull latest images and restart
-kortix reset       Wipe local data and start fresh
-kortix uninstall   Remove Kortix completely
+acme start       Start all services
+acme stop        Stop all services
+acme restart     Restart all services
+acme logs        Tail logs
+acme status      Show service status
+acme update      Pull latest images and restart
+acme reset       Wipe local data and start fresh
+acme uninstall   Remove Acme completely
 ```
 
 ## DEV Commands

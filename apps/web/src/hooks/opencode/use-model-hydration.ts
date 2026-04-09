@@ -4,7 +4,7 @@
  * One-time hydration of the global default model from the server.
  *
  * On app mount, if localStorage has no globalDefault but the server has one
- * (persisted in opencode.jsonc via PUT /kortix/preferences/model), we seed
+ * (persisted in opencode.jsonc via PUT /acme/preferences/model), we seed
  * localStorage so the resolution chain in use-opencode-local.ts picks it up.
  *
  * This runs once per page load — the module-level guard prevents repeated fetches.
@@ -28,7 +28,7 @@ export function useModelHydration() {
     const base = getActiveOpenCodeUrl();
     if (!base) return;
 
-    authenticatedFetch(`${base}/kortix/preferences/model`)
+    authenticatedFetch(`${base}/acme/preferences/model`)
       .then(async (res) => {
         if (!res.ok) return;
         const data = await res.json();

@@ -7,11 +7,11 @@ import { Hono } from 'hono'
 const marketplaceRouter = new Hono()
 const execFileAsync = promisify(execFile)
 
-const KORTIX_MARKETPLACE_NAMESPACE = 'kortix'
-const KORTIX_MARKETPLACE_REGISTRY_URL = 'https://kortix-registry-6om.pages.dev'
+const ACME_MARKETPLACE_NAMESPACE = 'acme'
+const ACME_MARKETPLACE_REGISTRY_URL = 'https://acme-registry-6om.pages.dev'
 
 function getWorkspacePaths() {
-  const workspaceRoot = process.env.KORTIX_WORKSPACE || '/workspace'
+  const workspaceRoot = process.env.ACME_WORKSPACE || '/workspace'
   const opencodeDir = path.join(workspaceRoot, '.opencode')
   return {
     workspaceRoot,
@@ -96,15 +96,15 @@ async function ensureKortixRegistry(): Promise<void> {
   const { ocxConfigPath } = getWorkspacePaths()
   const configText = await readFile(ocxConfigPath, 'utf8').catch(() => '')
   const hasKortixRegistry =
-    configText.includes('"kortix"') && configText.includes(KORTIX_MARKETPLACE_REGISTRY_URL)
+    configText.includes('"kortix"') && configText.includes(ACME_MARKETPLACE_REGISTRY_URL)
 
   if (!hasKortixRegistry) {
     await runOcx([
       'registry',
       'add',
-      KORTIX_MARKETPLACE_REGISTRY_URL,
+      ACME_MARKETPLACE_REGISTRY_URL,
       '--name',
-      KORTIX_MARKETPLACE_NAMESPACE,
+      ACME_MARKETPLACE_NAMESPACE,
     ])
   }
 }
@@ -121,7 +121,7 @@ async function listInstalledMarketplaceComponents(): Promise<string[]> {
   const payload = JSON.parse(stdout) as OcxInstalledListResponse
   const components = payload.data?.components ?? []
   return components
-    .filter((component) => component.name.startsWith(`${KORTIX_MARKETPLACE_NAMESPACE}/`))
+    .filter((component) => component.name.startsWith(`${ACME_MARKETPLACE_NAMESPACE}/`))
     .map((component) => component.name.replace(/^kortix\//, ''))
     .sort((a, b) => a.localeCompare(b))
 }
@@ -133,7 +133,7 @@ marketplaceRouter.get('/status', async (c) => {
     const installedComponents = await listInstalledMarketplaceComponents()
     const ocxConfigText = await readFile(ocxConfigPath, 'utf8').catch(() => '')
     const registryConfigured =
-      ocxConfigText.includes('"kortix"') && ocxConfigText.includes(KORTIX_MARKETPLACE_REGISTRY_URL)
+      ocxConfigText.includes('"kortix"') && ocxConfigText.includes(ACME_MARKETPLACE_REGISTRY_URL)
 
     return c.json({
       success: true,
@@ -142,7 +142,7 @@ marketplaceRouter.get('/status', async (c) => {
         opencodeDir,
         ocxConfigPath,
         opencodeConfigPath,
-        registryUrl: KORTIX_MARKETPLACE_REGISTRY_URL,
+        registryUrl: ACME_MARKETPLACE_REGISTRY_URL,
         registryConfigured,
         installedComponents,
       },
@@ -171,7 +171,7 @@ marketplaceRouter.post('/install', async (c) => {
       namespace?: string
     }
 
-    const namespace = body.namespace || KORTIX_MARKETPLACE_NAMESPACE
+    const namespace = body.namespace || ACME_MARKETPLACE_NAMESPACE
     const componentName = body.skillName || body.componentName
     if (!componentName) {
       return c.json({ error: 'skillName or componentName is required' }, 400)

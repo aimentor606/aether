@@ -6,7 +6,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/lib/supabase/client';
 import { getEnv } from '@/lib/env-config';
 import { Button } from '@/components/ui/button';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { AcmeLoader } from '@/components/ui/acme-loader';
 import { Shield, X } from 'lucide-react';
 
 const SCOPE_DESCRIPTIONS: Record<string, string> = {
@@ -19,7 +19,7 @@ export default function OAuthConsentPage() {
     <Suspense
       fallback={
         <div className="fixed inset-0 bg-background flex items-center justify-center">
-          <KortixLoader size="medium" />
+          <AcmeLoader size="medium" />
         </div>
       }
     >
@@ -103,7 +103,7 @@ function OAuthConsent() {
   if (isLoading || !user) {
     return (
       <div className="fixed inset-0 bg-background flex items-center justify-center">
-        <KortixLoader size="medium" />
+        <AcmeLoader size="medium" />
       </div>
     );
   }
@@ -132,7 +132,7 @@ function OAuthConsent() {
             Authorize {clientName}
           </h1>
           <p className="text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">{clientName}</span> wants to access your Kortix account
+            <span className="font-medium text-foreground">{clientName}</span> wants to access your Acme account
           </p>
         </div>
 

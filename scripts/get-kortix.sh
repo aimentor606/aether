@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Kortix — One-Click Install                                               ║
+# ║  Acme — One-Click Install                                               ║
 # ║                                                                            ║
-# ║  curl -fsSL https://kortix.com/install | bash                              ║
+# ║  curl -fsSL https://acme.dev/install | bash                              ║
 # ║                                                                            ║
 # ║  Supports two modes (same stack, different bind address):                  ║
 # ║    1. Local (laptop/desktop) — binds to 127.0.0.1                          ║
@@ -65,14 +65,14 @@ dots_done() { printf "${GREEN}done${NC}\n"; }
 dots_ok()   { printf "${GREEN}✓${NC}\n"; }
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${KORTIX_HOME:-$HOME/.kortix}"
+INSTALL_DIR="${ACME_HOME:-$HOME/.acme}"
 
 # Resolve the latest released version from GitHub Releases API.
 # Falls back to the 'latest' Docker tag if the API is unreachable.
 resolve_latest_version() {
   local gh_version
   gh_version=$(curl -sf --connect-timeout 5 \
-    "https://api.github.com/repos/kortix-ai/suna/releases/latest" 2>/dev/null \
+    "https://api.github.com/repos/acme-ai/suna/releases/latest" 2>/dev/null \
     | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"].lstrip("v"))' 2>/dev/null) || true
   if [ -n "$gh_version" ]; then
     printf '%s' "$gh_version"
@@ -85,11 +85,11 @@ resolve_latest_version() {
 
 # Allow explicit override via env var or --version flag; otherwise leave empty
 # and resolve dynamically after parse_args
-KORTIX_VERSION="${KORTIX_VERSION:-}"
-KORTIX_LOCAL_IMAGES="${KORTIX_LOCAL_IMAGES:-0}"
-KORTIX_LOCAL_TAG="${KORTIX_LOCAL_TAG:-latest}"
-KORTIX_BUILD_LOCAL_IMAGES="${KORTIX_BUILD_LOCAL_IMAGES:-0}"
-KORTIX_PULL_PARALLELISM="${KORTIX_PULL_PARALLELISM:-4}"
+ACME_VERSION="${ACME_VERSION:-}"
+ACME_LOCAL_IMAGES="${ACME_LOCAL_IMAGES:-0}"
+ACME_LOCAL_TAG="${ACME_LOCAL_TAG:-latest}"
+ACME_BUILD_LOCAL_IMAGES="${ACME_BUILD_LOCAL_IMAGES:-0}"
+ACME_PULL_PARALLELISM="${ACME_PULL_PARALLELISM:-4}"
 # Always prefer /dev/tty for interactive reads — critical for
 # `curl URL | bash` where stdin is the pipe, not the terminal.
 TTY_AVAILABLE="0"
@@ -103,7 +103,7 @@ if [ -n "$SCRIPT_SOURCE" ] && [ "$SCRIPT_SOURCE" != "bash" ] && [ -f "$SCRIPT_SO
   SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_SOURCE")" && pwd)"
   REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 fi
-KORTIX_LOCAL_REPO_ROOT="${KORTIX_LOCAL_REPO_ROOT:-$REPO_ROOT}"
+ACME_LOCAL_REPO_ROOT="${ACME_LOCAL_REPO_ROOT:-$REPO_ROOT}"
 
 resolve_node_bin() {
   local nvm_latest
@@ -123,7 +123,7 @@ compute_compose_project_name() {
   local raw
   raw="$(basename "$INSTALL_DIR")"
   raw="$(printf '%s' "$raw" | tr '[:upper:]' '[:lower:]' | sed 's/^[._-]*//; s/[^a-z0-9_-]//g')"
-  [ -n "$raw" ] || raw="kortix"
+  [ -n "$raw" ] || raw="acme"
   printf '%s' "$raw"
 }
 
@@ -139,7 +139,7 @@ parse_query_param() {
     local value="${pair#*=}"
     case "$key" in
       v|version|tag)
-        [ -n "$value" ] && KORTIX_VERSION="$value"
+        [ -n "$value" ] && ACME_VERSION="$value"
         ;;
     esac
   done
@@ -149,32 +149,32 @@ parse_args() {
   while [ "$#" -gt 0 ]; do
     case "$1" in
       --local)
-        KORTIX_LOCAL_IMAGES=1
+        ACME_LOCAL_IMAGES=1
         shift
         ;;
       --build-local)
-        KORTIX_LOCAL_IMAGES=1
-        KORTIX_BUILD_LOCAL_IMAGES=1
+        ACME_LOCAL_IMAGES=1
+        ACME_BUILD_LOCAL_IMAGES=1
         shift
         ;;
       --local-tag)
         [ "$#" -ge 2 ] || fatal "--local-tag requires a value"
-        KORTIX_LOCAL_IMAGES=1
-        KORTIX_LOCAL_TAG="$2"
+        ACME_LOCAL_IMAGES=1
+        ACME_LOCAL_TAG="$2"
         shift 2
         ;;
       --local-tag=*)
-        KORTIX_LOCAL_IMAGES=1
-        KORTIX_LOCAL_TAG="${1#*=}"
+        ACME_LOCAL_IMAGES=1
+        ACME_LOCAL_TAG="${1#*=}"
         shift
         ;;
       --version)
         [ "$#" -ge 2 ] || fatal "--version requires a value"
-        KORTIX_VERSION="$2"
+        ACME_VERSION="$2"
         shift 2
         ;;
       --version=*)
-        KORTIX_VERSION="${1#*=}"
+        ACME_VERSION="${1#*=}"
         shift
         ;;
       --query)
@@ -192,7 +192,7 @@ parse_args() {
         ;;
       -h|--help)
         cat <<'EOF'
-Usage: get-kortix.sh [options]
+Usage: get-acme.sh [options]
 
 Options:
   --local             Use local Docker images instead of pulling from registry
@@ -205,13 +205,13 @@ Options:
   --query "version=<tag>"
 
 Examples:
-  bash get-kortix.sh
-  bash get-kortix.sh --local
-  bash get-kortix.sh --local --build-local
-  bash get-kortix.sh --local --local-tag latest
-  bash get-kortix.sh --version 0.7.14
-  bash get-kortix.sh --query "v=0.7.14"
-  KORTIX_VERSION=0.7.15 bash get-kortix.sh
+  bash get-acme.sh
+  bash get-acme.sh --local
+  bash get-acme.sh --local --build-local
+  bash get-acme.sh --local --local-tag latest
+  bash get-acme.sh --version 0.7.14
+  bash get-acme.sh --query "v=0.7.14"
+  ACME_VERSION=0.7.15 bash get-acme.sh
 EOF
         exit 0
         ;;
@@ -225,37 +225,37 @@ EOF
 parse_args "$@"
 
 # If version wasn't explicitly set, resolve the latest from GitHub Releases API.
-if [ -z "$KORTIX_VERSION" ] && [ "$KORTIX_LOCAL_IMAGES" != "1" ]; then
-  KORTIX_VERSION=$(resolve_latest_version)
+if [ -z "$ACME_VERSION" ] && [ "$ACME_LOCAL_IMAGES" != "1" ]; then
+  ACME_VERSION=$(resolve_latest_version)
 fi
-# Ensure KORTIX_VERSION always has a value (fallback to 'latest' tag)
-KORTIX_VERSION="${KORTIX_VERSION:-latest}"
+# Ensure ACME_VERSION always has a value (fallback to 'latest' tag)
+ACME_VERSION="${ACME_VERSION:-latest}"
 
-IMAGE_TAG="$KORTIX_VERSION"
-SANDBOX_IMAGE_REPO="kortix/computer"
-if [ "$KORTIX_LOCAL_IMAGES" = "1" ]; then
-  IMAGE_TAG="$KORTIX_LOCAL_TAG"
-  SANDBOX_IMAGE_REPO="kortix/computer"
+IMAGE_TAG="$ACME_VERSION"
+SANDBOX_IMAGE_REPO="acme/computer"
+if [ "$ACME_LOCAL_IMAGES" = "1" ]; then
+  IMAGE_TAG="$ACME_LOCAL_TAG"
+  SANDBOX_IMAGE_REPO="acme/computer"
 fi
 
-FRONTEND_IMAGE="${KORTIX_FRONTEND_IMAGE:-kortix/kortix-frontend:${IMAGE_TAG}}"
-API_IMAGE="${KORTIX_API_IMAGE:-kortix/kortix-api:${IMAGE_TAG}}"
-SANDBOX_IMAGE="${KORTIX_SANDBOX_IMAGE:-${SANDBOX_IMAGE_REPO}:${IMAGE_TAG}}"
+FRONTEND_IMAGE="${ACME_FRONTEND_IMAGE:-acme/acme-frontend:${IMAGE_TAG}}"
+API_IMAGE="${ACME_API_IMAGE:-acme/acme-api:${IMAGE_TAG}}"
+SANDBOX_IMAGE="${ACME_SANDBOX_IMAGE:-${SANDBOX_IMAGE_REPO}:${IMAGE_TAG}}"
 FRONTEND_IMAGE_OVERRIDDEN="0"
 API_IMAGE_OVERRIDDEN="0"
 SANDBOX_IMAGE_OVERRIDDEN="0"
-[ -n "${KORTIX_FRONTEND_IMAGE:-}" ] && FRONTEND_IMAGE_OVERRIDDEN="1"
-[ -n "${KORTIX_API_IMAGE:-}" ] && API_IMAGE_OVERRIDDEN="1"
-[ -n "${KORTIX_SANDBOX_IMAGE:-}" ] && SANDBOX_IMAGE_OVERRIDDEN="1"
+[ -n "${ACME_FRONTEND_IMAGE:-}" ] && FRONTEND_IMAGE_OVERRIDDEN="1"
+[ -n "${ACME_API_IMAGE:-}" ] && API_IMAGE_OVERRIDDEN="1"
+[ -n "${ACME_SANDBOX_IMAGE:-}" ] && SANDBOX_IMAGE_OVERRIDDEN="1"
 SUPABASE_POSTGRES_IMAGE="supabase/postgres:15.8.1.085"
 SUPABASE_GOTRUE_IMAGE="supabase/gotrue:v2.186.0"
 SUPABASE_KONG_IMAGE="kong:2.8.1"
 SUPABASE_REST_IMAGE="postgrest/postgrest:v14.5"
 
 # ─── Self-hosted sandbox isolation ────────────────────────────────────────────
-# Different name + port range from dev (kortix-sandbox / 14000) so both can
+# Different name + port range from dev (acme-sandbox / 14000) so both can
 # run simultaneously on the same Docker daemon.
-SANDBOX_CONTAINER_NAME="${SANDBOX_CONTAINER_NAME:-kortix-hosted-sandbox}"
+SANDBOX_CONTAINER_NAME="${SANDBOX_CONTAINER_NAME:-acme-hosted-sandbox}"
 SANDBOX_PORT_BASE="${SANDBOX_PORT_BASE:-15000}"
 
 # Installer state
@@ -362,18 +362,18 @@ verify_local_image() {
 }
 
 ensure_local_build_requirements() {
-  [ -d "$KORTIX_LOCAL_REPO_ROOT/apps/web" ] || fatal "Local repo root not found at ${KORTIX_LOCAL_REPO_ROOT}."
+  [ -d "$ACME_LOCAL_REPO_ROOT/apps/web" ] || fatal "Local repo root not found at ${ACME_LOCAL_REPO_ROOT}."
   [ -x "$PNPM_BIN" ] || fatal "pnpm is required for --build-local."
 }
 
 rebuild_local_images() {
   ensure_local_build_requirements
-  local build_script="$KORTIX_LOCAL_REPO_ROOT/scripts/build-local-images.sh"
+  local build_script="$ACME_LOCAL_REPO_ROOT/scripts/build-local-images.sh"
   [ -f "$build_script" ] || fatal "Local build script not found: ${build_script}"
 
-  info "Rebuilding local installer images from ${KORTIX_LOCAL_REPO_ROOT}"
+  info "Rebuilding local installer images from ${ACME_LOCAL_REPO_ROOT}"
   echo ""
-  bash "$build_script" --tag "$KORTIX_LOCAL_TAG"
+  bash "$build_script" --tag "$ACME_LOCAL_TAG"
   success "Local images rebuilt"
 }
 
@@ -408,20 +408,20 @@ docker_manifest_exists() {
 }
 
 resolve_release_images() {
-  [ "$KORTIX_LOCAL_IMAGES" = "1" ] && return 0
+  [ "$ACME_LOCAL_IMAGES" = "1" ] && return 0
 
-  dots "Resolving images for v${KORTIX_VERSION}"
+  dots "Resolving images for v${ACME_VERSION}"
 
   if ! docker_manifest_exists "$FRONTEND_IMAGE"; then
     if [ "$FRONTEND_IMAGE_OVERRIDDEN" = "1" ]; then
       fatal "Configured frontend image not found: ${FRONTEND_IMAGE}"
     fi
-    local fallback_frontend="kortix/kortix-frontend:latest"
+    local fallback_frontend="acme/acme-frontend:latest"
     if docker_manifest_exists "$fallback_frontend"; then
       warn "Frontend image ${FRONTEND_IMAGE} not found; falling back to ${fallback_frontend}"
       FRONTEND_IMAGE="$fallback_frontend"
     else
-      fatal "Frontend image not found for ${KORTIX_VERSION}, and latest fallback is unavailable."
+      fatal "Frontend image not found for ${ACME_VERSION}, and latest fallback is unavailable."
     fi
   fi
 
@@ -429,12 +429,12 @@ resolve_release_images() {
     if [ "$API_IMAGE_OVERRIDDEN" = "1" ]; then
       fatal "Configured API image not found: ${API_IMAGE}"
     fi
-    local fallback_api="kortix/kortix-api:latest"
+    local fallback_api="acme/acme-api:latest"
     if docker_manifest_exists "$fallback_api"; then
       warn "API image ${API_IMAGE} not found; falling back to ${fallback_api}"
       API_IMAGE="$fallback_api"
     else
-      fatal "API image not found for ${KORTIX_VERSION}, and latest fallback is unavailable."
+      fatal "API image not found for ${ACME_VERSION}, and latest fallback is unavailable."
     fi
   fi
 
@@ -447,7 +447,7 @@ resolve_release_images() {
       warn "Sandbox image ${SANDBOX_IMAGE} not found; falling back to ${fallback_sandbox}"
       SANDBOX_IMAGE="$fallback_sandbox"
     else
-      fatal "Sandbox image not found for ${KORTIX_VERSION}, and latest fallback is unavailable."
+      fatal "Sandbox image not found for ${ACME_VERSION}, and latest fallback is unavailable."
     fi
   fi
 
@@ -459,13 +459,13 @@ pull_images_parallel() {
   [ ${#images[@]} -gt 0 ] || return 0
 
   printf '%s\n' "${images[@]}" | python3 -c 'import sys; print("\n".join(sorted(set(line.strip() for line in sys.stdin if line.strip()))))' \
-    | xargs -r -n1 -P "$KORTIX_PULL_PARALLELISM" docker pull
+    | xargs -r -n1 -P "$ACME_PULL_PARALLELISM" docker pull
 }
 
-# Free ports used by Kortix (local mode)
-# Usage: free_kortix_ports [project_name]
+# Free ports used by Acme (local mode)
+# Usage: free_acme_ports [project_name]
 # If project_name is provided, only cleans containers from that project
-free_kortix_ports() {
+free_acme_ports() {
   local project_name="${1:-}"
   local is_local=0
   
@@ -486,12 +486,12 @@ free_kortix_ports() {
   # First, clean up any lingering containers that might hold ports
   # Use project-specific pattern if project_name is provided
   if [ -n "$project_name" ]; then
-    # Clean up containers from this compose project (e.g. kortix-frontend-1).
-    # EXCLUDES standalone sandbox containers (kortix-sandbox, kortix-hosted-sandbox)
+    # Clean up containers from this compose project (e.g. acme-frontend-1).
+    # EXCLUDES standalone sandbox containers (acme-sandbox, acme-hosted-sandbox)
     # which are managed by the API, not compose — killing them breaks dev mode.
     docker ps -a --format '{{.Names}}' 2>/dev/null \
       | grep -E "^${project_name}-" \
-      | grep -v -E "^(kortix-sandbox|kortix-hosted-sandbox)$" \
+      | grep -v -E "^(acme-sandbox|acme-hosted-sandbox)$" \
       | xargs -r docker rm -f 2>/dev/null || true
   fi
   
@@ -505,7 +505,7 @@ free_kortix_ports() {
     fi
   done
   
-  [ $freed -eq 1 ] && info "Freed Kortix ports" || true
+  [ $freed -eq 1 ] && info "Freed Acme ports" || true
 }
 
 # Generate a Supabase JWT (anon or service_role)
@@ -539,7 +539,7 @@ EOF
   printf "${NC}\n"
   printf "    ${WHITE}The Autonomous Company Operating System${NC}\n"
   printf "\n"
-  printf "    ${FADED}v${KORTIX_VERSION}  ·  One-Click Installer  ·  Local or VPS${NC}\n"
+  printf "    ${FADED}v${ACME_VERSION}  ·  One-Click Installer  ·  Local or VPS${NC}\n"
   printf "\n"
 }
 
@@ -563,7 +563,7 @@ preflight() {
 
 # ─── Mode Selection ──────────────────────────────────────────────────────────
 prompt_mode() {
-  section "Where are you running Kortix?"
+  section "Where are you running Acme?"
 
   printf "\n"
   printf "    ${WHITE}1)${NC}  Local machine   ${FADED}laptop / desktop — binds to localhost${NC}\n"
@@ -829,22 +829,22 @@ ALTER ROLE authenticator WITH PASSWORD 'POSTGRES_PASSWORD_PLACEHOLDER';
 ALTER ROLE supabase_admin WITH PASSWORD 'POSTGRES_PASSWORD_PLACEHOLDER';
 ROLESEOF
 
-  # Kortix extensions and schemas
-  cat > "$INSTALL_DIR/volumes/db/kortix.sql" << 'KORTIXEOF'
--- Kortix bootstrap: extensions and schemas
+  # Acme extensions and schemas
+  cat > "$INSTALL_DIR/volumes/db/acme.sql" << 'ACMEEOF'
+-- Acme bootstrap: extensions and schemas
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 CREATE EXTENSION IF NOT EXISTS pg_net;
-CREATE SCHEMA IF NOT EXISTS kortix;
+CREATE SCHEMA IF NOT EXISTS acme;
 CREATE SCHEMA IF NOT EXISTS basejump;
 
 -- Scheduler helper (pg_cron → tick endpoint)
-CREATE OR REPLACE FUNCTION kortix.configure_scheduler(api_url TEXT, tick_secret TEXT)
+CREATE OR REPLACE FUNCTION acme.configure_scheduler(api_url TEXT, tick_secret TEXT)
 RETURNS void AS $$
 BEGIN
-  PERFORM cron.unschedule('kortix_global_tick')
-    WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'kortix_global_tick');
+  PERFORM cron.unschedule('acme_global_tick')
+    WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'acme_global_tick');
   PERFORM cron.schedule(
-    'kortix_global_tick',
+    'acme_global_tick',
     '* * * * *',
     format(
       'SELECT net.http_post(url := %L, headers := ''{"Content-Type": "application/json", "x-cron-secret": "%s"}''::jsonb, body := ''{"source": "pg_cron"}''::jsonb, timeout_milliseconds := 30000)',
@@ -863,7 +863,7 @@ GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
-KORTIXEOF
+ACMEEOF
 
   dots "Writing DB init scripts"; dots_done
 }
@@ -897,7 +897,7 @@ ${db_ports}
     volumes:
       - supabase-db-data:/var/lib/postgresql/data
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
-      - ./volumes/db/kortix.sql:/docker-entrypoint-initdb.d/init-scripts/99-kortix.sql:Z
+      - ./volumes/db/acme.sql:/docker-entrypoint-initdb.d/init-scripts/99-acme.sql:Z
     environment:
       POSTGRES_HOST: /var/run/postgresql
       POSTGRES_PORT: \"5432\"
@@ -946,7 +946,7 @@ ${db_ports}
       GOTRUE_SMTP_PORT: \"587\"
       GOTRUE_SMTP_USER: unused
       GOTRUE_SMTP_PASS: unused
-      GOTRUE_SMTP_SENDER_NAME: Kortix
+      GOTRUE_SMTP_SENDER_NAME: Acme
       GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
       GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
       GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
@@ -1011,13 +1011,13 @@ ${supabase_ports}
     # Both modes use the same HTTP-based pattern: Kong is exposed on host port
     # 13740 via the bind address. The frontend container uses extra_hosts to
     # resolve localhost to the host gateway.
-    frontend_supabase_env="      - KORTIX_PUBLIC_SUPABASE_URL=\${SUPABASE_PUBLIC_URL}
-      - KORTIX_PUBLIC_SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
-      - KORTIX_PUBLIC_BACKEND_URL=\${API_PUBLIC_URL}/v1
-      - KORTIX_PUBLIC_BILLING_ENABLED=false
-      - KORTIX_PUBLIC_ENV_MODE=local
-      - KORTIX_PUBLIC_APP_URL=\${PUBLIC_URL}
-      - KORTIX_PUBLIC_SANDBOX_ID=\${SANDBOX_CONTAINER_NAME}
+    frontend_supabase_env="      - ACME_PUBLIC_SUPABASE_URL=\${SUPABASE_PUBLIC_URL}
+      - ACME_PUBLIC_SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
+      - ACME_PUBLIC_BACKEND_URL=\${API_PUBLIC_URL}/v1
+      - ACME_PUBLIC_BILLING_ENABLED=false
+      - ACME_PUBLIC_ENV_MODE=local
+      - ACME_PUBLIC_APP_URL=\${PUBLIC_URL}
+      - ACME_PUBLIC_SANDBOX_ID=\${SANDBOX_CONTAINER_NAME}
       - SUPABASE_URL=\${SUPABASE_PUBLIC_URL}
       - SUPABASE_SERVER_URL=http://supabase-kong:8000
       - SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
@@ -1029,13 +1029,13 @@ ${supabase_ports}
   else
     # External mode — no Supabase containers
     api_depends="    # External Supabase — no local dependencies"
-    frontend_supabase_env="      - KORTIX_PUBLIC_SUPABASE_URL=\${SUPABASE_URL}
-      - KORTIX_PUBLIC_SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
-      - KORTIX_PUBLIC_BACKEND_URL=\${API_PUBLIC_URL}/v1
-      - KORTIX_PUBLIC_BILLING_ENABLED=false
-      - KORTIX_PUBLIC_ENV_MODE=local
-      - KORTIX_PUBLIC_APP_URL=\${PUBLIC_URL}
-      - KORTIX_PUBLIC_SANDBOX_ID=\${SANDBOX_CONTAINER_NAME}
+    frontend_supabase_env="      - ACME_PUBLIC_SUPABASE_URL=\${SUPABASE_URL}
+      - ACME_PUBLIC_SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
+      - ACME_PUBLIC_BACKEND_URL=\${API_PUBLIC_URL}/v1
+      - ACME_PUBLIC_BILLING_ENABLED=false
+      - ACME_PUBLIC_ENV_MODE=local
+      - ACME_PUBLIC_APP_URL=\${PUBLIC_URL}
+      - ACME_PUBLIC_SANDBOX_ID=\${SANDBOX_CONTAINER_NAME}
       - SUPABASE_URL=\${SUPABASE_URL}
       - SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
       - BACKEND_URL=\${API_PUBLIC_URL}/v1"
@@ -1044,7 +1044,7 @@ ${supabase_ports}
   fi
 
   cat > "$INSTALL_DIR/docker-compose.yml" << COMPOSE
-# Kortix — auto-generated by get-kortix.sh
+# Acme — auto-generated by get-acme.sh
 # Mode: ${DEPLOY_MODE} | Database: ${DB_MODE}
 services:
 ${supabase_services}
@@ -1056,11 +1056,11 @@ ${frontend_ports}
     environment:
 ${frontend_supabase_env}
     depends_on:
-      kortix-api:
+      acme-api:
         condition: service_started
     restart: unless-stopped
 
-  kortix-api:
+  acme-api:
     image: \${API_IMAGE}
     user: "0:0"
 ${api_ports}
@@ -1070,19 +1070,19 @@ ${supabase_url_env}
 ${supabase_db_env}
       - SUPABASE_SERVICE_ROLE_KEY=\${SUPABASE_SERVICE_ROLE_KEY}
       - ALLOWED_SANDBOX_PROVIDERS=local_docker
-      - KORTIX_LOCAL_IMAGES=\${KORTIX_LOCAL_IMAGES}
+      - ACME_LOCAL_IMAGES=\${ACME_LOCAL_IMAGES}
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - KORTIX_URL=http://kortix-api:8008/v1/router
+      - ACME_URL=http://acme-api:8008/v1/router
       - SANDBOX_NETWORK=${SANDBOX_NETWORK}
       - INTERNAL_SERVICE_KEY=\${INTERNAL_SERVICE_KEY}
       - FRONTEND_URL=\${PUBLIC_URL}
       - API_KEY_SECRET=\${API_KEY_SECRET}
       - CORS_ALLOWED_ORIGINS=\${PUBLIC_URL}
       - SANDBOX_IMAGE=\${SANDBOX_IMAGE}
-      - SANDBOX_VERSION=\${KORTIX_VERSION}
+      - SANDBOX_VERSION=\${ACME_VERSION}
       - TUNNEL_SIGNING_SECRET=\${TUNNEL_SIGNING_SECRET}
-      - KORTIX_ROUTER_INTERNAL_ENABLED=false
-      - KORTIX_BILLING_INTERNAL_ENABLED=false
+      - ACME_ROUTER_INTERNAL_ENABLED=false
+      - ACME_BILLING_INTERNAL_ENABLED=false
     env_file:
       - .env
     volumes:
@@ -1101,17 +1101,17 @@ COMPOSE
 write_env() {
   cat > "$INSTALL_DIR/.env" << ENVEOF
 # ──────────────────────────────────────────────────────────────────────────────
-# Kortix — Environment Configuration
-# Auto-generated by get-kortix.sh on $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+# Acme — Environment Configuration
+# Auto-generated by get-acme.sh on $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 # ──────────────────────────────────────────────────────────────────────────────
 
 # ─── Mode ────────────────────────────────────────────────────────────────────
 DEPLOY_MODE=${DEPLOY_MODE}
 DB_MODE=${DB_MODE}
 COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
-KORTIX_LOCAL_IMAGES=${KORTIX_LOCAL_IMAGES}
-KORTIX_LOCAL_TAG=${KORTIX_LOCAL_TAG}
-KORTIX_LOCAL_REPO_ROOT=${KORTIX_LOCAL_REPO_ROOT}
+ACME_LOCAL_IMAGES=${ACME_LOCAL_IMAGES}
+ACME_LOCAL_TAG=${ACME_LOCAL_TAG}
+ACME_LOCAL_REPO_ROOT=${ACME_LOCAL_REPO_ROOT}
 
 # ─── URLs ────────────────────────────────────────────────────────────────────
 PUBLIC_URL=${PUBLIC_URL}
@@ -1144,14 +1144,14 @@ SLACK_CLIENT_SECRET=${SLACK_CLIENT_SECRET}
 SLACK_SIGNING_SECRET=${SLACK_SIGNING_SECRET}
 
 # ─── Sandbox ─────────────────────────────────────────────────────────────────
-KORTIX_VERSION=${KORTIX_VERSION}
+ACME_VERSION=${ACME_VERSION}
 FRONTEND_IMAGE=${FRONTEND_IMAGE}
 API_IMAGE=${API_IMAGE}
 SANDBOX_IMAGE=${SANDBOX_IMAGE}
 SANDBOX_NETWORK=${SANDBOX_NETWORK}
 SANDBOX_CONTAINER_NAME=${SANDBOX_CONTAINER_NAME}
 SANDBOX_PORT_BASE=${SANDBOX_PORT_BASE}
-KORTIX_SANDBOX_VERSION=${KORTIX_VERSION}
+ACME_SANDBOX_VERSION=${ACME_VERSION}
 ENVEOF
 
   chmod 600 "$INSTALL_DIR/.env"
@@ -1177,8 +1177,8 @@ DATABASE_URL=${host_database_url}
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 DOCKER_HOST=${host_docker_host}
 ALLOWED_SANDBOX_PROVIDERS=local_docker
-KORTIX_LOCAL_IMAGES=${KORTIX_LOCAL_IMAGES}
-KORTIX_URL=${API_PUBLIC_URL}/v1/router
+ACME_LOCAL_IMAGES=${ACME_LOCAL_IMAGES}
+ACME_URL=${API_PUBLIC_URL}/v1/router
 SANDBOX_NETWORK=${host_sandbox_network}
 INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY}
 ENVEOF
@@ -1211,7 +1211,7 @@ fixup_db_init() {
 
 # ─── Write CLI ───────────────────────────────────────────────────────────────
 write_cli() {
-  cat > "$INSTALL_DIR/kortix" << 'CLIPATH'
+  cat > "$INSTALL_DIR/acme" << 'CLIPATH'
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -1240,19 +1240,19 @@ prompt_read() {
 }
 
 # Installed release metadata is persisted in .env so updates stay pinned.
-VERSION=$(grep -m1 '^KORTIX_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
-FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/kortix-frontend:${VERSION}")
-API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/kortix-api:${VERSION}")
-SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/computer:${VERSION}")
-SANDBOX_NAME=$(grep -m1 '^SANDBOX_CONTAINER_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix-hosted-sandbox")
-LOCAL_IMAGES=$(grep -m1 '^KORTIX_LOCAL_IMAGES=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "0")
-LOCAL_TAG=$(grep -m1 '^KORTIX_LOCAL_TAG=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "latest")
-LOCAL_REPO_ROOT=$(grep -m1 '^KORTIX_LOCAL_REPO_ROOT=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "")
+VERSION=$(grep -m1 '^ACME_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
+FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme/acme-frontend:${VERSION}")
+API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme/acme-api:${VERSION}")
+SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme/computer:${VERSION}")
+SANDBOX_NAME=$(grep -m1 '^SANDBOX_CONTAINER_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme-hosted-sandbox")
+LOCAL_IMAGES=$(grep -m1 '^ACME_LOCAL_IMAGES=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "0")
+LOCAL_TAG=$(grep -m1 '^ACME_LOCAL_TAG=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "latest")
+LOCAL_REPO_ROOT=$(grep -m1 '^ACME_LOCAL_REPO_ROOT=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "")
 
 _resolve_latest_version() {
   local gh_version
   gh_version=$(curl -sf --connect-timeout 5 \
-    "https://api.github.com/repos/kortix-ai/suna/releases/latest" 2>/dev/null \
+    "https://api.github.com/repos/acme-ai/suna/releases/latest" 2>/dev/null \
     | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"].lstrip("v"))' 2>/dev/null) || true
   if [ -n "$gh_version" ]; then
     printf '%s' "$gh_version"
@@ -1282,10 +1282,10 @@ PY
 }
 
 _refresh_state_from_env() {
-  VERSION=$(grep -m1 '^KORTIX_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
-  FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/kortix-frontend:${VERSION}")
-  API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/kortix-api:${VERSION}")
-  SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/computer:${VERSION}")
+  VERSION=$(grep -m1 '^ACME_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
+  FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme/acme-frontend:${VERSION}")
+  API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme/acme-api:${VERSION}")
+  SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme/computer:${VERSION}")
 }
 
 _patch_compose_images() {
@@ -1304,8 +1304,8 @@ for line in lines:
         service = 'frontend'
         out.append(line)
         continue
-    if stripped == 'kortix-api:':
-        service = 'kortix-api'
+    if stripped == 'acme-api:':
+        service = 'acme-api'
         out.append(line)
         continue
     if service and stripped.startswith('image:'):
@@ -1322,15 +1322,15 @@ PY
 }
 
 _refresh_installer_and_cli() {
-  local tmp_script="$DIR/get-kortix.sh.tmp"
-  curl -fsSL "https://raw.githubusercontent.com/kortix-ai/suna/main/scripts/get-kortix.sh" -o "$tmp_script" || return 0
+  local tmp_script="$DIR/get-acme.sh.tmp"
+  curl -fsSL "https://raw.githubusercontent.com/acme-ai/suna/main/scripts/get-acme.sh" -o "$tmp_script" || return 0
   chmod +x "$tmp_script"
-  mv "$tmp_script" "$DIR/get-kortix.sh"
+  mv "$tmp_script" "$DIR/get-acme.sh"
   awk '
     capture && $0 == "CLIPATH" { exit }
     capture { print; next }
     /<< '\''CLIPATH'\''$/ { capture = 1 }
-  ' "$DIR/get-kortix.sh" > "$DIR/kortix.new" && chmod +x "$DIR/kortix.new" && mv "$DIR/kortix.new" "$DIR/kortix" || true
+  ' "$DIR/get-acme.sh" > "$DIR/acme.new" && chmod +x "$DIR/acme.new" && mv "$DIR/acme.new" "$DIR/acme" || true
 }
 
 _show_update_notice() {
@@ -1339,7 +1339,7 @@ _show_update_notice() {
   latest=$(_resolve_latest_version)
   [ -n "$latest" ] || return 0
   [ "$latest" = "$VERSION" ] && return 0
-  printf "  ${Y}!${N}  ${Y}Update available:${N} v%s ${F}(run: kortix update)${N}\n" "$latest"
+  printf "  ${Y}!${N}  ${Y}Update available:${N} v%s ${F}(run: acme update)${N}\n" "$latest"
 }
 
 _open() {
@@ -1375,14 +1375,14 @@ _mode() {
 
 _project_name() {
   if [ -f "$DIR/.env" ]; then
-    grep -m1 '^COMPOSE_PROJECT_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix"
+    grep -m1 '^COMPOSE_PROJECT_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme"
   else
-    echo "kortix"
+    echo "acme"
   fi
 }
 
-# Free ports used by Kortix (local mode)
-_free_kortix_ports() {
+# Free ports used by Acme (local mode)
+_free_acme_ports() {
   local project_name
   project_name=$(_project_name)
   local ports=(13737 13738 13740 13741)
@@ -1392,7 +1392,7 @@ _free_kortix_ports() {
   # EXCLUDES standalone sandbox containers (managed by the API, not compose).
   docker ps -a --format '{{.Names}}' 2>/dev/null \
     | grep -E "^${project_name}-" \
-    | grep -v -E "^(kortix-sandbox|${SANDBOX_NAME})$" \
+    | grep -v -E "^(acme-sandbox|${SANDBOX_NAME})$" \
     | xargs -r docker rm -f 2>/dev/null || true
 
   # Kill any processes using the ports
@@ -1405,7 +1405,7 @@ _free_kortix_ports() {
     fi
   done
 
-  [ $freed -eq 1 ] && _info "Freed Kortix ports" || true
+  [ $freed -eq 1 ] && _info "Freed Acme ports" || true
 }
 
 _sync_supabase_passwords() {
@@ -1439,7 +1439,7 @@ _using_local_images() {
 }
 
 _rebuild_local_images() {
-  [ -n "$LOCAL_REPO_ROOT" ] || { _err "KORTIX_LOCAL_REPO_ROOT is not set"; exit 1; }
+  [ -n "$LOCAL_REPO_ROOT" ] || { _err "ACME_LOCAL_REPO_ROOT is not set"; exit 1; }
   local build_script="$LOCAL_REPO_ROOT/scripts/build-local-images.sh"
   [ -f "$build_script" ] || { _err "Build script not found: ${build_script}"; exit 1; }
   bash "$build_script" --tag "$LOCAL_TAG"
@@ -1460,7 +1460,7 @@ _reset_stack() {
   docker compose down -v --remove-orphans 2>/dev/null || true
   docker rm -f "$SANDBOX_NAME" 2>/dev/null || true
   docker volume rm "${SANDBOX_NAME}-data" 2>/dev/null || true
-  [ "$(_mode)" = "local" ] && _free_kortix_ports
+  [ "$(_mode)" = "local" ] && _free_acme_ports
 
   _info "Starting fresh stack..."
   docker compose up -d || true
@@ -1530,7 +1530,7 @@ _refresh_sandbox_container() {
 
 _banner() {
   printf "\n"
-  printf "  ${C}${B}Kortix CLI${N}  ${F}v${VERSION}${N}\n"
+  printf "  ${C}${B}Acme CLI${N}  ${F}v${VERSION}${N}\n"
   printf "  ${F}────────────────────────────────────────${N}\n"
   _show_update_notice
 }
@@ -1538,7 +1538,7 @@ _banner() {
 case "${1:-help}" in
   start)
     _banner
-    [ "$(_mode)" = "local" ] && _free_kortix_ports
+    [ "$(_mode)" = "local" ] && _free_acme_ports
     _sync_supabase_passwords
     docker compose up -d || true
     # Also restart the sandbox container if it exists but is stopped
@@ -1549,7 +1549,7 @@ case "${1:-help}" in
       fi
     fi
     echo ""
-    _ok "Kortix is running!"
+    _ok "Acme is running!"
     printf "  ${W}Dashboard${N}:  ${C}$(_url)${N}\n\n"
     ;;
   stop)
@@ -1562,7 +1562,7 @@ case "${1:-help}" in
   restart)
     _banner
     docker compose down 2>/dev/null || true
-    [ "$(_mode)" = "local" ] && _free_kortix_ports
+    [ "$(_mode)" = "local" ] && _free_acme_ports
     _sync_supabase_passwords
     docker compose up -d || true
     _ok "Restarted."
@@ -1595,11 +1595,11 @@ case "${1:-help}" in
       if [ -n "$local_latest" ] && [ "$local_latest" != "$VERSION" ]; then
         _info "Updating from v${VERSION} to v${local_latest}..."
         VERSION="$local_latest"
-        FRONTEND_IMAGE="kortix/kortix-frontend:${VERSION}"
-        API_IMAGE="kortix/kortix-api:${VERSION}"
-        SANDBOX_IMAGE="kortix/computer:${VERSION}"
-        _env_set KORTIX_VERSION "$VERSION"
-        _env_set KORTIX_SANDBOX_VERSION "$VERSION"
+        FRONTEND_IMAGE="acme/acme-frontend:${VERSION}"
+        API_IMAGE="acme/acme-api:${VERSION}"
+        SANDBOX_IMAGE="acme/computer:${VERSION}"
+        _env_set ACME_VERSION "$VERSION"
+        _env_set ACME_SANDBOX_VERSION "$VERSION"
         _env_set FRONTEND_IMAGE "$FRONTEND_IMAGE"
         _env_set API_IMAGE "$API_IMAGE"
         _env_set SANDBOX_IMAGE "$SANDBOX_IMAGE"
@@ -1615,7 +1615,7 @@ case "${1:-help}" in
       } | python3 -c 'import sys; print("\n".join(sorted(set(line.strip() for line in sys.stdin if line.strip()))))' | xargs -r -n1 -P 4 docker pull
     fi
     _info "Restarting services..."
-    [ "$(_mode)" = "local" ] && _free_kortix_ports
+    [ "$(_mode)" = "local" ] && _free_acme_ports
     _sync_supabase_passwords
     docker compose down 2>/dev/null || true
     docker compose up -d || true
@@ -1643,22 +1643,22 @@ case "${1:-help}" in
     if echo "$del_volumes" | grep -qi '^y'; then
       docker compose down -v --remove-orphans 2>/dev/null || true
       docker volume rm "${SANDBOX_NAME}-data" 2>/dev/null || true
-      docker volume rm kortix_supabase-db-data 2>/dev/null || true
-      docker volume rm supabase_db_kortix-local 2>/dev/null || true
+      docker volume rm acme_supabase-db-data 2>/dev/null || true
+      docker volume rm supabase_db_acme-local 2>/dev/null || true
       _ok "Volumes removed."
     else
       docker compose down 2>/dev/null || true
     fi
-    [ -L "/usr/local/bin/kortix" ] && rm -f /usr/local/bin/kortix 2>/dev/null || true
+    [ -L "/usr/local/bin/acme" ] && rm -f /usr/local/bin/acme 2>/dev/null || true
     rm -rf "$DIR"
-    _ok "Kortix uninstalled."
+    _ok "Acme uninstalled."
     echo ""
     ;;
   open)
     _open "$(_url)"
     ;;
   version)
-    echo "  kortix v${VERSION}"
+    echo "  acme v${VERSION}"
     ;;
   *)
     _banner
@@ -1666,12 +1666,12 @@ case "${1:-help}" in
     printf "  ${C}start${N}       Start all services\n"
     printf "  ${C}stop${N}        Stop all services\n"
     printf "  ${C}restart${N}     Restart all services\n"
-    printf "  ${C}logs${N}        Tail logs ${F}(kortix logs kortix-api)${N}\n"
+    printf "  ${C}logs${N}        Tail logs ${F}(acme logs acme-api)${N}\n"
     printf "  ${C}status${N}      Show running containers\n"
     printf "  ${C}setup${N}       Open sign-in page\n"
     printf "  ${C}update${N}      Pull latest images & restart\n"
     printf "  ${C}reset${N}       Wipe data and recreate stack\n"
-    printf "  ${C}uninstall${N}   Remove Kortix completely\n"
+    printf "  ${C}uninstall${N}   Remove Acme completely\n"
     printf "  ${C}open${N}        Open dashboard in browser\n"
     printf "  ${C}version${N}     Show installed version\n"
     echo ""
@@ -1679,14 +1679,14 @@ case "${1:-help}" in
  esac
 CLIPATH
 
-  chmod +x "$INSTALL_DIR/kortix"
+  chmod +x "$INSTALL_DIR/acme"
 }
 
 # ─── Add to PATH ─────────────────────────────────────────────────────────────
 setup_path() {
   if [ -d "/usr/local/bin" ] && [ -w "/usr/local/bin" ]; then
-    ln -sf "$INSTALL_DIR/kortix" /usr/local/bin/kortix 2>/dev/null && {
-      success "Linked 'kortix' -> /usr/local/bin/kortix"
+    ln -sf "$INSTALL_DIR/acme" /usr/local/bin/acme 2>/dev/null && {
+      success "Linked 'acme' -> /usr/local/bin/acme"
       return
     }
   fi
@@ -1703,9 +1703,9 @@ setup_path() {
   fi
 
   echo "" >> "$shell_rc"
-  echo "# Kortix CLI" >> "$shell_rc"
+  echo "# Acme CLI" >> "$shell_rc"
   echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$shell_rc"
-  success "Added 'kortix' to PATH (restart terminal or: source $shell_rc)"
+  success "Added 'acme' to PATH (restart terminal or: source $shell_rc)"
 }
 
 # ─── Pull & Start ───────────────────────────────────────────────────────────
@@ -1714,8 +1714,8 @@ pull_and_start() {
 
   section "Docker Images"
 
-  if [ "$KORTIX_LOCAL_IMAGES" = "1" ]; then
-    if [ "$KORTIX_BUILD_LOCAL_IMAGES" = "1" ]; then
+  if [ "$ACME_LOCAL_IMAGES" = "1" ]; then
+    if [ "$ACME_BUILD_LOCAL_IMAGES" = "1" ]; then
       rebuild_local_images
     fi
     info "Using local images (skipping registry)"
@@ -1738,7 +1738,7 @@ pull_and_start() {
   section "Starting Services"
 
   # Free ports in local mode to avoid conflicts
-  free_kortix_ports
+  free_acme_ports
 
   docker compose up -d || true
 
@@ -1763,7 +1763,7 @@ pull_and_start() {
   # ─── Final success output ────────────────────────────────────────────
   printf "\n"
   printf "  ${GREEN}${BOLD}╔══════════════════════════════════════════════════╗${NC}\n"
-  printf "  ${GREEN}${BOLD}║             Kortix is running!                  ║${NC}\n"
+  printf "  ${GREEN}${BOLD}║             Acme is running!                  ║${NC}\n"
   printf "  ${GREEN}${BOLD}╚══════════════════════════════════════════════════╝${NC}\n"
   printf "\n"
   printf "    ${WHITE}Dashboard${NC}   ${CYAN}${BOLD}${PUBLIC_URL}${NC}\n"
@@ -1783,7 +1783,7 @@ pull_and_start() {
 
   if [ "$DEPLOY_MODE" = "local" ]; then
     subsection "Want 24/7 uptime?"
-    printf "    ${WHITE}Kortix Cloud${NC}   ${CYAN}https://kortix.com${NC}     ${FADED}managed, zero setup${NC}\n"
+    printf "    ${WHITE}Acme Cloud${NC}   ${CYAN}https://acme.com${NC}     ${FADED}managed, zero setup${NC}\n"
     printf "    ${WHITE}Self-host${NC}      ${CYAN}hetzner.com${NC} / ${CYAN}justavps.com${NC}\n"
   fi
 
@@ -1791,12 +1791,12 @@ pull_and_start() {
   printf "    Open the dashboard and create your owner account.\n"
 
   subsection "CLI Reference"
-  printf "    ${CYAN}kortix start${NC}    Start services\n"
-  printf "    ${CYAN}kortix stop${NC}     Stop services\n"
-  printf "    ${CYAN}kortix setup${NC}    Open sign-in page\n"
-  printf "    ${CYAN}kortix update${NC}   Pull latest & restart\n"
-  printf "    ${CYAN}kortix logs${NC}     Tail service logs\n"
-  printf "    ${CYAN}kortix status${NC}   Show running containers\n"
+  printf "    ${CYAN}acme start${NC}    Start services\n"
+  printf "    ${CYAN}acme stop${NC}     Stop services\n"
+  printf "    ${CYAN}acme setup${NC}    Open sign-in page\n"
+  printf "    ${CYAN}acme update${NC}   Pull latest & restart\n"
+  printf "    ${CYAN}acme logs${NC}     Tail service logs\n"
+  printf "    ${CYAN}acme status${NC}   Show running containers\n"
   printf "\n"
 }
 
@@ -1806,11 +1806,11 @@ main() {
   preflight
 
   # Clean up any stale Docker volumes from a previous install that was
-  # manually removed (rm -rf ~/.kortix) without running `docker compose down -v`.
+  # manually removed (rm -rf ~/.acme) without running `docker compose down -v`.
   # Without this, fresh installs reuse old Postgres data with old passwords,
   # causing supabase-auth to fail with SASL auth errors.
   if [ ! -f "$INSTALL_DIR/docker-compose.yml" ]; then
-    docker volume rm kortix_supabase-db-data 2>/dev/null || true
+    docker volume rm acme_supabase-db-data 2>/dev/null || true
     docker rm -f "${SANDBOX_CONTAINER_NAME}" 2>/dev/null || true
     docker volume rm "${SANDBOX_CONTAINER_NAME}-data" 2>/dev/null || true
   fi
@@ -1829,7 +1829,7 @@ main() {
       local existing_url
       existing_url=$(grep -m1 '^PUBLIC_URL=' "$INSTALL_DIR/.env" 2>/dev/null | cut -d= -f2- || echo "http://localhost:13737")
       echo ""
-      success "Kortix is running!"
+      success "Acme is running!"
       printf "    ${WHITE}Dashboard${NC}:  ${CYAN}${existing_url}${NC}\n\n"
       exit 0
     fi
@@ -1842,8 +1842,8 @@ main() {
     docker compose down -v 2>/dev/null || true
     docker rm -f "${SANDBOX_CONTAINER_NAME}" 2>/dev/null || true
     # Also remove any leftover named volumes from previous installs
-    docker volume rm kortix_supabase-db-data 2>/dev/null || true
-    docker volume rm supabase_db_kortix-local 2>/dev/null || true
+    docker volume rm acme_supabase-db-data 2>/dev/null || true
+    docker volume rm supabase_db_acme-local 2>/dev/null || true
     docker volume rm "${SANDBOX_CONTAINER_NAME}-data" 2>/dev/null || true
     echo ""
   fi

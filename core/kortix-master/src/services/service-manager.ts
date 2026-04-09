@@ -161,7 +161,7 @@ export interface ServiceTemplate {
 }
 
 const REGISTRY_VERSION = 1
-const WORKSPACE_ROOT = process.env.KORTIX_WORKSPACE || '/workspace'
+const WORKSPACE_ROOT = process.env.ACME_WORKSPACE || '/workspace'
 const SERVICE_STATE_DIR = join(WORKSPACE_ROOT, '.kortix', 'services')
 const REGISTRY_FILE = join(SERVICE_STATE_DIR, 'registry.json')
 const LOG_DIR = join(SERVICE_STATE_DIR, 'logs')

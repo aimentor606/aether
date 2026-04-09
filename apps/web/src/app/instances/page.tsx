@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { useQuery } from '@tanstack/react-query';
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { AcmeLogo } from '@/components/sidebar/acme-logo';
 import {
   listSandboxes,
   ensureSandbox,
@@ -317,7 +317,7 @@ export default function InstancesPage() {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Top bar */}
       <div className="flex items-center justify-between px-6 py-4 shrink-0">
-        <KortixLogo size={20} />
+        <AcmeLogo size={20} />
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
@@ -362,7 +362,7 @@ export default function InstancesPage() {
                 className="gap-1.5"
               >
                 {autoCreating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-                {autoCreating ? 'Creating...' : 'New Kortix'}
+                {autoCreating ? 'Creating...' : 'New Acme'}
               </Button>
             )}
           </div>
@@ -392,14 +392,14 @@ export default function InstancesPage() {
           {canClaimComputer && !pageLoading && (
             <div className="rounded-2xl border border-border/50 bg-gradient-to-b from-background to-muted/20 px-8 py-14 pb-6 flex flex-col items-center text-center gap-6">
               <img
-                src="/kortix-computer.png"
-                alt="Kortix Computer"
+                src="/acme-computer.png"
+                alt="Acme Computer"
                 className="h-40 w-40 object-contain"
               />
 
               <div className="space-y-3 max-w-md">
                 <h3 className="text-2xl font-semibold tracking-tight text-foreground">
-                  Kortix is now even better
+                  Acme is now even better
                 </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
                   Your plan now includes a dedicated cloud computer
@@ -443,12 +443,12 @@ export default function InstancesPage() {
               <div className="text-center">
                 <p className="text-sm font-medium text-foreground/80">No instances yet</p>
                 <p className="text-xs text-muted-foreground/60 mt-1">
-                  Create your first Kortix instance to get started.
+                  Create your first Acme instance to get started.
                 </p>
               </div>
               <Button onClick={handleCreateInstance} className="gap-1.5">
                 <Plus className="h-3.5 w-3.5" />
-                New Kortix
+                New Acme
               </Button>
             </div>
           )}

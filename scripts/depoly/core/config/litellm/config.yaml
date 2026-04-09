@@ -1,0 +1,57 @@
+# LiteLLM Proxy Configuration
+# Docs: https://docs.litellm.ai/docs/proxy/configs
+#
+# API keys are read from environment variables via os.environ/
+# Set DEEPSEEK_API_KEY, QWEN_API_KEY, ZHIPU_API_KEY in ops/.env
+
+model_list:
+  # DeepSeek
+  - model_name: deepseek-chat
+    litellm_params:
+      model: deepseek/deepseek-chat
+      api_key: os.environ/DEEPSEEK_API_KEY
+
+  - model_name: deepseek-reasoner
+    litellm_params:
+      model: deepseek/deepseek-reasoner
+      api_key: os.environ/DEEPSEEK_API_KEY
+
+  # Qwen (Alibaba DashScope)
+  - model_name: qwen-turbo
+    litellm_params:
+      model: openai/qwen-turbo
+      api_key: os.environ/QWEN_API_KEY
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+
+  - model_name: qwen-plus
+    litellm_params:
+      model: openai/qwen-plus
+      api_key: os.environ/QWEN_API_KEY
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+
+  - model_name: qwen-max
+    litellm_params:
+      model: openai/qwen-max
+      api_key: os.environ/QWEN_API_KEY
+      api_base: https://dashscope.aliyuncs.com/compatible-mode/v1
+
+  # Zhipu GLM
+  - model_name: glm-4-flash
+    litellm_params:
+      model: openai/glm-4-flash
+      api_key: os.environ/ZHIPU_API_KEY
+      api_base: https://open.bigmodel.cn/api/paas/v4
+
+  - model_name: glm-4-plus
+    litellm_params:
+      model: openai/glm-4-plus
+      api_key: os.environ/ZHIPU_API_KEY
+      api_base: https://open.bigmodel.cn/api/paas/v4
+
+litellm_settings:
+  drop_params: true
+  request_timeout: 600
+
+router_settings:
+  num_retries: 3
+  timeout: 600

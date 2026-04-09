@@ -1,0 +1,45 @@
+# compose.db.yml
+# PostgreSQL Database Service
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: unless-stopped
+    user: postgres
+    environment:
+      POSTGRES_USER: ${DB_ROOT_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_ROOT_PASSWORD:-StrongPassword123!}
+      POSTGRES_DB: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - /data/postgres:/var/lib/postgresql/data
+      - /data/logs/postgresql:/var/log/postgresql
+      - ../init-db:/docker-entrypoint-initdb.d:ro
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_ROOT_USER:-postgres} -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    ports:
+      - "127.0.0.1:5432:5432"
+    command: >
+      postgres
+      -c max_connections=300
+      -c shared_buffers=512MB
+      -c effective_cache_size=1GB
+      -c log_destination=stderr
+      -c logging_collector=on
+      -c log_directory=/var/log/postgresql
+      -c log_filename=postgresql-%Y-%m-%d_%H%M%S.log
+      -c log_rotation_age=1d
+      -c log_rotation_size=100MB
+      -c log_min_duration_statement=1000
+
+networks:
+  app-network:
+    external: true
+    name: app-network

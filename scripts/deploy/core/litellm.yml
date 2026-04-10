@@ -16,6 +16,9 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-CHANGE_ME}
       - TZ=${TZ:-Asia/Shanghai}
+      # Trust X-Forwarded-* headers from Kong so Uvicorn generates
+      # correct redirect URLs (public host instead of llm-proxy:4000)
+      - FORWARDED_ALLOW_IPS=*
       # config.yaml uses os.environ/ to read these at runtime
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
       - QWEN_API_KEY=${QWEN_API_KEY:-}

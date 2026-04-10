@@ -26,6 +26,7 @@ docker run --rm \
   -e DECK_PUBLIC_HOST="$PUBLIC_HOST" \
   -e DECK_FORWARDED_PROTO="$FORWARDED_PROTO" \
   -e DECK_LITELLM_MASTER_KEY="$LITELLM_MASTER_KEY" \
+  -e DECK_PUBLIC_ORIGIN="${FORWARDED_PROTO}://${PUBLIC_HOST}" \
   kong/deck gateway sync kong.yml \
   --kong-addr http://kong:8001
 echo "✅ Kong config synced"

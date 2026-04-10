@@ -97,8 +97,7 @@ services:
       - name: cors
         config:
           origins:
-            - "https://www.aimentor.top"
-            - "https://aimentor.top"
+            - "${{ env "DECK_PUBLIC_ORIGIN" }}"
           methods:
             - GET
             - POST
@@ -127,31 +126,22 @@ services:
         paths:
           - /ui
         strip_path: false
+        preserve_host: true
         tags:
           - litellm-ui
 
     plugins:
       - name: request-transformer
         config:
-          set:
-            headers:
-              - "Host:${{ env "DECK_PUBLIC_HOST" }}"
           add:
             headers:
               - "X-Forwarded-Host:${{ env "DECK_PUBLIC_HOST" }}"
               - "X-Forwarded-Proto:${{ env "DECK_FORWARDED_PROTO" }}"
 
-      - name: response-transformer
-        config:
-          replace:
-            headers:
-              - "location:${{ env "DECK_FORWARDED_PROTO" }}://${{ env "DECK_PUBLIC_HOST" }}/ui/"
-
       - name: cors
         config:
           origins:
-            - "https://www.aimentor.top"
-            - "https://aimentor.top"
+            - "${{ env "DECK_PUBLIC_ORIGIN" }}"
           methods:
             - GET
             - POST
@@ -217,8 +207,7 @@ services:
       - name: cors
         config:
           origins:
-            - "https://www.aimentor.top"
-            - "https://aimentor.top"
+            - "${{ env "DECK_PUBLIC_ORIGIN" }}"
           methods:
             - GET
             - HEAD

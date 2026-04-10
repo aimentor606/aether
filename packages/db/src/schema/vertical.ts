@@ -6,7 +6,7 @@ import {
   jsonb,
   index,
 } from 'drizzle-orm/pg-core';
-import { acmeSchema } from './kortix';
+import { acmeSchema } from './acme';
 
 export const verticalTables = acmeSchema.table('vertical_entities', {
   id: uuid('id').primaryKey().defaultRandom(),

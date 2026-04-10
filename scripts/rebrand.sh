@@ -357,10 +357,14 @@ if [[ "${SKIP_FILE_RENAMES:-0}" != "1" ]]; then
   done < <(find . -type f -name '*kortix*' -not -path '*/node_modules/*' -not -path '*/.git/*' 2>/dev/null)
 
   # ── Rename directories containing 'kortix' (bottom-up to avoid nesting issues) ──
+  # Exclude: core/kortix-master, core/kortix-ocx, packages/kortix-*, svc-kortix-master
   while IFS= read -r oldpath; do
     case "$oldpath" in
-      */node_modules/*|*/.git/*|*/core/kortix-*|*/packages/kortix-*) continue ;;
+      */node_modules/*|*/.git/*) continue ;;
       ./core/kortix-*|./packages/kortix-*) continue ;;
+      */core/kortix-*|*/packages/kortix-*) continue ;;
+      *svc-kortix-master*) continue ;;
+      *kortix-env-setup*) continue ;;
     esac
 
     dir="$(dirname "$oldpath")"

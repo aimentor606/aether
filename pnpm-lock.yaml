@@ -1216,7 +1216,7 @@ importers:
         specifier: 8.2.0
         version: 8.2.0
 
-  core/kortix-master:
+  core/acme-master:
     dependencies:
       '@chat-adapter/discord':
         specifier: ^4.23.0

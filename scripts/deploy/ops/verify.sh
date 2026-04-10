@@ -39,13 +39,17 @@ check "/v1beta/ CORS" \
 
 echo ""
 echo "=== Authentication ==="
-check "No key = 401" \
-  "curl -s -o /dev/null -w '%{http_code}' http://localhost:80/api/status" \
-  "401"
 source ops/.env
-check "Valid key = 2xx" \
-  "curl -s -o /dev/null -w '%{http_code}' http://localhost:80/api/status -H 'X-API-Key: $DEFAULT_API_KEY'" \
-  "20"
+case "${LLM_PROXY:-newapi}" in
+  litellm) HEALTH_PATH="/v1beta/models" ;;
+  *)       HEALTH_PATH="/api/status" ;;
+esac
+check "No key = 401" \
+  "curl -s -o /dev/null -w '%{http_code}' http://localhost:80${HEALTH_PATH}" \
+  "401"
+check "Valid key passes Kong auth" \
+  "curl -s -o /dev/null -w '%{http_code}' http://localhost:80${HEALTH_PATH} -H 'X-API-Key: $DEFAULT_API_KEY'" \
+  "200"
 
 echo ""
 echo "=== Frontend ==="

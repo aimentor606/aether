@@ -11,6 +11,8 @@ services:
       - PORT=3000
       - TZ=${TZ:-Asia/Shanghai}
       - PROXY_BASE_URL=${FORWARDED_PROTO:-https}://${PUBLIC_HOST}
+      # Trust Kong's X-Forwarded-* headers (fixes trailing-slash redirect URLs)
+      - FORWARDED_ALLOW_IPS=*
       - SESSION_SECRET=${SESSION_SECRET:-CHANGE_ME}
       
       # Database Connection (Use dedicated user)

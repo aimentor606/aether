@@ -126,7 +126,6 @@ services:
         paths:
           - /ui
         strip_path: false
-        preserve_host: true
         tags:
           - litellm-ui
 
@@ -137,11 +136,14 @@ services:
             headers:
               - "X-Forwarded-Host:${{ env "DECK_PUBLIC_HOST" }}"
               - "X-Forwarded-Proto:${{ env "DECK_FORWARDED_PROTO" }}"
+          set:
+            headers:
+              - "Host:${{ env "DECK_PUBLIC_HOST" }}"
 
       - name: post-function
         config:
           header_filter:
-            - "local loc = kong.response.get_header('Location'); if loc then kong.response.set_header('Location', string.gsub(loc, 'https?://llm%-proxy:%d+', '${{ env "DECK_FORWARDED_PROTO" }}://${{ env "DECK_PUBLIC_HOST" }}')) end"
+            - "${{ env "DECK_UI_REDIRECT_REWRITE" }}"
 
       - name: cors
         config:

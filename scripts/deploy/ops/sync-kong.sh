@@ -16,6 +16,10 @@ esac
 FORWARDED_PROTO="http"
 [ "${USE_HTTPS}" = "true" ] && FORWARDED_PROTO="https"
 
+# Lua function to rewrite internal hostnames in Location headers
+# decK requires passing Lua via env vars (not inline in YAML)
+DECK_UI_REDIRECT_REWRITE="local loc = kong.response.get_header('Location'); if loc then kong.response.set_header('Location', string.gsub(loc, 'https?://llm%-proxy:%d+', '${FORWARDED_PROTO}://${PUBLIC_HOST}')) end"
+
 echo "Syncing kong.yml (upstream port: ${LLM_PROXY_PORT})..."
 docker run --rm \
   --network app-network \
@@ -27,6 +31,7 @@ docker run --rm \
   -e DECK_FORWARDED_PROTO="$FORWARDED_PROTO" \
   -e DECK_LITELLM_MASTER_KEY="$LITELLM_MASTER_KEY" \
   -e DECK_PUBLIC_ORIGIN="${FORWARDED_PROTO}://${PUBLIC_HOST}" \
+  -e DECK_UI_REDIRECT_REWRITE="$DECK_UI_REDIRECT_REWRITE" \
   kong/deck gateway sync kong.yml \
   --kong-addr http://kong:8001
 echo "✅ Kong config synced"

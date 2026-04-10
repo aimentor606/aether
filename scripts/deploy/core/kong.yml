@@ -131,6 +131,22 @@ services:
           - litellm-ui
 
     plugins:
+      - name: request-transformer
+        config:
+          set:
+            headers:
+              - "Host:${{ env "DECK_PUBLIC_HOST" }}"
+          add:
+            headers:
+              - "X-Forwarded-Host:${{ env "DECK_PUBLIC_HOST" }}"
+              - "X-Forwarded-Proto:${{ env "DECK_FORWARDED_PROTO" }}"
+
+      - name: response-transformer
+        config:
+          replace:
+            headers:
+              - "location:${{ env "DECK_FORWARDED_PROTO" }}://${{ env "DECK_PUBLIC_HOST" }}/ui/"
+
       - name: cors
         config:
           origins:

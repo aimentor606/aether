@@ -136,7 +136,7 @@ services:
             headers:
               - "X-Forwarded-Host:${{ env "DECK_PUBLIC_HOST" }}"
               - "X-Forwarded-Proto:${{ env "DECK_FORWARDED_PROTO" }}"
-          set:
+          replace:
             headers:
               - "Host:${{ env "DECK_PUBLIC_HOST" }}"
 

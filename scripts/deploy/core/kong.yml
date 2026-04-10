@@ -122,6 +122,11 @@ services:
         strip_path: false
         tags:
           - litellm-ui
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /ui
 
       - name: route-litellm-ui
         paths:

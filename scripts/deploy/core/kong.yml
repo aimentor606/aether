@@ -8,12 +8,6 @@ upstreams:
       - target: llm-proxy:${{ env "DECK_LLM_PROXY_PORT" }}
         weight: 100
 
-  - name: upstream-aether-frontend
-    algorithm: round-robin
-    targets:
-      - target: llm-proxy:${{ env "DECK_LLM_PROXY_PORT" }}
-        weight: 100
-
   - name: upstream-litellm-ui
     algorithm: round-robin
     targets:
@@ -129,77 +123,17 @@ services:
         tags:
           - litellm-ui
 
-      # LiteLLM management API endpoints (different path structure than NewAPI)
-      # NewAPI uses /api/* for everything; LiteLLM uses top-level paths
-      - name: route-litellm-key
+      # Catch-all: LiteLLM management uses scattered top-level paths (/key/*, /user/*,
+      # /model/*, /health/*, /config/*, /guardrails/*, /policies/*, /server/*, /tools/*,
+      # /public/*, /chat/completions, /embeddings, /images/*, etc.) that cannot be
+      # enumerated individually. Kong matches longest path first, so /api, /v1, /v1beta,
+      # and /ui still hit their specific routes above; everything else falls through here.
+      - name: route-litellm-catchall
         paths:
-          - /key
+          - /
         strip_path: false
         tags:
-          - litellm-mgmt
-
-      - name: route-litellm-user
-        paths:
-          - /user
-        strip_path: false
-        tags:
-          - litellm-mgmt
-
-      - name: route-litellm-model
-        paths:
-          - /model
-        strip_path: false
-        tags:
-          - litellm-mgmt
-
-      - name: route-litellm-team
-        paths:
-          - /team
-        strip_path: false
-        tags:
-          - litellm-mgmt
-
-      - name: route-litellm-health
-        paths:
-          - /health
-        strip_path: false
-        tags:
-          - litellm-mgmt
-
-      - name: route-litellm-config
-        paths:
-          - /config
-        strip_path: false
-        tags:
-          - litellm-mgmt
-
-      - name: route-litellm-global
-        paths:
-          - /global
-        strip_path: false
-        tags:
-          - litellm-mgmt
-
-      - name: route-litellm-spend
-        paths:
-          - /spend
-        strip_path: false
-        tags:
-          - litellm-mgmt
-
-      - name: route-litellm-budget
-        paths:
-          - /budget
-        strip_path: false
-        tags:
-          - litellm-mgmt
-
-      - name: route-litellm-customer
-        paths:
-          - /customer
-        strip_path: false
-        tags:
-          - litellm-mgmt
+          - litellm-catchall
 
     plugins:
       - name: request-transformer
@@ -233,68 +167,6 @@ services:
             - Content-Type
             - Authorization
           credentials: true
-
-  - name: svc-frontend
-    url: http://upstream-aether-frontend
-    connect_timeout: 5000
-    read_timeout: 60000 
-    write_timeout: 60000
-    tags:
-      - frontend
-      - web
-
-    routes:
-      - name: route-frontend
-        paths:
-          - /
-        methods:
-          - GET
-          - HEAD
-          - OPTIONS
-        strip_path: false
-        tags:
-          - web-route
-
-    plugins:
-      - name: request-transformer
-        config:
-          add:
-            headers:
-              - "X-Forwarded-Host:${{ env "DECK_PUBLIC_HOST" }}"
-              - "X-Forwarded-Proto:${{ env "DECK_FORWARDED_PROTO" }}"
-      
-      - name: proxy-cache
-        config:
-          content_type:
-            - text/html
-            - text/css
-            - application/javascript
-            - image/png
-            - image/jpeg
-          cache_ttl: 300
-          strategy: memory
-          cache_control: true
-      
-      - name: response-transformer
-        config:
-          add:
-            headers:
-              - "X-Frame-Options: DENY"
-              - "X-Content-Type-Options: nosniff"
-              - "X-XSS-Protection: 1; mode=block"
-      
-      - name: cors
-        config:
-          origins:
-            - "${{ env "DECK_PUBLIC_ORIGIN" }}"
-          methods:
-            - GET
-            - HEAD
-            - OPTIONS
-          headers:
-            - Accept
-            - Content-Type
-          credentials: false
 
 consumers:
   - username: app-client-01

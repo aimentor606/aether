@@ -129,6 +129,78 @@ services:
         tags:
           - litellm-ui
 
+      # LiteLLM management API endpoints (different path structure than NewAPI)
+      # NewAPI uses /api/* for everything; LiteLLM uses top-level paths
+      - name: route-litellm-key
+        paths:
+          - /key
+        strip_path: false
+        tags:
+          - litellm-mgmt
+
+      - name: route-litellm-user
+        paths:
+          - /user
+        strip_path: false
+        tags:
+          - litellm-mgmt
+
+      - name: route-litellm-model
+        paths:
+          - /model
+        strip_path: false
+        tags:
+          - litellm-mgmt
+
+      - name: route-litellm-team
+        paths:
+          - /team
+        strip_path: false
+        tags:
+          - litellm-mgmt
+
+      - name: route-litellm-health
+        paths:
+          - /health
+        strip_path: false
+        tags:
+          - litellm-mgmt
+
+      - name: route-litellm-config
+        paths:
+          - /config
+        strip_path: false
+        tags:
+          - litellm-mgmt
+
+      - name: route-litellm-global
+        paths:
+          - /global
+        strip_path: false
+        tags:
+          - litellm-mgmt
+
+      - name: route-litellm-spend
+        paths:
+          - /spend
+        strip_path: false
+        tags:
+          - litellm-mgmt
+
+      - name: route-litellm-budget
+        paths:
+          - /budget
+        strip_path: false
+        tags:
+          - litellm-mgmt
+
+      - name: route-litellm-customer
+        paths:
+          - /customer
+        strip_path: false
+        tags:
+          - litellm-mgmt
+
     plugins:
       - name: request-transformer
         config:

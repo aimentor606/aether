@@ -48,7 +48,8 @@ services:
       KONG_ANONYMOUS_REPORTS: "off"
 
       # Rewrite upstream redirect Location headers (llm-proxy → public host)
-      KONG_NGINX_LOCATION_PROXY_REDIRECT: "http://llm-proxy:${LLM_PROXY_PORT:-4000}/ ${FORWARDED_PROTO:-https}://${PUBLIC_HOST}/"
+      # Regex matches both http:// and https:// from upstream
+      KONG_NGINX_LOCATION_PROXY_REDIRECT: "~^https?://llm-proxy:${LLM_PROXY_PORT:-4000}(.*)$ ${FORWARDED_PROTO:-https}://${PUBLIC_HOST}$1"
 
     volumes:
       - ../ssl:/var/lib/kong/ssl:ro

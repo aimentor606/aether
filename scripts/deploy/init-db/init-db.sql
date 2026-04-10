@@ -1,7 +1,12 @@
--- init-databases.sql
+-- init-db.sql
 -- Create databases, users, and permissions for all services
--- Run as: docker exec -i postgres psql -U root -d postgres < init-db/init-databases.sql
--- Or auto-executed on first start via /docker-entrypoint-initdb.d/
+-- Auto-executed on first start via /docker-entrypoint-initdb.d/
+--
+-- IMPORTANT: Passwords here MUST match ops/.env variables:
+--   kong       → KONG_PG_PASSWORD
+--   newapi     → NEWAPI_DB_PASSWORD
+--   litellm    → LITELLM_DB_PASSWORD
+-- If you change .env passwords, run ALTER USER manually or reinitialize.
 
 -- ========== Kong Database ==========
 

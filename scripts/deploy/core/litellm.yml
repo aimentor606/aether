@@ -8,7 +8,7 @@ services:
     container_name: llm-proxy
     restart: unless-stopped
     environment:
-      - DATABASE_URL=postgresql://${LITELLM_DB_USER:-litellm}:${LITELLM_DB_PASSWORD:-CHANGE_ME}@postgres:5432/${LITELLM_DB_DATABASE:-litellm}
+      - DATABASE_URL=postgresql://${LITELLM_DB_USER:-litellm}:${LITELLM_DB_PASSWORD:-aetherailitellm8864}@postgres:5432/${LITELLM_DB_DATABASE:-litellm}
       - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:-sk-CHANGE_ME}
       - LITELLM_SALT_KEY=${LITELLM_SALT_KEY:-sk-CHANGE_ME}
       - STORE_MODEL_IN_DB=True
@@ -16,6 +16,10 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-CHANGE_ME}
       - TZ=${TZ:-Asia/Shanghai}
+      # config.yaml uses os.environ/ to read these at runtime
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - QWEN_API_KEY=${QWEN_API_KEY:-}
+      - ZHIPU_API_KEY=${ZHIPU_API_KEY:-}
     volumes:
       - ./config/litellm/config.yaml:/app/config.yaml:ro
       - /data/logs/litellm:/app/logs

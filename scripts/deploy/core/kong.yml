@@ -116,6 +116,13 @@ services:
       - ui
 
     routes:
+      - name: route-litellm-ui-chat
+        paths:
+          - /ui/chat
+        strip_path: false
+        tags:
+          - litellm-ui
+
       - name: route-litellm-ui
         paths:
           - /ui

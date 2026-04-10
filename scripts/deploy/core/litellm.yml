@@ -16,6 +16,7 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-CHANGE_ME}
       - TZ=${TZ:-Asia/Shanghai}
+      - PROXY_BASE_URL=${FORWARDED_PROTO:-https}://${PUBLIC_HOST}
       # config.yaml uses os.environ/ to read these at runtime
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
       - QWEN_API_KEY=${QWEN_API_KEY:-}

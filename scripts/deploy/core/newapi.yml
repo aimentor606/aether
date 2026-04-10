@@ -10,6 +10,7 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - TZ=${TZ:-Asia/Shanghai}
+      - PROXY_BASE_URL=${FORWARDED_PROTO:-https}://${PUBLIC_HOST}
       - SESSION_SECRET=${SESSION_SECRET:-CHANGE_ME}
       
       # Database Connection (Use dedicated user)

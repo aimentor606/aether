@@ -1,9 +1,9 @@
-import { config, ACME_MARKUP } from '../../config';
+import { litellmConfig } from '../config/litellm-config';
+import { ACME_MARKUP } from '../../config';
 import type { ModelConfig } from '../config/models';
+import { resolveVirtualKey } from './litellm-keys';
 
 const ANTHROPIC_VERSION = '2023-06-01';
-
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface AnthropicUsage {
   inputTokens: number;
@@ -12,48 +12,28 @@ export interface AnthropicUsage {
   cacheReadInputTokens: number;
 }
 
-// ─── Proxy ───────────────────────────────────────────────────────────────────
-
-/**
- * Forward a request to OpenRouter's /messages endpoint (Anthropic-compatible format).
- * OpenRouter accepts native Anthropic Messages API requests and routes to the
- * appropriate Anthropic model. Uses OPENROUTER_API_KEY — never ANTHROPIC_API_KEY.
- * Returns the raw fetch Response (may be streaming SSE or JSON).
- */
 export async function proxyToAnthropic(
   body: Record<string, unknown>,
   isStreaming: boolean,
 ): Promise<Response> {
-  const apiKey = config.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    throw new Error('OpenRouter API key is missing. Set OPENROUTER_API_KEY environment variable.');
-  }
+  const virtualKey = await resolveVirtualKey('anthropic-passthrough');
+  const url = `${litellmConfig.LITELLM_URL}/v1/messages`;
 
-  const url = `${config.OPENROUTER_API_URL}/messages`;
-
-  console.log(
-    `[LLM][Anthropic] Proxying via OpenRouter: ${body.model} (stream=${isStreaming})`,
+  console.info(
+    `[LiteLLM][Anthropic] Proxying via LiteLLM: ${body.model} (stream=${isStreaming})`,
   );
 
   return fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
+      'Authorization': `Bearer ${virtualKey}`,
       'anthropic-version': ANTHROPIC_VERSION,
-      'HTTP-Referer': config.FRONTEND_URL || 'https://acme.ai',
-      'X-Title': 'Acme',
     },
     body: JSON.stringify(body),
   });
 }
 
-// ─── Usage Extraction ────────────────────────────────────────────────────────
-
-/**
- * Extract token usage from a non-streaming Anthropic response body.
- * Includes prompt caching metrics when present.
- */
 export function extractAnthropicUsage(responseBody: any): AnthropicUsage | null {
   if (!responseBody?.usage) return null;
   return {
@@ -64,12 +44,6 @@ export function extractAnthropicUsage(responseBody: any): AnthropicUsage | null 
   };
 }
 
-// ─── Cost Calculation ────────────────────────────────────────────────────────
-
-/**
- * Calculate cost for an Anthropic request.
- * Uses cache-aware pricing when cache metrics are present.
- */
 export function calculateAnthropicCost(
   modelConfig: ModelConfig,
   usage: AnthropicUsage,

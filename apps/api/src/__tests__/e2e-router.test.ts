@@ -6,7 +6,7 @@
  * Strategy:
  * - mock.module() replaces external services (Tavily, Serper, LLM proxy, billing)
  * - apiKeyAuth mock bypasses auth validation, sets accountId from Bearer token
- * - The LLM route is a 1:1 passthrough proxy to OpenRouter — we mock proxyToOpenRouter
+ * - The LLM route is a 1:1 passthrough proxy to LiteLLM — we mock proxyToLiteLLM
  *   to return realistic OpenAI-compatible responses (including tool_calls)
  */
 import { describe, test, expect, beforeEach, mock } from 'bun:test';
@@ -24,7 +24,7 @@ let mockSerperError: Error | null = null;
 let mockCheckCreditsResult = { hasCredits: true, message: 'OK', balance: 100 };
 let mockDeductResult: any = { success: true, cost: 0.01, newBalance: 99, transactionId: 'tx_mock_001' };
 
-// Mock OpenRouter proxy response — full OpenAI-compat format
+// Mock LiteLLM proxy response
 let mockProxyResponse: Response | null = null;
 let mockProxyError: Error | null = null;
 let lastProxyBody: Record<string, unknown> | null = null;
@@ -119,14 +119,13 @@ mock.module('../router/services/billing', () => ({
   deductLLMCredits: async (...args: any[]) => mockDeductResult,
 }));
 
-mock.module('../router/services/llm', () => ({
-  proxyToOpenRouter: async (body: Record<string, unknown>, isStreaming: boolean) => {
-    lastProxyBody = body;
+mock.module('../router/services/litellm', () => ({
+  proxyToLiteLLM: async (options: any) => {
+    lastProxyBody = options.body;
     if (mockProxyError) throw mockProxyError;
     if (mockProxyResponse) return mockProxyResponse;
 
-    // Default: return a realistic non-streaming response
-    if (isStreaming) {
+    if (options.isStreaming) {
       return createMockStreamResponse();
     }
     return new Response(JSON.stringify(createMockChatResponse()), {
@@ -139,8 +138,20 @@ mock.module('../router/services/llm', () => ({
     return {
       promptTokens: responseBody.usage.prompt_tokens ?? 0,
       completionTokens: responseBody.usage.completion_tokens ?? 0,
+      cachedTokens: 0,
+      cacheWriteTokens: 0,
     };
   },
+}));
+
+mock.module('../router/services/litellm-keys', () => ({
+  resolveVirtualKey: async (accountId: string) => 'sk-litellm-test-key',
+  syncKeyBudget: async () => {},
+  createVirtualKey: async () => 'sk-litellm-test-key',
+  findKeyByAlias: async () => null,
+}));
+
+mock.module('../router/services/llm', () => ({
   calculateCost: (modelConfig: any, prompt: number, completion: number) => {
     return ((prompt / 1_000_000) * (modelConfig?.inputPer1M || 0) +
             (completion / 1_000_000) * (modelConfig?.outputPer1M || 0)) * 1.2;
@@ -152,13 +163,30 @@ mock.module('../router/services/llm', () => ({
     { id: 'minimax/minimax-m2.5', object: 'model', owned_by: 'acme', context_window: 196608, pricing: { input: 0.20, output: 1.17 }, tier: 'free' },
   ],
   getModel: (id: string) => ({
-    openrouterId: id,
+    litellmModel: id,
     inputPer1M: id === 'minimax/minimax-m2.7' ? 0.30 : id === 'z-ai/glm-5-turbo' ? 1.20 : id === 'moonshotai/kimi-k2.5' ? 0.45 : 0.20,
     outputPer1M: id === 'minimax/minimax-m2.7' ? 1.20 : id === 'z-ai/glm-5-turbo' ? 4.00 : id === 'moonshotai/kimi-k2.5' ? 2.20 : 1.17,
     contextWindow: id === 'minimax/minimax-m2.7' ? 204800 : id === 'z-ai/glm-5-turbo' ? 202752 : id === 'moonshotai/kimi-k2.5' ? 262144 : 196608,
     tier: 'free' as 'free' | 'paid',
   }),
-  resolveOpenRouterId: (id: string) => id,
+  extractUsage: (responseBody: any) => {
+    if (!responseBody?.usage) return null;
+    return {
+      promptTokens: responseBody.usage.prompt_tokens ?? 0,
+      completionTokens: responseBody.usage.completion_tokens ?? 0,
+      cachedTokens: 0,
+      cacheWriteTokens: 0,
+    };
+  },
+}));
+
+mock.module('../router/config/litellm-config', () => ({
+  litellmConfig: {
+    LITELLM_URL: 'http://localhost:4000',
+    LITELLM_MASTER_KEY: 'sk-test-master',
+    LITELLM_TIMEOUT_MS: 60000,
+    LITELLM_NUM_RETRIES: 3,
+  },
 }));
 
 // ─── Import router AFTER mocks ───────────────────────────────────────────────
@@ -527,7 +555,7 @@ describe('Router: chat/completions (streaming)', () => {
 });
 
 describe('Router: chat/completions (tool support)', () => {
-  test('preserves tools and tool_choice in request to OpenRouter', async () => {
+  test('preserves tools and tool_choice in request to LiteLLM', async () => {
     const tools = [
       {
         type: 'function',
@@ -556,7 +584,7 @@ describe('Router: chat/completions (tool support)', () => {
     });
     expect(res.status).toBe(200);
 
-    // Verify the tools were passed through to proxyToOpenRouter
+    // Verify the tools were passed through to proxyToLiteLLM
     expect(lastProxyBody).not.toBeNull();
     expect(lastProxyBody!.tools).toEqual(tools);
     expect(lastProxyBody!.tool_choice).toBe('auto');

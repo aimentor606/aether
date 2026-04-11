@@ -130,22 +130,17 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
 
     // ─── LLM Providers ─────────────────────────────────────────────────────
     //
-    // Dual-mode:
-    // - Acme-managed (Mode 1): uses Acme-owned provider keys.
-    //   Anthropic/OpenAI go direct to native providers.
-    //   xAI/Gemini/Groq route through OpenRouter.
-    // - Passthrough (Mode 2): forwards the user's own API key to the real
-    //   upstream provider for platform-fee billing.
+    // All LLM traffic now routes through LiteLLM Proxy Server.
+    // LiteLLM handles model routing, fallbacks, and key management.
+    // Direct provider access here is only for passthrough mode
+    // (user's own API keys with platform-fee billing).
     //
-    // Mode 1 (Acme token in auth): inject provider key configured in service
-    // Mode 2 (user key + X-Acme-Token): passthrough to real provider
-    //
-    // The proxy handler picks targetBaseUrl for Mode 2/3 and
-    // acmeTargetBaseUrl for Mode 1 (when present).
+    // LiteLLM config.yaml handles the primary routing.
+    // These entries handle passthrough (Mode 2) billing only.
 
     anthropic: {
       name: 'anthropic',
-      targetBaseUrl: config.ANTHROPIC_API_URL,   // https://api.anthropic.com/v1
+      targetBaseUrl: config.ANTHROPIC_API_URL,
       getAcmeApiKey: () => config.ANTHROPIC_API_KEY,
       keyInjection: { type: 'header', headerName: 'x-api-key' },
       allowedRoutes: [
@@ -157,7 +152,7 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
 
     openai: {
       name: 'openai',
-      targetBaseUrl: config.OPENAI_API_URL,      // https://api.openai.com/v1
+      targetBaseUrl: config.OPENAI_API_URL,
       getAcmeApiKey: () => config.OPENAI_API_KEY,
       keyInjection: { type: 'header', headerName: 'Authorization', prefix: 'Bearer ' },
       allowedRoutes: [
@@ -170,9 +165,8 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
 
     xai: {
       name: 'xai',
-      targetBaseUrl: config.XAI_API_URL,         // https://api.x.ai/v1
-      acmeTargetBaseUrl: config.OPENROUTER_API_URL,
-      getAcmeApiKey: () => config.OPENROUTER_API_KEY,
+      targetBaseUrl: config.XAI_API_URL,
+      getAcmeApiKey: () => config.XAI_API_KEY,
       keyInjection: { type: 'header', headerName: 'Authorization', prefix: 'Bearer ' },
       allowedRoutes: [
         { path: '/chat/completions', methods: ['POST'] },
@@ -183,9 +177,8 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
 
     gemini: {
       name: 'gemini',
-      targetBaseUrl: config.GEMINI_API_URL,      // https://generativelanguage.googleapis.com/v1beta
-      acmeTargetBaseUrl: config.OPENROUTER_API_URL,
-      getAcmeApiKey: () => config.OPENROUTER_API_KEY,
+      targetBaseUrl: config.GEMINI_API_URL,
+      getAcmeApiKey: () => config.GEMINI_API_KEY,
       keyInjection: { type: 'header', headerName: 'Authorization', prefix: 'Bearer ' },
       allowedRoutes: [
         { path: '/chat/completions', methods: ['POST'] },
@@ -196,9 +189,8 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
 
     groq: {
       name: 'groq',
-      targetBaseUrl: config.GROQ_API_URL,        // https://api.groq.com/openai/v1
-      acmeTargetBaseUrl: config.OPENROUTER_API_URL,
-      getAcmeApiKey: () => config.OPENROUTER_API_KEY,
+      targetBaseUrl: config.GROQ_API_URL,
+      getAcmeApiKey: () => config.GROQ_API_KEY,
       keyInjection: { type: 'header', headerName: 'Authorization', prefix: 'Bearer ' },
       allowedRoutes: [
         { path: '/chat/completions', methods: ['POST'] },

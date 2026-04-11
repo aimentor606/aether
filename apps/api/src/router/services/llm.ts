@@ -1,14 +1,6 @@
-import { config, ACME_MARKUP } from '../../config';
-import { getModel, getAllModels, resolveOpenRouterId, type ModelConfig } from '../config/models';
+import { ACME_MARKUP } from '../../config';
+import type { ModelConfig } from '../config/models';
 
-/**
- * Calculate cost based on token usage and model pricing.
- * When cache metrics are available, uses differential pricing for cached/written tokens.
- *
- * @param markup - Multiplier applied to the raw provider cost.
- *   Defaults to ACME_MARKUP (1.2× = 20% markup) when Acme provides the key.
- *   Pass PLATFORM_FEE_MARKUP (0.1× = 10% platform fee) for user-owned keys.
- */
 export function calculateCost(
   modelConfig: ModelConfig,
   promptTokens: number,
@@ -17,7 +9,6 @@ export function calculateCost(
   cacheWriteTokens: number = 0,
   markup: number = ACME_MARKUP,
 ): number {
-  // When we have cache metrics and the model has cache pricing, compute differential cost
   if ((cachedTokens > 0 || cacheWriteTokens > 0) && modelConfig.cacheReadPer1M != null) {
     const regularInputTokens = Math.max(0, promptTokens - cachedTokens - cacheWriteTokens);
     const regularInputCost = (regularInputTokens / 1_000_000) * modelConfig.inputPer1M;
@@ -27,44 +18,9 @@ export function calculateCost(
     return (regularInputCost + cacheReadCost + cacheWriteCost + outputCost) * markup;
   }
 
-  // Fallback: flat input pricing (no cache breakdown)
   const inputCost = (promptTokens / 1_000_000) * modelConfig.inputPer1M;
   const outputCost = (completionTokens / 1_000_000) * modelConfig.outputPer1M;
   return (inputCost + outputCost) * markup;
-}
-
-/**
- * Forward a chat completion request to OpenRouter as a 1:1 passthrough proxy.
- * Preserves the full request body (tools, tool_choice, response_format, etc).
- *
- * @returns The raw fetch Response from OpenRouter (may be streaming or not).
- */
-export async function proxyToOpenRouter(
-  body: Record<string, unknown>,
-  isStreaming: boolean
-): Promise<Response> {
-  const modelId = body.model as string;
-  const openrouterId = resolveOpenRouterId(modelId);
-
-  // Rewrite the model field to the actual OpenRouter model ID
-  const forwardBody = { ...body, model: openrouterId };
-
-  const url = `${config.OPENROUTER_API_URL}/chat/completions`;
-
-  console.log(`[LLM] Proxying to OpenRouter: ${modelId} → ${openrouterId} (stream=${isStreaming})`);
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${config.OPENROUTER_API_KEY}`,
-      'HTTP-Referer': config.FRONTEND_URL || 'https://acme.ai',
-      'X-Title': 'Acme',
-    },
-    body: JSON.stringify(forwardBody),
-  });
-
-  return response;
 }
 
 export interface UsageInfo {
@@ -74,10 +30,6 @@ export interface UsageInfo {
   cacheWriteTokens: number;
 }
 
-/**
- * Extract usage from a non-streaming OpenAI-compatible response body.
- * Includes cache metrics from prompt_tokens_details when available.
- */
 export function extractUsage(responseBody: any): UsageInfo | null {
   if (!responseBody?.usage) return null;
   const details = responseBody.usage.prompt_tokens_details;
@@ -89,5 +41,4 @@ export function extractUsage(responseBody: any): UsageInfo | null {
   };
 }
 
-// Re-export model functions
-export { getModel, getAllModels, resolveOpenRouterId } from '../config/models';
+export { getModel, getAllModels } from '../config/models';

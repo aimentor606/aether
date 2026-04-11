@@ -97,9 +97,13 @@ const envSchema = z.object({
   FREESTYLE_API_URL:           optUrl('https://api.freestyle.sh'),
   FREESTYLE_API_KEY:           optStr,
 
-  // ── LLM Providers (optional — only needed in cloud mode) ─────────────────
-  OPENROUTER_API_URL:          optUrl('https://openrouter.ai/api/v1'),
-  OPENROUTER_API_KEY:          optStr,
+  // ── LLM Gateway — LiteLLM Proxy Server (required for LLM features) ────────
+  LITELLM_URL:                 optUrl('http://litellm:4000'),
+  LITELLM_MASTER_KEY:          optStr,
+  LITELLM_TIMEOUT_MS:          optInt(60_000),
+  LITELLM_NUM_RETRIES:         optInt(3),
+
+  // ── LLM Providers (optional — passed through to LiteLLM via config.yaml) ──
   ANTHROPIC_API_URL:           optUrl('https://api.anthropic.com/v1'),
   ANTHROPIC_API_KEY:           optStr,
   OPENAI_API_URL:              optUrl('https://api.openai.com/v1'),
@@ -296,8 +300,8 @@ function validateEnv(): z.infer<typeof envSchema> {
   }
 
   // ── Warnings (non-fatal but worth knowing) ─────────────────────────────
-  if (!raw.OPENROUTER_API_KEY) {
-    issues.push({ var: 'OPENROUTER_API_KEY', message: 'Not set — primary LLM route will fail with silent 401 errors', level: 'warn' });
+  if (!raw.LITELLM_MASTER_KEY) {
+    issues.push({ var: 'LITELLM_MASTER_KEY', message: 'Not set — LLM gateway features will be unavailable', level: 'warn' });
   }
 
   // ── Print results ─────────────────────────────────────────────────────
@@ -389,9 +393,13 @@ export const config = {
   FREESTYLE_API_URL: env.FREESTYLE_API_URL,
   FREESTYLE_API_KEY: env.FREESTYLE_API_KEY,
 
-  // ─── LLM Providers ────────────────────────────────────────────────────────
-  OPENROUTER_API_URL: env.OPENROUTER_API_URL,
-  OPENROUTER_API_KEY: env.OPENROUTER_API_KEY,
+  // ─── LLM Gateway (LiteLLM) ─────────────────────────────────────────────────
+  LITELLM_URL: env.LITELLM_URL,
+  LITELLM_MASTER_KEY: env.LITELLM_MASTER_KEY,
+  LITELLM_TIMEOUT_MS: env.LITELLM_TIMEOUT_MS,
+  LITELLM_NUM_RETRIES: env.LITELLM_NUM_RETRIES,
+
+  // ─── LLM Providers (passed to LiteLLM via config.yaml) ──────────────────────
   ANTHROPIC_API_URL: env.ANTHROPIC_API_URL,
   ANTHROPIC_API_KEY: env.ANTHROPIC_API_KEY,
   OPENAI_API_URL: env.OPENAI_API_URL,
@@ -659,7 +667,7 @@ export interface LLMPricing {
 }
 
 export const LLM_PRICING: Record<string, LLMPricing> = {
-  openrouter: {
+  litellm: {
     inputCostPer1M: 0,
     outputCostPer1M: 0,
     markupMultiplier: 1.2,
@@ -697,9 +705,9 @@ export function calculateLLMCost(
   outputTokens: number,
   providerReportedCost?: number
 ): number {
-  const pricing = LLM_PRICING[provider] || LLM_PRICING['openrouter'];
+  const pricing = LLM_PRICING[provider] || LLM_PRICING['litellm'];
 
-  if (provider === 'openrouter' && providerReportedCost !== undefined) {
+  if (provider === 'litellm' && providerReportedCost !== undefined) {
     return providerReportedCost * pricing.markupMultiplier;
   }
 

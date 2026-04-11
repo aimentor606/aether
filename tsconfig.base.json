@@ -11,6 +11,15 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@acme/vertical-finance": ["packages/vertical/finance/src"],
+      "@acme/vertical-finance/*": ["packages/vertical/finance/src/*"],
+      "@acme/vertical-healthcare": ["packages/vertical/healthcare/src"],
+      "@acme/vertical-healthcare/*": ["packages/vertical/healthcare/src/*"],
+      "@acme/vertical-retail": ["packages/vertical/retail/src"],
+      "@acme/vertical-retail/*": ["packages/vertical/retail/src/*"]
+    }
   }
 }

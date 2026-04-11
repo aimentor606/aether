@@ -1216,7 +1216,7 @@ importers:
         specifier: 8.2.0
         version: 8.2.0
 
-  core/acme-master:
+  core/kortix-master:
     dependencies:
       '@chat-adapter/discord':
         specifier: ^4.23.0
@@ -1340,6 +1340,18 @@ importers:
         version: 5.9.3
 
   packages/shared:
+    devDependencies:
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  packages/theme:
+    devDependencies:
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  packages/vertical:
     devDependencies:
       typescript:
         specifier: ^5.0.0

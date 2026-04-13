@@ -8,3 +8,4 @@
 export { useQuery } from './hooks/use-query';
 export { ApiClientProvider, useApiClient } from './providers/api-client-provider';
 export { useFinance } from './hooks/use-finance';
+export { useLiteLLMAdmin } from './hooks/use-litellm-admin';

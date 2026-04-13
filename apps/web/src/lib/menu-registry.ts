@@ -614,6 +614,16 @@ export const menuRegistry: MenuItemDef[] = [
     href: '/finance',
     keywords: 'finance invoices expenses budgets ledger accounting',
   },
+  {
+    id: 'litellm-admin',
+    label: 'LiteLLM Management',
+    icon: Bot,
+    group: 'admin',
+    showIn: ['commandPalette'],
+    kind: 'navigate',
+    href: '/admin/litellm',
+    keywords: 'litellm llm models providers proxy management admin',
+  },
 
   // ──────────────────────────────────────────────────────────────────────────
   // SETTINGS PAGES (navigate to route)

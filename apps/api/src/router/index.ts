@@ -5,6 +5,7 @@ import { tenantConfigLoader } from '../middleware/tenant-config-loader';
 import { webSearch } from './routes/search-web';
 import { imageSearch } from './routes/search-image';
 import { litellm } from './routes/litellm';
+import { litellmAdmin } from './routes/litellm-admin';
 import { invoicesRoutes, expensesRoutes, budgetsRoutes, ledgersRoutes } from './routes/finance';
 import { proxy } from './routes/proxy';
 
@@ -36,6 +37,10 @@ router.use('/messages', tenantConfigLoader);
 router.use('/models', apiKeyAuth);
 router.use('/models/*', apiKeyAuth);
 router.route('/', litellm);
+
+// LiteLLM admin routes (apiKeyAuth + tenant)
+router.use('/litellm-admin/*', apiKeyAuth);
+router.route('/litellm-admin', litellmAdmin);
 
 // Finance routes (apiKeyAuth + tenant)
 router.use('/finance/*', apiKeyAuth);

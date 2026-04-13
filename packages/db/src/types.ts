@@ -1,5 +1,6 @@
-import { sandboxes, deployments, acmeApiKeys, integrationCredentials, integrations, sandboxIntegrations, serverEntries, accounts, accountMembers, creditAccounts, tunnelConnections, tunnelPermissions, tunnelPermissionRequests, tunnelAuditLogs } from './schema/acme';
+import { sandboxes, deployments, acmeApiKeys, integrationCredentials, integrations, sandboxIntegrations, serverEntries, accounts, accountMembers, creditAccounts, tunnelConnections, tunnelPermissions, tunnelPermissionRequests, tunnelAuditLogs } from './schema/kortix';
 import { apiKeys, accountUser } from './schema/public';
+import { featureFlags, verticalConfigs, accountIntegrations } from './schema/vertical';
 
 // Select types (what you get back from queries)
 export type Account = typeof accounts.$inferSelect;
@@ -41,3 +42,11 @@ export type NewTunnelAuditLog = typeof tunnelAuditLogs.$inferInsert;
 // Aliases
 export type SandboxSelect = Sandbox;
 export type DeploymentSelect = Deployment;
+
+// Vertical / Multi-tenant
+export type FeatureFlag = typeof featureFlags.$inferSelect;
+export type NewFeatureFlag = typeof featureFlags.$inferInsert;
+export type VerticalConfig = typeof verticalConfigs.$inferSelect;
+export type NewVerticalConfig = typeof verticalConfigs.$inferInsert;
+export type AccountIntegration = typeof accountIntegrations.$inferSelect;
+export type NewAccountIntegration = typeof accountIntegrations.$inferInsert;

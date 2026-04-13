@@ -1,13 +1,13 @@
 import {
   uuid,
   varchar,
-  text,
   timestamp,
   jsonb,
   index,
   boolean,
 } from 'drizzle-orm/pg-core';
-import { acmeSchema } from './kortix';
+import { relations } from 'drizzle-orm';
+import { acmeSchema, accounts } from './kortix';
 
 export const verticalTables = acmeSchema.table('vertical_entities', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -36,6 +36,13 @@ export const featureFlags = acmeSchema.table('feature_flags', {
   index('idx_feature_flags_name').on(table.featureName),
 ]);
 
+export const featureFlagsRelations = relations(featureFlags, ({ one }) => ({
+  account: one(accounts, {
+    fields: [featureFlags.accountId],
+    references: [accounts.accountId],
+  }),
+}));
+
 export const verticalConfigs = acmeSchema.table('vertical_configs', {
   id: uuid('id').primaryKey().defaultRandom(),
   accountId: uuid('account_id').notNull(),
@@ -47,6 +54,13 @@ export const verticalConfigs = acmeSchema.table('vertical_configs', {
   index('idx_vertical_configs_account').on(table.accountId),
   index('idx_vertical_configs_vertical').on(table.verticalId),
 ]);
+
+export const verticalConfigsRelations = relations(verticalConfigs, ({ one }) => ({
+  account: one(accounts, {
+    fields: [verticalConfigs.accountId],
+    references: [accounts.accountId],
+  }),
+}));
 
 export const accountIntegrations = acmeSchema.table('account_integrations', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -60,3 +74,10 @@ export const accountIntegrations = acmeSchema.table('account_integrations', {
   index('idx_account_integrations_account').on(table.accountId),
   index('idx_account_integrations_type').on(table.integrationType),
 ]);
+
+export const accountIntegrationsRelations = relations(accountIntegrations, ({ one }) => ({
+  account: one(accounts, {
+    fields: [accountIntegrations.accountId],
+    references: [accounts.accountId],
+  }),
+}));

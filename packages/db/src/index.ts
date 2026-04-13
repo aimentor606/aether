@@ -72,7 +72,7 @@ export {
   // Pool
   poolResources,
   poolSandboxes,
-} from './schema/acme';
+} from './schema/kortix';
 
 export type {
   TunnelMachineInfo,
@@ -80,7 +80,54 @@ export type {
   TunnelShellScope,
   TunnelNetworkScope,
   TunnelPermissionScope,
-} from './schema/acme';
+} from './schema/kortix';
+
+export {
+  invoiceStatusEnum,
+  expenseCategoryEnum,
+  expenseStatusEnum,
+  budgetPeriodEnum,
+  budgetStatusEnum,
+  ledgerStatusEnum,
+  invoices,
+  expenses,
+  budgets,
+  ledgers,
+  invoicesRelations,
+  expensesRelations,
+  budgetsRelations,
+  ledgersRelations,
+  createInvoiceSchema,
+  updateInvoiceSchema,
+  createExpenseSchema,
+  updateExpenseSchema,
+  createBudgetSchema,
+  updateBudgetSchema,
+  createLedgerSchema,
+  updateLedgerSchema,
+} from './schema/finance';
+
+export type {
+  CreateInvoiceInput,
+  UpdateInvoiceInput,
+  CreateExpenseInput,
+  UpdateExpenseInput,
+  CreateBudgetInput,
+  UpdateBudgetInput,
+  CreateLedgerInput,
+  UpdateLedgerInput,
+} from './schema/finance';
+
+// Vertical / Multi-tenant tables
+export {
+  verticalTables,
+  featureFlags,
+  verticalConfigs,
+  accountIntegrations,
+  featureFlagsRelations,
+  verticalConfigsRelations,
+  accountIntegrationsRelations,
+} from './schema/vertical';
 
 // Public/basejump tables
 export {
@@ -118,4 +165,10 @@ export type {
   NewTunnelPermissionRequest,
   TunnelAuditLog,
   NewTunnelAuditLog,
+  FeatureFlag,
+  NewFeatureFlag,
+  VerticalConfig,
+  NewVerticalConfig,
+  AccountIntegration,
+  NewAccountIntegration,
 } from './types';

@@ -23,7 +23,7 @@ describe('Session Suggestions', () => {
     ].join('\n'))
     opencode = await startDummyOpenCode(9004)
     master = await startKortixMaster(8004, fixture, {
-      ACME_TOKEN: 'suggestions-test-token',
+      AETHER_TOKEN: 'suggestions-test-token',
       OPENCODE_PORT: '9004',
     })
   })

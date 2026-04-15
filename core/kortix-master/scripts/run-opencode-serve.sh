@@ -18,11 +18,11 @@ export PATH="/opt/bun/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 # Daytona/JustAVPS/pool) or injected within seconds via the /env API.
 # Wait up to 10s — combined with DB lock wait (~10s), total must stay under
 # ServiceManager's START_WAIT_MS (30s) so OpenCode can bind port 4096.
-TOKEN_FILE="/run/s6/container_environment/ACME_TOKEN"
-API_URL_FILE="/run/s6/container_environment/ACME_API_URL"
+TOKEN_FILE="/run/s6/container_environment/AETHER_TOKEN"
+API_URL_FILE="/run/s6/container_environment/AETHER_API_URL"
 
 if [ ! -s "$TOKEN_FILE" ] || [ ! -s "$API_URL_FILE" ]; then
-  echo "[opencode-serve] Waiting for ACME_TOKEN and ACME_API_URL to be provisioned..."
+  echo "[opencode-serve] Waiting for AETHER_TOKEN and AETHER_API_URL to be provisioned..."
   for i in $(seq 1 5); do
     [ -s "$TOKEN_FILE" ] && [ -s "$API_URL_FILE" ] && break
     sleep 2
@@ -30,14 +30,14 @@ if [ ! -s "$TOKEN_FILE" ] || [ ! -s "$API_URL_FILE" ]; then
 fi
 
 [ -s "$TOKEN_FILE" ] && \
-  export ACME_TOKEN="$(cat "$TOKEN_FILE")"
+  export AETHER_TOKEN="$(cat "$TOKEN_FILE")"
 [ -s "$API_URL_FILE" ] && \
-  export ACME_API_URL="$(cat "$API_URL_FILE")"
+  export AETHER_API_URL="$(cat "$API_URL_FILE")"
 
-# Safety check: if ACME_API_URL is still unset or points to localhost, warn loudly.
+# Safety check: if AETHER_API_URL is still unset or points to localhost, warn loudly.
 # This catches pool sandboxes where env injection failed or was delayed.
-if [ -z "$ACME_API_URL" ] || echo "$ACME_API_URL" | grep -q "localhost"; then
-  echo "[opencode-serve] WARNING: ACME_API_URL is '${ACME_API_URL:-unset}' — LLM calls will fail in cloud mode!"
+if [ -z "$AETHER_API_URL" ] || echo "$AETHER_API_URL" | grep -q "localhost"; then
+  echo "[opencode-serve] WARNING: AETHER_API_URL is '${AETHER_API_URL:-unset}' — LLM calls will fail in cloud mode!"
 fi
 
 cd /workspace

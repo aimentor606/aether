@@ -13,7 +13,7 @@
 
 import { Hono } from 'hono';
 import { eq, and } from 'drizzle-orm';
-import { sandboxes, acmeApiKeys, type Database } from '@acme/db';
+import { sandboxes, aetherApiKeys, type Database } from '@aether/db';
 import { db as defaultDb } from '../../shared/db';
 import { hashSecretKey, generateApiKeyPair, generateSandboxKeyPair, isApiKeySecretConfigured } from '../../shared/crypto';
 import type { AuthVariables } from '../../types';
@@ -73,7 +73,7 @@ export function createApiKeysRouter(
    *   1. If param looks like a UUID:
    *      a. Try as DB `sandboxId` (PK) — fast path when frontend sends instanceId
    *      b. Fallback: try as `externalId` — cloud providers (Daytona) use UUID external IDs
-   *   2. Otherwise: look up by `externalId` (e.g. 'acme-sandbox' for local Docker)
+   *   2. Otherwise: look up by `externalId` (e.g. 'aether-sandbox' for local Docker)
    *
    * Returns the resolved DB UUID, or null if not found / not owned by the account.
    */
@@ -95,7 +95,7 @@ export function createApiKeysRouter(
       return row?.sandboxId ?? null;
     }
 
-    // Not a UUID — must be an externalId string (e.g. 'acme-sandbox')
+    // Not a UUID — must be an externalId string (e.g. 'aether-sandbox')
     const [row] = await db
       .select({ sandboxId: sandboxes.sandboxId })
       .from(sandboxes)
@@ -148,7 +148,7 @@ export function createApiKeysRouter(
       const secretKeyHash = hashSecretKey(secretKey);
 
       const [row] = await db
-        .insert(acmeApiKeys)
+        .insert(aetherApiKeys)
         .values({
           sandboxId: resolvedSandboxId,
           accountId,
@@ -188,7 +188,7 @@ export function createApiKeysRouter(
 
   // ─── GET / ──────────────────────────────────────────────────────────────
   // List all API keys for a sandbox (no secrets).
-  // Accepts sandbox_id as either the UUID or external_id (e.g. 'acme-sandbox').
+  // Accepts sandbox_id as either the UUID or external_id (e.g. 'aether-sandbox').
 
   router.get('/', async (c) => {
     const userId = c.get('userId');
@@ -210,19 +210,19 @@ export function createApiKeysRouter(
     try {
       const keys = await db
         .select({
-          keyId: acmeApiKeys.keyId,
-          publicKey: acmeApiKeys.publicKey,
-          title: acmeApiKeys.title,
-          description: acmeApiKeys.description,
-          type: acmeApiKeys.type,
-          status: acmeApiKeys.status,
-          sandboxId: acmeApiKeys.sandboxId,
-          expiresAt: acmeApiKeys.expiresAt,
-          lastUsedAt: acmeApiKeys.lastUsedAt,
-          createdAt: acmeApiKeys.createdAt,
+          keyId: aetherApiKeys.keyId,
+          publicKey: aetherApiKeys.publicKey,
+          title: aetherApiKeys.title,
+          description: aetherApiKeys.description,
+          type: aetherApiKeys.type,
+          status: aetherApiKeys.status,
+          sandboxId: aetherApiKeys.sandboxId,
+          expiresAt: aetherApiKeys.expiresAt,
+          lastUsedAt: aetherApiKeys.lastUsedAt,
+          createdAt: aetherApiKeys.createdAt,
         })
-        .from(acmeApiKeys)
-        .where(eq(acmeApiKeys.sandboxId, resolvedSandboxId));
+        .from(aetherApiKeys)
+        .where(eq(aetherApiKeys.sandboxId, resolvedSandboxId));
 
       return c.json({
         success: true,
@@ -254,16 +254,16 @@ export function createApiKeysRouter(
 
     try {
       const result = await db
-        .update(acmeApiKeys)
+        .update(aetherApiKeys)
         .set({ status: 'revoked' })
         .where(
           and(
-            eq(acmeApiKeys.keyId, keyId),
-            eq(acmeApiKeys.accountId, accountId),
-            eq(acmeApiKeys.status, 'active'),
+            eq(aetherApiKeys.keyId, keyId),
+            eq(aetherApiKeys.accountId, accountId),
+            eq(aetherApiKeys.status, 'active'),
           ),
         )
-        .returning({ keyId: acmeApiKeys.keyId });
+        .returning({ keyId: aetherApiKeys.keyId });
 
       if (result.length === 0) {
         return c.json({ error: 'API key not found or already revoked' }, 404);
@@ -285,14 +285,14 @@ export function createApiKeysRouter(
 
     try {
       const result = await db
-        .delete(acmeApiKeys)
+        .delete(aetherApiKeys)
         .where(
           and(
-            eq(acmeApiKeys.keyId, keyId),
-            eq(acmeApiKeys.accountId, accountId),
+            eq(aetherApiKeys.keyId, keyId),
+            eq(aetherApiKeys.accountId, accountId),
           ),
         )
-        .returning({ keyId: acmeApiKeys.keyId });
+        .returning({ keyId: aetherApiKeys.keyId });
 
       if (result.length === 0) {
         return c.json({ error: 'API key not found' }, 404);
@@ -311,10 +311,10 @@ export function createApiKeysRouter(
   //
   // Flow:
   //   1. Revoke old key in DB
-  //   2. Create new acme_sb_ key in DB
+  //   2. Create new aether_sb_ key in DB
   //   3. Resolve sandbox endpoint via provider
-  //   4. Read all secrets from sandbox (decrypted with old ACME_TOKEN)
-  //   5. Update ACME_TOKEN in sandbox (changes encryption key derivation)
+  //   4. Read all secrets from sandbox (decrypted with old AETHER_TOKEN)
+  //   5. Update AETHER_TOKEN in sandbox (changes encryption key derivation)
   //   6. Re-write all secrets (re-encrypted with new key)
   //   7. Restart sandbox services
 
@@ -327,16 +327,16 @@ export function createApiKeysRouter(
       // Find the existing key and verify it's a sandbox key owned by this account
       const [existing] = await db
         .select({
-          keyId: acmeApiKeys.keyId,
-          sandboxId: acmeApiKeys.sandboxId,
-          type: acmeApiKeys.type,
-          status: acmeApiKeys.status,
+          keyId: aetherApiKeys.keyId,
+          sandboxId: aetherApiKeys.sandboxId,
+          type: aetherApiKeys.type,
+          status: aetherApiKeys.status,
         })
-        .from(acmeApiKeys)
+        .from(aetherApiKeys)
         .where(
           and(
-            eq(acmeApiKeys.keyId, keyId),
-            eq(acmeApiKeys.accountId, accountId),
+            eq(aetherApiKeys.keyId, keyId),
+            eq(aetherApiKeys.accountId, accountId),
           ),
         )
         .limit(1);
@@ -366,9 +366,9 @@ export function createApiKeysRouter(
       // Revoke the old key
       if (existing.status === 'active') {
         await db
-          .update(acmeApiKeys)
+          .update(aetherApiKeys)
           .set({ status: 'revoked' })
-          .where(eq(acmeApiKeys.keyId, keyId));
+          .where(eq(aetherApiKeys.keyId, keyId));
       }
 
       // Create a new sandbox key for the same sandbox
@@ -376,7 +376,7 @@ export function createApiKeysRouter(
       const secretKeyHash = hashSecretKey(secretKey);
 
       const [newRow] = await db
-        .insert(acmeApiKeys)
+        .insert(aetherApiKeys)
         .values({
           sandboxId: existing.sandboxId,
           accountId,
@@ -411,7 +411,7 @@ export function createApiKeysRouter(
           }
 
           sandboxUpdated = true;
-          console.log(`[API-KEYS] Pushed new ACME_TOKEN to sandbox ${sandbox.externalId}`);
+          console.log(`[API-KEYS] Pushed new AETHER_TOKEN to sandbox ${sandbox.externalId}`);
         } catch (err) {
           // Sandbox may be stopped or unreachable — that's OK.
           // The new key is in the DB; sandbox will need a restart.

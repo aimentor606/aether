@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { A2UIBlock, A2UICatalog } from '@acme/sdk/a2ui';
+import type { A2UIBlock, A2UICatalog } from '@aether/sdk/a2ui';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyComponent = React.ComponentType<any>;

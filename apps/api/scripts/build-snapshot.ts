@@ -6,8 +6,8 @@
  * Works both locally (reads .env) and in CI (env vars set by GitHub secrets).
  *
  * Usage:
- *   bun run scripts/build-snapshot.ts --image acme/computer:0.8.26
- *   bun run scripts/build-snapshot.ts --image acme/computer:0.8.26 --name acme-computer-v0.8.26
+ *   bun run scripts/build-snapshot.ts --image aether/computer:0.8.26
+ *   bun run scripts/build-snapshot.ts --image aether/computer:0.8.26 --name acme-computer-v0.8.26
  *   bun run scripts/build-snapshot.ts --server-type cx23 --location nbg1
  *   bun run scripts/build-snapshot.ts --keep-machine
  *
@@ -45,7 +45,7 @@ const defaultVersion = 'latest';
 
 const { values } = parseArgs({
   options: {
-    image: { type: 'string', default: `acme/computer:${defaultVersion}` },
+    image: { type: 'string', default: `aether/computer:${defaultVersion}` },
     name: { type: 'string' },
     'server-type': { type: 'string', default: 'cx23' },
     location: { type: 'string', default: 'nbg1' },

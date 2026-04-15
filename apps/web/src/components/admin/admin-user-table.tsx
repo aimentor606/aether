@@ -1,28 +1,40 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Skeleton,
+} from '@aether/ui/primitives';
 import { DataTable, DataTableColumn } from '@/components/ui/data-table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/ui/pagination';
-import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  Search, 
-  User, 
-  CreditCard, 
+import {
+  Search,
+  User,
+  CreditCard,
   Calendar,
   Filter,
   TrendingUp,
   Users,
-  Activity
+  Activity,
 } from 'lucide-react';
-import { useAdminUserList, useAdminUserStats } from '@/hooks/admin/use-admin-users';
+import {
+  useAdminUserList,
+  useAdminUserStats,
+} from '@/hooks/admin/use-admin-users';
 import type { UserSummary } from '@/hooks/admin/use-admin-users';
-import { formatCredits, dollarsToCredits } from '@acme/shared';
+import { formatCredits, dollarsToCredits } from '@aether/shared';
 
 interface AdminUserTableProps {
   onUserSelect?: (user: UserSummary) => void;
@@ -35,10 +47,14 @@ export function AdminUserTable({ onUserSelect }: AdminUserTableProps) {
   const [tierFilter, setTierFilter] = useState<string>('');
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  
+
   const [debouncedSearch, setDebouncedSearch] = useState(searchEmail);
-  
-  const { data: userListResponse, isLoading, error } = useAdminUserList({
+
+  const {
+    data: userListResponse,
+    isLoading,
+    error,
+  } = useAdminUserList({
     page,
     page_size: pageSize,
     search_email: debouncedSearch || undefined,
@@ -79,59 +95,62 @@ export function AdminUserTable({ onUserSelect }: AdminUserTableProps) {
     }
   };
 
-  const columns: DataTableColumn<UserSummary>[] = useMemo(() => [
-    {
-      id: 'user',
-      header: 'User',
-      cell: (user) => (
-        <div className="flex flex-col gap-1 min-w-[200px]">
-          <div className="font-medium text-foreground">{user.email}</div>
-          <div className="text-xs text-muted-foreground">
-            Joined {formatDate(user.created_at)}
+  const columns: DataTableColumn<UserSummary>[] = useMemo(
+    () => [
+      {
+        id: 'user',
+        header: 'User',
+        cell: (user) => (
+          <div className="flex flex-col gap-1 min-w-[200px]">
+            <div className="font-medium text-foreground">{user.email}</div>
+            <div className="text-xs text-muted-foreground">
+              Joined {formatDate(user.created_at)}
+            </div>
           </div>
-        </div>
-      ),
-    },
-    {
-      id: 'tier',
-      header: 'Tier',
-      cell: (user) => (
-        <Badge variant="outline" className="capitalize">
-          {tierName(user.tier)}
-        </Badge>
-      ),
-      width: 'w-42',
-    },
-    {
-      id: 'balance',
-      header: 'Credit Balance',
-      cell: (user) => (
-        <div className="text-start">
-          <div className="font-medium text-green-600">
-            {formatCredits(dollarsToCredits(user.credit_balance))}
+        ),
+      },
+      {
+        id: 'tier',
+        header: 'Tier',
+        cell: (user) => (
+          <Badge variant="outline" className="capitalize">
+            {tierName(user.tier)}
+          </Badge>
+        ),
+        width: 'w-42',
+      },
+      {
+        id: 'balance',
+        header: 'Credit Balance',
+        cell: (user) => (
+          <div className="text-start">
+            <div className="font-medium text-green-600">
+              {formatCredits(dollarsToCredits(user.credit_balance))}
+            </div>
           </div>
-        </div>
-      ),
-      width: 'w-42',
-    },
-    {
-      id: 'actions',
-      header: 'Actions',
-      cell: (user) => (
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            onUserSelect?.(user);
-          }}
-        >
-          Details
-        </Button>
-      ),
-      width: 'w-32',
-    },
-  ], [onUserSelect]);
+        ),
+        width: 'w-42',
+      },
+      {
+        id: 'actions',
+        header: 'Actions',
+        cell: (user) => (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onUserSelect?.(user);
+            }}
+          >
+            Details
+          </Button>
+        ),
+        width: 'w-32',
+      },
+    ],
+    [onUserSelect],
+  );
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -164,9 +183,11 @@ export function AdminUserTable({ onUserSelect }: AdminUserTableProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-3">
-        <Input type="text"
+        <Input
+          type="text"
           id="search-email"
-          placeholder="Search by email..." autoComplete="off"
+          placeholder="Search by email..."
+          autoComplete="off"
           value={searchEmail}
           onChange={(e) => setSearchEmail(e.target.value)}
           className="flex-1"
@@ -187,7 +208,7 @@ export function AdminUserTable({ onUserSelect }: AdminUserTableProps) {
           </SelectContent>
         </Select>
       </div>
-      <Card className='border-0 shadow-none bg-transparent'>
+      <Card className="border-0 shadow-none bg-transparent">
         <CardContent className="p-0">
           {isLoading ? (
             <div className="p-6 space-y-3">
@@ -221,4 +242,4 @@ export function AdminUserTable({ onUserSelect }: AdminUserTableProps) {
       )}
     </div>
   );
-} 
+}

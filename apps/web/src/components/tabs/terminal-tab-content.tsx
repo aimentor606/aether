@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { CircleDashed, Plus, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAcmeComputerStore } from '@/stores/acme-computer-store';
+import { useAetherComputerStore } from '@/stores/aether-computer-store';
 import { useServerStore } from '@/stores/server-store';
 import { useOpenCodePtyList, useCreatePty, useRemovePty } from '@/hooks/opencode/use-opencode-pty';
 import { useTabStore, openTabAndNavigate } from '@/stores/tab-store';
@@ -36,7 +36,7 @@ interface TerminalTabContentProps {
  * For sandbox mode, renders SSHTerminal instead (shared across all terminal tabs).
  */
 export function TerminalTabContent({ ptyId, tabId, hidden = false }: TerminalTabContentProps) {
-  const currentSandboxId = useAcmeComputerStore((s) => s.currentSandboxId);
+  const currentSandboxId = useAetherComputerStore((s) => s.currentSandboxId);
   const serverUrl = useServerStore((s) => {
     const server = s.servers.find((srv) => srv.id === s.activeServerId);
     return server?.url ?? s.getActiveServerUrl();

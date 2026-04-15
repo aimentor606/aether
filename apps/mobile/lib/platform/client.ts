@@ -1,5 +1,5 @@
 /**
- * Platform API Client for Acme Computer Mobile
+ * Platform API Client for Aether Computer Mobile
  *
  * Communicates with the Computer backend to manage sandbox lifecycle
  * and provides the sandbox URL for OpenCode session operations.
@@ -16,7 +16,7 @@ import { log } from '@/lib/logger';
 export const SANDBOX_PORTS = {
   DESKTOP: '6080',
   DESKTOP_HTTPS: '6081',
-  ACME_MASTER: '8000',
+  AETHER_MASTER: '8000',
   BROWSER_STREAM: '9223',
   SSH: '22',
 } as const;
@@ -52,7 +52,7 @@ interface PlatformResponse<T> {
  * Pattern: {BACKEND_URL}/p/{externalId}/8000
  */
 export function getSandboxUrl(sandboxExternalId: string): string {
-  return `${API_URL}/p/${sandboxExternalId}/${SANDBOX_PORTS.ACME_MASTER}`;
+  return `${API_URL}/p/${sandboxExternalId}/${SANDBOX_PORTS.AETHER_MASTER}`;
 }
 
 /**

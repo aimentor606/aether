@@ -9,7 +9,7 @@
  */
 function resolveAuthCookieName() {
   const appUrl =
-    process.env.ACME_PUBLIC_APP_URL ||
+    process.env.AETHER_PUBLIC_APP_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.NEXT_PUBLIC_URL ||
     process.env.PUBLIC_URL;
@@ -31,4 +31,4 @@ function resolveAuthCookieName() {
   return 'sb-acme-auth-token';
 }
 
-export const ACME_SUPABASE_AUTH_COOKIE = resolveAuthCookieName();
+export const AETHER_SUPABASE_AUTH_COOKIE = resolveAuthCookieName();

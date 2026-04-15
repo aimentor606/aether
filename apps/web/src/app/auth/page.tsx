@@ -9,13 +9,13 @@ import { useState, useEffect, Suspense, lazy, useRef, useCallback, useActionStat
 import { signUp, verifyOtp, requestAccess, signInWithPassword, sendOtpCode } from './actions';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Mail, MailCheck, Clock, ExternalLink, ChevronRight } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useAuth } from '@/components/AuthProvider';
 import { useAuthMethodTracking } from '@/stores/auth-tracking';
 import { toast } from '@/lib/toast';
 import { useTranslations } from 'next-intl';
-import { AcmeLogo } from '@/components/sidebar/acme-logo';
+import { AetherLogo } from '@/components/sidebar/aether-logo';
 import { ReferralCodeDialog } from '@/components/referrals/referral-code-dialog';
 import { isElectron, getAuthOrigin } from '@/lib/utils/is-electron';
 import { trackSendAuthLink } from '@/lib/analytics/gtm';
@@ -126,7 +126,7 @@ function AccessRequestForm({ email, onSubmitted, onBack }: { email: string; onSu
         />
         <textarea
           name="useCase"
-          placeholder="What will you build with Acme?"
+          placeholder="What will you build with Aether?"
           rows={3}
           className="w-full rounded-xl bg-foreground/[0.04] border border-foreground/[0.08] text-[15px] text-foreground/80 placeholder:text-foreground/30 px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/15 transition-colors"
         />
@@ -360,7 +360,7 @@ function LoginContent() {
   if (isLoading || user) {
     return (
       <div className="fixed inset-0 bg-background flex items-center justify-center">
-        <AcmeLoader size="medium" />
+        <AetherLoader size="medium" />
       </div>
     );
   }
@@ -372,7 +372,7 @@ function LoginContent() {
       <div className="fixed inset-0">
         <WallpaperBackground />
         <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 gap-6">
-          <AcmeLogo size={28} />
+          <AetherLogo size={28} />
           <h1 className="text-[36px] font-extralight tracking-tight text-foreground/80 leading-none">
             {t('checkYourEmail')}
           </h1>
@@ -505,13 +505,13 @@ function LoginContent() {
         <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 gap-6">
           {autoSendingCode ? (
             <div className="flex flex-col items-center gap-4">
-              <AcmeLogo size={28} />
-              <AcmeLoader size="medium" />
+              <AetherLogo size={28} />
+              <AetherLoader size="medium" />
               <p className="text-[15px] text-foreground/50">Sending a fresh code…</p>
             </div>
           ) : newCodeSent ? (
             <div className="flex flex-col items-center gap-6 w-full max-w-[340px]">
-              <AcmeLogo size={28} />
+              <AetherLogo size={28} />
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
                 <MailCheck className="h-6 w-6 text-emerald-500" />
               </div>
@@ -577,7 +577,7 @@ function LoginContent() {
             </div>
           ) : (
             <div className="flex flex-col items-center gap-6 w-full max-w-[340px]">
-              <AcmeLogo size={28} />
+              <AetherLogo size={28} />
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/10 border border-amber-500/20">
                 <Clock className="h-6 w-6 text-amber-500" />
               </div>
@@ -641,7 +641,7 @@ function LoginContent() {
             >
               <div className="flex flex-col items-center gap-1.5">
                 <p className="text-foreground/50 text-sm font-medium tracking-wide">
-                  Acme
+                  Aether
                 </p>
                 <p className="text-foreground/25 text-xs tracking-widest uppercase">
                   Click or press Enter to sign in
@@ -691,7 +691,7 @@ function LoginContent() {
               <div className="bg-background/80 dark:bg-background/75 backdrop-blur-2xl border border-foreground/[0.06] rounded-[20px] px-7 py-8">
                 {/* Shared header */}
                 <p className="text-[11px] text-center text-foreground/30 tracking-[0.2em] uppercase mb-6">
-                  Sign in to Acme
+                  Sign in to Aether
                 </p>
 
                 {isPasswordMode ? (
@@ -772,11 +772,11 @@ function LoginContent() {
                         />
                         <label htmlFor="gdprConsent" className="text-[11px] leading-[1.6] text-foreground/30 cursor-pointer select-none">
                           I agree to the{' '}
-                          <a href="https://www.acme.dev/legal?tab=privacy" target="_blank" rel="noopener noreferrer" className="text-foreground/45 hover:text-foreground/65 transition-colors">
+                          <a href="https://www.aether.dev/legal?tab=privacy" target="_blank" rel="noopener noreferrer" className="text-foreground/45 hover:text-foreground/65 transition-colors">
                             Privacy Policy
                           </a>
                           {' & '}
-                          <a href="https://www.acme.dev/legal?tab=terms" target="_blank" rel="noopener noreferrer" className="text-foreground/45 hover:text-foreground/65 transition-colors">
+                          <a href="https://www.aether.dev/legal?tab=terms" target="_blank" rel="noopener noreferrer" className="text-foreground/45 hover:text-foreground/65 transition-colors">
                             Terms
                           </a>
                         </label>
@@ -868,7 +868,7 @@ function SelfHostedLoginContent() {
   if (isLoading || statusLoading || (user && installed !== false)) {
     return (
       <div className="fixed inset-0 bg-background flex items-center justify-center">
-        <AcmeLoader size="medium" />
+        <AetherLoader size="medium" />
       </div>
     );
   }
@@ -907,7 +907,7 @@ function SelfHostedLoginContent() {
               transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
               <div className="flex flex-col items-center gap-1.5">
-                <p className="text-foreground/50 text-sm font-medium tracking-wide">Acme</p>
+                <p className="text-foreground/50 text-sm font-medium tracking-wide">Aether</p>
                 <p className="text-foreground/25 text-xs tracking-widest uppercase">Click or press Enter to sign in</p>
               </div>
               <motion.div
@@ -967,13 +967,13 @@ function SelfHostedLoginContent() {
 export default function Login() {
   if (isSelfHosted()) {
     return (
-      <Suspense fallback={<div className="fixed inset-0 bg-background flex items-center justify-center"><AcmeLoader size="medium" /></div>}>
+      <Suspense fallback={<div className="fixed inset-0 bg-background flex items-center justify-center"><AetherLoader size="medium" /></div>}>
         <SelfHostedLoginContent />
       </Suspense>
     );
   }
   return (
-    <Suspense fallback={<div className="fixed inset-0 bg-background flex items-center justify-center"><AcmeLoader size="medium" /></div>}>
+    <Suspense fallback={<div className="fixed inset-0 bg-background flex items-center justify-center"><AetherLoader size="medium" /></div>}>
       <LoginContent />
     </Suspense>
   );

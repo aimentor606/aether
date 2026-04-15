@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Pressable, Modal, Platform, Alert } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { Download, FileType, FileText, FileCode, X } from 'lucide-react-native';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
@@ -532,7 +532,7 @@ ${content}
           className={`h-9 w-9 items-center justify-center rounded-xl bg-card border border-border active:opacity-70 ${disabled || isExporting || !content ? 'opacity-50' : ''} ${className || ''}`}
         >
           {isExporting ? (
-            <AcmeLoader size="small" customSize={17} />
+            <AetherLoader size="small" customSize={17} />
           ) : (
             <Icon
               as={Download}
@@ -586,7 +586,7 @@ ${content}
                   >
                     <View className="h-10 w-10 items-center justify-center rounded-lg bg-primary/10 mr-3">
                       {isExporting && exportingFormat === option.format ? (
-                        <AcmeLoader size="small" customSize={20} />
+                        <AetherLoader size="small" customSize={20} />
                       ) : (
                         <Icon
                           as={option.icon}
@@ -630,7 +630,7 @@ ${content}
       className={`h-9 w-9 items-center justify-center rounded-xl bg-card border border-border active:opacity-70 ${disabled || isExporting || !content ? 'opacity-50' : ''} ${className || ''}`}
     >
       {isExporting ? (
-        <AcmeLoader size="small" customSize={17} />
+        <AetherLoader size="small" customSize={17} />
       ) : (
         <Icon
           as={Download}

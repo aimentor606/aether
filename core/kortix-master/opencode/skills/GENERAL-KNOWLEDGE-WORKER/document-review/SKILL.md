@@ -254,9 +254,9 @@ Fact-check each claim using the `web_search` and `bash` tools, then record resul
 - **source_urls** — Include URLs from `web_search` results that informed the verdict. For `numerical_consistency` claims (verified via calculation), pass an empty list. Never fabricate URLs.
 
 ```
-Turn 4: web_search("Acme Corp 2023 annual report") + web_search("U.S. census 2023") + bash(calc claim:5) + bash(calc claim:6)
+Turn 4: web_search("Aether Corp 2023 annual report") + web_search("U.S. census 2023") + bash(calc claim:5) + bash(calc claim:6)
          → broad searches verify claims 1-3 (revenue, headcount, founding date) + claim 4 (population) + claims 5-6 (math)
-Turn 5: update-claims [1-6] + web_search("Acme Corp acquisition history") + bash(calc claim:9)
+Turn 5: update-claims [1-6] + web_search("Aether Corp acquisition history") + bash(calc claim:9)
          → narrow search for claims 7-8 that broad searches missed
 Turn 6: update-claims [7-9] + web_search("specific fact still unverified")
 ```

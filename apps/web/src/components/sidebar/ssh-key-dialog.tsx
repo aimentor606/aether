@@ -46,7 +46,7 @@ type SSHAccessMeta = {
 /* ─── Derive machine-unique identifiers from host IP ─────────────────────── */
 
 function deriveKeyName(host: string) {
-  return `acme_${host.replace(/\./g, '-')}`;
+  return `aether_${host.replace(/\./g, '-')}`;
 }
 
 function deriveHostAlias(host: string) {
@@ -125,7 +125,7 @@ function SecretCodeBlock({ text, label }: { text: string; label?: string }) {
 
   // Mask the private key: show first 6 chars after heredoc then bullets
   const masked = text.replace(
-    /(cat > [^\n]+<< 'ACME_KEY'\n)([^\n]{6})[^]*?(ACME_KEY)/,
+    /(cat > [^\n]+<< 'AETHER_KEY'\n)([^\n]{6})[^]*?(AETHER_KEY)/,
     '$1$2••••••••••••\n$3',
   );
   const finalMasked = masked.replace(
@@ -163,13 +163,13 @@ export function SSHResultView({ sshResult, copiedField, onCopy, onRegenerate, is
   const hostAlias = deriveHostAlias(sshResult.host);
   const pk = sshResult.private_key.trim();
 
-  const setupCmd = `mkdir -p ~/.ssh && cat > ~/.ssh/${keyName} << 'ACME_KEY'\n${pk}\nACME_KEY\nchmod 600 ~/.ssh/${keyName} && ssh -i ~/.ssh/${keyName} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${sshResult.port} ${sshResult.username}@${sshResult.host}`;
+  const setupCmd = `mkdir -p ~/.ssh && cat > ~/.ssh/${keyName} << 'AETHER_KEY'\n${pk}\nAETHER_KEY\nchmod 600 ~/.ssh/${keyName} && ssh -i ~/.ssh/${keyName} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${sshResult.port} ${sshResult.username}@${sshResult.host}`;
 
   const reconnectCmd = `ssh -i ~/.ssh/${keyName} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${sshResult.port} ${sshResult.username}@${sshResult.host}`;
 
   const sshConfigCmd = `grep -q "Host ${hostAlias}" ~/.ssh/config 2>/dev/null || cat >> ~/.ssh/config << 'EOF'\n\nHost ${hostAlias}\n  HostName ${sshResult.host}\n  Port ${sshResult.port}\n  User ${sshResult.username}\n  IdentityFile ~/.ssh/${keyName}\n  StrictHostKeyChecking no\nEOF`;
 
-  const agentPrompt = `Set up SSH access to my remote Acme instance and connect via Remote-SSH.\n\n1. Save the SSH key:\n${setupCmd}\n\n2. Add to ~/.ssh/config:\nHost ${hostAlias}\n  HostName ${sshResult.host}\n  Port ${sshResult.port}\n  User ${sshResult.username}\n  IdentityFile ~/.ssh/${keyName}\n  StrictHostKeyChecking no\n\n3. Connect via Remote-SSH to host "${hostAlias}"`;
+  const agentPrompt = `Set up SSH access to my remote Aether instance and connect via Remote-SSH.\n\n1. Save the SSH key:\n${setupCmd}\n\n2. Add to ~/.ssh/config:\nHost ${hostAlias}\n  HostName ${sshResult.host}\n  Port ${sshResult.port}\n  User ${sshResult.username}\n  IdentityFile ~/.ssh/${keyName}\n  StrictHostKeyChecking no\n\n3. Connect via Remote-SSH to host "${hostAlias}"`;
 
   return (
     <div className="flex flex-col gap-3">
@@ -372,7 +372,7 @@ export function SSHKeyDialog({ open, onOpenChange }: SSHKeyDialogProps) {
             SSH Access
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Connect to your Acme instance via your IDE so it feels like home.
+            Connect to your Aether instance via your IDE so it feels like home.
           </DialogDescription>
         </DialogHeader>
 

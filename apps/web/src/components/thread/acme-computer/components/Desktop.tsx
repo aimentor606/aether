@@ -8,10 +8,10 @@ import { AppDock } from './Dock';
 import { PanelHeader } from './PanelHeader';
 import { ToolView } from '../../tool-views/wrapper';
 import { getUserFriendlyToolName, getToolIcon } from '@/components/thread/utils';
-import { ToolCallInput } from '../AcmeComputer';
+import { ToolCallInput } from '../AetherComputer';
 import { Project } from '@/types/project';
 
-import { ViewType } from '@/stores/acme-computer-store';
+import { ViewType } from '@/stores/aether-computer-store';
 import { cn } from '@/lib/utils';
 import { useFileList, fileListKeys, useFileUpload, useFileMkdir, useFileDelete, useFileRename, useFilesStore, FileBrowser, FileViewer, FileHistoryPanel, downloadFile } from '@/features/files';
 import { DesktopContextMenu } from './DesktopContextMenu';

@@ -26,15 +26,15 @@ export interface ProxyServiceConfig {
   name: string;
   /** Real upstream base URL (e.g. "https://api.tavily.com") — used for passthrough (Mode 2/3) */
   targetBaseUrl: string;
-  /** Alternate upstream base URL for Acme-managed requests (Mode 1). Falls back to targetBaseUrl. */
+  /** Alternate upstream base URL for Aether-managed requests (Mode 1). Falls back to targetBaseUrl. */
   acmeTargetBaseUrl?: string;
-  /** Acme-owned API key for this upstream service */
-  getAcmeApiKey: () => string;
+  /** Aether-owned API key for this upstream service */
+  getAetherApiKey: () => string;
   /** How to inject the API key into upstream requests (passthrough) */
   keyInjection: KeyInjectionMethod;
-  /** Alternate key injection for Acme-managed requests (Mode 1). Falls back to keyInjection. */
+  /** Alternate key injection for Aether-managed requests (Mode 1). Falls back to keyInjection. */
   acmeKeyInjection?: KeyInjectionMethod;
-  /** Only these routes are allowed when using Acme's key (prevents cost abuse) */
+  /** Only these routes are allowed when using Aether's key (prevents cost abuse) */
   allowedRoutes: AllowedRoute[];
   /** Default tool name for billing attribution (can be overridden per-route) */
   billingToolName: string;
@@ -53,7 +53,7 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
     tavily: {
       name: 'tavily',
       targetBaseUrl: config.TAVILY_API_URL,
-      getAcmeApiKey: () => config.TAVILY_API_KEY,
+      getAetherApiKey: () => config.TAVILY_API_KEY,
       keyInjection: { type: 'json_body_field', field: 'api_key' },
       allowedRoutes: [
         { path: '/search', methods: ['POST'] },
@@ -64,7 +64,7 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
     serper: {
       name: 'serper',
       targetBaseUrl: config.SERPER_API_URL,
-      getAcmeApiKey: () => config.SERPER_API_KEY,
+      getAetherApiKey: () => config.SERPER_API_KEY,
       keyInjection: { type: 'header', headerName: 'X-API-KEY' },
       allowedRoutes: [
         { path: '/search', methods: ['POST'] },
@@ -79,7 +79,7 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
     firecrawl: {
       name: 'firecrawl',
       targetBaseUrl: config.FIRECRAWL_API_URL,
-      getAcmeApiKey: () => config.FIRECRAWL_API_KEY,
+      getAetherApiKey: () => config.FIRECRAWL_API_KEY,
       keyInjection: { type: 'header', headerName: 'Authorization', prefix: 'Bearer ' },
       allowedRoutes: [
         { path: '/v1/scrape', methods: ['POST'] },
@@ -98,7 +98,7 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
     replicate: {
       name: 'replicate',
       targetBaseUrl: config.REPLICATE_API_URL,
-      getAcmeApiKey: () => config.REPLICATE_API_TOKEN,
+      getAetherApiKey: () => config.REPLICATE_API_TOKEN,
       keyInjection: { type: 'header', headerName: 'Authorization', prefix: 'Token ' },
       allowedRoutes: [
         // Allowed models — locked to specific models, each with own billing
@@ -119,7 +119,7 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
     context7: {
       name: 'context7',
       targetBaseUrl: config.CONTEXT7_API_URL,
-      getAcmeApiKey: () => config.CONTEXT7_API_KEY,
+      getAetherApiKey: () => config.CONTEXT7_API_KEY,
       keyInjection: { type: 'header', headerName: 'Authorization', prefix: 'Bearer ' },
       allowedRoutes: [
         { path: '/api/v2/libs/search', methods: ['GET', 'POST'] },
@@ -141,7 +141,7 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
     anthropic: {
       name: 'anthropic',
       targetBaseUrl: config.ANTHROPIC_API_URL,
-      getAcmeApiKey: () => config.ANTHROPIC_API_KEY,
+      getAetherApiKey: () => config.ANTHROPIC_API_KEY,
       keyInjection: { type: 'header', headerName: 'x-api-key' },
       allowedRoutes: [
         { path: '/messages', methods: ['POST'] },
@@ -153,7 +153,7 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
     openai: {
       name: 'openai',
       targetBaseUrl: config.OPENAI_API_URL,
-      getAcmeApiKey: () => config.OPENAI_API_KEY,
+      getAetherApiKey: () => config.OPENAI_API_KEY,
       keyInjection: { type: 'header', headerName: 'Authorization', prefix: 'Bearer ' },
       allowedRoutes: [
         { path: '/chat/completions', methods: ['POST'] },
@@ -166,7 +166,7 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
     xai: {
       name: 'xai',
       targetBaseUrl: config.XAI_API_URL,
-      getAcmeApiKey: () => config.XAI_API_KEY,
+      getAetherApiKey: () => config.XAI_API_KEY,
       keyInjection: { type: 'header', headerName: 'Authorization', prefix: 'Bearer ' },
       allowedRoutes: [
         { path: '/chat/completions', methods: ['POST'] },
@@ -178,7 +178,7 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
     gemini: {
       name: 'gemini',
       targetBaseUrl: config.GEMINI_API_URL,
-      getAcmeApiKey: () => config.GEMINI_API_KEY,
+      getAetherApiKey: () => config.GEMINI_API_KEY,
       keyInjection: { type: 'header', headerName: 'Authorization', prefix: 'Bearer ' },
       allowedRoutes: [
         { path: '/chat/completions', methods: ['POST'] },
@@ -190,7 +190,7 @@ export function getProxyServices(): Record<string, ProxyServiceConfig> {
     groq: {
       name: 'groq',
       targetBaseUrl: config.GROQ_API_URL,
-      getAcmeApiKey: () => config.GROQ_API_KEY,
+      getAetherApiKey: () => config.GROQ_API_KEY,
       keyInjection: { type: 'header', headerName: 'Authorization', prefix: 'Bearer ' },
       allowedRoutes: [
         { path: '/chat/completions', methods: ['POST'] },

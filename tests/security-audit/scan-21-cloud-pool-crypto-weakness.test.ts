@@ -10,11 +10,11 @@
  * predictable (within milliseconds).
  *
  * This token is used as the Authorization header when injecting env vars
- * (ACME_TOKEN, INTERNAL_SERVICE_KEY) into pool sandboxes.
+ * (AETHER_TOKEN, INTERNAL_SERVICE_KEY) into pool sandboxes.
  *
  * If an attacker can predict the placeholder token, they could:
  * 1. Inject arbitrary env vars into a pool sandbox before it's claimed
- * 2. Steal the ACME_TOKEN that gets injected
+ * 2. Steal the AETHER_TOKEN that gets injected
  * 3. Use the stolen token to impersonate the sandbox
  *
  * Also: sql.raw() interpolation in pool/inventory.ts:131-133

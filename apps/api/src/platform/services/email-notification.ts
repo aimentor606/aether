@@ -35,7 +35,7 @@ export async function sendWorkspaceReadyEmail(opts: {
     }
 
     const email = data.user.email;
-    const frontendUrl = config.FRONTEND_URL || 'https://app.acme.dev';
+    const frontendUrl = config.FRONTEND_URL || 'https://app.aether.dev';
     const instanceUrl = `${frontendUrl}/instances/${sandboxId}`;
 
     const html = `
@@ -63,7 +63,7 @@ export async function sendWorkspaceReadyEmail(opts: {
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">Acme</div>
+      <div class="logo">Aether</div>
     </div>
     <div class="body">
       <div class="check">
@@ -76,7 +76,7 @@ export async function sendWorkspaceReadyEmail(opts: {
       <a href="${escapeHtml(instanceUrl)}" class="btn">Open Workspace</a>
     </div>
     <div class="footer">
-      <p>Acme &mdash; The Autonomous Company Operating System</p>
+      <p>Aether &mdash; The Autonomous Company Operating System</p>
     </div>
   </div>
 </body>

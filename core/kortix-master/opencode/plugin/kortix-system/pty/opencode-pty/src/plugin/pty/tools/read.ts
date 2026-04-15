@@ -34,8 +34,8 @@ function formatPtyOutput(
     `</pty_output>`,
   ].join('\n')
   
-  // Wrap in acme_system tags so frontend renders as system/internal component
-  return `<acme_system type="pty-output" source="opencode-pty">\n${inner}\n</acme_system>`
+  // Wrap in aether_system tags so frontend renders as system/internal component
+  return `<aether_system type="pty-output" source="opencode-pty">\n${inner}\n</aether_system>`
 }
 
 /**
@@ -81,7 +81,7 @@ function handlePatternRead(
       `Total lines in buffer: ${result.totalLines}`,
       `</pty_output>`,
     ].join('\n')
-    return `<acme_system type="pty-output" source="opencode-pty">\n${inner}\n</acme_system>`
+    return `<aether_system type="pty-output" source="opencode-pty">\n${inner}\n</aether_system>`
   }
 
   const formattedLines = result.matches.map((match) =>
@@ -123,7 +123,7 @@ function handlePlainRead(
       `Total lines: ${result.totalLines}`,
       `</pty_output>`,
     ].join('\n')
-    return `<acme_system type="pty-output" source="opencode-pty">\n${inner}\n</acme_system>`
+    return `<aether_system type="pty-output" source="opencode-pty">\n${inner}\n</aether_system>`
   }
 
   const formattedLines = result.lines.map((line, index) =>

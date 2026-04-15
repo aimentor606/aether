@@ -1,5 +1,5 @@
 {
-  "name": "@acme/triggers",
+  "name": "@aether/triggers",
   "version": "1.0.0",
   "description": "Unified trigger system: cron schedules, webhooks, with prompt/command/http actions",
   "license": "MIT",

@@ -79,7 +79,7 @@ export async function writeContainerConfig(
 export async function buildFromInspect(
   endpoint: ResolvedEndpoint,
 ): Promise<ContainerConfig | null> {
-  const names = [config.SANDBOX_CONTAINER_NAME, 'acme-sandbox', 'justavps-workload'];
+  const names = [config.SANDBOX_CONTAINER_NAME, 'aether-sandbox', 'justavps-workload'];
   for (const name of names) {
     const result = await execOnHost(
       endpoint,

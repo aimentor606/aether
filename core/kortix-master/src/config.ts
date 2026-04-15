@@ -17,24 +17,24 @@ function parsePortMap(): Record<string, string> {
 
 export const config = {
   // Kortix Master port (main entry point)
-  PORT: parseInt(process.env.ACME_MASTER_PORT || '8000'),
+  PORT: parseInt(process.env.AETHER_MASTER_PORT || '8000'),
 
   // OpenCode server (proxied, always unprotected)
   OPENCODE_HOST: process.env.OPENCODE_HOST || 'localhost',
   OPENCODE_PORT: parseInt(process.env.OPENCODE_PORT || '4096'),
 
   // ─── Kortix Backend ─────────────────────────────────────────────────────────
-  // ACME_API_URL: base URL of kortix-api. Source of truth is the secrets-manager-
+  // AETHER_API_URL: base URL of kortix-api. Source of truth is the secrets-manager-
   // backed s6 env file when present; process.env/.env are fallbacks for native dev.
-  get ACME_API_URL() { return getEnv('ACME_API_URL') || 'http://localhost:8008' },
+  get AETHER_API_URL() { return getEnv('AETHER_API_URL') || 'http://localhost:8008' },
 
-  // ACME_TOKEN — direction: sandbox → kortix-api.
+  // AETHER_TOKEN — direction: sandbox → kortix-api.
   // Source of truth is the secrets-manager-backed s6 env file. This allows token
   // rotation and sync without trusting stale container process.env values.
-  get ACME_TOKEN() { return getEnv('ACME_TOKEN') || '' },
+  get AETHER_TOKEN() { return getEnv('AETHER_TOKEN') || '' },
 
   // Feature flag: enable or disable local deployment routes (/kortix/deploy/*)
-  ACME_DEPLOYMENTS_ENABLED: process.env.ACME_DEPLOYMENTS_ENABLED === 'true',
+  AETHER_DEPLOYMENTS_ENABLED: process.env.AETHER_DEPLOYMENTS_ENABLED === 'true',
 
   // Secret storage
   SECRET_FILE_PATH: process.env.SECRET_FILE_PATH || '/workspace/.secrets/.secrets.json',
@@ -50,7 +50,7 @@ export const config = {
   // Every inbound request from outside the container must include this as a Bearer token.
   // Validated by the global auth middleware in index.ts.
   // Localhost requests (from inside the sandbox) bypass auth entirely — no token needed.
-  // Counterpart: ACME_TOKEN goes the other direction (sandbox → kortix-api).
+  // Counterpart: AETHER_TOKEN goes the other direction (sandbox → kortix-api).
   // Auto-generates if not provided — external access is ALWAYS auth-protected.
   // In normal operation, kortix-api injects the key as a Docker env var.
   get INTERNAL_SERVICE_KEY(): string {

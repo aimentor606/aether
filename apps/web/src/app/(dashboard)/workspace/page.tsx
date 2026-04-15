@@ -47,11 +47,11 @@ import {
   type Command,
   type McpStatus,
 } from '@/hooks/opencode/use-opencode-sessions';
-import { useAcmeProjects, type AcmeProject } from '@/hooks/acme/use-acme-projects';
-import { useAcmeConnectors, type AcmeConnector } from '@/hooks/acme/use-acme-connectors';
+import { useAetherProjects, type AetherProject } from '@/hooks/acme/use-acme-projects';
+import { useAetherConnectors, type AetherConnector } from '@/hooks/acme/use-acme-connectors';
 
 // Re-export as Project for backward compat in this file
-type Project = AcmeProject;
+type Project = AetherProject;
 import { useSkills } from '@/features/skills/hooks';
 import { getSkillSource, type Skill } from '@/features/skills/types';
 import { openTabAndNavigate } from '@/stores/tab-store';
@@ -190,7 +190,7 @@ function DetailSheet({
     }
   }
   if (item?.kind === 'connector' && item.raw) {
-    const c = item.raw as AcmeConnector;
+    const c = item.raw as AetherConnector;
     if (c.source) rows.push({ label: 'Source', value: c.source });
     if (c.pipedream_slug) rows.push({ label: 'Pipedream', value: c.pipedream_slug, mono: true });
     if (c.env_keys?.length) rows.push({ label: 'Env', value: c.env_keys.join(', '), mono: true });
@@ -412,8 +412,8 @@ export default function WorkspacePage() {
     }
   }, [createSession]);
 
-  // Data — Acme projects are the source of truth
-  const { data: projects,  isLoading: lProjects, error: projectsError  } = useAcmeProjects();
+  // Data — Aether projects are the source of truth
+  const { data: projects,  isLoading: lProjects, error: projectsError  } = useAetherProjects();
   // Debug: log to browser console if projects fail to load
   if (typeof window !== 'undefined') {
     if (projectsError) console.error('[workspace] projects error:', projectsError);
@@ -424,7 +424,7 @@ export default function WorkspacePage() {
   const { data: commands,  isLoading: lCommands  } = useOpenCodeCommands();
   const { data: toolIds,   isLoading: lTools     } = useOpenCodeToolIds();
   const { data: mcpStatus, isLoading: lMcp       } = useOpenCodeMcpStatus();
-  const { data: connectors, isLoading: lConnectors } = useAcmeConnectors();
+  const { data: connectors, isLoading: lConnectors } = useAetherConnectors();
 
   const isLoading = lProjects || lAgents || lSkills || lCommands || lTools || lMcp || lConnectors;
 

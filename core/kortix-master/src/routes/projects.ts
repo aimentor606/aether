@@ -31,7 +31,7 @@ let _db: Database | null = null
 function getDb(): Database {
   if (_db) return _db
 
-  const workspace = process.env.ACME_WORKSPACE?.trim()
+  const workspace = process.env.AETHER_WORKSPACE?.trim()
     || process.env.OPENCODE_CONFIG_DIR?.replace(/\/opencode\/?$/, '')
     || '/workspace'
   const dbPath = join(workspace, '.kortix', 'kortix.db')

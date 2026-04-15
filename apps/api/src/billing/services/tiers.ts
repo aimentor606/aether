@@ -39,12 +39,12 @@ export function getComputeDisplayPriceCents(serverType: string): number | null {
 
 /**
  * Human-readable line for Stripe checkout / invoice descriptions.
- * Example: "Acme Computer · Pro — 8 vCPU, 16 GB RAM, 320 GB SSD"
+ * Example: "Aether Computer · Pro — 8 vCPU, 16 GB RAM, 320 GB SSD"
  */
 export function getComputeDescription(serverType: string): string {
   const t = COMPUTE_TIERS[serverType];
-  if (!t) return 'Acme Computer';
-  return `Acme Computer · ${t.label} — ${t.cores} vCPU, ${t.memoryGb} GB RAM, ${t.diskGb} GB SSD`;
+  if (!t) return 'Aether Computer';
+  return `Aether Computer · ${t.label} — ${t.cores} vCPU, ${t.memoryGb} GB RAM, ${t.diskGb} GB SSD`;
 }
 
 // ─── Tiers ──────────────────────────────────────────────────────────────────
@@ -157,7 +157,7 @@ const STRIPE_PRICES_STAGING: StripePriceConfig = {
 };
 
 function getStripePrices(): StripePriceConfig {
-  return config.INTERNAL_ACME_ENV === 'prod' ? STRIPE_PRICES_PROD : STRIPE_PRICES_STAGING;
+  return config.INTERNAL_AETHER_ENV === 'prod' ? STRIPE_PRICES_PROD : STRIPE_PRICES_STAGING;
 }
 
 export function getProductId(): string {
@@ -283,16 +283,16 @@ export function isDowngrade(fromTier: string, toTier: string): boolean {
 // ─── RevenueCat (mobile billing — untouched) ─────────────────────────────────
 
 const REVENUECAT_PRODUCT_MAPPING: Record<string, string> = {
-  'acme_plus_monthly': 'tier_2_20',
-  'acme_plus_yearly': 'tier_2_20',
+  'aether_plus_monthly': 'tier_2_20',
+  'aether_plus_yearly': 'tier_2_20',
   'plus:plus-monthly': 'tier_2_20',
 
-  'acme_pro_monthly': 'pro',
-  'acme_pro_yearly': 'pro',
+  'aether_pro_monthly': 'pro',
+  'aether_pro_yearly': 'pro',
   'pro:pro-monthly': 'pro',
 
-  'acme_ultra_monthly': 'tier_25_200',
-  'acme_ultra_yearly': 'tier_25_200',
+  'aether_ultra_monthly': 'tier_25_200',
+  'aether_ultra_yearly': 'tier_25_200',
   'ultra:ultra-monthly': 'tier_25_200',
 };
 

@@ -119,7 +119,7 @@ describe("Kortix Sandbox Proxy E2E", () => {
     runtime = createRuntimeFixture('kortix-proxy-');
     opencode = await startDummyOpenCode(9000);
     master = await startKortixMaster(8000, runtime, {
-      ACME_TOKEN: 'proxy-test-token',
+      AETHER_TOKEN: 'proxy-test-token',
       OPENCODE_PORT: '9000',
     });
 

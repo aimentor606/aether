@@ -101,7 +101,7 @@ function shortenPath(path: string | undefined): string {
   return path.replace(/^\/workspace\/?/, '') || '/';
 }
 
-// ─── ServiceCard (Acme SpotlightCard pattern) ─────────────────────────────
+// ─── ServiceCard (Aether SpotlightCard pattern) ─────────────────────────────
 
 function ServiceCard({
   service,
@@ -284,7 +284,7 @@ function EmptyState() {
         </div>
         <h3 className="text-lg font-semibold text-foreground mb-2">No services found</h3>
         <p className="text-sm text-muted-foreground text-center leading-relaxed max-w-md">
-          Services will appear here when Acme Master starts managing them. Register a project app or wait for the built-in services to come online.
+          Services will appear here when Aether Master starts managing them. Register a project app or wait for the built-in services to come online.
         </p>
       </div>
     </div>

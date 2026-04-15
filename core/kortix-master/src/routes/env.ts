@@ -219,14 +219,14 @@ envRouter.get('/:key',
   },
 )
 
-// POST /env/rotate-token — rotate ACME_TOKEN.
-// Encryption is decoupled from ACME_TOKEN, so this just updates the token
+// POST /env/rotate-token — rotate AETHER_TOKEN.
+// Encryption is decoupled from AETHER_TOKEN, so this just updates the token
 // value and restarts services. No re-encryption needed.
 envRouter.post('/rotate-token',
   describeRoute({
     tags: ['Secrets'],
-    summary: 'Rotate ACME_TOKEN',
-    description: 'Rotates the ACME_TOKEN used for sandbox↔API authentication. Encryption is decoupled — secrets are NOT re-encrypted. Always restarts services.',
+    summary: 'Rotate AETHER_TOKEN',
+    description: 'Rotates the AETHER_TOKEN used for sandbox↔API authentication. Encryption is decoupled — secrets are NOT re-encrypted. Always restarts services.',
     responses: {
       200: { description: 'Token rotated', content: { 'application/json': { schema: resolver(RotateTokenResponse) } } },
       400: { description: 'Invalid body', content: { 'application/json': { schema: resolver(ErrorResponse) } } },
@@ -247,13 +247,13 @@ envRouter.post('/rotate-token',
       const result = await secretStore.rotateToken(newToken)
 
       // Persist new token to s6 env dir + bootstrap so it survives service/container restarts
-      await writeS6Env('ACME_TOKEN', newToken)
-      updateBootstrapKey('ACME_TOKEN', newToken)
+      await writeS6Env('AETHER_TOKEN', newToken)
+      updateBootstrapKey('AETHER_TOKEN', newToken)
 
       // Restart OpenCode to pick up the new token
       await restartServices(['opencode'])
 
-      console.log(`[ENV API] ACME_TOKEN rotated. ${result.rotated} secret(s) unaffected (encryption decoupled).`)
+      console.log(`[ENV API] AETHER_TOKEN rotated. ${result.rotated} secret(s) unaffected (encryption decoupled).`)
       return c.json({ ok: true, ...result })
     } catch (error) {
       console.error('[ENV API] Token rotation error:', error)

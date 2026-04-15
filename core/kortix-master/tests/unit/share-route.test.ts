@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
 
 const ENV_KEYS = [
   'ENV_MODE', 'JUSTAVPS_SLUG', 'JUSTAVPS_PROXY_TOKEN', 'JUSTAVPS_PROXY_DOMAIN',
-  'SANDBOX_ID', 'ACME_API_URL', 'SANDBOX_PORT_MAP', 'SHARE_STORE_PATH',
+  'SANDBOX_ID', 'AETHER_API_URL', 'SANDBOX_PORT_MAP', 'SHARE_STORE_PATH',
 ]
 const savedEnv: Record<string, string | undefined> = {}
 
@@ -160,7 +160,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
     const res = await app.request('/kortix/share/3000')
     const body = await res.json() as any
 
-    expect(body.url).toContain('8000--abc123.acme.cloud')
+    expect(body.url).toContain('8000--abc123.aether.cloud')
     expect(body.url).toContain('__proxy_token=tok_xyz')
     expect(body.url).toContain('/s/')
   })

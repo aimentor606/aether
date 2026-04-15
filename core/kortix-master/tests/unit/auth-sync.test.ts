@@ -52,13 +52,13 @@ describe('auth-sync', () => {
     savedEnv.SECRET_FILE_PATH = process.env.SECRET_FILE_PATH
     savedEnv.SALT_FILE_PATH = process.env.SALT_FILE_PATH
     savedEnv.ENCRYPTION_KEY_PATH = process.env.ENCRYPTION_KEY_PATH
-    savedEnv.ACME_TOKEN = process.env.ACME_TOKEN
+    savedEnv.AETHER_TOKEN = process.env.AETHER_TOKEN
     savedEnv.S6_ENV_DIR = process.env.S6_ENV_DIR
 
     process.env.SECRET_FILE_PATH = join(tempDir, '.secrets.json')
     process.env.SALT_FILE_PATH = join(tempDir, '.salt')
     process.env.ENCRYPTION_KEY_PATH = join(tempDir, '.encryption-key')
-    process.env.ACME_TOKEN = 'test-token-auth-sync'
+    process.env.AETHER_TOKEN = 'test-token-auth-sync'
     process.env.S6_ENV_DIR = s6EnvDir
 
     secretStore = new SecretStore()

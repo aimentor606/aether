@@ -13,7 +13,7 @@
 
 import { Hono } from 'hono';
 import { eq, and } from 'drizzle-orm';
-import { serverEntries } from '@acme/db';
+import { serverEntries } from '@aether/db';
 import type { AppEnv } from '../types';
 import { db } from '../shared/db';
 import { config } from '../config';

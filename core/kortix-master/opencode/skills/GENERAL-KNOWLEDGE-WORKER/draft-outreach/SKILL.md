@@ -126,8 +126,8 @@ Research first, then draft. This skill never sends generic outreach - it always 
 
 ```
 Input patterns:
-- "draft outreach to John Smith at Acme" → Person + company
-- "write cold email to Acme's CTO" → Role + company
+- "draft outreach to John Smith at Aether" → Person + company
+- "write cold email to Aether's CTO" → Role + company
 - "reach out to sarah@acme.com" → Email provided
 - "LinkedIn message to [LinkedIn URL]" → Profile provided
 ```

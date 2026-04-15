@@ -185,7 +185,7 @@ export async function stopAndStartContainer(
   const scriptLines = [
     '#!/bin/bash',
     'systemctl disable --now justavps-docker 2>/dev/null || true',
-    'systemctl disable --now acme-sandbox 2>/dev/null || true',
+    'systemctl disable --now aether-sandbox 2>/dev/null || true',
     `docker stop -t 10 ${containerName} 2>/dev/null || true`,
     `docker rm -f ${containerName} 2>/dev/null || true`,
     `for i in $(seq 1 10); do docker inspect ${containerName} >/dev/null 2>&1 || break; sleep 1; done`,
@@ -203,7 +203,7 @@ export async function stopAndStartContainer(
 
   const result = await execOnHost(
     endpoint,
-    `systemctl reset-failed ${unitName} 2>/dev/null || true; systemd-run --unit=${unitName} --description="Acme sandbox update" /tmp/acme-update.sh`,
+    `systemctl reset-failed ${unitName} 2>/dev/null || true; systemd-run --unit=${unitName} --description="Aether sandbox update" /tmp/acme-update.sh`,
     15,
   );
 

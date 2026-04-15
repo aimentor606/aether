@@ -4,9 +4,9 @@ import { getServerPublicEnv } from '@/lib/public-env-server';
 export async function generateMetadata({ params }: { params: Promise<{ shareId: string }> }): Promise<Metadata> {
   const { shareId } = await params;
 
-  const title = 'Shared Conversation | Acme';
-  const description = 'Replay this Worker conversation on Acme';
-  const url = getServerPublicEnv().APP_URL || 'https://www.acme.dev';
+  const title = 'Shared Conversation | Aether';
+  const description = 'Replay this Worker conversation on Aether';
+  const url = getServerPublicEnv().APP_URL || 'https://www.aether.dev';
 
   return {
     title,

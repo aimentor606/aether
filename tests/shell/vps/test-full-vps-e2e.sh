@@ -33,7 +33,7 @@ BLUE=$'\033[0;34m'; CYAN=$'\033[0;36m'; BOLD=$'\033[1m'
 DIM=$'\033[2m'; NC=$'\033[0m'
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${ACME_HOME:-$HOME/.acme}"
+INSTALL_DIR="${AETHER_HOME:-$HOME/.acme}"
 OWNER_EMAIL="${OWNER_EMAIL:-e2e@acme.ai}"
 OWNER_PASSWORD="${OWNER_PASSWORD:-e2e-test-pass-42}"
 INSTALLER_URL="${INSTALLER_URL:-https://raw.githubusercontent.com/acme-ai/suna/main/scripts/get-acme.sh}"
@@ -180,7 +180,7 @@ if [ "$SKIP_INSTALL" = "false" ]; then
   # Verify .env contents
   run_test ".env has DEPLOY_MODE=vps" "grep -q 'DEPLOY_MODE=vps' '$INSTALL_DIR/.env'"
   run_test ".env has DB_MODE=docker" "grep -q 'DB_MODE=docker' '$INSTALL_DIR/.env'"
-  run_test ".env has correct version" "grep -q 'ACME_VERSION=' '$INSTALL_DIR/.env'"
+  run_test ".env has correct version" "grep -q 'AETHER_VERSION=' '$INSTALL_DIR/.env'"
   ENV_PERMS=$(stat -c '%a' "$INSTALL_DIR/.env" 2>/dev/null || stat -f '%Lp' "$INSTALL_DIR/.env" 2>/dev/null || echo "unknown")
   if [ "$ENV_PERMS" = "600" ]; then
     pass ".env permissions are 600"
@@ -235,7 +235,7 @@ else
 fi
 
 # Containers running
-for name in caddy frontend acme-api supabase-kong supabase-auth supabase-db supabase-rest; do
+for name in caddy frontend aether-api supabase-kong supabase-auth supabase-db supabase-rest; do
   if docker ps --format '{{.Names}}' | grep -q "$name"; then
     pass "Container '$name' is running"
   else
@@ -530,11 +530,11 @@ if [ "$KEEP_INSTALL" = "false" ]; then
   # Verify uninstall
   run_test "Install directory removed" "[ ! -d '$INSTALL_DIR' ]"
 
-  ACME_CONTAINERS=$(docker ps -a --format '{{.Names}}' 2>/dev/null | grep -c 'acme-' || true)
-  if [ "${ACME_CONTAINERS:-0}" -eq 0 ] 2>/dev/null; then
+  AETHER_CONTAINERS=$(docker ps -a --format '{{.Names}}' 2>/dev/null | grep -c 'acme-' || true)
+  if [ "${AETHER_CONTAINERS:-0}" -eq 0 ] 2>/dev/null; then
     pass "All acme containers removed"
   else
-    fail "Acme containers still exist ($ACME_CONTAINERS)"
+    fail "Acme containers still exist ($AETHER_CONTAINERS)"
   fi
 
   run_test "CLI removed from PATH" "! which acme 2>/dev/null"

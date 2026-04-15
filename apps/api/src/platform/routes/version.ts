@@ -7,11 +7,11 @@ import { config } from '../../config';
  * Sources of truth:
  *   - Running version: process.env.SANDBOX_VERSION (injected at container start)
  *   - Stable releases: GitHub Releases API
- *   - Dev builds:      Docker Hub Tags API (acme/computer:dev-*)
+ *   - Dev builds:      Docker Hub Tags API (aether/computer:dev-*)
  *
  * Docker Hub tag convention:
- *   - Stable:  acme/computer:0.8.29,  acme/computer:latest
- *   - Dev:     acme/computer:dev-{sha8},  acme/computer:dev-latest
+ *   - Stable:  aether/computer:0.8.29,  aether/computer:latest
+ *   - Dev:     aether/computer:dev-{sha8},  aether/computer:dev-latest
  *
  * Update flow (frontend):
  *   1. GET /v1/platform/sandbox/version           → running version
@@ -24,7 +24,7 @@ import { config } from '../../config';
 
 const GITHUB_REPO = 'aimentor606/aether';
 const GITHUB_API_BASE = 'https://api.github.com';
-const DOCKERHUB_REPO = 'acme/computer';
+const DOCKERHUB_REPO = 'aether/computer';
 const DOCKERHUB_TAGS_URL = `https://hub.docker.com/v2/repositories/${DOCKERHUB_REPO}/tags`;
 
 const CACHE_TTL_MS = 5 * 60 * 1000;

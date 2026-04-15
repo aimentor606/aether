@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, ScrollView, Pressable, Alert, Modal, FlatList } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { AcmeLoader } from '@/components/ui';
+import { AetherLoader } from '@/components/ui';
 import {
   File,
   Folder,
@@ -20,7 +20,7 @@ import * as Haptics from 'expo-haptics';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAcmeComputerStore } from '@/stores/acme-computer-store';
+import { useAetherComputerStore } from '@/stores/aether-computer-store';
 import {
   useSandboxFiles,
   useUploadFileToSandbox,
@@ -35,7 +35,7 @@ import {
   type CommitInfo,
 } from '@/lib/files/hooks';
 import type { SandboxFile } from '@/api/types';
-import { AcmeComputerHeader, type BreadcrumbSegment } from './AcmeComputerHeader';
+import { AetherComputerHeader, type BreadcrumbSegment } from './AetherComputerHeader';
 import { VersionBanner } from './VersionBanner';
 
 interface FileBrowserViewProps {
@@ -95,7 +95,7 @@ export function FileBrowserView({
     selectedVersionDate,
     setSelectedVersion,
     clearSelectedVersion,
-  } = useAcmeComputerStore();
+  } = useAetherComputerStore();
 
   const [isUploading, setIsUploading] = useState(false);
   const [showVersionModal, setShowVersionModal] = useState(false);
@@ -461,7 +461,7 @@ export function FileBrowserView({
   return (
     <View className="flex-1">
       {/* Header */}
-      <AcmeComputerHeader
+      <AetherComputerHeader
         icon={Home}
         onIconClick={navigateHome}
         iconTitle="Home"
@@ -477,7 +477,7 @@ export function FileBrowserView({
               className={`h-9 w-9 items-center justify-center rounded-xl bg-card border border-border active:opacity-70 ${selectedVersion ? 'opacity-50' : ''}`}
             >
               {isUploading ? (
-                <AcmeLoader size="small" customSize={17} />
+                <AetherLoader size="small" customSize={17} />
               ) : (
                 <Icon
                   as={Upload}
@@ -537,7 +537,7 @@ export function FileBrowserView({
         {/* Show loading while fetching sandbox status */}
         {hasSandbox && isLoadingStatus && !sandboxStatus ? (
           <View className="flex-1 items-center justify-center gap-2 p-8">
-            <AcmeLoader size="large" />
+            <AetherLoader size="large" />
             <Text className="text-sm font-roobert-medium text-center">
               Checking computer status...
             </Text>
@@ -561,7 +561,7 @@ export function FileBrowserView({
         ) : hasSandbox && !isSandboxReady && (sandboxStatus || isAutoStarting) ? (
           /* Show sandbox status when not ready */
           <View className="flex-1 items-center justify-center gap-2 p-8">
-            <AcmeLoader size="large" />
+            <AetherLoader size="large" />
             <Text className="text-sm font-roobert-medium text-center">
               {(sandboxStatus === 'STARTING' || isAutoStarting) && (isAutoStarting ? 'Waking up computer...' : 'Computer starting...')}
               {sandboxStatus === 'OFFLINE' && !isAutoStarting && 'Computer offline'}
@@ -577,7 +577,7 @@ export function FileBrowserView({
           </View>
         ) : isLoading ? (
           <View className="flex-1 items-center justify-center gap-2">
-            <AcmeLoader size="large" />
+            <AetherLoader size="large" />
             <Text className="text-sm text-muted-foreground">
               {isLoadingVersionFiles ? 'Loading version...' : 'Loading files...'}
             </Text>
@@ -695,7 +695,7 @@ export function FileBrowserView({
 
           {isLoadingVersions ? (
             <View className="flex-1 items-center justify-center">
-              <AcmeLoader size="large" />
+              <AetherLoader size="large" />
               <Text className="text-sm text-muted-foreground mt-4">Loading history...</Text>
             </View>
           ) : versions.length === 0 ? (
@@ -739,7 +739,7 @@ export function FileBrowserView({
 
             {isLoadingRevertInfo ? (
               <View className="py-8 items-center">
-                <AcmeLoader size="small" />
+                <AetherLoader size="small" />
               </View>
             ) : revertCommitInfo ? (
               <View className="mb-4">
@@ -793,7 +793,7 @@ export function FileBrowserView({
               >
                 {isReverting ? (
                   <View className="flex-row items-center gap-2">
-                    <AcmeLoader size="small" customSize={14} forceTheme="dark" />
+                    <AetherLoader size="small" customSize={14} forceTheme="dark" />
                     <Text className="text-sm font-roobert-medium" style={{ color: '#ffffff' }}>Restoring...</Text>
                   </View>
                 ) : (

@@ -1,5 +1,5 @@
 /**
- * Sentry client-side configuration for Acme Frontend.
+ * Sentry client-side configuration for Aether Frontend.
  *
  * Uses @sentry/nextjs SDK pointed at Better Stack's Sentry-compatible endpoint.
  * Errors are tunneled through /monitoring route (auto-configured by
@@ -13,7 +13,7 @@ const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
-    environment: process.env.NEXT_PUBLIC_ACME_ENV || 'dev',
+    environment: process.env.NEXT_PUBLIC_AETHER_ENV || 'dev',
 
     // Capture 100% of errors
     // Sample 10% of page loads for performance (keep low on client)

@@ -16,7 +16,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ToolViewIconTitle } from '../shared/ToolViewIconTitle';
 import { ToolViewFooter } from '../shared/ToolViewFooter';
 import { LoadingState } from '../shared/LoadingState';
-import { parseProjectListOutput, type ProjectEntry } from '@/lib/utils/acme-tool-output';
+import { parseProjectListOutput, type ProjectEntry } from '@/lib/utils/aether-tool-output';
 
 export function OcProjectListToolView({
   toolCall,

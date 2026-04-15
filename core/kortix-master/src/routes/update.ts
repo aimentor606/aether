@@ -4,8 +4,8 @@ import { describeRoute } from 'hono-openapi';
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const VERSION_FILE = '/ephemeral/metadata/.version';
-const ACME_DATA_DIR = '/workspace/.kortix';
-const UPDATE_STATUS_FILE = ACME_DATA_DIR + '/update-status.json';
+const AETHER_DATA_DIR = '/workspace/.kortix';
+const UPDATE_STATUS_FILE = AETHER_DATA_DIR + '/update-status.json';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 

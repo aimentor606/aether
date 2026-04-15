@@ -397,7 +397,7 @@ function ApiKeysContent() {
                     </Text>
                     <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4, alignSelf: 'flex-start' }}>
                       <Text style={{ fontSize: 11, fontFamily: 'Roobert-Medium', color: fg }}>
-                        Authorization: Bearer acme_...
+                        Authorization: Bearer aether_...
                       </Text>
                     </View>
                     <Text style={{ fontSize: 11, fontFamily: 'Roobert', color: muted, lineHeight: 16, marginTop: 2 }}>

@@ -1,5 +1,5 @@
 /**
- * Test helpers for acme-api E2E tests.
+ * Test helpers for aether-api E2E tests.
  *
  * Provides:
  * - createTestApp() — Hono app mimicking the monolith with auth bypassed + injectable mock providers
@@ -15,7 +15,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
-import { createDb, type Database, sandboxes, deployments, acmeApiKeys } from '@acme/db';
+import { createDb, type Database, sandboxes, deployments, aetherApiKeys } from '@aether/db';
 import { sql } from 'drizzle-orm';
 import { BillingError } from '../errors';
 import type { AuthVariables } from '../types';
@@ -51,9 +51,9 @@ export interface SandboxProvider {
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 export const TEST_USER_ID = '00000000-0000-4000-a000-000000000001';
-export const TEST_USER_EMAIL = 'test@acme.dev';
+export const TEST_USER_EMAIL = 'test@aether.dev';
 export const OTHER_USER_ID = '00000000-0000-4000-a000-000000000002';
-export const OTHER_USER_EMAIL = 'other@acme.dev';
+export const OTHER_USER_EMAIL = 'other@aether.dev';
 
 // ─── DB ──────────────────────────────────────────────────────────────────────
 
@@ -107,7 +107,7 @@ export function createMockProvider(
     externalId: `mock-${name}-${Date.now()}`,
     baseUrl:
       name === 'daytona'
-        ? `https://acme.cloud/mock-daytona-id/8000`
+        ? `https://aether.cloud/mock-daytona-id/8000`
         : `http://localhost:${30000 + Math.floor(Math.random() * 1000)}`,
     metadata: {
       provisionedBy: 'test',
@@ -184,7 +184,7 @@ export function createTestApp(opts: TestAppOptions = {}) {
   app.get('/health', (c) =>
     c.json({
       status: 'ok',
-      service: 'acme-api',
+      service: 'aether-api',
       timestamp: new Date().toISOString(),
     }),
   );
@@ -334,7 +334,7 @@ export function createTestApp(opts: TestAppOptions = {}) {
  */
 export async function cleanupTestData(): Promise<void> {
   const db = getTestDb();
-  await db.delete(acmeApiKeys).execute();
+  await db.delete(aetherApiKeys).execute();
   await db.delete(deployments).execute();
   await db.delete(sandboxes).execute();
 }

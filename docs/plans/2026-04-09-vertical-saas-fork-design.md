@@ -1,4 +1,4 @@
-# 基于Acme构建垂直行业SaaS产品 — Fork策略设计
+# 基于Aether构建垂直行业SaaS产品 — Fork策略设计
 
 ## 文档信息
 
@@ -10,7 +10,7 @@
 
 ## 1. 需求总结
 
-**目标**：基于开源项目 Acme (aimentor606/aether) fork 构建垂直行业 SaaS 产品。
+**目标**：基于开源项目 Aether (aimentor606/aether) fork 构建垂直行业 SaaS 产品。
 
 **约束**：
 1. 尽量与上游保持同步，上游更新时下游更新成本最小
@@ -196,7 +196,7 @@ git checkout main && git merge sync-upstream-$(date +%Y%m%d)
 
 ## 7. 扩展机制利用
 
-Acme 已有以下扩展机制，可以在不改核心代码的情况下添加能力：
+Aether 已有以下扩展机制，可以在不改核心代码的情况下添加能力：
 
 | 机制 | 文件位置 | 用途 |
 |---|---|---|
@@ -216,7 +216,7 @@ Acme 已有以下扩展机制，可以在不改核心代码的情况下添加能
 
 ### 8.1 核心思路
 
-**保留目录名不动，替换其他所有 "Acme" 关键字。** 用 codemod 脚本自动化，每次 merge 上游后运行一次。
+**保留目录名不动，替换其他所有 "Aether" 关键字。** 用 codemod 脚本自动化，每次 merge 上游后运行一次。
 
 ### 8.2 替换范围
 
@@ -232,7 +232,7 @@ Acme 已有以下扩展机制，可以在不改核心代码的情况下添加能
 | 包名 | `acme-api` | `yourbrand-api` | package.json、pnpm 引用 |
 | 环境变量前缀 | `ACME_PUBLIC_*`、`ACME_TOKEN` 等 | `YOURBRAND_PUBLIC_*`、`YOURBRAND_TOKEN` | ~40+ 文件 |
 | Auth Cookie | `ACME_SUPABASE_AUTH_COOKIE` | `YOURBRAND_SUPABASE_AUTH_COOKIE` | ~5 文件 |
-| 用户可见文字 | "Acme" | 你的品牌名 | ~100+ 文件（前端/i18n） |
+| 用户可见文字 | "Aether" | 你的品牌名 | ~100+ 文件（前端/i18n） |
 | API Key 前缀 | `acme_` | `yourbrand_` | ~3 文件 |
 | Docker 镜像名 | `acme/suna:*` | `yourbrand/app:*` | ~5 文件 |
 | CLI 命令名 | `acme start` 等 | `yourbrand start` | ~20 文件 |
@@ -288,11 +288,11 @@ find ./apps/web \( -name '*.tsx' -o -name '*.ts' \) \
   -not -path '*/node_modules/*' \
   -not -path '*/.next/*' | \
   xargs sed -i '' \
-    -e "s/Acme/$BRAND_CAP/g"
+    -e "s/Aether/$BRAND_CAP/g"
 
 # i18n 翻译文件
 find ./apps/web/translations -name '*.json' | \
-  xargs sed -i '' "s/Acme/$BRAND_CAP/g"
+  xargs sed -i '' "s/Aether/$BRAND_CAP/g"
 
 # --- 第4步：其他固定替换 ---
 

@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - HTTP Method Fuzzing
  *
- * LIVE scan against https://computer-preview-api.acme.dev
+ * LIVE scan against https://computer-preview-api.aether.dev
  * Tests unexpected HTTP methods on endpoints to find method confusion bugs.
  *
  * FINDINGS:
@@ -12,7 +12,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.acme.dev';
+const CLOUD = 'https://computer-preview-api.aether.dev';
 
 async function probe(method: string, path: string): Promise<{ status: number; body: any }> {
   try {

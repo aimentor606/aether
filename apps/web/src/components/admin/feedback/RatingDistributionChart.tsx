@@ -1,7 +1,13 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+} from '@aether/ui/primitives';
 import { useAdminFeedbackStats } from '@/hooks/admin/use-admin-feedback';
 import {
   ChartContainer,
@@ -46,7 +52,9 @@ export function RatingDistributionChart() {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-medium">Rating Distribution</CardTitle>
+        <CardTitle className="text-base font-medium">
+          Rating Distribution
+        </CardTitle>
         <CardDescription>Breakdown by star rating</CardDescription>
       </CardHeader>
       <CardContent>
@@ -58,33 +66,33 @@ export function RatingDistributionChart() {
           </div>
         ) : (
           <ChartContainer config={chartConfig} className="h-[250px] w-full">
-            <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
-              <XAxis 
-                type="number" 
-                tickLine={false} 
+            <BarChart
+              data={chartData}
+              layout="vertical"
+              margin={{ top: 0, right: 20, left: 0, bottom: 0 }}
+            >
+              <XAxis
+                type="number"
+                tickLine={false}
                 axisLine={false}
                 fontSize={12}
                 className="text-muted-foreground"
               />
-              <YAxis 
-                type="category" 
-                dataKey="rating" 
-                tickLine={false} 
+              <YAxis
+                type="category"
+                dataKey="rating"
+                tickLine={false}
                 axisLine={false}
                 fontSize={12}
                 width={40}
                 tickFormatter={(value) => `${value}★`}
                 className="text-muted-foreground"
               />
-              <ChartTooltip 
+              <ChartTooltip
                 content={<ChartTooltipContent />}
                 formatter={(value) => [`${value} reviews`, 'Count']}
               />
-              <Bar 
-                dataKey="count" 
-                radius={[0, 4, 4, 0]}
-                maxBarSize={24}
-              >
+              <Bar dataKey="count" radius={[0, 4, 4, 0]} maxBarSize={24}>
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.fill} />
                 ))}

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import React, { useState, useRef, useEffect, memo } from 'react';
 import { Mic, Square } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { Button } from '@/components/ui/button';
 import {
     Tooltip,
@@ -150,7 +150,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = memo(function VoiceRe
             case 'recording':
                 return <Square className="h-4 w-4" />;
             case 'processing':
-                return <AcmeLoader size="small" />;
+                return <AetherLoader size="small" />;
             default:
                 return <Mic className="h-4 w-4" />;
         }

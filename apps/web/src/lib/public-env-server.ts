@@ -5,7 +5,7 @@ import { parseRuntimeEnv, type RuntimeEnv } from '@/lib/env-schema'
 export type PublicRuntimeEnv = RuntimeEnv
 
 function read(name: string): string | undefined {
-  return process.env[`ACME_PUBLIC_${name}`] ?? process.env[`NEXT_PUBLIC_${name}`]
+  return process.env[`AETHER_PUBLIC_${name}`] ?? process.env[`NEXT_PUBLIC_${name}`]
 }
 
 export function getServerPublicEnv(): PublicRuntimeEnv {

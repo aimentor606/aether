@@ -26,7 +26,7 @@ describe('Security Audit: Config Security', () => {
     test('health endpoint does not leak secrets', () => {
       const healthResponse = {
         status: 'ok',
-        service: 'acme-api',
+        service: 'aether-api',
         timestamp: new Date().toISOString(),
         env: 'local',
       };

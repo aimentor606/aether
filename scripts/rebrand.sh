@@ -55,6 +55,7 @@ cd "$PROJECT_ROOT"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Rebrand: kortix → ${BRAND}"
+echo "  Rebrand: acme → ${BRAND}"
 echo "  Domain: ${BRAND_DOMAIN}  Twitter: ${BRAND_TWITTER}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
@@ -396,6 +397,116 @@ else
 fi
 
 # ══════════════════════════════════════════════════════════════════════════════
+# PHASE 14: Acme → Brand replacements
+# ══════════════════════════════════════════════════════════════════════════════
+info "Phase 14: Acme brand replacements"
+
+# Package names: @acme/* → @brand/*
+sf -name 'package.json' -type f | while read -r f; do
+  eval "$SI \
+    -e 's/@acme\//@${BRAND}\//g' \
+    -e 's/\"acme-Frontend\"/\"${BRAND_PASCAL}-Frontend\"/g' \
+    -e 's/\"acme\"/\"${BRAND}\"/g' \
+    '$f'"
+done
+
+# Import statements: @acme/* → @brand/*
+sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' \) | while read -r f; do
+  eval "$SI -e 's/@acme\//@${BRAND}\//g' '$f'"
+done
+
+# Environment variables: ACME_* → BRAND_*
+sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.env*' -o -name '*.sh' \) | while read -r f; do
+  eval "$SI \
+    -e 's/ACME_PUBLIC_/${BRAND_UPPER}_PUBLIC_/g' \
+    -e 's/ACME_SUPABASE_AUTH_COOKIE/${BRAND_UPPER}_SUPABASE_AUTH_COOKIE/g' \
+    -e 's/ACME_BILLING_INTERNAL_ENABLED/${BRAND_UPPER}_BILLING_INTERNAL_ENABLED/g' \
+    -e 's/ACME_DEPLOYMENTS_ENABLED/${BRAND_UPPER}_DEPLOYMENTS_ENABLED/g' \
+    -e 's/ACME_LOCAL_IMAGES/${BRAND_UPPER}_LOCAL_IMAGES/g' \
+    -e 's/ACME_MARKUP/${BRAND_UPPER}_MARKUP/g' \
+    -e 's/ACME_DATA_DIR/${BRAND_UPPER}_DATA_DIR/g' \
+    -e 's/ACME_WORKSPACE_ROOT/${BRAND_UPPER}_WORKSPACE_ROOT/g' \
+    -e 's/ACME_WORKSPACE/${BRAND_UPPER}_WORKSPACE/g' \
+    -e 's/ACME_TOKEN/${BRAND_UPPER}_TOKEN/g' \
+    -e 's/ACME_API_URL/${BRAND_UPPER}_API_URL/g' \
+    -e 's/ACME_URL/${BRAND_UPPER}_URL/g' \
+    -e 's/ACME_MASTER_URL/${BRAND_UPPER}_MASTER_URL/g' \
+    -e 's/INTERNAL_ACME_ENV/INTERNAL_${BRAND_UPPER}_ENV/g' \
+    -e 's/ACME_SKIP_ENSURE_SCHEMA/${BRAND_UPPER}_SKIP_ENSURE_SCHEMA/g' \
+    -e 's/ACME_/${BRAND_UPPER}_/g' \
+    '$f'"
+done
+
+# HTTP headers: X-Acme-Token → X-Brand-Token
+sf -type f \( -name '*.ts' -o -name '*.tsx' \) | while read -r f; do
+  eval "$SI \
+    -e 's/X-Acme-Token/X-${BRAND_PASCAL}-Token/g' \
+    -e 's/x-acme-token/x-${BRAND}-token/g' \
+    '$f'"
+done
+
+# API key prefixes: acme_ → brand_ (with backward compat note)
+sf -type f \( -name '*.ts' -o -name '*.tsx' \) | while read -r f; do
+  eval "$SI \
+    -e 's/acme_sb_/${BRAND}_sb_/g' \
+    -e 's/acme_tnl_/${BRAND}_tnl_/g' \
+    -e 's/acme_/${BRAND}_/g' \
+    '$f'"
+done
+
+# User-visible strings: Acme → Brand
+sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.json' -o -name '*.md' \) -not -path '*/packages/db/drizzle/*' | while read -r f; do
+  eval "$SI -e 's/Acme/${BRAND_CAP}/g' '$f'"
+done
+
+# Docker images: acme/computer → brand/computer
+sf -type f \( -name '*.ts' -o -name '*.yml' -o -name '*.yaml' -o -name '*.sh' \) | while read -r f; do
+  eval "$SI \
+    -e 's/acme\/computer/${BRAND}\/computer/g' \
+    -e 's/acme-sandbox/${BRAND}-sandbox/g' \
+    -e 's/acme-api/${BRAND}-api/g' \
+    -e 's/acme\/acme-api/${BRAND}\/${BRAND}-api/g' \
+    '$f'"
+done
+
+# Domains: acme.dev → brand.dev etc
+sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.yml' -o -name '*.md' \) | while read -r f; do
+  eval "$SI -e 's/acme\.dev/${BRAND}.dev/g' -e 's/acme\.cloud/${BRAND}.cloud/g' -e 's/acme\.ai/${BRAND}.ai/g' '$f'"
+done
+
+# CamelCase/kebab identifiers: acmeSchema, acme-computer-store etc
+sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.css' \) | while read -r f; do
+  eval "$SI \
+    -e 's/acmeSchema/${BRAND}Schema/g' \
+    -e 's/acmeApiKeys/${BRAND}ApiKeys/g' \
+    -e 's/acme-computer-store/${BRAND}-computer-store/g' \
+    -e 's/acme-loader/${BRAND}-loader/g' \
+    -e 's/acme-logo/${BRAND}-logo/g' \
+    -e 's/acme-enterprise-modal/${BRAND}-enterprise-modal/g' \
+    -e 's/acme-tool-output/${BRAND}-tool-output/g' \
+    -e 's/acme-system-tags/${BRAND}-system-tags/g' \
+    -e 's/acme-box-display/${BRAND}-box-display/g' \
+    -e 's/acme-spreadsheet/${BRAND}-spreadsheet/g' \
+    '$f'"
+done
+
+# File renames: acme-* → brand-*
+if [[ "${SKIP_FILE_RENAMES:-0}" != "1" ]]; then
+  while IFS= read -r oldpath; do
+    case "$oldpath" in
+      */node_modules/*|*/.git/*|*/drizzle/*) continue ;;
+    esac
+    dir="$(dirname "$oldpath")"
+    base="$(basename "$oldpath")"
+    newbase="$(echo "$base" | sed "s/acme/${BRAND}/g; s/Acme/${BRAND_CAP}/g")"
+    if [[ "$base" != "$newbase" && ! -e "${dir}/${newbase}" ]]; then
+      mv "$oldpath" "${dir}/${newbase}"
+      info "  Renamed: $oldpath → ${dir}/${newbase}"
+    fi
+  done < <(find . -type f -name '*acme*' -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/drizzle/*' 2>/dev/null)
+fi
+
+success "Phase 14 done"
 # VERIFICATION
 # ══════════════════════════════════════════════════════════════════════════════
 echo ""
@@ -404,14 +515,15 @@ info "Verification: scanning for remaining kortix references..."
 remaining=$(sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.json' -o -name '*.sh' -o -name '*.yml' -o -name '*.md' \) 2>/dev/null \
   | grep -v 'core/kortix-master' \
   | grep -v 'packages/kortix-ocx-registry' \
-  | xargs grep -il 'kortix' 2>/dev/null | wc -l | tr -d ' ')
+  | grep -v 'packages/db/drizzle' \
+  | xargs grep -il 'kortix\|acme' 2>/dev/null | wc -l | tr -d ' ')
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if [[ "${remaining:-0}" -eq 0 ]]; then
-  success "Rebrand complete: kortix → ${BRAND} — no stray references found"
+  success "Rebrand complete: kortix/acme → ${BRAND} — no stray references found"
 else
-  warn "${remaining} files still contain 'kortix' (allowed dirs or comments)"
+  warn "${remaining} files still contain 'kortix' or 'acme' (allowed dirs or comments)"
 fi
 echo ""
 warn "Run to verify:  pnpm install && pnpm build"

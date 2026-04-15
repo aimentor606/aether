@@ -14,10 +14,10 @@
 #   bash /opt/tests/test-browser-system.sh
 #
 #   # Run from the host (against running container):
-#   docker exec acme-sandbox bash /opt/tests/test-browser-system.sh
+#   docker exec aether-sandbox bash /opt/tests/test-browser-system.sh
 #
 #   # Run from the repo root:
-#   docker exec acme-sandbox bash /workspace/computer/core/tests/test-browser-system.sh
+#   docker exec aether-sandbox bash /workspace/computer/core/tests/test-browser-system.sh
 #
 # Exit codes:
 #   0 = all tests passed

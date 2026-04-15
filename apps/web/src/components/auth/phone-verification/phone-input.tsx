@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Phone } from "lucide-react";
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { PhoneInput as PhoneInputComponent } from "@/components/ui/phone-input";
 
 function getUserCountryCode(): string {
@@ -154,7 +154,7 @@ export function PhoneInput({ onSubmit, isLoading = false, error = null }: PhoneI
           >
             {isLoading ? (
               <>
-                <AcmeLoader size="small" className="mr-2" />
+                <AetherLoader size="small" className="mr-2" />
                 {t('sendingCode')}
               </>
             ) : (

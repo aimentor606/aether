@@ -17,9 +17,9 @@ set -euo pipefail
 # State file: ~/.acme-deploy-slot tracks which slot is active
 # ─────────────────────────────────────────────────────────────────────────────
 
-IMAGE_NAME="acme-api"
+IMAGE_NAME="aether-api"
 STATE_FILE="$HOME/.acme-deploy-slot"
-NGINX_CONF="/etc/nginx/sites-available/acme-api"
+NGINX_CONF="/etc/nginx/sites-available/aether-api"
 HEALTH_TIMEOUT=60
 HEALTH_INTERVAL=2
 LOCK_FILE="$HOME/.acme-deploy.lock"
@@ -62,7 +62,7 @@ git submodule sync --recursive
 git submodule update --init --recursive --remote
 
 # Migrate .env from old paths to new paths (one-time after repo restructure)
-[ -f acme-api/.env ] && [ ! -f apps/api/.env ] && mkdir -p apps/api && mv acme-api/.env apps/api/.env && echo "  Migrated acme-api/.env → apps/api/.env"
+[ -f aether-api/.env ] && [ ! -f apps/api/.env ] && mkdir -p apps/api && mv aether-api/.env apps/api/.env && echo "  Migrated aether-api/.env → apps/api/.env"
 [ -f apps/frontend/.env ] && [ ! -f apps/web/.env ] && mkdir -p apps/web && mv apps/frontend/.env apps/web/.env && echo "  Migrated apps/frontend/.env → apps/web/.env"
 [ -f sandbox/docker/.env ] && [ ! -f core/docker/.env ] && mkdir -p core/docker && mv sandbox/docker/.env core/docker/.env && echo "  Migrated sandbox/docker/.env → core/docker/.env"
 
@@ -87,15 +87,15 @@ fi
 
 # ── 3. Start standby container ───────────────────────────────────────────────
 echo "[3/6] Starting $STANDBY_SLOT on port $STANDBY_PORT..."
-docker rm -f "acme-api-$STANDBY_SLOT" 2>/dev/null || true
+docker rm -f "aether-api-$STANDBY_SLOT" 2>/dev/null || true
 
-# Extract version from image tag (e.g. "acme/acme-api:0.8.29" → "0.8.29")
+# Extract version from image tag (e.g. "acme/aether-api:0.8.29" → "0.8.29")
 # Falls back to git commit short SHA for dev builds
 SANDBOX_VERSION="${IMAGE_TAG##*:}"
 echo "  SANDBOX_VERSION=$SANDBOX_VERSION"
 
 docker run -d \
-  --name "acme-api-$STANDBY_SLOT" \
+  --name "aether-api-$STANDBY_SLOT" \
   --env-file apps/api/.env \
   -e "SANDBOX_VERSION=$SANDBOX_VERSION" \
   -p "${STANDBY_PORT}:8008" \
@@ -119,8 +119,8 @@ done
 if [ "$HEALTHY" = "false" ]; then
   echo "  ✗ Health check FAILED after ${HEALTH_TIMEOUT}s — rolling back"
   echo "  Container logs:"
-  docker logs "acme-api-$STANDBY_SLOT" 2>&1 | tail -20
-  docker rm -f "acme-api-$STANDBY_SLOT" 2>/dev/null || true
+  docker logs "aether-api-$STANDBY_SLOT" 2>&1 | tail -20
+  docker rm -f "aether-api-$STANDBY_SLOT" 2>/dev/null || true
   echo "  Rollback complete. Active ($ACTIVE_SLOT:$ACTIVE_PORT) unchanged."
   exit 1
 fi
@@ -135,7 +135,7 @@ if sudo nginx -t 2>&1; then
 else
   echo "  ✗ nginx config test failed — reverting"
   sudo sed -i "s|proxy_pass http://127.0.0.1:[0-9]*;|proxy_pass http://127.0.0.1:${ACTIVE_PORT};|" "$NGINX_CONF"
-  docker rm -f "acme-api-$STANDBY_SLOT" 2>/dev/null || true
+  docker rm -f "aether-api-$STANDBY_SLOT" 2>/dev/null || true
   exit 1
 fi
 
@@ -146,13 +146,13 @@ else
   echo "  ✗ nginx verification failed — reverting"
   sudo sed -i "s|proxy_pass http://127.0.0.1:[0-9]*;|proxy_pass http://127.0.0.1:${ACTIVE_PORT};|" "$NGINX_CONF"
   sudo nginx -s reload
-  docker rm -f "acme-api-$STANDBY_SLOT" 2>/dev/null || true
+  docker rm -f "aether-api-$STANDBY_SLOT" 2>/dev/null || true
   exit 1
 fi
 
 # ── 6. Stop old container + cleanup ──────────────────────────────────────────
 echo "[6/6] Stopping old $ACTIVE_SLOT container..."
-docker rm -f "acme-api-$ACTIVE_SLOT" 2>/dev/null || true
+docker rm -f "aether-api-$ACTIVE_SLOT" 2>/dev/null || true
 
 # Save new active slot
 echo "$STANDBY_SLOT" > "$STATE_FILE"

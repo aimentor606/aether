@@ -1,6 +1,6 @@
 import { invoicesRepository } from '../repositories';
-import { createInvoiceSchema, updateInvoiceSchema } from '@acme/db';
-import type { CreateInvoiceInput, UpdateInvoiceInput } from '@acme/db';
+import { createInvoiceSchema, updateInvoiceSchema } from '@aether/db';
+import type { CreateInvoiceInput, UpdateInvoiceInput } from '@aether/db';
 
 export const invoicesService = {
   async listAll(accountId: string) {

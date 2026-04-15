@@ -6,9 +6,9 @@ import { loadBootstrapEnv } from '../services/bootstrap-env'
 const S6_ENV_DIR = process.env.S6_ENV_DIR || '/run/s6/container_environment'
 
 async function main() {
-  // Load bootstrap env FIRST — restores ACME_TOKEN (the SecretStore encryption
+  // Load bootstrap env FIRST — restores AETHER_TOKEN (the SecretStore encryption
   // key) from the persistent bootstrap file before we try to decrypt secrets.
-  // Without this, ACME_TOKEN may be empty (Docker passes it as "" on restart),
+  // Without this, AETHER_TOKEN may be empty (Docker passes it as "" on restart),
   // causing SecretStore to use 'default-key' and fail to decrypt, which triggers
   // destructive auto-purge of all encrypted secrets.
   loadBootstrapEnv()

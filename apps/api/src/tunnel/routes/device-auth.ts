@@ -13,7 +13,7 @@
 
 import { Hono } from 'hono';
 import { eq, and, gt } from 'drizzle-orm';
-import { tunnelConnections, tunnelDeviceAuthRequests, tunnelPermissions } from '@acme/db';
+import { tunnelConnections, tunnelDeviceAuthRequests, tunnelPermissions } from '@aether/db';
 import { db } from '../../shared/db';
 import { generateDeviceCode, generateTunnelToken, hashSecretKey, verifySecretKey, randomAlphanumeric } from '../../shared/crypto';
 import { tunnelRateLimiter } from '../core/rate-limiter';

@@ -1,4 +1,4 @@
-export * from './kortix';
+export * from './aether';
 
 export * from './public';
 

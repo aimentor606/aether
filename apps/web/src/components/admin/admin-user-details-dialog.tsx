@@ -3,28 +3,29 @@
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import {
+  Input,
+  Label,
+  Skeleton,
+  Switch,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Switch } from '@/components/ui/switch';
+  Textarea,
+} from '@aether/ui/primitives';
 import { toast } from '@/lib/toast';
 import {
   User,
@@ -41,8 +42,12 @@ import {
   MessageSquare,
   ExternalLink,
 } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
-import { useAdminUserDetails, useAdminUserThreads, useAdminUserActivity } from '@/hooks/admin/use-admin-users';
+import { AetherLoader } from '@/components/ui/aether-loader';
+import {
+  useAdminUserDetails,
+  useAdminUserThreads,
+  useAdminUserActivity,
+} from '@/hooks/admin/use-admin-users';
 import {
   useUserBillingSummary,
   useAdjustCredits,
@@ -50,7 +55,11 @@ import {
   useAdminUserTransactions,
 } from '@/hooks/billing';
 import type { UserSummary } from '@/hooks/admin/use-admin-users';
-import { formatCredits, dollarsToCredits, formatCreditsWithSign } from '@acme/shared';
+import {
+  formatCredits,
+  dollarsToCredits,
+  formatCreditsWithSign,
+} from '@aether/shared';
 
 interface AdminUserDetailsDialogProps {
   user: UserSummary | null;
@@ -75,23 +84,28 @@ export function AdminUserDetailsDialog({
   const [transactionsPage, setTransactionsPage] = useState(1);
   const [activityPage, setActivityPage] = useState(1);
 
-  const { data: userDetails, isLoading } = useAdminUserDetails(user?.id || null);
-  const { data: billingSummary, refetch: refetchBilling } = useUserBillingSummary(user?.id || null);
+  const { data: userDetails, isLoading } = useAdminUserDetails(
+    user?.id || null,
+  );
+  const { data: billingSummary, refetch: refetchBilling } =
+    useUserBillingSummary(user?.id || null);
   const { data: userThreads, isLoading: threadsLoading } = useAdminUserThreads({
     email: user?.email || '',
     page: threadsPage,
     page_size: 10,
   });
-  const { data: userTransactions, isLoading: transactionsLoading } = useAdminUserTransactions({
-    userId: user?.id || '',
-    page: transactionsPage,
-    page_size: 10,
-  });
-  const { data: userActivity, isLoading: activityLoading } = useAdminUserActivity({
-    userId: user?.id || '',
-    page: activityPage,
-    page_size: 10,
-  });
+  const { data: userTransactions, isLoading: transactionsLoading } =
+    useAdminUserTransactions({
+      userId: user?.id || '',
+      page: transactionsPage,
+      page_size: 10,
+    });
+  const { data: userActivity, isLoading: activityLoading } =
+    useAdminUserActivity({
+      userId: user?.id || '',
+      page: activityPage,
+      page_size: 10,
+    });
   const adjustCreditsMutation = useAdjustCredits();
   const processRefundMutation = useProcessRefund();
 
@@ -121,7 +135,7 @@ export function AdminUserDetailsDialog({
       });
 
       toast.success(
-        `Credits adjusted successfully. New balance: ${formatCredits(dollarsToCredits(result.new_balance))}`
+        `Credits adjusted successfully. New balance: ${formatCredits(dollarsToCredits(result.new_balance))}`,
       );
 
       refetchBilling();
@@ -150,7 +164,7 @@ export function AdminUserDetailsDialog({
       });
 
       toast.success(
-        `Refund processed. New balance: ${formatCredits(dollarsToCredits(result.new_balance))}`
+        `Refund processed. New balance: ${formatCredits(dollarsToCredits(result.new_balance))}`,
       );
 
       refetchBilling();
@@ -249,20 +263,31 @@ export function AdminUserDetailsDialog({
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Email</p>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          Email
+                        </p>
                         <p className="font-mono text-sm">{user.email}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">User ID</p>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          User ID
+                        </p>
                         <p className="font-mono text-xs">{user.id}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Joined</p>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          Joined
+                        </p>
                         <p className="text-sm">{formatDate(user.created_at)}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Tier</p>
-                        <Badge variant={getTierBadgeVariant(user.tier)} className="capitalize">
+                        <p className="text-sm font-medium text-muted-foreground">
+                          Tier
+                        </p>
+                        <Badge
+                          variant={getTierBadgeVariant(user.tier)}
+                          className="capitalize"
+                        >
                           {user.tier}
                         </Badge>
                       </div>
@@ -278,7 +303,9 @@ export function AdminUserDetailsDialog({
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Current Balance</p>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          Current Balance
+                        </p>
                         <p className="text-2xl font-medium text-green-600">
                           {formatCredits(dollarsToCredits(user.credit_balance))}
                         </p>
@@ -286,17 +313,27 @@ export function AdminUserDetailsDialog({
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <p className="text-muted-foreground">Purchased</p>
-                          <p className="font-medium">{formatCredits(dollarsToCredits(user.total_purchased))}</p>
+                          <p className="font-medium">
+                            {formatCredits(
+                              dollarsToCredits(user.total_purchased),
+                            )}
+                          </p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Used</p>
-                          <p className="font-medium">{formatCredits(dollarsToCredits(user.total_used))}</p>
+                          <p className="font-medium">
+                            {formatCredits(dollarsToCredits(user.total_used))}
+                          </p>
                         </div>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Subscription</p>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          Subscription
+                        </p>
                         <Badge
-                          variant={getSubscriptionBadgeVariant(user.subscription_status)}
+                          variant={getSubscriptionBadgeVariant(
+                            user.subscription_status,
+                          )}
                           className="capitalize"
                         >
                           {user.subscription_status || 'None'}
@@ -332,17 +369,27 @@ export function AdminUserDetailsDialog({
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
                                 {thread.project_name ? (
-                                  <p className="text-sm font-medium truncate">{thread.project_name}</p>
+                                  <p className="text-sm font-medium truncate">
+                                    {thread.project_name}
+                                  </p>
                                 ) : (
-                                  <p className="text-sm font-medium text-muted-foreground">Direct Thread</p>
+                                  <p className="text-sm font-medium text-muted-foreground">
+                                    Direct Thread
+                                  </p>
                                 )}
                                 {thread.is_public && (
-                                  <Badge variant="outline" className="text-xs">Public</Badge>
+                                  <Badge variant="outline" className="text-xs">
+                                    Public
+                                  </Badge>
                                 )}
                               </div>
                               <div className="mt-1 text-xs text-muted-foreground space-y-0.5">
-                                <div>Created {formatDate(thread.created_at)}</div>
-                                <div>Updated {formatDate(thread.updated_at)}</div>
+                                <div>
+                                  Created {formatDate(thread.created_at)}
+                                </div>
+                                <div>
+                                  Updated {formatDate(thread.updated_at)}
+                                </div>
                               </div>
                               <p className="text-xs text-muted-foreground mt-1 font-mono truncate">
                                 {thread.thread_id}
@@ -366,32 +413,38 @@ export function AdminUserDetailsDialog({
                             </Button>
                           </div>
                         ))}
-                        {userThreads.pagination && userThreads.pagination.total_pages > 1 && (
-                          <div className="flex items-center justify-between pt-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={!userThreads.pagination.has_previous}
-                              onClick={() => setThreadsPage(p => Math.max(1, p - 1))}
-                            >
-                              Previous
-                            </Button>
-                            <span className="text-sm text-muted-foreground">
-                              Page {userThreads.pagination.current_page} of {userThreads.pagination.total_pages}
-                            </span>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={!userThreads.pagination.has_next}
-                              onClick={() => setThreadsPage(p => p + 1)}
-                            >
-                              Next
-                            </Button>
-                          </div>
-                        )}
+                        {userThreads.pagination &&
+                          userThreads.pagination.total_pages > 1 && (
+                            <div className="flex items-center justify-between pt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={!userThreads.pagination.has_previous}
+                                onClick={() =>
+                                  setThreadsPage((p) => Math.max(1, p - 1))
+                                }
+                              >
+                                Previous
+                              </Button>
+                              <span className="text-sm text-muted-foreground">
+                                Page {userThreads.pagination.current_page} of{' '}
+                                {userThreads.pagination.total_pages}
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={!userThreads.pagination.has_next}
+                                onClick={() => setThreadsPage((p) => p + 1)}
+                              >
+                                Next
+                              </Button>
+                            </div>
+                          )}
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">No threads found</p>
+                      <p className="text-sm text-muted-foreground">
+                        No threads found
+                      </p>
                     )}
                   </CardContent>
                 </Card>
@@ -412,7 +465,8 @@ export function AdminUserDetailsDialog({
                           <Skeleton key={i} className="h-16 w-full" />
                         ))}
                       </div>
-                    ) : userTransactions && userTransactions.data?.length > 0 ? (
+                    ) : userTransactions &&
+                      userTransactions.data?.length > 0 ? (
                       <div className="space-y-2">
                         {userTransactions.data.map((transaction: any) => (
                           <div
@@ -420,47 +474,69 @@ export function AdminUserDetailsDialog({
                             className="flex items-center justify-between p-3 border rounded-lg"
                           >
                             <div>
-                              <p className="text-sm font-medium">{transaction.description}</p>
+                              <p className="text-sm font-medium">
+                                {transaction.description}
+                              </p>
                               <p className="text-xs text-muted-foreground">
                                 {formatDate(transaction.created_at)}
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className={cn('font-semibold', getTransactionColor(transaction.type))}>
-                                {formatCreditsWithSign(dollarsToCredits(transaction.amount), { showDecimals: true })}
+                              <p
+                                className={cn(
+                                  'font-semibold',
+                                  getTransactionColor(transaction.type),
+                                )}
+                              >
+                                {formatCreditsWithSign(
+                                  dollarsToCredits(transaction.amount),
+                                  { showDecimals: true },
+                                )}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                Balance: {formatCredits(dollarsToCredits(transaction.balance_after), { showDecimals: true })}
+                                Balance:{' '}
+                                {formatCredits(
+                                  dollarsToCredits(transaction.balance_after),
+                                  { showDecimals: true },
+                                )}
                               </p>
                             </div>
                           </div>
                         ))}
-                        {userTransactions.pagination && userTransactions.pagination.total_pages > 1 && (
-                          <div className="flex items-center justify-between pt-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={!userTransactions.pagination.has_prev}
-                              onClick={() => setTransactionsPage(p => Math.max(1, p - 1))}
-                            >
-                              Previous
-                            </Button>
-                            <span className="text-sm text-muted-foreground">
-                              Page {userTransactions.pagination.page} of {userTransactions.pagination.total_pages}
-                            </span>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={!userTransactions.pagination.has_next}
-                              onClick={() => setTransactionsPage(p => p + 1)}
-                            >
-                              Next
-                            </Button>
-                          </div>
-                        )}
+                        {userTransactions.pagination &&
+                          userTransactions.pagination.total_pages > 1 && (
+                            <div className="flex items-center justify-between pt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={!userTransactions.pagination.has_prev}
+                                onClick={() =>
+                                  setTransactionsPage((p) => Math.max(1, p - 1))
+                                }
+                              >
+                                Previous
+                              </Button>
+                              <span className="text-sm text-muted-foreground">
+                                Page {userTransactions.pagination.page} of{' '}
+                                {userTransactions.pagination.total_pages}
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={!userTransactions.pagination.has_next}
+                                onClick={() =>
+                                  setTransactionsPage((p) => p + 1)
+                                }
+                              >
+                                Next
+                              </Button>
+                            </div>
+                          )}
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">No transactions found</p>
+                      <p className="text-sm text-muted-foreground">
+                        No transactions found
+                      </p>
                     )}
                   </CardContent>
                 </Card>
@@ -490,16 +566,26 @@ export function AdminUserDetailsDialog({
                           >
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
-                                <p className="text-sm font-medium">{activity.agent_name}</p>
+                                <p className="text-sm font-medium">
+                                  {activity.agent_name}
+                                </p>
                                 <Badge
-                                  variant={activity.status === 'completed' ? 'default' : activity.status === 'failed' ? 'destructive' : 'secondary'}
+                                  variant={
+                                    activity.status === 'completed'
+                                      ? 'default'
+                                      : activity.status === 'failed'
+                                        ? 'destructive'
+                                        : 'secondary'
+                                  }
                                   className="text-xs"
                                 >
                                   {activity.status}
                                 </Badge>
                               </div>
                               <p className="text-xs text-muted-foreground mt-1">
-                                {formatDate(activity.created_at)} • Thread: {activity.thread_name || activity.thread_id.slice(-8)}
+                                {formatDate(activity.created_at)} • Thread:{' '}
+                                {activity.thread_name ||
+                                  activity.thread_id.slice(-8)}
                               </p>
                               {activity.error && (
                                 <p className="text-xs text-red-600 mt-1 truncate">
@@ -510,38 +596,47 @@ export function AdminUserDetailsDialog({
                             {activity.credit_cost > 0 && (
                               <div className="text-right ml-2">
                                 <p className="text-sm font-medium text-muted-foreground">
-                                  {formatCredits(dollarsToCredits(activity.credit_cost), { showDecimals: true })}
+                                  {formatCredits(
+                                    dollarsToCredits(activity.credit_cost),
+                                    { showDecimals: true },
+                                  )}
                                 </p>
                               </div>
                             )}
                           </div>
                         ))}
-                        {userActivity.pagination && userActivity.pagination.total_pages > 1 && (
-                          <div className="flex items-center justify-between pt-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={!userActivity.pagination.has_prev}
-                              onClick={() => setActivityPage(p => Math.max(1, p - 1))}
-                            >
-                              Previous
-                            </Button>
-                            <span className="text-sm text-muted-foreground">
-                              Page {userActivity.pagination.page} of {userActivity.pagination.total_pages}
-                            </span>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={!userActivity.pagination.has_next}
-                              onClick={() => setActivityPage(p => p + 1)}
-                            >
-                              Next
-                            </Button>
-                          </div>
-                        )}
+                        {userActivity.pagination &&
+                          userActivity.pagination.total_pages > 1 && (
+                            <div className="flex items-center justify-between pt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={!userActivity.pagination.has_prev}
+                                onClick={() =>
+                                  setActivityPage((p) => Math.max(1, p - 1))
+                                }
+                              >
+                                Previous
+                              </Button>
+                              <span className="text-sm text-muted-foreground">
+                                Page {userActivity.pagination.page} of{' '}
+                                {userActivity.pagination.total_pages}
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={!userActivity.pagination.has_next}
+                                onClick={() => setActivityPage((p) => p + 1)}
+                              >
+                                Next
+                              </Button>
+                            </div>
+                          )}
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">No activity found</p>
+                      <p className="text-sm text-muted-foreground">
+                        No activity found
+                      </p>
                     )}
                   </CardContent>
                 </Card>
@@ -565,7 +660,9 @@ export function AdminUserDetailsDialog({
                         </div>
                       </div>
                       <div>
-                        <Label htmlFor="refund-amount">Refund Amount (USD)</Label>
+                        <Label htmlFor="refund-amount">
+                          Refund Amount (USD)
+                        </Label>
                         <Input
                           id="refund-amount"
                           type="number"
@@ -576,7 +673,9 @@ export function AdminUserDetailsDialog({
                         />
                       </div>
                       <div>
-                        <Label htmlFor="refund-reason mb-2">Refund Reason</Label>
+                        <Label htmlFor="refund-reason mb-2">
+                          Refund Reason
+                        </Label>
                         <Textarea
                           id="refund-reason"
                           placeholder="Service outage compensation"
@@ -587,21 +686,28 @@ export function AdminUserDetailsDialog({
                       </div>
                       <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
                         <div className="flex items-center gap-2">
-                          <Label htmlFor="refund-expiring" className="cursor-pointer flex items-center gap-2">
+                          <Label
+                            htmlFor="refund-expiring"
+                            className="cursor-pointer flex items-center gap-2"
+                          >
                             {refundIsExpiring ? (
                               <Clock className="h-4 w-4 text-orange-500" />
                             ) : (
                               <Infinity className="h-4 w-4 text-blue-500" />
                             )}
                             <span className="font-medium">
-                              {refundIsExpiring ? 'Expiring Credits' : 'Non-Expiring Credits'}
+                              {refundIsExpiring
+                                ? 'Expiring Credits'
+                                : 'Non-Expiring Credits'}
                             </span>
                           </Label>
                         </div>
                         <Switch
                           id="refund-expiring"
                           checked={!refundIsExpiring}
-                          onCheckedChange={(checked) => setRefundIsExpiring(!checked)}
+                          onCheckedChange={(checked) =>
+                            setRefundIsExpiring(!checked)
+                          }
                         />
                       </div>
                       <p className="text-xs text-muted-foreground -mt-2">
@@ -617,7 +723,7 @@ export function AdminUserDetailsDialog({
                       >
                         {processRefundMutation.isPending ? (
                           <>
-                            <AcmeLoader size="small" className="mr-2" />
+                            <AetherLoader size="small" className="mr-2" />
                             Processing...
                           </>
                         ) : (
@@ -640,4 +746,4 @@ export function AdminUserDetailsDialog({
       </DialogContent>
     </Dialog>
   );
-} 
+}

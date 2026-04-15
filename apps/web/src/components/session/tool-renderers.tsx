@@ -5631,7 +5631,7 @@ ToolRegistry.register("oc-project_delete", ProjectDeleteTool);
 ToolRegistry.register("oc-project-delete", ProjectDeleteTool);
 
 // ============================================================================
-// AgentSpawnTool — Acme agent delegation (replaces native task tool)
+// AgentSpawnTool — Aether agent delegation (replaces native task tool)
 // Same UX as TaskTool: compact card, live shimmer, SubSessionModal
 // ============================================================================
 
@@ -6385,7 +6385,7 @@ function SkillTool({ part, forceOpen }: ToolProps) {
 ToolRegistry.register("skill", SkillTool);
 
 // ============================================================================
-// Project Tools — Acme Orchestrator project management
+// Project Tools — Aether Orchestrator project management
 // ============================================================================
 
 import {
@@ -6393,7 +6393,7 @@ import {
 	parseProjectSelectOutput,
 	parseProjectCreateOutput,
 	type ProjectEntry,
-} from "@/lib/utils/acme-tool-output";
+} from "@/lib/utils/aether-tool-output";
 
 function ProjectListTool({ part, defaultOpen, forceOpen }: ToolProps) {
 	const output = partOutput(part);
@@ -6545,7 +6545,7 @@ ToolRegistry.register("oc-project_create", ProjectCreateTool);
 ToolRegistry.register("oc-project-create", ProjectCreateTool);
 
 // ============================================================================
-// Connector Tools — Acme Connectors plugin
+// Connector Tools — Aether Connectors plugin
 // ============================================================================
 
 import {
@@ -6553,7 +6553,7 @@ import {
 	parseConnectorGetOutput,
 	parseConnectorSetupOutput,
 	type ConnectorEntry,
-} from "@/lib/utils/acme-tool-output";
+} from "@/lib/utils/aether-tool-output";
 
 function ConnectorListTool({ part, defaultOpen, forceOpen }: ToolProps) {
 	const input = partInput(part);

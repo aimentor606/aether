@@ -48,9 +48,9 @@ export const metadata: Metadata = {
   },
   description: siteMetadata.description,
   keywords: siteMetadata.keywords,
-  authors: [{ name: 'Acme Team', url: 'https://www.acme.dev' }],
-  creator: 'Acme Team',
-  publisher: 'Acme Team',
+  authors: [{ name: 'Aether Team', url: 'https://www.aether.dev' }],
+  creator: 'Aether Team',
+  publisher: 'Aether Team',
   applicationName: siteMetadata.name,
   robots: {
     index: true,
@@ -116,7 +116,7 @@ export default async function RootLayout({
             Docker images get correct env vars regardless of build-time defaults. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.__ACME_RUNTIME_CONFIG=${JSON.stringify(runtimeEnv)};window.__RUNTIME_ENV=window.__ACME_RUNTIME_CONFIG;`,
+            __html: `window.__AETHER_RUNTIME_CONFIG=${JSON.stringify(runtimeEnv)};window.__RUNTIME_ENV=window.__AETHER_RUNTIME_CONFIG;`,
           }}
         />
 
@@ -183,21 +183,21 @@ export default async function RootLayout({
         />
 
         {/* Static SEO meta tags - rendered in initial HTML */}
-        <title>Acme – The Autonomous Company Operating System</title>
+        <title>Aether – The Autonomous Company Operating System</title>
         <meta name="description" content="A cloud computer where AI agents run your company. Connect 3,000+ tools, configure autonomous agents, set triggers — and the machine operates 24/7 with persistent memory." />
-        <meta name="keywords" content="Acme, autonomous company operating system, AI agents, self-driving company, cloud computer, AI automation, agent orchestration, autowork, AI triggers, persistent memory, autonomous workforce, AI operations" />
-        <meta property="og:title" content="Acme – The Autonomous Company Operating System" />
+        <meta name="keywords" content="Aether, autonomous company operating system, AI agents, self-driving company, cloud computer, AI automation, agent orchestration, autowork, AI triggers, persistent memory, autonomous workforce, AI operations" />
+        <meta property="og:title" content="Aether – The Autonomous Company Operating System" />
         <meta property="og:description" content="A cloud computer where AI agents run your company. Connect 3,000+ tools, configure autonomous agents, set triggers — and the machine operates 24/7 with persistent memory." />
-        <meta property="og:image" content="https://acme.dev/banner.png" />
-        <meta property="og:url" content="https://acme.dev" />
+        <meta property="og:image" content="https://aether.dev/banner.png" />
+        <meta property="og:url" content="https://aether.dev" />
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Acme" />
+        <meta property="og:site_name" content="Aether" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Acme – The Autonomous Company Operating System" />
+        <meta name="twitter:title" content="Aether – The Autonomous Company Operating System" />
         <meta name="twitter:description" content="A cloud computer where AI agents run your company. Connect 3,000+ tools, configure autonomous agents, set triggers — and the machine operates 24/7 with persistent memory." />
-        <meta name="twitter:image" content="https://acme.dev/banner.png" />
+        <meta name="twitter:image" content="https://aether.dev/banner.png" />
         <meta name="twitter:site" content="@acme" />
-        <link rel="canonical" href="https://acme.dev" />
+        <link rel="canonical" href="https://aether.dev" />
 
         {/* iOS Smart App Banner - shows native install banner in Safari */}
         {!featureFlags.disableMobileAdvertising ? (
@@ -213,7 +213,7 @@ export default async function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: siteMetadata.name,
-              alternateName: ['Acme', 'Acme AI', 'Acme – The Autonomous Company Operating System'],
+              alternateName: ['Aether', 'Aether AI', 'Aether – The Autonomous Company Operating System'],
               url: siteMetadata.url,
               logo: `${siteMetadata.url}/favicon.png`,
               description: siteMetadata.description,
@@ -239,7 +239,7 @@ export default async function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'SoftwareApplication',
               name: siteMetadata.title,
-              alternateName: [siteMetadata.name, 'Acme'],
+              alternateName: [siteMetadata.name, 'Aether'],
               applicationCategory: 'BusinessApplication',
               operatingSystem: 'Web, macOS, Windows, Linux',
               description: siteMetadata.description,

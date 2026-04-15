@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { AcmeLogo } from '@/components/sidebar/acme-logo';
+import { AetherLogo } from '@/components/sidebar/aether-logo';
 
 function isMobileDevice(): boolean {
   if (typeof window === 'undefined') return false;
@@ -82,13 +82,13 @@ export function MobileAppBanner({ shareId }: MobileAppBannerProps) {
         <div className="flex items-center gap-3">
           {/* App icon */}
           <div className="shrink-0 w-10 h-10 rounded-xl bg-foreground flex items-center justify-center">
-            <AcmeLogo size={20} className="invert dark:invert-0" />
+            <AetherLogo size={20} className="invert dark:invert-0" />
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-foreground text-sm leading-tight">
-              Acme
+              Aether
             </h3>
             <p className="text-xs text-muted-foreground leading-tight">
               Open this content in app

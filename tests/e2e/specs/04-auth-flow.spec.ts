@@ -44,7 +44,7 @@ test.describe('04 — Authentication flow', () => {
     }
 
     // May already be authenticated from a prior session, or show login form
-    const signInHeading = page.getByRole('heading', { name: 'Sign in to Acme' });
+    const signInHeading = page.getByRole('heading', { name: 'Sign in to Aether' });
     const wizardHeading = page.getByRole('heading', { name: /Connect a provider/i });
 
     // Wait for either the login form or the wizard

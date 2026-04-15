@@ -12,7 +12,7 @@ import * as path from "node:path"
 // ─── DB path resolution (same as connectors.ts) ─────────────────────────────
 
 function resolveDbPath(): string {
-  const root = process.env.ACME_WORKSPACE?.trim()
+  const root = process.env.AETHER_WORKSPACE?.trim()
     || (process.env.OPENCODE_CONFIG_DIR?.trim()
       ? path.dirname(path.resolve(process.env.OPENCODE_CONFIG_DIR))
       : (process.env.HOME ? path.join(process.env.HOME, "") : process.cwd()))

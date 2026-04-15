@@ -81,7 +81,7 @@
     "guest": {
       "label": "Invité",
       "title": "Browse Without\nan Account",
-      "description": "Try Acme with limited features. No signup required!",
+      "description": "Try Aether with limited features. No signup required!",
       "continue": "Continue as Guest",
       "signUp": "Sign Up Instead",
       "agreement": "By continuing, you agree to our",
@@ -99,7 +99,7 @@
     "resetFailed": "Impossible d'envoyer l'email. Réessaie.",
     "passwordsDontMatch": "Les mots de passe ne correspondent pas",
     "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
-    "welcomeTitle": "Engager Acme pour",
+    "welcomeTitle": "Engager Aether pour",
     "rotatingPhrases": {
       "presentations": "présentations",
       "writing": "écriture",
@@ -123,12 +123,12 @@
     }
   },
   "onboarding": {
-    "welcome": "Découvrez ce que Acme peut faire",
+    "welcome": "Découvrez ce que Aether peut faire",
     "welcomeSubtitle": "Votre assistant IA qui passe à l'action",
     "skip": "Passer",
     "next": "Suivant",
     "getStarted": "Commencer",
-    "acmeComputer": "Acme Computer",
+    "acmeComputer": "Aether Computer",
     "ready": "Prêt",
     "examples": {
       "presentations": {
@@ -237,8 +237,8 @@
   },
   "chat": {
     "newChat": "Nouveau Chat",
-    "placeholder": "Donne une tâche à Acme...",
-    "inputPlaceholder": "Demande n'importe quoi à Acme...",
+    "placeholder": "Donne une tâche à Aether...",
+    "inputPlaceholder": "Demande n'importe quoi à Aether...",
     "recording": "Enregistrement...",
     "cancelRecording": "Annuler",
     "stopRecording": "Arrêter",
@@ -251,7 +251,7 @@
     "rateThisResult": "Évaluer ce résultat",
     "feedbackHelpsImprove": "Vos commentaires nous aident à nous améliorer",
     "additionalFeedbackOptional": "Commentaire supplémentaire (optionnel)",
-    "helpAcmeImprove": "Aidez Acme à s'améliorer avec mes commentaires",
+    "helpAetherImprove": "Aidez Aether à s'améliorer avec mes commentaires",
     "submit": "Envoyer",
     "submitting": "Envoi en cours...",
     "suggestedFollowUps": "Suggestions de suivi",
@@ -266,7 +266,7 @@
     "newWorker": "Nouveau Worker",
     "myWorkers": "Mes Workers",
     "searchAgents": "Rechercher workers",
-    "defaultAgent": "Acme",
+    "defaultAgent": "Aether",
     "defaultDescription": "IA polyvalente pour toutes les tâches",
     "superWorker": "Super Worker",
     "coder": "Coder",
@@ -534,12 +534,12 @@
   "beta": {
     "title": "Fonctionnalités Bêta",
     "webSupportTitle": "Entièrement Pris en Charge sur le Web",
-    "webSupportDescription": "Disponible sur Acme.com. Bientôt sur mobile—encore en développement ici.",
-    "visitAcme": "Visiter Acme.com",
+    "webSupportDescription": "Disponible sur Aether.com. Bientôt sur mobile—encore en développement ici.",
+    "visitAether": "Visiter Aether.com",
     "advancedFeatures": "Fonctionnalités Avancées",
     "mobileBeta": "Bêta Mobile",
     "pleaseNote": "Note Importante",
-    "mobileWarning": "En développement sur mobile et peut avoir des problèmes. Pour la meilleure expérience, utilise Acme.com."
+    "mobileWarning": "En développement sur mobile et peut avoir des problèmes. Pour la meilleure expérience, utilise Aether.com."
   },
   "accountDeletion": {
     "title": "Supprimer le Compte",
@@ -575,7 +575,7 @@
     "chooseModelFor": "Choisis un modèle pour le worker {{agent}}"
   },
   "placeholders": {
-    "default": "Donne une tâche à Acme...",
+    "default": "Donne une tâche à Aether...",
     "search": "Rechercher...",
     "searchConversations": "Rechercher chats",
     "searchAgents": "Rechercher workers",

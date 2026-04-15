@@ -14,7 +14,7 @@ export const OSSCard = () => {
           Fully Open Source.
         </h3>
         <p className="text-muted-foreground/70 max-w-lg leading-relaxed mb-8">
-          Acme is Elastic 2.0 licensed so you can view the source code, contribute, and self-host.
+          Aether is Elastic 2.0 licensed so you can view the source code, contribute, and self-host.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
           <GithubButton size="lg" className="h-12" />

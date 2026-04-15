@@ -23,7 +23,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { ThemeToggle } from "../home/theme-toggle"
-import { AcmeLogo } from "../sidebar/acme-logo"
+import { AetherLogo } from "../sidebar/aether-logo"
 
 const helpData = {
   navMain: [
@@ -68,7 +68,7 @@ export function HelpSidebar({ onSearchClick, ...props }: HelpSidebarProps) {
   return (
     <Sidebar className="w-72 [&_[data-sidebar=sidebar]]:bg-background dark:[&_[data-sidebar=sidebar]]:bg-background border-none" {...props}>
       <SidebarHeader className="bg-transparent p-6 px-6 space-y-3">
-        <AcmeLogo size={24} />
+        <AetherLogo size={24} />
         {onSearchClick && (
           <Button
             variant="outline"

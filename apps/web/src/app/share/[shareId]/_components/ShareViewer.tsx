@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { getEnv } from '@/lib/env-config';
 import { UnifiedMarkdown } from '@/components/markdown/unified-markdown';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import {
   AlertTriangle,
   Copy,
@@ -142,7 +142,7 @@ export function ShareViewer({ shareId }: { shareId: string }) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
-          <AcmeLoader size="medium" />
+          <AetherLoader size="medium" />
           <p className="text-sm text-muted-foreground">Loading shared session...</p>
         </div>
       </div>
@@ -304,12 +304,12 @@ function AssistantBlock({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      {/* Agent header — Acme logomark (matches Suna AgentHeader for name="Acme") */}
+      {/* Agent header — Aether logomark (matches Suna AgentHeader for name="Aether") */}
       <div className="flex items-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/acme-logomark-white.svg"
-          alt="Acme"
+          src="/aether-logomark-white.svg"
+          alt="Aether"
           className="dark:invert-0 invert flex-shrink-0"
           style={{ height: '12px', width: 'auto' }}
         />

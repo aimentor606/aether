@@ -98,7 +98,7 @@ export const MOBILE_APP_STORE_LINKS = {
 } as const;
 
 /**
- * Deep link scheme for opening the Acme app
+ * Deep link scheme for opening the Aether app
  */
-export const ACME_DEEP_LINK = 'acme://';
+export const AETHER_DEEP_LINK = 'acme://';
 

@@ -15,11 +15,11 @@ export function SimpleFooter() {
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-muted-foreground/35">
-            <span>© {currentYear} Acme</span>
+            <span>© {currentYear} Aether</span>
             <Link href="/support" className="hover:text-muted-foreground/60 transition-colors">Support</Link>
             <Link href="/legal?tab=privacy" className="hover:text-muted-foreground/60 transition-colors">Privacy</Link>
             <Link href="/legal?tab=terms" className="hover:text-muted-foreground/60 transition-colors">Terms</Link>
-            <a href="https://status.acme.dev" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground/60 transition-colors">Status</a>
+            <a href="https://status.aether.dev" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground/60 transition-colors">Status</a>
           </div>
 
           <div className="flex items-center gap-1.5">

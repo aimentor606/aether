@@ -183,7 +183,7 @@ Connect your tools to supercharge this skill:
 ```
 Identify what to research:
 - "Research Stripe" → Company research
-- "Look up John Smith at Acme" → Person + company
+- "Look up John Smith at Aether" → Person + company
 - "Who is the CTO at Notion" → Role-based search
 - "Intel on acme.com" → Domain-based lookup
 ```
@@ -274,7 +274,7 @@ Focus on: Attendee backgrounds, recent news, relationship history
 ## Tips for Better Research
 
 1. **Include the domain** — "research acme.com" is more precise
-2. **Specify the person** — "look up Jane Smith, VP Sales at Acme"
+2. **Specify the person** — "look up Jane Smith, VP Sales at Aether"
 3. **State your goal** — "research Stripe before my demo call"
 4. **Ask for specifics** — "what's their tech stack?" after initial research
 

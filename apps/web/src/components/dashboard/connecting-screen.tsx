@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useSandboxConnectionStore } from '@/stores/sandbox-connection-store';
 import { resolveServerUrl, useServerStore } from '@/stores/server-store';
 import { Button } from '@/components/ui/button';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { useRouter } from 'next/navigation';
 import {
   WifiOff,
@@ -137,7 +137,7 @@ function FirstConnectContent({ label, url }: { label: string; url: string }) {
         )}
       </div>
 
-      <AcmeLoader size="small" />
+      <AetherLoader size="small" />
     </>
   );
 }

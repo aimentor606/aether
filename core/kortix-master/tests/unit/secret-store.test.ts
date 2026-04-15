@@ -33,12 +33,12 @@ describe('SecretStore', () => {
     savedEnv.SECRET_FILE_PATH = process.env.SECRET_FILE_PATH
     savedEnv.SALT_FILE_PATH = process.env.SALT_FILE_PATH
     savedEnv.ENCRYPTION_KEY_PATH = process.env.ENCRYPTION_KEY_PATH
-    savedEnv.ACME_TOKEN = process.env.ACME_TOKEN
+    savedEnv.AETHER_TOKEN = process.env.AETHER_TOKEN
 
     process.env.SECRET_FILE_PATH = secretsPath
     process.env.SALT_FILE_PATH = saltPath
     process.env.ENCRYPTION_KEY_PATH = encryptionKeyPath
-    process.env.ACME_TOKEN = 'test-token-for-encryption'
+    process.env.AETHER_TOKEN = 'test-token-for-encryption'
   })
 
   afterEach(() => {
@@ -339,13 +339,13 @@ describe('SecretStore', () => {
       await Promise.all([
         store.set('ONBOARDING_COMPLETE', 'true'),
         store.set('ONBOARDING_USER_NAME', 'Test User'),
-        store.set('ONBOARDING_USER_SUMMARY', 'Developer at Acme'),
+        store.set('ONBOARDING_USER_SUMMARY', 'Developer at Aether'),
         store.set('ONBOARDING_COMPLETED_AT', '2026-03-19T00:00:00Z'),
       ])
 
       expect(await store.get('ONBOARDING_COMPLETE')).toBe('true')
       expect(await store.get('ONBOARDING_USER_NAME')).toBe('Test User')
-      expect(await store.get('ONBOARDING_USER_SUMMARY')).toBe('Developer at Acme')
+      expect(await store.get('ONBOARDING_USER_SUMMARY')).toBe('Developer at Aether')
       expect(await store.get('ONBOARDING_COMPLETED_AT')).toBe('2026-03-19T00:00:00Z')
       expect((await store.listKeys()).length).toBe(4)
     })
@@ -388,29 +388,29 @@ describe('SecretStore', () => {
     })
   })
 
-  // ─── ACME_TOKEN independence ──────────────────────────────────────────
+  // ─── AETHER_TOKEN independence ──────────────────────────────────────────
 
-  describe('encryption decoupled from ACME_TOKEN', () => {
-    it('secrets survive ACME_TOKEN change', async () => {
+  describe('encryption decoupled from AETHER_TOKEN', () => {
+    it('secrets survive AETHER_TOKEN change', async () => {
       const store1 = new SecretStore()
       await store1.set('API_KEY', 'sk-test-123')
       await store1.set('OTHER_KEY', 'other-value')
 
-      // Simulate ACME_TOKEN change (API restart, rotation, etc.)
-      process.env.ACME_TOKEN = 'completely-different-token'
+      // Simulate AETHER_TOKEN change (API restart, rotation, etc.)
+      process.env.AETHER_TOKEN = 'completely-different-token'
 
-      // New store instance with new ACME_TOKEN — secrets should still work
+      // New store instance with new AETHER_TOKEN — secrets should still work
       const store2 = new SecretStore()
       expect(await store2.get('API_KEY')).toBe('sk-test-123')
       expect(await store2.get('OTHER_KEY')).toBe('other-value')
     })
 
-    it('secrets survive ACME_TOKEN being unset', async () => {
+    it('secrets survive AETHER_TOKEN being unset', async () => {
       const store1 = new SecretStore()
       await store1.set('IMPORTANT', 'must-survive')
 
-      // Simulate ACME_TOKEN being completely absent
-      delete process.env.ACME_TOKEN
+      // Simulate AETHER_TOKEN being completely absent
+      delete process.env.AETHER_TOKEN
 
       const store2 = new SecretStore()
       expect(await store2.get('IMPORTANT')).toBe('must-survive')
@@ -425,7 +425,7 @@ describe('SecretStore', () => {
 
       // Secrets should still be readable
       expect(await store.get('BEFORE_ROTATE')).toBe('original-value')
-      expect(process.env.ACME_TOKEN).toBe('brand-new-token')
+      expect(process.env.AETHER_TOKEN).toBe('brand-new-token')
     })
   })
 
@@ -490,7 +490,7 @@ describe('SecretStore', () => {
 
   describe('v1 → v2 migration', () => {
     /**
-     * Helper: create a v1-style secrets file encrypted with ACME_TOKEN-derived key.
+     * Helper: create a v1-style secrets file encrypted with AETHER_TOKEN-derived key.
      * This mimics what the old SecretStore would have written.
      */
     function createV1Secrets(token: string, secrets: Record<string, string>) {
@@ -498,7 +498,7 @@ describe('SecretStore', () => {
       const salt = randomBytes(32)
       writeFileSync(saltPath, salt, { mode: 0o600 })
 
-      // Derive key the old way: scrypt(ACME_TOKEN, salt, 32)
+      // Derive key the old way: scrypt(AETHER_TOKEN, salt, 32)
       const key = scryptSync(token, salt, 32)
 
       // Encrypt each value
@@ -518,7 +518,7 @@ describe('SecretStore', () => {
     }
 
     it('automatically migrates v1 secrets to v2 on first access', async () => {
-      // Create v1 secrets (encrypted with ACME_TOKEN)
+      // Create v1 secrets (encrypted with AETHER_TOKEN)
       createV1Secrets('test-token-for-encryption', {
         OPENAI_KEY: 'sk-old-openai',
         CUSTOM_VAR: 'my-custom-value',
@@ -553,7 +553,7 @@ describe('SecretStore', () => {
       expect(backups.length).toBe(1)
     })
 
-    it('migrated secrets survive ACME_TOKEN change', async () => {
+    it('migrated secrets survive AETHER_TOKEN change', async () => {
       createV1Secrets('test-token-for-encryption', {
         PRESERVED: 'must-survive-token-change',
       })
@@ -563,7 +563,7 @@ describe('SecretStore', () => {
       expect(await store1.get('PRESERVED')).toBe('must-survive-token-change')
 
       // Change token
-      process.env.ACME_TOKEN = 'new-completely-different-token'
+      process.env.AETHER_TOKEN = 'new-completely-different-token'
 
       // Should still work (encryption key is now independent)
       const store2 = new SecretStore()

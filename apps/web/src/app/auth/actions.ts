@@ -22,7 +22,7 @@ export async function signIn(prevState: any, formData: FormData) {
 
   // Use magic link (passwordless) authentication
   // For desktop app, use custom protocol (acme://auth/callback) - same as mobile
-  // For web, use standard origin (https://acme.dev/auth/callback)
+  // For web, use standard origin (https://aether.dev/auth/callback)
   // Include email in redirect URL so it's available if the link expires
   let emailRedirectTo: string;
   if (isDesktopApp && origin.startsWith('acme://')) {
@@ -229,7 +229,7 @@ export async function resendMagicLink(prevState: any, formData: FormData) {
 
   // Use magic link (passwordless) authentication
   // For desktop app, use custom protocol (acme://auth/callback) - same as mobile
-  // For web, use standard origin (https://acme.dev/auth/callback)
+  // For web, use standard origin (https://aether.dev/auth/callback)
   // Include email in redirect URL so it's available if the link expires
   let emailRedirectTo: string;
   if (isDesktopApp && origin.startsWith('acme://')) {

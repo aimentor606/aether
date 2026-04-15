@@ -9,7 +9,7 @@ import OAIIcon from '@/assets/images/models/OAI.svg';
 import GeminiIcon from '@/assets/images/models/Gemini.svg';
 import GrokIcon from '@/assets/images/models/Grok.svg';
 import MoonshotIcon from '@/assets/images/models/Moonshot.svg';
-import AcmeSymbolIcon from '@/assets/brand/acme-symbol.svg';
+import AetherSymbolIcon from '@/assets/brand/acme-symbol.svg';
 import type { SvgProps } from 'react-native-svg';
 import type React from 'react';
 
@@ -24,19 +24,19 @@ export type ModelProvider =
   | 'acme';
 
 /**
- * Check if a model ID corresponds to a Acme mode (Basic or Advanced)
+ * Check if a model ID corresponds to a Aether mode (Basic or Advanced)
  */
-export function isAcmeMode(modelId: string): boolean {
-  // New Acme registry IDs
+export function isAetherMode(modelId: string): boolean {
+  // New Aether registry IDs
   if (modelId === 'acme/basic' || modelId === 'acme/power' ||
       modelId === 'acme-basic' || modelId === 'acme-power') {
     return true;
   }
-  // Legacy: Acme Basic (Haiku 4.5)
+  // Legacy: Aether Basic (Haiku 4.5)
   if (modelId.includes('claude-haiku-4-5') || modelId.includes('heol2zyy5v48')) {
     return true;
   }
-  // Legacy: Acme Advanced Mode (Sonnet 4.5)
+  // Legacy: Aether Advanced Mode (Sonnet 4.5)
   if (modelId.includes('claude-sonnet-4-5') || modelId.includes('few7z4l830xh')) {
     return true;
   }
@@ -47,8 +47,8 @@ export function isAcmeMode(modelId: string): boolean {
  * Get the provider from a model ID
  */
 export function getModelProvider(modelId: string): ModelProvider {
-  // Check for Acme modes first
-  if (isAcmeMode(modelId)) {
+  // Check for Aether modes first
+  if (isAetherMode(modelId)) {
     return 'acme';
   }
   if (modelId.includes('anthropic') || modelId.includes('claude')) {
@@ -92,7 +92,7 @@ export function getModelProviderName(modelId: string): string {
   const provider = getModelProvider(modelId);
 
   const nameMap: Record<ModelProvider, string> = {
-    acme: 'Acme',
+    acme: 'Aether',
     anthropic: 'Anthropic',
     openai: 'OpenAI',
     google: 'Google',
@@ -112,7 +112,7 @@ export function getModelProviderIcon(modelId: string): React.FC<SvgProps> {
   const provider = getModelProvider(modelId);
 
   const iconMap: Record<ModelProvider, React.FC<SvgProps>> = {
-    acme: AcmeSymbolIcon, // Acme modes use the Acme symbol
+    acme: AetherSymbolIcon, // Aether modes use the Aether symbol
     anthropic: AnthropicIcon,
     openai: OAIIcon,
     google: GeminiIcon,

@@ -19,7 +19,7 @@ test.describe('01 — Docker containers are running', () => {
   });
 
   test('API container is up', () => {
-    expect(containerRunning('acme-acme-api')).toBe(true);
+    expect(containerRunning('acme-aether-api')).toBe(true);
   });
 
   test('Supabase Auth container is up', () => {
@@ -35,6 +35,6 @@ test.describe('01 — Docker containers are running', () => {
   });
 
   test('Sandbox container is up', () => {
-    expect(containerRunning('acme-sandbox')).toBe(true);
+    expect(containerRunning('aether-sandbox')).toBe(true);
   });
 });

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ApiClient } from '../../api/types';
 
-// ─── Record types (mirror @acme/db schema) ────────────────────────────────────
+// ─── Record types (mirror @aether/db schema) ────────────────────────────────────
 
 export interface InvoiceRecord {
   id: string;

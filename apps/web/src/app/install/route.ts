@@ -21,7 +21,7 @@ function scriptHeaders(upstreamHeaders: Headers): Headers {
   headers.set('Content-Type', 'text/x-shellscript; charset=utf-8');
   headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
   headers.set('Access-Control-Allow-Origin', '*');
-  headers.set('X-Acme-Install-Source', RAW_SCRIPT_URL);
+  headers.set('X-Aether-Install-Source', RAW_SCRIPT_URL);
   return headers;
 }
 

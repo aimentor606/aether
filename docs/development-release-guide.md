@@ -312,7 +312,7 @@ All ports are on `127.0.0.1` in dev (no public exposure).
 
 | Host port | Container port | Service |
 |---|---|---|
-| `14000` | `8000` | Acme Master (proxy entry point) |
+| `14000` | `8000` | Aether Master (proxy entry point) |
 | `14001` | `3111` | OpenCode Web UI |
 | `14002` | `6080` | Desktop (noVNC HTTP) |
 | `14003` | `6081` | Desktop (noVNC HTTPS) |

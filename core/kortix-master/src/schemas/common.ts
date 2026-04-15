@@ -58,7 +58,7 @@ export const DeleteEnvResponse = z.object({
 })
 
 export const RotateTokenBody = z.object({
-  token: z.string().describe('New ACME_TOKEN value'),
+  token: z.string().describe('New AETHER_TOKEN value'),
 })
 
 export const RotateTokenResponse = z.object({

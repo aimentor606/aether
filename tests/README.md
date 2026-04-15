@@ -1,6 +1,6 @@
-# Acme Test Suite
+# Aether Test Suite
 
-All tests for the Acme platform, centralised in one place.
+All tests for the Aether platform, centralised in one place.
 
 ## Quick Start
 
@@ -103,7 +103,7 @@ npm run test:shell:auth     # Auth E2E (needs running stack)
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `E2E_OWNER_EMAIL` | `test-e2e@acme.ai` | Test owner email |
+| `E2E_OWNER_EMAIL` | `test-e2e@aether.ai` | Test owner email |
 | `E2E_OWNER_PASSWORD` | `e2e-testpass-123` | Test owner password |
 | `E2E_BASE_URL` | `http://localhost:13737` | Frontend URL |
 | `E2E_API_URL` | `http://localhost:13738/v1` | API URL |

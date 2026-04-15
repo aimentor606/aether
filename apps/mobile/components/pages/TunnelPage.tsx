@@ -228,7 +228,7 @@ function TunnelContent() {
               Connect your machine
             </RNText>
             <RNText style={{ fontSize: 13, fontFamily: 'Roobert', color: muted, textAlign: 'center', lineHeight: 20, paddingHorizontal: 20, marginBottom: 20 }}>
-              Run this command on any machine to connect it to Acme. You'll approve the connection in your browser.
+              Run this command on any machine to connect it to Aether. You'll approve the connection in your browser.
             </RNText>
             <Pressable
               onPress={() => createSheetRef.current?.present()}
@@ -383,7 +383,7 @@ const CreateTunnelSheet = React.forwardRef<
   const [copied, setCopied] = useState(false);
 
   const apiUrl = `${API_URL}/tunnel`;
-  const command = `npx @acme/agent-tunnel connect --api-url ${apiUrl}`;
+  const command = `npx @aether/agent-tunnel connect --api-url ${apiUrl}`;
 
   const handleCopy = useCallback(async () => {
     await Clipboard.setStringAsync(command);

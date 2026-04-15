@@ -1,56 +1,66 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  Badge,
+  Button,
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useAdminSandboxes, useDeleteAdminSandbox } from '@/hooks/admin/use-admin-sandboxes';
-import type { AdminSandbox } from '@/hooks/admin/use-admin-sandboxes';
-import { useAdminRole } from '@/hooks/admin/use-admin-role';
+  Skeleton,
+} from '@aether/ui/primitives';
 import {
-  useSandboxPoolHealth,
-  useSandboxPoolList,
-  useSandboxPoolReplenish,
-  useSandboxPoolForceCreate,
-  useSandboxPoolCleanup,
-  useCreatePoolResource,
-} from '@/hooks/admin/use-sandbox-pool';
+  useApiClient,
+  useAdminSandboxes,
+  useAdminSandboxPool,
+} from '@aether/sdk/client';
+import type { AdminSandbox } from '@aether/sdk/client';
+import { useAdminRole } from '@/hooks/admin/use-admin-role';
 import { toast } from '@/lib/toast';
 import {
-  Server, ShieldCheck, Trash2, RefreshCw, Search,
-  ChevronLeft, ChevronRight, Database, Plus, Minus,
-  CheckCircle, AlertTriangle, XCircle, Loader2,
+  Server,
+  ShieldCheck,
+  Trash2,
+  RefreshCw,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Database,
+  Plus,
+  Minus,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useServerTypes } from '@/hooks/instance/use-server-types';
 import { INSTANCE_CONFIG } from '@/components/instance/config';
 import { RegionToggle } from '@/components/instance/globe-region-picker';
-import { SizePickerSkeleton, formatMemory, formatDisk, getSizeLabel } from '@/components/instance/size-picker';
+import {
+  SizePickerSkeleton,
+  formatMemory,
+  formatDisk,
+  getSizeLabel,
+} from '@/components/instance/size-picker';
 
 const PAGE_SIZE = 50;
 
@@ -61,9 +71,17 @@ function StatusBadge({ status }: { status: string | null }) {
     case 'running':
       return <Badge variant="highlight">{status}</Badge>;
     case 'pooled':
-      return <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/30 gap-1">{status}</Badge>;
+      return (
+        <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/30 gap-1">
+          {status}
+        </Badge>
+      );
     case 'provisioning':
-      return <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/30 gap-1">{status}</Badge>;
+      return (
+        <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/30 gap-1">
+          {status}
+        </Badge>
+      );
     case 'stopped':
     case 'paused':
     case 'archived':
@@ -79,8 +97,11 @@ function StatusBadge({ status }: { status: string | null }) {
 function formatDate(dateStr: string | null) {
   if (!dateStr) return '\u2014';
   return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 }
 
@@ -88,7 +109,9 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex justify-between gap-4 py-1.5 border-b border-foreground/[0.06] last:border-0">
       <span className="text-muted-foreground text-sm shrink-0">{label}</span>
-      <span className="text-sm font-mono text-right break-all">{value ?? '\u2014'}</span>
+      <span className="text-sm font-mono text-right break-all">
+        {value ?? '\u2014'}
+      </span>
     </div>
   );
 }
@@ -105,13 +128,31 @@ function useDebounce<T>(value: T, delay: number): T {
 function PoolHealthBadge({ status }: { status: string }) {
   switch (status) {
     case 'healthy':
-      return <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 gap-1 px-2.5 py-0.5"><CheckCircle className="w-3 h-3" /> Healthy</Badge>;
+      return (
+        <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 gap-1 px-2.5 py-0.5">
+          <CheckCircle className="w-3 h-3" /> Healthy
+        </Badge>
+      );
     case 'warning':
-      return <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/30 gap-1 px-2.5 py-0.5"><AlertTriangle className="w-3 h-3" /> Warning</Badge>;
+    case 'degraded':
+      return (
+        <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/30 gap-1 px-2.5 py-0.5">
+          <AlertTriangle className="w-3 h-3" /> Warning
+        </Badge>
+      );
     case 'critical':
-      return <Badge className="bg-red-500/10 text-red-400 border-red-500/30 gap-1 px-2.5 py-0.5"><XCircle className="w-3 h-3" /> Critical</Badge>;
+    case 'unhealthy':
+      return (
+        <Badge className="bg-red-500/10 text-red-400 border-red-500/30 gap-1 px-2.5 py-0.5">
+          <XCircle className="w-3 h-3" /> Critical
+        </Badge>
+      );
     default:
-      return <Badge variant="secondary" className="gap-1 px-2.5 py-0.5">Disabled</Badge>;
+      return (
+        <Badge variant="secondary" className="gap-1 px-2.5 py-0.5">
+          Disabled
+        </Badge>
+      );
   }
 }
 
@@ -124,18 +165,27 @@ function SandboxesTab() {
   const [page, setPage] = useState(1);
   const search = useDebounce(searchInput, 350);
 
-  useEffect(() => { setPage(1); }, [search, statusFilter, providerFilter]);
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter, providerFilter]);
 
-  const { data, isLoading, isFetching, refetch } = useAdminSandboxes({
-    search, status: statusFilter, provider: providerFilter, page, limit: PAGE_SIZE,
+  const client = useApiClient();
+  const admin = useAdminSandboxes(client, {
+    search,
+    status: statusFilter,
+    provider: providerFilter,
+    page,
+    limit: PAGE_SIZE,
   });
 
-  const deleteMutation = useDeleteAdminSandbox();
+  const { data, isLoading, isFetching, refetch } = admin.list;
+  const deleteMutation = admin.deleteSandbox;
+
   const [infoDialog, setInfoDialog] = useState<AdminSandbox | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<AdminSandbox | null>(null);
 
-  const list  = data?.sandboxes ?? [];
-  const total = data?.total ?? 0;
+  const list = (data as any)?.sandboxes ?? [];
+  const total = (data as any)?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const handleDelete = useCallback(async () => {
@@ -143,9 +193,7 @@ function SandboxesTab() {
     try {
       await deleteMutation.mutateAsync(confirmDelete.sandboxId);
       toast.success(`Deleted sandbox ${confirmDelete.sandboxId.slice(0, 8)}`, {
-        description: confirmDelete.provider === 'justavps'
-          ? 'Removed from DB and JustaVPS machine deleted.'
-          : 'Removed from DB.',
+        description: 'Removed from database.',
       });
       setInfoDialog(null);
     } catch (err: any) {
@@ -159,15 +207,22 @@ function SandboxesTab() {
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-          <Input type="text"
+          <Input
+            type="text"
             className="pl-8 h-8 text-sm"
-            placeholder="Search by sandbox ID, name, account, email..." autoComplete="off"
+            placeholder="Search by sandbox ID, name, account, email..."
+            autoComplete="off"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
         </div>
-        <Select value={statusFilter || 'all'} onValueChange={(v) => setStatusFilter(v === 'all' ? '' : v)}>
-          <SelectTrigger className="h-8 w-[130px] text-sm"><SelectValue placeholder="Status" /></SelectTrigger>
+        <Select
+          value={statusFilter || 'all'}
+          onValueChange={(v) => setStatusFilter(v === 'all' ? '' : v)}
+        >
+          <SelectTrigger className="h-8 w-[130px] text-sm">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="active">Active</SelectItem>
@@ -177,29 +232,51 @@ function SandboxesTab() {
             <SelectItem value="error">Error</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={providerFilter || 'all'} onValueChange={(v) => setProviderFilter(v === 'all' ? '' : v)}>
-          <SelectTrigger className="h-8 w-[130px] text-sm"><SelectValue placeholder="Provider" /></SelectTrigger>
+        <Select
+          value={providerFilter || 'all'}
+          onValueChange={(v) => setProviderFilter(v === 'all' ? '' : v)}
+        >
+          <SelectTrigger className="h-8 w-[130px] text-sm">
+            <SelectValue placeholder="Provider" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All providers</SelectItem>
-            <SelectItem value="justavps">JustAVPS</SelectItem>
-            <SelectItem value="daytona">Daytona</SelectItem>
+            <SelectItem value="justavps">Cloud VPS</SelectItem>
+            <SelectItem value="daytona">Managed</SelectItem>
             <SelectItem value="local_docker">Local</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching} className="h-8 gap-1.5">
-          <RefreshCw className={cn('h-3.5 w-3.5', isFetching ? 'animate-spin' : '')} />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="h-8 gap-1.5"
+        >
+          <RefreshCw
+            className={cn('h-3.5 w-3.5', isFetching ? 'animate-spin' : '')}
+          />
         </Button>
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">{[...Array(8)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+        <div className="space-y-3">
+          {[...Array(8)].map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full" />
+          ))}
+        </div>
       ) : list.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground border border-foreground/[0.08] rounded-xl">
           <Server className="h-10 w-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">No sandboxes match your filters</p>
         </div>
       ) : (
-        <div className={cn('border border-foreground/[0.08] rounded-xl overflow-hidden transition-opacity', isFetching ? 'opacity-60' : '')}>
+        <div
+          className={cn(
+            'border border-foreground/[0.08] rounded-xl overflow-hidden transition-opacity',
+            isFetching ? 'opacity-60' : '',
+          )}
+        >
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
@@ -214,22 +291,59 @@ function SandboxesTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {list.map((sandbox) => (
-                <TableRow key={sandbox.sandboxId} className="group cursor-pointer" onClick={() => setInfoDialog(sandbox)}>
-                  <TableCell className="font-mono text-xs text-muted-foreground" title={sandbox.sandboxId}>{sandbox.sandboxId.slice(0, 8)}</TableCell>
-                  <TableCell className="text-sm max-w-[140px] truncate" title={sandbox.name ?? undefined}>{sandbox.name ?? <span className="text-muted-foreground">&mdash;</span>}</TableCell>
+              {list.map((sandbox: any) => (
+                <TableRow
+                  key={sandbox.sandboxId}
+                  className="group cursor-pointer"
+                  onClick={() => setInfoDialog(sandbox)}
+                >
+                  <TableCell
+                    className="font-mono text-xs text-muted-foreground"
+                    title={sandbox.sandboxId}
+                  >
+                    {sandbox.sandboxId.slice(0, 8)}
+                  </TableCell>
+                  <TableCell
+                    className="text-sm max-w-[140px] truncate"
+                    title={sandbox.name ?? undefined}
+                  >
+                    {sandbox.name ?? (
+                      <span className="text-muted-foreground">&mdash;</span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-sm truncate">{sandbox.accountName ?? '\u2014'}</span>
-                      {sandbox.ownerEmail && <span className="text-xs text-muted-foreground truncate">{sandbox.ownerEmail}</span>}
+                      <span className="text-sm truncate">
+                        {sandbox.accountName ?? '\u2014'}
+                      </span>
+                      {sandbox.ownerEmail && (
+                        <span className="text-xs text-muted-foreground truncate">
+                          {sandbox.ownerEmail}
+                        </span>
+                      )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm capitalize">{sandbox.provider ?? <span className="text-muted-foreground">&mdash;</span>}</TableCell>
-                  <TableCell><StatusBadge status={sandbox.status} /></TableCell>
-                  <TableCell className="text-xs text-muted-foreground">{formatDate(sandbox.createdAt)}</TableCell>
-                  <TableCell className="text-xs text-muted-foreground">{formatDate(sandbox.lastUsedAt)}</TableCell>
+                  <TableCell className="text-sm capitalize">
+                    {sandbox.provider ?? (
+                      <span className="text-muted-foreground">&mdash;</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={sandbox.status} />
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {formatDate(sandbox.createdAt)}
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {formatDate(sandbox.lastUsedAt)}
+                  </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
-                    <Button size="sm" variant="ghost" className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-500 hover:bg-red-500/10" onClick={() => setConfirmDelete(sandbox)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-500 hover:bg-red-500/10"
+                      onClick={() => setConfirmDelete(sandbox)}
+                    >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </TableCell>
@@ -242,12 +356,48 @@ function SandboxesTab() {
 
       {pages > 1 && (
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>Page {page} of {pages} &mdash; {total.toLocaleString()} results</span>
+          <span>
+            Page {page} of {pages} &mdash; {total.toLocaleString()} results
+          </span>
           <div className="flex gap-1">
-            <Button variant="outline" size="sm" className="h-7 w-7 p-0" onClick={() => setPage(1)} disabled={page === 1} title="First page">&laquo;</Button>
-            <Button variant="outline" size="sm" className="h-7 px-2 gap-1" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}><ChevronLeft className="h-3.5 w-3.5" /> Prev</Button>
-            <Button variant="outline" size="sm" className="h-7 px-2 gap-1" onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page === pages}>Next <ChevronRight className="h-3.5 w-3.5" /></Button>
-            <Button variant="outline" size="sm" className="h-7 w-7 p-0" onClick={() => setPage(pages)} disabled={page === pages} title="Last page">&raquo;</Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={() => setPage(1)}
+              disabled={page === 1}
+              title="First page"
+            >
+              &laquo;
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 gap-1"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              <ChevronLeft className="h-3.5 w-3.5" /> Prev
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 gap-1"
+              onClick={() => setPage((p) => Math.min(pages, p + 1))}
+              disabled={page === pages}
+            >
+              Next <ChevronRight className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={() => setPage(pages)}
+              disabled={page === pages}
+              title="Last page"
+            >
+              &raquo;
+            </Button>
           </div>
         </div>
       )}
@@ -255,56 +405,123 @@ function SandboxesTab() {
       <Dialog open={!!infoDialog} onOpenChange={() => setInfoDialog(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="font-mono text-base">{infoDialog?.sandboxId}</DialogTitle>
+            <DialogTitle className="font-mono text-base">
+              {(infoDialog as any)?.sandboxId}
+            </DialogTitle>
             <DialogDescription>Full sandbox details</DialogDescription>
           </DialogHeader>
           {infoDialog && (
             <div className="space-y-0.5 max-h-[60vh] overflow-y-auto pr-1">
-              <InfoRow label="Name" value={infoDialog.name} />
-              <InfoRow label="Account" value={infoDialog.accountName} />
-              <InfoRow label="Email" value={infoDialog.ownerEmail} />
-              <InfoRow label="Account ID" value={infoDialog.accountId} />
-              <InfoRow label="Provider" value={infoDialog.provider} />
-              <InfoRow label="Status" value={<StatusBadge status={infoDialog.status} />} />
-              <InfoRow label="External ID" value={infoDialog.externalId} />
-              <InfoRow label="Base URL" value={infoDialog.baseUrl} />
-              <InfoRow label="Created" value={formatDate(infoDialog.createdAt)} />
-              <InfoRow label="Updated" value={formatDate(infoDialog.updatedAt)} />
-              <InfoRow label="Last Used" value={formatDate(infoDialog.lastUsedAt)} />
-              {!!infoDialog.metadata && (
+              <InfoRow label="Name" value={(infoDialog as any).name} />
+              <InfoRow
+                label="Account"
+                value={(infoDialog as any).accountName}
+              />
+              <InfoRow label="Email" value={(infoDialog as any).ownerEmail} />
+              <InfoRow
+                label="Account ID"
+                value={(infoDialog as any).accountId}
+              />
+              <InfoRow label="Provider" value={(infoDialog as any).provider} />
+              <InfoRow
+                label="Status"
+                value={<StatusBadge status={(infoDialog as any).status} />}
+              />
+              <InfoRow
+                label="External ID"
+                value={(infoDialog as any).externalId}
+              />
+              <InfoRow label="Base URL" value={(infoDialog as any).baseUrl} />
+              <InfoRow
+                label="Created"
+                value={formatDate((infoDialog as any).createdAt)}
+              />
+              <InfoRow
+                label="Updated"
+                value={formatDate((infoDialog as any).updatedAt)}
+              />
+              <InfoRow
+                label="Last Used"
+                value={formatDate((infoDialog as any).lastUsedAt)}
+              />
+              {!!(infoDialog as any).metadata && (
                 <div className="pt-2">
                   <p className="text-muted-foreground text-xs mb-1">Metadata</p>
-                  <pre className="text-xs bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg p-3 overflow-auto max-h-40">{JSON.stringify(infoDialog.metadata as Record<string, unknown>, null, 2)}</pre>
+                  <pre className="text-xs bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg p-3 overflow-auto max-h-40">
+                    {JSON.stringify(
+                      (infoDialog as any).metadata as Record<string, unknown>,
+                      null,
+                      2,
+                    )}
+                  </pre>
                 </div>
               )}
             </div>
           )}
           <DialogFooter>
-            <Button variant="destructive" size="sm" onClick={() => setConfirmDelete(infoDialog)} disabled={deleteMutation.isPending}><Trash2 className="h-3.5 w-3.5 mr-1.5" /> Delete</Button>
-            <Button variant="outline" onClick={() => setInfoDialog(null)}>Close</Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setConfirmDelete(infoDialog)}
+              disabled={deleteMutation.isPending}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1.5" /> Delete
+            </Button>
+            <Button variant="outline" onClick={() => setInfoDialog(null)}>
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!confirmDelete} onOpenChange={() => setConfirmDelete(null)}>
+      <Dialog
+        open={!!confirmDelete}
+        onOpenChange={() => setConfirmDelete(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Sandbox</DialogTitle>
             <DialogDescription>
-              Permanently delete <span className="font-mono text-foreground">{confirmDelete?.sandboxId.slice(0, 8)}</span>
-              {confirmDelete?.provider === 'justavps' && ' and terminate the JustaVPS machine'}. This cannot be undone.
+              Permanently delete{' '}
+              <span className="font-mono text-foreground">
+                {(confirmDelete as any)?.sandboxId?.slice(0, 8)}
+              </span>
+              . This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           {confirmDelete && (
             <div className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg px-4 py-3 space-y-1.5 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Account</span><span>{confirmDelete.accountName ?? '\u2014'}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Provider</span><span className="capitalize">{confirmDelete.provider ?? '\u2014'}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Status</span><span>{confirmDelete.status ?? '\u2014'}</span></div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Account</span>
+                <span>{(confirmDelete as any).accountName ?? '\u2014'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Provider</span>
+                <span className="capitalize">
+                  {(confirmDelete as any).provider ?? '\u2014'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Status</span>
+                <span>{(confirmDelete as any).status ?? '\u2014'}</span>
+              </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmDelete(null)} disabled={deleteMutation.isPending}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>{deleteMutation.isPending ? 'Deleting\u2026' : 'Delete'}</Button>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDelete(null)}
+              disabled={deleteMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? 'Deleting\u2026' : 'Delete'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -316,20 +533,25 @@ function SandboxesTab() {
 
 function PoolTab() {
   const [replenishOpen, setReplenishOpen] = useState(false);
-  const [location, setLocation] = useState<string>(INSTANCE_CONFIG.fallbackRegion);
+  const [location, setLocation] = useState<string>(
+    INSTANCE_CONFIG.fallbackRegion,
+  );
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
-  const { data: health } = useSandboxPoolHealth();
-  const { data: poolList, isLoading: poolLoading } = useSandboxPoolList(50);
-  const { data: serverTypesData, isLoading: typesLoading } = useServerTypes(location);
+  const client = useApiClient();
+  const pool = useAdminSandboxPool(client, { listLimit: 50 });
+
+  const { data: health } = pool.health;
+  const { data: poolList, isLoading: poolLoading } = pool.list;
+  const { data: serverTypesData, isLoading: typesLoading } =
+    useServerTypes(location);
 
   const serverTypes = serverTypesData?.serverTypes ?? [];
 
-  const forceCreateMutation = useSandboxPoolForceCreate();
-  const cleanupMutation = useSandboxPoolCleanup();
-  const createResourceMutation = useCreatePoolResource();
-
-  const totalToCreate = Object.values(quantities).reduce((sum, n) => sum + n, 0);
+  const totalToCreate = Object.values(quantities).reduce(
+    (sum, n) => sum + n,
+    0,
+  );
 
   const updateQuantity = (name: string, delta: number) => {
     setQuantities((prev) => {
@@ -352,21 +574,27 @@ function PoolTab() {
     setReplenishOpen(false);
     setQuantities({});
 
-    toast.success(`Provisioning ${totalRequested} pool ${totalRequested === 1 ? 'sandbox' : 'sandboxes'}`, {
-      description: 'They will appear in the pool once ready.',
-    });
+    toast.success(
+      `Provisioning ${totalRequested} pool ${totalRequested === 1 ? 'sandbox' : 'sandboxes'}`,
+      {
+        description: 'They will appear in the pool once ready.',
+      },
+    );
 
     (async () => {
       for (const [serverType, count] of entries) {
         try {
-          const res = await createResourceMutation.mutateAsync({
+          const res = await pool.createResource.mutateAsync({
             provider: 'justavps',
             server_type: serverType,
             location,
             desired_count: count,
-          });
+          } as any);
 
-          await forceCreateMutation.mutateAsync({ count, resource_id: res.resource.id });
+          await pool.forceCreate.mutateAsync({
+            count,
+            resource_id: (res as any).resource?.id ?? (res as any).id,
+          });
         } catch (err) {
           toast.error(`Failed to create ${serverType} sandboxes`);
         }
@@ -375,22 +603,32 @@ function PoolTab() {
   };
 
   const handleCleanup = () => {
-    cleanupMutation.mutate(undefined, {
-      onSuccess: (data) => toast.success(`Cleaned up ${data.cleaned_count} stale sandboxes`),
-      onError: () => toast.error('Failed to cleanup'),
-    });
+    pool.cleanup
+      .mutateAsync()
+      .then((data: any) =>
+        toast.success(
+          `Cleaned up ${data.cleaned_count ?? data.removed} stale sandboxes`,
+        ),
+      )
+      .catch(() => toast.error('Failed to cleanup'));
   };
 
-  const isCreating = forceCreateMutation.isPending || createResourceMutation.isPending;
+  const isCreating =
+    pool.forceCreate.isPending || pool.createResource.isPending;
+  const healthData = health as any;
+  const poolListData = poolList as any;
+  const issues: string[] = healthData?.issues ?? [];
 
   return (
     <>
-      {health?.issues && health.issues.length > 0 && (
+      {issues.length > 0 && (
         <div className="flex items-start gap-3 bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3">
           <AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
           <div>
-            {health.issues.map((issue, i) => (
-              <p key={i} className="text-sm text-muted-foreground">{issue}</p>
+            {issues.map((issue: string, i: number) => (
+              <p key={i} className="text-sm text-muted-foreground">
+                {issue}
+              </p>
             ))}
           </div>
         </div>
@@ -398,23 +636,43 @@ function PoolTab() {
 
       {/* Actions */}
       <div className="flex gap-2">
-        <Button size="sm" className="gap-1.5" onClick={() => setReplenishOpen(true)}>
+        <Button
+          size="sm"
+          className="gap-1.5"
+          onClick={() => setReplenishOpen(true)}
+        >
           <Plus className="h-3.5 w-3.5" /> Add to Pool
         </Button>
-        <Button variant="outline" size="sm" className="gap-1.5" onClick={handleCleanup} disabled={cleanupMutation.isPending}>
-          {cleanupMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          onClick={handleCleanup}
+          disabled={pool.cleanup.isPending}
+        >
+          {pool.cleanup.isPending ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Trash2 className="h-3.5 w-3.5" />
+          )}
           Cleanup Stale
         </Button>
       </div>
 
       {/* Pooled Sandboxes List */}
       {poolLoading ? (
-        <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
-      ) : !poolList?.sandboxes?.length ? (
+        <div className="space-y-2">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full" />
+          ))}
+        </div>
+      ) : !poolListData?.sandboxes?.length ? (
         <div className="text-center py-16 text-muted-foreground border border-foreground/[0.08] rounded-xl">
           <Database className="h-10 w-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">No sandboxes in pool</p>
-          <p className="text-xs text-muted-foreground/70 mt-1">Click &ldquo;Add to Pool&rdquo; to pre-provision machines</p>
+          <p className="text-xs text-muted-foreground/70 mt-1">
+            Click &ldquo;Add to Pool&rdquo; to pre-provision machines
+          </p>
         </div>
       ) : (
         <div className="border border-foreground/[0.08] rounded-xl overflow-hidden">
@@ -430,14 +688,28 @@ function PoolTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {poolList.sandboxes.map((s, i) => (
+              {poolListData.sandboxes.map((s: any, i: number) => (
                 <TableRow key={s.id}>
-                  <TableCell className="text-xs text-muted-foreground">{i + 1}</TableCell>
-                  <TableCell className="font-mono text-xs text-muted-foreground">{s.external_id?.slice(0, 8) ?? '\u2014'}</TableCell>
-                  <TableCell className="text-sm font-mono">{(s as any).server_type ?? '\u2014'}</TableCell>
-                  <TableCell className="text-sm">{(s as any).location ?? '\u2014'}</TableCell>
-                  <TableCell><StatusBadge status={s.status ?? 'pooled'} /></TableCell>
-                  <TableCell className="text-xs text-muted-foreground">{s.pooled_at ? formatDate(s.pooled_at) : 'Provisioning\u2026'}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {i + 1}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">
+                    {s.external_id?.slice(0, 8) ?? '\u2014'}
+                  </TableCell>
+                  <TableCell className="text-sm font-mono">
+                    {s.server_type ?? '\u2014'}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {s.location ?? '\u2014'}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={s.status ?? 'pooled'} />
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {s.pooled_at
+                      ? formatDate(s.pooled_at)
+                      : 'Provisioning\u2026'}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -446,16 +718,26 @@ function PoolTab() {
       )}
 
       {/* Replenish Dialog */}
-      <Dialog open={replenishOpen} onOpenChange={(open) => { setReplenishOpen(open); if (!open) setQuantities({}); }}>
+      <Dialog
+        open={replenishOpen}
+        onOpenChange={(open) => {
+          setReplenishOpen(open);
+          if (!open) setQuantities({});
+        }}
+      >
         <DialogContent className="w-lg max-w-lg">
           <DialogHeader>
             <DialogTitle>Add to Pool</DialogTitle>
-            <DialogDescription>Choose machine sizes to pre-provision</DialogDescription>
+            <DialogDescription>
+              Choose machine sizes to pre-provision
+            </DialogDescription>
           </DialogHeader>
 
           {/* Region Toggle */}
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Region</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+              Region
+            </p>
             <RegionToggle location={location} onLocationChange={setLocation} />
           </div>
 
@@ -465,7 +747,7 @@ function PoolTab() {
               <SizePickerSkeleton count={4} />
             ) : (
               <div className="grid grid-cols-1 gap-1.5">
-                {serverTypes.map((t) => {
+                {serverTypes.map((t: any) => {
                   const qty = quantities[t.name] || 0;
                   return (
                     <div
@@ -477,19 +759,31 @@ function PoolTab() {
                           : 'border-border/40',
                       )}
                     >
-                      <div className={cn(
-                        'shrink-0 w-11 h-11 rounded-lg border flex flex-col items-center justify-center',
-                        qty > 0 ? 'bg-foreground text-background' : 'bg-muted/60 text-foreground/70',
-                      )}>
-                        <span className="text-[15px] font-bold tabular-nums leading-none">{t.cores}</span>
-                        <span className="text-[8px] font-medium opacity-60 mt-0.5">vCPU</span>
+                      <div
+                        className={cn(
+                          'shrink-0 w-11 h-11 rounded-lg border flex flex-col items-center justify-center',
+                          qty > 0
+                            ? 'bg-foreground text-background'
+                            : 'bg-muted/60 text-foreground/70',
+                        )}
+                      >
+                        <span className="text-[15px] font-bold tabular-nums leading-none">
+                          {t.cores}
+                        </span>
+                        <span className="text-[8px] font-medium opacity-60 mt-0.5">
+                          vCPU
+                        </span>
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <span className="text-[13px] font-semibold text-foreground">{getSizeLabel(t.cores)}</span>
+                        <span className="text-[13px] font-semibold text-foreground">
+                          {getSizeLabel(t.cores)}
+                        </span>
                         <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground/60">
                           <span>{formatMemory(t.memory)} RAM</span>
-                          <span className="text-muted-foreground/20">{'\u00B7'}</span>
+                          <span className="text-muted-foreground/20">
+                            {'\u00B7'}
+                          </span>
                           <span>{formatDisk(t.disk)} SSD</span>
                         </div>
                       </div>
@@ -509,7 +803,9 @@ function PoolTab() {
                         >
                           <Minus className="w-3.5 h-3.5" />
                         </button>
-                        <span className="w-8 text-center text-sm font-semibold tabular-nums">{qty}</span>
+                        <span className="w-8 text-center text-sm font-semibold tabular-nums">
+                          {qty}
+                        </span>
                         <button
                           type="button"
                           onClick={() => updateQuantity(t.name, 1)}
@@ -521,7 +817,7 @@ function PoolTab() {
                               : 'border-border hover:bg-muted cursor-pointer',
                           )}
                         >
-                          <Plus className="w-3.5 h-3.5" />
+                          <Plus className="w-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
@@ -532,12 +828,23 @@ function PoolTab() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setReplenishOpen(false)}>Cancel</Button>
-            <Button onClick={handleReplenish} disabled={totalToCreate === 0 || isCreating}>
+            <Button variant="outline" onClick={() => setReplenishOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleReplenish}
+              disabled={totalToCreate === 0 || isCreating}
+            >
               {isCreating ? (
-                <><Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> Creating...</>
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />{' '}
+                  Creating...
+                </>
               ) : (
-                <>Create {totalToCreate} {totalToCreate === 1 ? 'sandbox' : 'sandboxes'}</>
+                <>
+                  Create {totalToCreate}{' '}
+                  {totalToCreate === 1 ? 'sandbox' : 'sandboxes'}
+                </>
               )}
             </Button>
           </DialogFooter>
@@ -552,8 +859,12 @@ function PoolTab() {
 export default function AdminSandboxesPage() {
   const { data: adminRole, isLoading: roleLoading } = useAdminRole();
   const [activeTab, setActiveTab] = useState<string>('sandboxes');
-  const { data: health } = useSandboxPoolHealth();
-  const { data: poolList } = useSandboxPoolList(50);
+
+  const client = useApiClient();
+  const pool = useAdminSandboxPool(client, { listLimit: 50 });
+
+  const { data: health } = pool.health;
+  const { data: poolList } = pool.list;
 
   if (roleLoading) {
     return (
@@ -572,12 +883,19 @@ export default function AdminSandboxesPage() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-3">
           <ShieldCheck className="h-12 w-12 text-muted-foreground/40 mx-auto" />
-          <h2 className="text-lg font-medium text-foreground/80">Admin access required</h2>
-          <p className="text-sm text-muted-foreground">You don&apos;t have permission to view this page.</p>
+          <h2 className="text-lg font-medium text-foreground/80">
+            Admin access required
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            You don&apos;t have permission to view this page.
+          </p>
         </div>
       </div>
     );
   }
+
+  const poolListData = poolList as any;
+  const healthData = health as any;
 
   return (
     <div className="min-h-screen bg-background">
@@ -594,12 +912,14 @@ export default function AdminSandboxesPage() {
           </div>
           <div className="flex gap-3">
             <div className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg px-4 py-2 text-center min-w-[80px]">
-              <p className="text-lg font-semibold text-blue-400">{poolList?.count ?? 0}</p>
+              <p className="text-lg font-semibold text-blue-400">
+                {poolListData?.count ?? poolListData?.total ?? 0}
+              </p>
               <p className="text-[11px] text-muted-foreground">Pooled</p>
             </div>
             {health && (
               <div className="flex items-center">
-                <PoolHealthBadge status={health.status} />
+                <PoolHealthBadge status={healthData?.status ?? 'unknown'} />
               </div>
             )}
           </div>
@@ -614,9 +934,9 @@ export default function AdminSandboxesPage() {
             <TabsTrigger value="pool" className="gap-1.5">
               <Database className="h-3.5 w-3.5" />
               Pool
-              {(poolList?.count ?? 0) > 0 && (
+              {(poolListData?.count ?? poolListData?.total ?? 0) > 0 && (
                 <span className="ml-1 text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded-full font-medium">
-                  {poolList?.count}
+                  {poolListData?.count ?? poolListData?.total}
                 </span>
               )}
             </TabsTrigger>

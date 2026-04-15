@@ -9,7 +9,7 @@
  * explicit autowork execution loop.
  *
  * Defers to kortix-autowork: if an autowork loop is active for the session,
- * this plugin does nothing (it checks for the ACME_AUTOWORK marker and
+ * this plugin does nothing (it checks for the AETHER_AUTOWORK marker and
  * the autowork loop's session flag).
  */
 
@@ -30,7 +30,7 @@ import { evaluate } from "./engine"
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function wrapSystemPrompt(text: string): string {
-	return `<acme_system type="passive-continuation" source="kortix-todo-enforcing">\n${text}\n</acme_system>`
+	return `<aether_system type="passive-continuation" source="kortix-todo-enforcing">\n${text}\n</aether_system>`
 }
 
 type LogFn = (level: "info" | "warn" | "error", message: string) => void
@@ -49,7 +49,7 @@ function extractMessageText(input: any): string {
 function isInternalMessage(text: string): boolean {
 	if (text.includes(INTERNAL_MARKER)) return true
 	if (text.includes("[SYSTEM REMINDER")) return true
-	if (text.includes("<acme_system")) return true
+	if (text.includes("<aether_system")) return true
 	return false
 }
 
@@ -180,11 +180,11 @@ const KortixTodoEnforcingPlugin: Plugin = async ({ client }) => {
 				contState.inflight = false
 
 				// If autowork is being activated in this message, mark the session
-				if (messageText.includes("ACME_AUTOWORK")) {
+				if (messageText.includes("AETHER_AUTOWORK")) {
 					autoworkActiveSessions.add(sessionId)
 				}
 				// If autowork is being cancelled, remove the mark and disable passive too
-				if (messageText.includes("ACME_AUTOWORK_CANCEL")) {
+				if (messageText.includes("AETHER_AUTOWORK_CANCEL")) {
 					autoworkActiveSessions.delete(sessionId)
 					disabledSessions.add(sessionId)
 				}

@@ -1,6 +1,6 @@
 import { eq, and } from 'drizzle-orm';
 import { db } from '../shared/db';
-import { sandboxes, integrations, sandboxIntegrations } from '@acme/db';
+import { sandboxes, integrations, sandboxIntegrations } from '@aether/db';
 
 export async function insertIntegration(data: {
   accountId: string;

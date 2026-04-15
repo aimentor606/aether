@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
 import { cn } from '@/lib/utils';
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from 'react';
 import {
   Activity,
   AlertTriangle,
@@ -16,31 +16,22 @@ import {
   RefreshCw,
   BarChart3,
   Settings,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "@/lib/toast";
+} from 'lucide-react';
 import {
-  useStatelessHealth,
-  useStatelessDashboard,
-  useStatelessStuckRuns,
-  useStatelessDLQ,
-  useStatelessCircuitBreakers,
-  useStatelessBackpressure,
-  useStatelessRateLimiters,
-  useStatelessMetricsHistory,
-  useStatelessSweep,
-  useStatelessFlush,
-  useStatelessForceComplete,
-  useStatelessForceFail,
-  useStatelessForceResume,
-  useStatelessDLQRetry,
-  useStatelessDLQDelete,
-  useStatelessDLQPurge,
-  useStatelessResetCircuitBreakers,
-} from "@/hooks/admin/use-stateless";
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Badge,
+  Button,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@aether/ui/primitives';
+import { toast } from '@/lib/toast';
+import { useApiClient, useAdminStateless } from '@aether/sdk/client';
 import {
   StatCard,
   StatCardGrid,
@@ -55,25 +46,30 @@ import {
   BackpressurePanel,
   RateLimitersPanel,
   RunLookup,
-} from "./components";
+} from './components';
 
 // Format metrics history for charts
-function formatMetricsHistory(history: Array<{
-  timestamp: number;
-  active_runs: number;
-  pending_writes: number;
-  runs_started: number;
-  runs_completed: number;
-  runs_failed: number;
-  flush_latency_avg: number;
-  flush_latency_p99: number;
-  writes_dropped: number;
-  dlq_entries: number;
-}>) {
+function formatMetricsHistory(
+  history: Array<{
+    timestamp: number;
+    active_runs: number;
+    pending_writes: number;
+    runs_started: number;
+    runs_completed: number;
+    runs_failed: number;
+    flush_latency_avg: number;
+    flush_latency_p99: number;
+    writes_dropped: number;
+    dlq_entries: number;
+  }>,
+) {
   return history.map((entry) => {
     const date = new Date(entry.timestamp * 1000);
     return {
-      time: date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+      time: date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
       activeRuns: entry.active_runs,
       pendingWrites: entry.pending_writes,
       runsStarted: entry.runs_started,
@@ -88,28 +84,55 @@ function formatMetricsHistory(history: Array<{
 }
 
 export default function StatelessAdminPage() {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState('overview');
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
   // Data hooks
-  const { data: health, isLoading: healthLoading, refetch: refetchHealth } = useStatelessHealth();
-  const { data: dashboard, isLoading: dashboardLoading, refetch: refetchDashboard } = useStatelessDashboard();
-  const { data: stuckRuns, isLoading: stuckLoading, refetch: refetchStuck } = useStatelessStuckRuns(5);
-  const { data: dlqEntries, isLoading: dlqLoading, refetch: refetchDlq } = useStatelessDLQ(100);
-  const { data: circuitBreakers, refetch: refetchBreakers } = useStatelessCircuitBreakers();
-  const { data: backpressure, refetch: refetchBackpressure } = useStatelessBackpressure();
-  const { data: rateLimiters, refetch: refetchRateLimiters } = useStatelessRateLimiters();
-  const { data: metricsHistory, refetch: refetchMetrics } = useStatelessMetricsHistory(30);
+  const client = useApiClient();
+  const admin = useAdminStateless(client, {
+    dlqLimit: 100,
+    stuckLimit: 5,
+    metricsMinutes: 30,
+  });
 
-  const sweepMutation = useStatelessSweep();
-  const flushMutation = useStatelessFlush();
-  const forceCompleteMutation = useStatelessForceComplete();
-  const forceFailMutation = useStatelessForceFail();
-  const forceResumeMutation = useStatelessForceResume();
-  const dlqRetryMutation = useStatelessDLQRetry();
-  const dlqDeleteMutation = useStatelessDLQDelete();
-  const dlqPurgeMutation = useStatelessDLQPurge();
-  const resetCircuitBreakersMutation = useStatelessResetCircuitBreakers();
+  const {
+    data: health,
+    isLoading: healthLoading,
+    refetch: refetchHealth,
+  } = admin.health;
+  const {
+    data: dashboard,
+    isLoading: dashboardLoading,
+    refetch: refetchDashboard,
+  } = admin.dashboard;
+  const {
+    data: stuckRuns,
+    isLoading: stuckLoading,
+    refetch: refetchStuck,
+  } = admin.stuckRuns;
+  const {
+    data: dlqEntries,
+    isLoading: dlqLoading,
+    refetch: refetchDlq,
+  } = admin.dlq;
+  const { data: circuitBreakers, refetch: refetchBreakers } =
+    admin.circuitBreakers;
+  const { data: backpressure, refetch: refetchBackpressure } =
+    admin.backpressure;
+  const { data: rateLimiters, refetch: refetchRateLimiters } =
+    admin.rateLimiters;
+  const { data: metricsHistory, refetch: refetchMetrics } =
+    admin.metricsHistory;
+
+  const sweepMutation = admin.sweep;
+  const flushMutation = admin.flush;
+  const forceCompleteMutation = admin.forceComplete;
+  const forceFailMutation = admin.forceFail;
+  const forceResumeMutation = admin.forceResume;
+  const dlqRetryMutation = admin.dlqRetry;
+  const dlqDeleteMutation = admin.dlqDelete;
+  const dlqPurgeMutation = admin.dlqPurge;
+  const resetCircuitBreakersMutation = admin.resetCircuitBreakers;
 
   const history = useMemo(() => {
     return formatMetricsHistory(metricsHistory?.history || []);
@@ -125,15 +148,17 @@ export default function StatelessAdminPage() {
     refetchRateLimiters();
     refetchMetrics();
     setLastRefresh(new Date());
-    toast.success("Data refreshed");
+    toast.success('Data refreshed');
   };
 
   const handleSweep = () => {
     sweepMutation.mutate(undefined, {
       onSuccess: (data) => {
-        toast.success(`Sweep complete: ${data.recovered} recovered, ${data.completed} completed`);
+        toast.success(
+          `Sweep complete: ${data.recovered} recovered, ${data.completed} completed`,
+        );
       },
-      onError: () => toast.error("Sweep failed"),
+      onError: () => toast.error('Sweep failed'),
     });
   };
 
@@ -142,56 +167,63 @@ export default function StatelessAdminPage() {
       onSuccess: (data) => {
         toast.success(`Flushed ${data.total} writes from ${data.runs} runs`);
       },
-      onError: () => toast.error("Flush failed"),
+      onError: () => toast.error('Flush failed'),
     });
   };
 
   const handleForceComplete = (runId: string) => {
-    forceCompleteMutation.mutate({ runId }, {
-      onSuccess: () => toast.success(`Run ${runId.slice(0, 8)}... completed`),
-      onError: () => toast.error("Failed to complete run"),
-    });
+    forceCompleteMutation.mutate(
+      { runId },
+      {
+        onSuccess: () => toast.success(`Run ${runId.slice(0, 8)}... completed`),
+        onError: () => toast.error('Failed to complete run'),
+      },
+    );
   };
 
   const handleForceFail = (runId: string) => {
-    forceFailMutation.mutate({ runId, error: "Admin terminated" }, {
-      onSuccess: () => toast.success(`Run ${runId.slice(0, 8)}... failed`),
-      onError: () => toast.error("Failed to fail run"),
-    });
+    forceFailMutation.mutate(
+      { runId, error: 'Admin terminated' },
+      {
+        onSuccess: () => toast.success(`Run ${runId.slice(0, 8)}... failed`),
+        onError: () => toast.error('Failed to fail run'),
+      },
+    );
   };
 
   const handleForceResume = (runId: string) => {
     forceResumeMutation.mutate(runId, {
-      onSuccess: (data) => toast.success(data.message || `Run ${runId.slice(0, 8)}... resumed`),
-      onError: () => toast.error("Failed to resume run"),
+      onSuccess: (data) =>
+        toast.success(data.message || `Run ${runId.slice(0, 8)}... resumed`),
+      onError: () => toast.error('Failed to resume run'),
     });
   };
 
   const handleDLQRetry = (entryId: string) => {
     dlqRetryMutation.mutate(entryId, {
-      onSuccess: () => toast.success("Entry queued for retry"),
-      onError: () => toast.error("Retry failed"),
+      onSuccess: () => toast.success('Entry queued for retry'),
+      onError: () => toast.error('Retry failed'),
     });
   };
 
   const handleDLQDelete = (entryId: string) => {
     dlqDeleteMutation.mutate(entryId, {
-      onSuccess: () => toast.success("Entry deleted"),
-      onError: () => toast.error("Delete failed"),
+      onSuccess: () => toast.success('Entry deleted'),
+      onError: () => toast.error('Delete failed'),
     });
   };
 
   const handleDLQPurge = (hours?: number) => {
     dlqPurgeMutation.mutate(hours ? hours * 3600 : undefined, {
       onSuccess: (data) => toast.success(`Purged ${data.deleted} entries`),
-      onError: () => toast.error("Purge failed"),
+      onError: () => toast.error('Purge failed'),
     });
   };
 
   const handleResetCircuitBreakers = () => {
     resetCircuitBreakersMutation.mutate(undefined, {
-      onSuccess: () => toast.success("Circuit breakers reset"),
-      onError: () => toast.error("Reset failed"),
+      onSuccess: () => toast.success('Circuit breakers reset'),
+      onError: () => toast.error('Reset failed'),
     });
   };
 
@@ -207,7 +239,14 @@ export default function StatelessAdminPage() {
       const errorType = extractErrorType(entry.error);
       errorCounts.set(errorType, (errorCounts.get(errorType) || 0) + 1);
     });
-    const colors = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6", "#8b5cf6"];
+    const colors = [
+      '#ef4444',
+      '#f97316',
+      '#eab308',
+      '#22c55e',
+      '#3b82f6',
+      '#8b5cf6',
+    ];
     return Array.from(errorCounts.entries())
       .sort((a, b) => b[1] - a[1])
       .slice(0, 6)
@@ -222,21 +261,28 @@ export default function StatelessAdminPage() {
   const runStats = useMemo(() => {
     if (!dashboard) return [];
     return [
-      { name: "Completed", value: dashboard.runs_completed || 0, color: "#10b981" },
-      { name: "Failed", value: dashboard.runs_failed || 0, color: "#ef4444" },
-      { name: "Active", value: dashboard.active_runs || 0, color: "#3b82f6" },
-      { name: "Stuck", value: dashboard.stuck_count || 0, color: "#f59e0b" },
+      {
+        name: 'Completed',
+        value: dashboard.runs_completed || 0,
+        color: '#10b981',
+      },
+      { name: 'Failed', value: dashboard.runs_failed || 0, color: '#ef4444' },
+      { name: 'Active', value: dashboard.active_runs || 0, color: '#3b82f6' },
+      { name: 'Stuck', value: dashboard.stuck_count || 0, color: '#f59e0b' },
     ].filter((s) => s.value > 0);
   }, [dashboard]);
 
   // Sparkline data for stat cards
-  const sparklineData = useMemo(() => ({
-    activeRuns: history.map((h) => h.activeRuns),
-    pendingWrites: history.map((h) => h.pendingWrites),
-    completed: history.map((h) => h.runsCompleted),
-    failed: history.map((h) => h.runsFailed),
-    latency: history.map((h) => h.latencyP99),
-  }), [history]);
+  const sparklineData = useMemo(
+    () => ({
+      activeRuns: history.map((h) => h.activeRuns),
+      pendingWrites: history.map((h) => h.pendingWrites),
+      completed: history.map((h) => h.runsCompleted),
+      failed: history.map((h) => h.runsFailed),
+      latency: history.map((h) => h.latencyP99),
+    }),
+    [history],
+  );
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -248,14 +294,20 @@ export default function StatelessAdminPage() {
                 <Activity className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">Monitoring</h1>
+                <h1 className="text-2xl font-bold tracking-tight">
+                  Monitoring
+                </h1>
                 <p className="text-sm text-muted-foreground">
                   Real-time monitoring, debugging, and recovery management
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <HealthBadges health={health} backpressure={backpressure} alertCount={alertCount} />
+              <HealthBadges
+                health={health}
+                backpressure={backpressure}
+                alertCount={alertCount}
+              />
             </div>
           </div>
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/50">
@@ -280,7 +332,9 @@ export default function StatelessAdminPage() {
                 disabled={isLoading}
                 className="gap-1.5 h-8"
               >
-                <RefreshCw className={cn('w-3.5 h-3.5', isLoading ? "animate-spin" : "")} />
+                <RefreshCw
+                  className={cn('w-3.5 h-3.5', isLoading ? 'animate-spin' : '')}
+                />
                 Refresh
               </Button>
             </div>
@@ -297,7 +351,8 @@ export default function StatelessAdminPage() {
                   <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
                   <div className="flex-1">
                     <p className="font-medium text-amber-400">
-                      {dashboard.alerts.length} Alert{dashboard.alerts.length > 1 ? "s" : ""} Detected
+                      {dashboard.alerts.length} Alert
+                      {dashboard.alerts.length > 1 ? 's' : ''} Detected
                     </p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {dashboard.alerts.map((alert, i) => (
@@ -305,12 +360,15 @@ export default function StatelessAdminPage() {
                           key={i}
                           variant="outline"
                           className={
-                            alert.level === "critical"
-                              ? "border-red-500/50 text-red-400"
-                              : "border-amber-500/50 text-amber-400"
+                            alert.level === 'critical'
+                              ? 'border-red-500/50 text-red-400'
+                              : 'border-amber-500/50 text-amber-400'
                           }
                         >
-                          {alert.metric}: {typeof alert.value === "number" ? alert.value.toLocaleString() : alert.value}
+                          {alert.metric}:{' '}
+                          {typeof alert.value === 'number'
+                            ? alert.value.toLocaleString()
+                            : alert.value}
                         </Badge>
                       ))}
                     </div>
@@ -324,7 +382,11 @@ export default function StatelessAdminPage() {
           <StatCardGrid columns={4}>
             <StatCard
               title="Active Runs"
-              value={isLoading ? "..." : (dashboard?.active_runs ?? 0).toLocaleString()}
+              value={
+                isLoading
+                  ? '...'
+                  : (dashboard?.active_runs ?? 0).toLocaleString()
+              }
               subtitle={`Owned: ${dashboard?.owned_runs ?? 0}`}
               icon={<Server className="w-6 h-6" />}
               variant="info"
@@ -332,25 +394,43 @@ export default function StatelessAdminPage() {
             />
             <StatCard
               title="Pending Writes"
-              value={isLoading ? "..." : (dashboard?.pending_writes ?? 0).toLocaleString()}
+              value={
+                isLoading
+                  ? '...'
+                  : (dashboard?.pending_writes ?? 0).toLocaleString()
+              }
               subtitle={`WAL: ${dashboard?.wal?.total_pending ?? 0}`}
               icon={<Database className="w-6 h-6" />}
-              variant={(dashboard?.pending_writes ?? 0) > 100 ? "warning" : "default"}
+              variant={
+                (dashboard?.pending_writes ?? 0) > 100 ? 'warning' : 'default'
+              }
               sparklineData={sparklineData.pendingWrites}
             />
             <StatCard
               title="Stuck Runs"
-              value={isLoading ? "..." : (dashboard?.stuck_count ?? 0).toLocaleString()}
+              value={
+                isLoading
+                  ? '...'
+                  : (dashboard?.stuck_count ?? 0).toLocaleString()
+              }
               subtitle={`Recovered: ${dashboard?.runs_recovered ?? 0}`}
               icon={<AlertTriangle className="w-6 h-6" />}
-              variant={(dashboard?.stuck_count ?? 0) > 0 ? "warning" : "success"}
+              variant={
+                (dashboard?.stuck_count ?? 0) > 0 ? 'warning' : 'success'
+              }
             />
             <StatCard
               title="DLQ Entries"
-              value={isLoading ? "..." : (dashboard?.dlq?.total_entries ?? 0).toLocaleString()}
+              value={
+                isLoading
+                  ? '...'
+                  : (dashboard?.dlq?.total_entries ?? 0).toLocaleString()
+              }
               subtitle={`Runs affected: ${dashboard?.dlq?.unique_runs ?? 0}`}
               icon={<FileWarning className="w-6 h-6" />}
-              variant={(dashboard?.dlq?.total_entries ?? 0) > 0 ? "danger" : "success"}
+              variant={
+                (dashboard?.dlq?.total_entries ?? 0) > 0 ? 'danger' : 'success'
+              }
             />
           </StatCardGrid>
           <StatCardGrid columns={4}>
@@ -372,7 +452,7 @@ export default function StatelessAdminPage() {
               title="Runs Failed"
               value={(dashboard?.runs_failed ?? 0).toLocaleString()}
               icon={<XCircle className="w-5 h-5" />}
-              variant={(dashboard?.runs_failed ?? 0) > 0 ? "danger" : "default"}
+              variant={(dashboard?.runs_failed ?? 0) > 0 ? 'danger' : 'default'}
               size="compact"
               sparklineData={sparklineData.failed}
             />
@@ -380,7 +460,9 @@ export default function StatelessAdminPage() {
               title="Flush Latency (p99)"
               value={`${(dashboard?.flush_latency_p99 ?? 0).toFixed(2)}s`}
               icon={<Clock className="w-5 h-5" />}
-              variant={(dashboard?.flush_latency_p99 ?? 0) > 5 ? "warning" : "default"}
+              variant={
+                (dashboard?.flush_latency_p99 ?? 0) > 5 ? 'warning' : 'default'
+              }
               size="compact"
               sparklineData={sparklineData.latency}
             />
@@ -394,7 +476,10 @@ export default function StatelessAdminPage() {
               <TabsTrigger value="stuck" className="gap-1.5 text-sm px-3">
                 Stuck Runs
                 {stuckRuns && stuckRuns.length > 0 && (
-                  <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                  <Badge
+                    variant="secondary"
+                    className="ml-1 h-5 px-1.5 text-xs"
+                  >
                     {stuckRuns.length}
                   </Badge>
                 )}
@@ -402,7 +487,10 @@ export default function StatelessAdminPage() {
               <TabsTrigger value="dlq" className="gap-1.5 text-sm px-3">
                 DLQ
                 {dlqEntries && dlqEntries.length > 0 && (
-                  <Badge variant="destructive" className="ml-1 h-5 px-1.5 text-xs">
+                  <Badge
+                    variant="destructive"
+                    className="ml-1 h-5 px-1.5 text-xs"
+                  >
                     {dlqEntries.length}
                   </Badge>
                 )}
@@ -420,8 +508,16 @@ export default function StatelessAdminPage() {
                   description="Active runs and pending writes over time"
                   data={history}
                   dataKeys={[
-                    { key: "activeRuns", label: "Active Runs", color: "#3b82f6" },
-                    { key: "pendingWrites", label: "Pending Writes", color: "#f59e0b" },
+                    {
+                      key: 'activeRuns',
+                      label: 'Active Runs',
+                      color: '#3b82f6',
+                    },
+                    {
+                      key: 'pendingWrites',
+                      label: 'Pending Writes',
+                      color: '#f59e0b',
+                    },
                   ]}
                   xAxisKey="time"
                   type="area"
@@ -435,8 +531,16 @@ export default function StatelessAdminPage() {
                   description="P99 latency trend in milliseconds"
                   data={history}
                   dataKeys={[
-                    { key: "latencyP99", label: "P99 Latency (ms)", color: "#8b5cf6" },
-                    { key: "latencyAvg", label: "Avg Latency (ms)", color: "#a1a1aa" },
+                    {
+                      key: 'latencyP99',
+                      label: 'P99 Latency (ms)',
+                      color: '#8b5cf6',
+                    },
+                    {
+                      key: 'latencyAvg',
+                      label: 'Avg Latency (ms)',
+                      color: '#a1a1aa',
+                    },
                   ]}
                   xAxisKey="time"
                   type="line"
@@ -453,8 +557,12 @@ export default function StatelessAdminPage() {
                   description="Cumulative runs completed and failed"
                   data={history}
                   dataKeys={[
-                    { key: "runsCompleted", label: "Completed", color: "#10b981" },
-                    { key: "runsFailed", label: "Failed", color: "#ef4444" },
+                    {
+                      key: 'runsCompleted',
+                      label: 'Completed',
+                      color: '#10b981',
+                    },
+                    { key: 'runsFailed', label: 'Failed', color: '#ef4444' },
                   ]}
                   xAxisKey="time"
                   type="area"
@@ -496,12 +604,18 @@ export default function StatelessAdminPage() {
                 ) : (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-base">DLQ Error Distribution</CardTitle>
-                      <CardDescription>Types of errors in dead letter queue</CardDescription>
+                      <CardTitle className="text-base">
+                        DLQ Error Distribution
+                      </CardTitle>
+                      <CardDescription>
+                        Types of errors in dead letter queue
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center justify-center h-[180px] text-center">
                       <CheckCircle className="w-10 h-10 text-emerald-500/50 mb-2" />
-                      <p className="text-sm text-muted-foreground">No DLQ entries</p>
+                      <p className="text-sm text-muted-foreground">
+                        No DLQ entries
+                      </p>
                     </CardContent>
                   </Card>
                 )}
@@ -516,16 +630,28 @@ export default function StatelessAdminPage() {
                 <CardContent>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="p-4 rounded-xl bg-muted/50 border">
-                      <p className="text-sm text-muted-foreground">Total Pending</p>
-                      <p className="text-3xl font-bold mt-1">{dashboard?.wal?.total_pending ?? 0}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Total Pending
+                      </p>
+                      <p className="text-3xl font-bold mt-1">
+                        {dashboard?.wal?.total_pending ?? 0}
+                      </p>
                     </div>
                     <div className="p-4 rounded-xl bg-muted/50 border">
-                      <p className="text-sm text-muted-foreground">Runs with Pending</p>
-                      <p className="text-3xl font-bold mt-1">{dashboard?.wal?.runs_with_pending ?? 0}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Runs with Pending
+                      </p>
+                      <p className="text-3xl font-bold mt-1">
+                        {dashboard?.wal?.runs_with_pending ?? 0}
+                      </p>
                     </div>
                     <div className="p-4 rounded-xl bg-muted/50 border">
-                      <p className="text-sm text-muted-foreground">Local Buffer Runs</p>
-                      <p className="text-3xl font-bold mt-1">{dashboard?.wal?.local_buffer_runs ?? 0}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Local Buffer Runs
+                      </p>
+                      <p className="text-3xl font-bold mt-1">
+                        {dashboard?.wal?.local_buffer_runs ?? 0}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -582,8 +708,8 @@ export default function StatelessAdminPage() {
 
 function extractErrorType(error: string): string {
   const match = error.match(/([a-zA-Z]+\.errors\.[a-zA-Z]+)/);
-  if (match) return match[1].split(".").pop() || error.slice(0, 20);
+  if (match) return match[1].split('.').pop() || error.slice(0, 20);
   const pyMatch = error.match(/^([A-Z][a-zA-Z]+Error|[A-Z][a-zA-Z]+Exception)/);
   if (pyMatch) return pyMatch[1];
-  return error.slice(0, 20) + (error.length > 20 ? "..." : "");
+  return error.slice(0, 20) + (error.length > 20 ? '...' : '');
 }

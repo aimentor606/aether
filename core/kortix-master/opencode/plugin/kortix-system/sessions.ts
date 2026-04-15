@@ -50,13 +50,13 @@ export const KortixSessionsPlugin: Plugin = async ({ client, directory }) => {
 				try {
 					const parts: string[] = []
 					if (currentSessionId) {
-						// Wrap session context in acme_system tags so frontend strips it from UI
+						// Wrap session context in aether_system tags so frontend strips it from UI
 						const sessionCtx = `<session_context>\nSession ID: ${currentSessionId}\n</session_context>`
 						parts.push(wrapInKortixSystemTags(sessionCtx, { type: "session-context", source: "kortix-sessions" }))
 					}
 					const mergedMemory = renderMergedMemoryContext(import.meta.dir)
 					if (mergedMemory) {
-						// Wrap memory context in acme_system tags so frontend strips it from UI
+						// Wrap memory context in aether_system tags so frontend strips it from UI
 						const memCtx = `<memory>\n${mergedMemory}\n</memory>`
 						parts.push(wrapInKortixSystemTags(memCtx, { type: "memory-context", source: "kortix-sessions" }))
 					}

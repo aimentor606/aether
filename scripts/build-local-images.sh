@@ -58,11 +58,11 @@ printf "[build-local-images] Building frontend standalone output...\n"
 printf "[build-local-images] Building acme/acme-frontend:%s...\n" "$TAG"
 docker build --no-cache -f "$REPO_ROOT/apps/web/Dockerfile" -t "acme/acme-frontend:${TAG}" "$REPO_ROOT"
 
-printf "[build-local-images] Building acme/acme-api:%s...\n" "$TAG"
-docker build --build-arg SERVICE=apps/api -f "$REPO_ROOT/apps/api/Dockerfile" -t "acme/acme-api:${TAG}" "$REPO_ROOT"
+printf "[build-local-images] Building acme/aether-api:%s...\n" "$TAG"
+docker build --build-arg SERVICE=apps/api -f "$REPO_ROOT/apps/api/Dockerfile" -t "acme/aether-api:${TAG}" "$REPO_ROOT"
 
-printf "[build-local-images] Building acme/computer:%s...\n" "$TAG"
-docker build --build-arg SANDBOX_VERSION="${TAG}" -f "$REPO_ROOT/core/docker/Dockerfile" -t "acme/computer:${TAG}" "$REPO_ROOT"
+printf "[build-local-images] Building aether/computer:%s...\n" "$TAG"
+docker build --build-arg SANDBOX_VERSION="${TAG}" -f "$REPO_ROOT/core/docker/Dockerfile" -t "aether/computer:${TAG}" "$REPO_ROOT"
 
 printf "[build-local-images] Build a local sandbox with compose via: docker compose -f %s/core/docker/docker-compose.yml up --build\n" "$REPO_ROOT"
 

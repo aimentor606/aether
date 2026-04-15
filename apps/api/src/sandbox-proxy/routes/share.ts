@@ -9,7 +9,7 @@
  * - GET    /v1/p/share        query: sandbox_id
  * - DELETE /v1/p/share/:token query: sandbox_id
  *
- * Auth: combinedAuth (Supabase JWT, acme_ token, or cookie).
+ * Auth: combinedAuth (Supabase JWT, aether_ token, or cookie).
  */
 
 import { Hono } from 'hono'

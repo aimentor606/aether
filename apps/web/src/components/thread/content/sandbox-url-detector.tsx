@@ -24,7 +24,7 @@ import {
 } from '@/lib/utils/sandbox-url';
 import { useAuthenticatedPreviewUrl } from '@/hooks/use-authenticated-preview-url';
 import { enrichPreviewMetadata } from '@/lib/utils/session-context';
-import { stripAcmeSystemTags } from '@/lib/utils/acme-system-tags';
+import { stripAetherSystemTags } from '@/lib/utils/aether-system-tags';
 
 interface SandboxUrlDetectorProps {
   content: string;
@@ -542,11 +542,11 @@ export const SandboxUrlDetector: React.FC<SandboxUrlDetectorProps> = ({
   content,
   isStreaming = false,
 }) => {
-  // Strip acme_system XML tags before any processing/rendering.
+  // Strip aether_system XML tags before any processing/rendering.
   // These tags contain internal/system content injected by OpenCode plugins
   // that should not appear in the UI.
   const rawContent = typeof content === 'string' ? content : content ? String(content) : '';
-  const safeContent = stripAcmeSystemTags(rawContent);
+  const safeContent = stripAetherSystemTags(rawContent);
 
   const { proxyUrl } = useSandboxProxy();
 

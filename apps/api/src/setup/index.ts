@@ -16,7 +16,7 @@ import { config } from '../config';
 import { ALL_SANDBOX_ENV_KEYS, buildProviderKeySchema } from '../providers/registry';
 import { supabaseAuth } from '../middleware/auth';
 import { eq, sql } from 'drizzle-orm';
-import { accounts } from '@acme/db';
+import { accounts } from '@aether/db';
 import { db, hasDatabase } from '../shared/db';
 import { resolveAccountId } from '../shared/resolve-account';
 import { getSupabase } from '../shared/supabase';
@@ -75,7 +75,7 @@ function getProjectRoot(): string {
 
 function getMasterUrlCandidates(): string[] {
   const candidates: string[] = [];
-  const explicit = process.env.ACME_MASTER_URL;
+  const explicit = process.env.AETHER_MASTER_URL;
   if (explicit && explicit.trim()) candidates.push(explicit.trim());
 
   // Inside docker-compose network, the sandbox service is reachable by name.
@@ -170,7 +170,7 @@ async function getLocalSandboxWarmStatus() {
       success: true,
       status: 'creating',
       progress: 95,
-      message: 'Sandbox container is running and finishing Acme boot...',
+      message: 'Sandbox container is running and finishing Aether boot...',
     };
   }
 
@@ -562,7 +562,7 @@ setupApp.post('/env', async (c) => {
     if (existsSync(examplePath)) {
       writeFileSync(rootEnvPath, readFileSync(examplePath, 'utf-8'));
     } else {
-      writeFileSync(rootEnvPath, '# Acme Environment Configuration\nENV_MODE=local\n');
+      writeFileSync(rootEnvPath, '# Aether Environment Configuration\nENV_MODE=local\n');
     }
   }
 
@@ -578,13 +578,13 @@ setupApp.post('/env', async (c) => {
     if (existsSync(examplePath)) {
       writeFileSync(sandboxEnvPath, readFileSync(examplePath, 'utf-8'));
     } else {
-      writeFileSync(sandboxEnvPath, '# Acme Sandbox Environment\nENV_MODE=local\n');
+      writeFileSync(sandboxEnvPath, '# Aether Sandbox Environment\nENV_MODE=local\n');
     }
   }
   sandboxData.ENV_MODE = 'local';
   sandboxData.SANDBOX_ID = config.SANDBOX_CONTAINER_NAME;
   sandboxData.PROJECT_ID = 'local';
-  sandboxData.ACME_API_URL = 'http://acme-api:8008';
+  sandboxData.AETHER_API_URL = 'http://aether-api:8008';
   writeEnvFile(sandboxEnvPath, sandboxData);
 
   // Run setup-env.sh

@@ -11,7 +11,7 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { sandboxes } from '@acme/db';
+import { sandboxes } from '@aether/db';
 import { db } from './src/shared/db';
 import { getProvider, type ProviderName } from './src/platform/providers';
 import { execOnHost } from './src/update/exec';
@@ -108,7 +108,7 @@ for db in glob.glob('/workspace/.local/share/opencode/*.db'):
     '#!/bin/bash',
     'set -e',
     'systemctl disable --now justavps-docker 2>/dev/null || true',
-    'systemctl disable --now acme-sandbox 2>/dev/null || true',
+    'systemctl disable --now aether-sandbox 2>/dev/null || true',
     `docker stop -t 10 ${config.name} 2>/dev/null || true`,
     `docker rm -f ${config.name} 2>/dev/null || true`,
     `for i in $(seq 1 10); do docker inspect ${config.name} >/dev/null 2>&1 || break; sleep 1; done`,

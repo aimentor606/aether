@@ -1,19 +1,19 @@
 /**
- * @acme/sdk — Unified SDK for Aether applications.
+ * @aether/sdk — Unified SDK for Aether applications.
  *
  * Core modules (no React dependency):
- *   import { ... } from '@acme/sdk'
- *   import { ... } from '@acme/sdk/api'
- *   import { ... } from '@acme/sdk/auth'
- *   import { ... } from '@acme/sdk/realtime'
- *   import { ... } from '@acme/sdk/llm'
- *   import { ... } from '@acme/sdk/a2ui'
+ *   import { ... } from '@aether/sdk'
+ *   import { ... } from '@aether/sdk/api'
+ *   import { ... } from '@aether/sdk/auth'
+ *   import { ... } from '@aether/sdk/realtime'
+ *   import { ... } from '@aether/sdk/llm'
+ *   import { ... } from '@aether/sdk/a2ui'
  *
  * React-specific (requires React):
- *   import { ... } from '@acme/sdk/client'
+ *   import { ... } from '@aether/sdk/client'
  *
  * Server-specific (Node.js only):
- *   import { ... } from '@acme/sdk/server'
+ *   import { ... } from '@aether/sdk/server'
  */
 
 export * from './auth';

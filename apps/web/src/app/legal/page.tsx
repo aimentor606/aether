@@ -98,7 +98,7 @@ function LegalContent() {
                       </h3>
                       <div className="text-muted-foreground mb-6 space-y-2">
                         <p>
-                          <strong>Acme AI Corp</strong>
+                          <strong>Aether AI Corp</strong>
                         </p>
                         <p>Incorporated in Delaware, United States</p>
                         <p className="mt-4">
@@ -124,10 +124,10 @@ function LegalContent() {
                         <p>
                           Email:{' '}
                           <a
-                            href="mailto:info@acme.dev"
+                            href="mailto:info@aether.dev"
                             className="text-primary hover:underline"
                           >
-                            info@acme.dev
+                            info@aether.dev
                           </a>
                         </p>
                       </div>
@@ -136,7 +136,7 @@ function LegalContent() {
                         Responsible for Content
                       </h3>
                       <p className="text-muted-foreground mb-6">
-                        Acme AI Corp is responsible for the content of this
+                        Aether AI Corp is responsible for the content of this
                         website in accordance with applicable laws.
                       </p>
 
@@ -172,11 +172,11 @@ function LegalContent() {
                       <p className="text-muted-foreground text-balance mb-6">
                         PLEASE READ THESE TERMS OF USE ("AGREEMENT" OR "TERMS OF
                         USE" or "TERMS OF SERVICE" or "TERMS AND CONDITIONS")
-                        CAREFULLY BEFORE USING THE SERVICES OFFERED BY Acme AI
+                        CAREFULLY BEFORE USING THE SERVICES OFFERED BY Aether AI
                         Corp, a Delaware corporation with its principal place of business
                         at 701 Tillery Street Unit 12-2521, Austin, Texas 78702, United States
                         ("Company"). THIS AGREEMENT SETS FORTH THE LEGALLY
-                        BINDING TERMS AND CONDITIONS FOR YOUR USE OF THE Acme
+                        BINDING TERMS AND CONDITIONS FOR YOUR USE OF THE Aether
                         WEBSITE AND ALL RELATED SERVICES.
                       </p>
 
@@ -185,17 +185,17 @@ function LegalContent() {
                       </h3>
                       <ul className="text-muted-foreground space-y-1 mb-6">
                         <li>
-                          "Company" refers to Acme AI Corp, a Delaware corporation
+                          "Company" refers to Aether AI Corp, a Delaware corporation
                           with its principal place of business at 701 Tillery Street
                           Unit 12-2521, Austin, Texas 78702, United States.
                         </li>
                         <li>
-                          "Site" refers to the Acme website, including any related
+                          "Site" refers to the Aether website, including any related
                           features, content, or applications offered from time to
                           time by the Company.
                         </li>
                         <li>
-                          "Service" refers to the Acme platform and all related
+                          "Service" refers to the Aether platform and all related
                           services provided by the Company, including the platform
                           for building, managing, and training autonomous AI agents,
                           browser automation, file management, web intelligence,
@@ -273,7 +273,7 @@ function LegalContent() {
                         </li>
                         <li>
                           "Notice Address" refers to the contact address for the
-                          Company, specifically legal@acme.dev
+                          Company, specifically legal@aether.dev
                         </li>
                         <li>
                           "Privacy Policy" refers to the document outlining how
@@ -321,7 +321,7 @@ function LegalContent() {
                         Description of Service
                       </h3>
                       <p className="text-muted-foreground text-balance mb-4">
-                        Acme is a complete platform for creating, managing, and
+                        Aether is a complete platform for creating, managing, and
                         training autonomous AI agents. The Service enables Users to
                         build sophisticated AI agents that can work autonomously
                         on their behalf. The platform provides:
@@ -652,7 +652,7 @@ function LegalContent() {
                         held by others. We respect rights holders internationally,
                         and we ask our users to do the same. If you believe your
                         copyright or trademark is being infringed by the Service,
-                        please write to legal@acme.dev and we will process and
+                        please write to legal@aether.dev and we will process and
                         investigate your request and take appropriate actions
                         under the Digital Millennium Copyright Act and other
                         applicable intellectual property laws with respect to any
@@ -708,10 +708,10 @@ function LegalContent() {
                       <p className="text-muted-foreground text-balance mb-4">
                         To exercise these rights, please contact us at{' '}
                         <a
-                          href="mailto:info@acme.dev"
+                          href="mailto:info@aether.dev"
                           className="text-primary hover:underline"
                         >
-                          info@acme.dev
+                          info@aether.dev
                         </a>
                         . We will respond to your request within a reasonable timeframe
                         and in accordance with applicable law.
@@ -753,10 +753,10 @@ function LegalContent() {
                       <p className="text-muted-foreground text-balance mb-4">
                         For GDPR-related requests, please contact us at{' '}
                         <a
-                          href="mailto:info@acme.dev"
+                          href="mailto:info@aether.dev"
                           className="text-primary hover:underline"
                         >
-                          info@acme.dev
+                          info@aether.dev
                         </a>
                         . Our legal basis for processing your data includes performance
                         of contract, legitimate interests, consent, and compliance with
@@ -797,10 +797,10 @@ function LegalContent() {
                       <p className="text-muted-foreground text-balance mb-6">
                         To exercise your CCPA rights, please contact us at{' '}
                         <a
-                          href="mailto:info@acme.dev"
+                          href="mailto:info@aether.dev"
                           className="text-primary hover:underline"
                         >
-                          info@acme.dev
+                          info@aether.dev
                         </a>
                         . We may require verification of your identity before processing
                         your request. We will not discriminate against you for exercising
@@ -816,7 +816,7 @@ function LegalContent() {
                         subscription, payable in U.S. dollars, that will
                         automatically renew. You can stop using the Service and
                         cancel your subscription at any time through the website
-                        or by emailing us at info@acme.dev. If you cancel
+                        or by emailing us at info@aether.dev. If you cancel
                         your subscription, you may not receive a refund or credit
                         for any amounts that have already been billed or paid. The
                         Company reserves the right to change its prices at any
@@ -1004,10 +1004,10 @@ function LegalContent() {
                         Account at any time by following the instructions on the Service
                         or by contacting us at{' '}
                         <a
-                          href="mailto:info@acme.dev"
+                          href="mailto:info@aether.dev"
                           className="text-primary hover:underline"
                         >
-                          info@acme.dev
+                          info@aether.dev
                         </a>
                         . Termination of your Account will result in the deletion of
                         your data in accordance with our data retention policies.
@@ -1241,7 +1241,7 @@ function LegalContent() {
                       <p className="text-muted-foreground text-balance mb-6">
                         The Service software is available for self-hosting on your own
                         infrastructure, subject to the terms of the LICENSE file in our
-                        GitHub repository. Self-hosting is governed by the Acme Public
+                        GitHub repository. Self-hosting is governed by the Aether Public
                         Source License (KPSL), which includes restrictions on
                         network-accessible deployments and commercial use. For
                         network-accessible deployments or commercial use beyond the
@@ -1249,10 +1249,10 @@ function LegalContent() {
                         required. Please refer to the LICENSE file for complete terms
                         and contact{' '}
                         <a
-                          href="mailto:hey@acme.dev"
+                          href="mailto:hey@aether.dev"
                           className="text-primary hover:underline"
                         >
-                          hey@acme.dev
+                          hey@aether.dev
                         </a>
                         {' '}for commercial licensing inquiries.
                       </p>
@@ -1292,7 +1292,7 @@ function LegalContent() {
                         Trademarks and Patents
                       </h3>
                       <p className="text-muted-foreground text-balance mb-6">
-                        All Acme logos, marks, and designations are trademarks or
+                        All Aether logos, marks, and designations are trademarks or
                         registered trademarks of the Company. All other trademarks
                         mentioned on this website are the property of their
                         respective owners. The trademarks and logos displayed on
@@ -1447,14 +1447,14 @@ function LegalContent() {
                       <p className="text-muted-foreground text-balance mb-6">
                         ALL USE OF THE SERVICE AND ANY CONTENT IS UNDERTAKEN
                         ENTIRELY AT YOUR OWN RISK. THE SERVICE (INCLUDING, WITHOUT
-                        LIMITATION, THE Acme WEB APP AND ANY CONTENT) IS PROVIDED
+                        LIMITATION, THE Aether WEB APP AND ANY CONTENT) IS PROVIDED
                         "AS IS" AND "AS AVAILABLE" AND IS WITHOUT WARRANTY OF ANY
                         KIND, EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
                         THE IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT,
                         MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE, AND
                         ANY WARRANTIES IMPLIED BY ANY COURSE OF PERFORMANCE OR
                         USAGE OF TRADE, ALL OF WHICH ARE EXPRESSLY DISCLAIMED.
-                        Acme DOES NOT GUARANTEE THE ACCURACY, COMPLETENESS, OR
+                        Aether DOES NOT GUARANTEE THE ACCURACY, COMPLETENESS, OR
                         RELIABILITY OF THE AI-GENERATED CONTENT, AND USERS ASSUME
                         FULL RESPONSIBILITY FOR ANY APPLICATIONS CREATED USING THE
                         SERVICE. SOME STATES DO NOT ALLOW LIMITATIONS ON HOW LONG
@@ -1489,10 +1489,10 @@ function LegalContent() {
                         For questions regarding the Service, you can get in touch by
                         emailing us at{' '}
                         <a
-                          href="mailto:info@acme.dev"
+                          href="mailto:info@aether.dev"
                           className="text-primary hover:underline"
                         >
-                          info@acme.dev
+                          info@aether.dev
                         </a>
                         .
                       </p>
@@ -1500,10 +1500,10 @@ function LegalContent() {
                         <strong>Legal Matters:</strong> For legal inquiries, DMCA
                         notices, or other legal matters, please contact{' '}
                         <a
-                          href="mailto:legal@acme.dev"
+                          href="mailto:legal@aether.dev"
                           className="text-primary hover:underline"
                         >
-                          legal@acme.dev
+                          legal@aether.dev
                         </a>
                         .
                       </p>
@@ -1512,16 +1512,16 @@ function LegalContent() {
                         data privacy requests (access, deletion, portability, etc.),
                         please contact{' '}
                         <a
-                          href="mailto:info@acme.dev"
+                          href="mailto:info@aether.dev"
                           className="text-primary hover:underline"
                         >
-                          info@acme.dev
+                          info@aether.dev
                         </a>
                         {' '}with the subject line "Privacy Request" and include details
                         of your request.
                       </p>
                       <p className="text-muted-foreground text-balance mb-6">
-                        <strong>Mailing Address:</strong> Acme AI Corp, 701 Tillery
+                        <strong>Mailing Address:</strong> Aether AI Corp, 701 Tillery
                         Street Unit 12-2521, Austin, Texas 78702, United States.
                       </p>
                     </div>
@@ -1548,7 +1548,7 @@ function LegalContent() {
                       </p>
 
                       <p className="text-muted-foreground text-balance mb-6">
-                        References to our "Services" at Acme in this statement
+                        References to our "Services" at Aether in this statement
                         include our website, apps, and other products and
                         services. This statement applies to our Services that
                         display or reference this Privacy Statement. Third-party
@@ -1557,7 +1557,7 @@ function LegalContent() {
                       </p>
 
                       <p className="text-muted-foreground text-balance mb-6">
-                        Acme does not collect biometric or identifying
+                        Aether does not collect biometric or identifying
                         information. All data is processed securely and any data
                         is deleted upon account removal.
                       </p>
@@ -1741,10 +1741,10 @@ function LegalContent() {
                       <p className="text-muted-foreground text-balance">
                         You can get in touch by emailing us at{' '}
                         <a
-                          href="mailto:info@acme.dev"
+                          href="mailto:info@aether.dev"
                           className="text-primary hover:underline"
                         >
-                          info@acme.dev
+                          info@aether.dev
                         </a>
                         .
                       </p>

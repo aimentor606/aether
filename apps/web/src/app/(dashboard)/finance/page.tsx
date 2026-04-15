@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useApiClient, useFinance } from '@acme/sdk/client';
+import { useApiClient, useFinance } from '@aether/sdk/client';
 import {
   FinanceDataTable,
   invoiceColumns,
@@ -9,13 +9,13 @@ import {
   budgetColumns,
   ledgerColumns,
   BudgetCard,
-} from '@acme/ui/vertical/finance';
+} from '@aether/ui/vertical/finance';
 import type {
   InvoiceRecord,
   ExpenseRecord,
   BudgetRecord,
   LedgerRecord,
-} from '@acme/ui/vertical/finance';
+} from '@aether/ui/vertical/finance';
 
 type TabKey = 'invoices' | 'expenses' | 'budgets' | 'ledgers';
 

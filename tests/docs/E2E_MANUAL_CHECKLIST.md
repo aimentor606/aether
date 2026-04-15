@@ -1,4 +1,4 @@
-# Acme E2E Test — Full Install to Verify
+# Aether E2E Test — Full Install to Verify
 
 Complete test from clean slate to every feature working.
 
@@ -32,7 +32,7 @@ bash scripts/get-acme.sh
 
 ### Step 5 — Wait for image pull + startup
 - Installer pulls 4 images: postgres, frontend, acme-api, computer
-- Ends with "Acme is running!" + opens browser to `/setup`
+- Ends with "Aether is running!" + opens browser to `/setup`
 
 **VERIFY:**
 ```bash

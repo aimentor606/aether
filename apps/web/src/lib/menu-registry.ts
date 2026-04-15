@@ -89,7 +89,7 @@ import {
 } from 'lucide-react';
 
 const DEPLOYMENTS_ENABLED =
-  process.env.NEXT_PUBLIC_ACME_DEPLOYMENTS_ENABLED === 'true';
+  process.env.NEXT_PUBLIC_AETHER_DEPLOYMENTS_ENABLED === 'true';
 
 // ============================================================================
 // Types

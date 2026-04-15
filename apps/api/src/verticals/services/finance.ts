@@ -1,11 +1,11 @@
-// Finance vertical service layer — delegates to @acme/vertical-finance
+// Finance vertical service layer — delegates to @aether/vertical-finance
 
 import {
   invoicesService,
   expensesService,
   budgetsService,
   ledgersService,
-} from '@acme/vertical-finance';
+} from '@aether/vertical-finance';
 
 export {
   invoicesService,

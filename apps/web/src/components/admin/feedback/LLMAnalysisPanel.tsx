@@ -2,34 +2,44 @@
 
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  ScrollArea,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Skeleton,
+} from '@aether/ui/primitives';
+import {
   useAdminFeedbackAnalysis,
   type LLMAnalysisResponse,
-  type LLMAnalysisRequest 
+  type LLMAnalysisRequest,
 } from '@/hooks/admin/use-admin-feedback';
-import { 
-  Sparkles, 
+import {
+  Sparkles,
   AlertTriangle,
-  CheckCircle2, 
+  CheckCircle2,
   Lightbulb,
   Target,
   MessageSquareQuote,
   Loader2,
   Zap,
-  ArrowRight
+  ArrowRight,
 } from 'lucide-react';
 
 export function LLMAnalysisPanel() {
   const [focusArea, setFocusArea] = useState<string>('all');
   const [days, setDays] = useState(30);
   const [analysis, setAnalysis] = useState<LLMAnalysisResponse | null>(null);
-  
+
   const analysisMutation = useAdminFeedbackAnalysis();
 
   const handleAnalyze = async () => {
@@ -38,7 +48,7 @@ export function LLMAnalysisPanel() {
       days,
       max_feedback: 200,
     };
-    
+
     const result = await analysisMutation.mutateAsync(request);
     setAnalysis(result);
   };
@@ -53,9 +63,12 @@ export function LLMAnalysisPanel() {
     return (
       <div className="flex gap-0.5">
         {[1, 2, 3].map((i) => (
-          <div 
-            key={i} 
-            className={cn('w-1.5 h-1.5 rounded-full', i <= count ? 'bg-secondary' : 'bg-muted')} 
+          <div
+            key={i}
+            className={cn(
+              'w-1.5 h-1.5 rounded-full',
+              i <= count ? 'bg-secondary' : 'bg-muted',
+            )}
           />
         ))}
       </div>
@@ -82,7 +95,10 @@ export function LLMAnalysisPanel() {
                 <SelectItem value="critical">Critical (≤2★)</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={days.toString()} onValueChange={(v) => setDays(parseInt(v))}>
+            <Select
+              value={days.toString()}
+              onValueChange={(v) => setDays(parseInt(v))}
+            >
               <SelectTrigger className="w-[100px] h-8">
                 <SelectValue />
               </SelectTrigger>
@@ -92,7 +108,7 @@ export function LLMAnalysisPanel() {
                 <SelectItem value="90">90 days</SelectItem>
               </SelectContent>
             </Select>
-            <Button 
+            <Button
               onClick={handleAnalyze}
               disabled={analysisMutation.isPending}
               size="sm"
@@ -112,7 +128,8 @@ export function LLMAnalysisPanel() {
           </div>
         </div>
         <CardDescription>
-          Get AI-powered insights and actionable recommendations from user feedback
+          Get AI-powered insights and actionable recommendations from user
+          feedback
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -154,8 +171,8 @@ export function LLMAnalysisPanel() {
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {analysis.key_themes.map((theme, i) => (
-                      <span 
-                        key={i} 
+                      <span
+                        key={i}
                         className="px-3 py-1.5 rounded-full text-sm font-medium bg-secondary/10 text-secondary"
                       >
                         {theme}
@@ -177,8 +194,12 @@ export function LLMAnalysisPanel() {
                     <ul className="space-y-2">
                       {analysis.positive_highlights.map((highlight, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm">
-                          <span className="text-secondary mt-0.5 shrink-0">✓</span>
-                          <span className="text-muted-foreground">{highlight}</span>
+                          <span className="text-secondary mt-0.5 shrink-0">
+                            ✓
+                          </span>
+                          <span className="text-muted-foreground">
+                            {highlight}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -194,12 +215,24 @@ export function LLMAnalysisPanel() {
                     </div>
                     <div className="space-y-2">
                       {analysis.improvement_areas.slice(0, 4).map((area, i) => (
-                        <div key={i} className="flex items-center gap-2 text-sm">
-                          <div className={cn('w-2 h-2 rounded-full shrink-0', 
-                            area.severity === 'high' ? 'bg-destructive' : 'bg-secondary'
-                          )} />
-                          <span className="text-muted-foreground truncate">{area.area}</span>
-                          <span className="text-xs text-muted-foreground ml-auto shrink-0">{area.frequency}</span>
+                        <div
+                          key={i}
+                          className="flex items-center gap-2 text-sm"
+                        >
+                          <div
+                            className={cn(
+                              'w-2 h-2 rounded-full shrink-0',
+                              area.severity === 'high'
+                                ? 'bg-destructive'
+                                : 'bg-secondary',
+                            )}
+                          />
+                          <span className="text-muted-foreground truncate">
+                            {area.area}
+                          </span>
+                          <span className="text-xs text-muted-foreground ml-auto shrink-0">
+                            {area.frequency}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -215,33 +248,44 @@ export function LLMAnalysisPanel() {
                   </h4>
                   <div className="space-y-3">
                     {analysis.improvement_areas.map((area, i) => (
-                      <div 
-                        key={i} 
-                        className={cn('rounded-lg border-l-4 p-4', getSeverityStyles(area.severity))}
+                      <div
+                        key={i}
+                        className={cn(
+                          'rounded-lg border-l-4 p-4',
+                          getSeverityStyles(area.severity),
+                        )}
                       >
                         <div className="flex items-start justify-between gap-4 mb-2">
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-medium">{area.area}</span>
-                              <Badge 
-                                variant="outline" 
-                                className={cn('text-[10px] uppercase', 
-                                  area.severity === 'high' 
-                                    ? 'border-destructive/50 text-destructive' 
-                                    : 'border-secondary/50 text-secondary'
+                              <Badge
+                                variant="outline"
+                                className={cn(
+                                  'text-[10px] uppercase',
+                                  area.severity === 'high'
+                                    ? 'border-destructive/50 text-destructive'
+                                    : 'border-secondary/50 text-secondary',
                                 )}
                               >
                                 {area.severity}
                               </Badge>
                             </div>
-                            <p className="text-sm text-muted-foreground">{area.suggested_action}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {area.suggested_action}
+                            </p>
                           </div>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap">{area.frequency} mentions</span>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                            {area.frequency} mentions
+                          </span>
                         </div>
                         {area.user_quotes.length > 0 && (
                           <div className="mt-3 pl-3 border-l-2 border-muted">
                             {area.user_quotes.slice(0, 2).map((quote, qi) => (
-                              <p key={qi} className="text-xs italic text-muted-foreground mb-1">
+                              <p
+                                key={qi}
+                                className="text-xs italic text-muted-foreground mb-1"
+                              >
                                 "{quote}"
                               </p>
                             ))}
@@ -261,16 +305,19 @@ export function LLMAnalysisPanel() {
                   </h4>
                   <div className="space-y-3">
                     {analysis.actionable_recommendations.map((rec, i) => (
-                      <div 
-                        key={i} 
+                      <div
+                        key={i}
                         className="group rounded-xl border bg-card p-4 hover:border-secondary/50 transition-colors"
                       >
                         <div className="flex items-start gap-4">
-                          <div className={cn('p-2 rounded-lg shrink-0', 
-                            rec.priority === 'high' 
-                              ? 'bg-destructive/10 text-destructive' 
-                              : 'bg-secondary/10 text-secondary'
-                          )}>
+                          <div
+                            className={cn(
+                              'p-2 rounded-lg shrink-0',
+                              rec.priority === 'high'
+                                ? 'bg-destructive/10 text-destructive'
+                                : 'bg-secondary/10 text-secondary',
+                            )}
+                          >
                             {rec.priority === 'high' ? (
                               <Zap className="h-3.5 w-3.5" />
                             ) : (
@@ -279,7 +326,9 @@ export function LLMAnalysisPanel() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2 mb-2">
-                              <h5 className="font-medium text-sm">{rec.recommendation}</h5>
+                              <h5 className="font-medium text-sm">
+                                {rec.recommendation}
+                              </h5>
                               <div className="flex items-center gap-3 shrink-0">
                                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                   <span>Effort</span>
@@ -287,7 +336,9 @@ export function LLMAnalysisPanel() {
                                 </div>
                               </div>
                             </div>
-                            <p className="text-sm text-muted-foreground mb-2">{rec.impact}</p>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {rec.impact}
+                            </p>
                             <div className="flex items-center gap-1 text-xs text-secondary">
                               <ArrowRight className="h-3 w-3" />
                               <span>{rec.implementation_hint}</span>

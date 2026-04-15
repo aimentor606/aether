@@ -1,4 +1,4 @@
-import { ACME_MARKUP } from '../../config';
+import { AETHER_MARKUP } from '../../config';
 import type { ModelConfig } from '../config/models';
 
 export function calculateCost(
@@ -7,7 +7,7 @@ export function calculateCost(
   completionTokens: number,
   cachedTokens: number = 0,
   cacheWriteTokens: number = 0,
-  markup: number = ACME_MARKUP,
+  markup: number = AETHER_MARKUP,
 ): number {
   if ((cachedTokens > 0 || cacheWriteTokens > 0) && modelConfig.cacheReadPer1M != null) {
     const regularInputTokens = Math.max(0, promptTokens - cachedTokens - cacheWriteTokens);

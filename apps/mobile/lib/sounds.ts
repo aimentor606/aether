@@ -7,14 +7,14 @@ import { useSoundStore, type SoundEvent } from '@/stores/sound-store';
 // The opencode pack has no files yet, so it falls back to acme.
 // ---------------------------------------------------------------------------
 
-const ACME_ASSETS: Partial<Record<SoundEvent, AVPlaybackSource>> = {
+const AETHER_ASSETS: Partial<Record<SoundEvent, AVPlaybackSource>> = {
   completion: require('@/assets/sounds/acme/completion.mp3'),
   send: require('@/assets/sounds/acme/send.mp3'),
 };
 
 function resolveAsset(pack: string, event: SoundEvent): AVPlaybackSource | null {
   if (pack === 'acme') {
-    return ACME_ASSETS[event] ?? ACME_ASSETS.completion ?? null;
+    return AETHER_ASSETS[event] ?? AETHER_ASSETS.completion ?? null;
   }
   // opencode pack has no files yet — returns null (no sound)
   return null;

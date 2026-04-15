@@ -1,41 +1,56 @@
 'use client';
 
 import { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@aether/ui/primitives';
 import {
+  Badge,
+  Button,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useAccessRequests, useApproveRequest, useRejectRequest } from '@/hooks/admin/use-access-requests';
-import type { AccessRequest } from '@/hooks/admin/use-access-requests';
+} from '@aether/ui/primitives';
+import { useApiClient, useAdminAccessRequests } from '@aether/sdk/client';
+import type { AccessRequest } from '@aether/sdk/client';
 import { useAdminRole } from '@/hooks/admin/use-admin-role';
 import { toast } from '@/lib/toast';
-import { CheckCircle, XCircle, Clock, ShieldCheck, UserPlus } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import {
+  CheckCircle,
+  XCircle,
+  Clock,
+  ShieldCheck,
+  UserPlus,
+} from 'lucide-react';
 
 function StatusBadge({ status }: { status: AccessRequest['status'] }) {
   switch (status) {
     case 'pending':
-      return <Badge variant="secondary" className="gap-1"><Clock className="h-3 w-3" /> Pending</Badge>;
+      return (
+        <Badge variant="secondary" className="gap-1">
+          <Clock className="h-3 w-3" /> Pending
+        </Badge>
+      );
     case 'approved':
-      return <Badge variant="highlight" className="gap-1"><CheckCircle className="h-3 w-3" /> Approved</Badge>;
+      return (
+        <Badge variant="highlight" className="gap-1">
+          <CheckCircle className="h-3 w-3" /> Approved
+        </Badge>
+      );
     case 'rejected':
-      return <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" /> Rejected</Badge>;
+      return (
+        <Badge variant="destructive" className="gap-1">
+          <XCircle className="h-3 w-3" /> Rejected
+        </Badge>
+      );
   }
 }
 
@@ -50,16 +65,17 @@ function formatDate(dateStr: string) {
 }
 
 export default function AccessRequestsPage() {
+  const client = useApiClient();
   const { data: adminRole, isLoading: roleLoading } = useAdminRole();
   const [activeTab, setActiveTab] = useState<string>('pending');
-  const [confirmDialog, setConfirmDialog] = useState<{ request: AccessRequest; action: 'approve' | 'reject' } | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    request: AccessRequest;
+    action: 'approve' | 'reject';
+  } | null>(null);
 
-  const { data, isLoading } = useAccessRequests({
+  const admin = useAdminAccessRequests(client, {
     status: activeTab === 'all' ? undefined : activeTab,
   });
-
-  const approveMutation = useApproveRequest();
-  const rejectMutation = useRejectRequest();
 
   if (roleLoading) {
     return (
@@ -78,15 +94,23 @@ export default function AccessRequestsPage() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-3">
           <ShieldCheck className="h-12 w-12 text-muted-foreground/40 mx-auto" />
-          <h2 className="text-lg font-medium text-foreground/80">Admin access required</h2>
-          <p className="text-sm text-muted-foreground">You don&apos;t have permission to view this page.</p>
+          <h2 className="text-lg font-medium text-foreground/80">
+            Admin access required
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            You don&apos;t have permission to view this page.
+          </p>
         </div>
       </div>
     );
   }
 
-  const summary = data?.summary || { pending: 0, approved: 0, rejected: 0 };
-  const requests = data?.requests || [];
+  const summary = admin.list.data?.summary || {
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+  };
+  const requests = admin.list.data?.requests || [];
 
   async function handleAction() {
     if (!confirmDialog) return;
@@ -94,12 +118,12 @@ export default function AccessRequestsPage() {
 
     try {
       if (action === 'approve') {
-        await approveMutation.mutateAsync(request.id);
+        await admin.approve.mutateAsync(request.id);
         toast.success(`Approved ${request.email}`, {
           description: 'Email added to allowlist. They can now sign up.',
         });
       } else {
-        await rejectMutation.mutateAsync(request.id);
+        await admin.reject.mutateAsync(request.id);
         toast.success(`Rejected ${request.email}`);
       }
     } catch (err: any) {
@@ -110,7 +134,7 @@ export default function AccessRequestsPage() {
     setConfirmDialog(null);
   }
 
-  const isActioning = approveMutation.isPending || rejectMutation.isPending;
+  const isActioning = admin.approve.isPending || admin.reject.isPending;
 
   return (
     <div className="min-h-screen bg-background">
@@ -130,15 +154,21 @@ export default function AccessRequestsPage() {
           {/* Summary cards */}
           <div className="flex gap-3">
             <div className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg px-4 py-2 text-center min-w-[80px]">
-              <p className="text-lg font-semibold text-amber-500">{summary.pending}</p>
+              <p className="text-lg font-semibold text-amber-500">
+                {summary.pending}
+              </p>
               <p className="text-[11px] text-muted-foreground">Pending</p>
             </div>
             <div className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg px-4 py-2 text-center min-w-[80px]">
-              <p className="text-lg font-semibold text-green-500">{summary.approved}</p>
+              <p className="text-lg font-semibold text-green-500">
+                {summary.approved}
+              </p>
               <p className="text-[11px] text-muted-foreground">Approved</p>
             </div>
             <div className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg px-4 py-2 text-center min-w-[80px]">
-              <p className="text-lg font-semibold text-red-500">{summary.rejected}</p>
+              <p className="text-lg font-semibold text-red-500">
+                {summary.rejected}
+              </p>
               <p className="text-[11px] text-muted-foreground">Rejected</p>
             </div>
           </div>
@@ -171,7 +201,7 @@ export default function AccessRequestsPage() {
         </Tabs>
 
         {/* Table */}
-        {isLoading ? (
+        {admin.list.isLoading ? (
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
               <Skeleton key={i} className="h-14 w-full" />
@@ -180,7 +210,9 @@ export default function AccessRequestsPage() {
         ) : requests.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <UserPlus className="h-10 w-10 mx-auto mb-3 opacity-30" />
-            <p className="text-sm">No {activeTab === 'all' ? '' : activeTab} requests</p>
+            <p className="text-sm">
+              No {activeTab === 'all' ? '' : activeTab} requests
+            </p>
           </div>
         ) : (
           <div className="border border-foreground/[0.08] rounded-xl overflow-hidden">
@@ -192,19 +224,30 @@ export default function AccessRequestsPage() {
                   <TableHead className="w-[300px]">Use Case</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Requested</TableHead>
-                  {activeTab === 'pending' && <TableHead className="text-right">Actions</TableHead>}
+                  {activeTab === 'pending' && (
+                    <TableHead className="text-right">Actions</TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {requests.map((req) => (
                   <TableRow key={req.id} className="group">
                     <TableCell className="font-medium">{req.email}</TableCell>
-                    <TableCell className="text-muted-foreground">{req.company || '—'}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm max-w-[300px] truncate" title={req.useCase || undefined}>
+                    <TableCell className="text-muted-foreground">
+                      {req.company || '—'}
+                    </TableCell>
+                    <TableCell
+                      className="text-muted-foreground text-sm max-w-[300px] truncate"
+                      title={req.useCase || undefined}
+                    >
                       {req.useCase || '—'}
                     </TableCell>
-                    <TableCell><StatusBadge status={req.status} /></TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{formatDate(req.createdAt)}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={req.status} />
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {formatDate(req.createdAt)}
+                    </TableCell>
                     {activeTab === 'pending' && (
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -212,7 +255,12 @@ export default function AccessRequestsPage() {
                             size="sm"
                             variant="outline"
                             className="h-7 text-xs text-green-500 border-green-500/30 hover:bg-green-500/10"
-                            onClick={() => setConfirmDialog({ request: req, action: 'approve' })}
+                            onClick={() =>
+                              setConfirmDialog({
+                                request: req,
+                                action: 'approve',
+                              })
+                            }
                           >
                             Approve
                           </Button>
@@ -220,7 +268,12 @@ export default function AccessRequestsPage() {
                             size="sm"
                             variant="outline"
                             className="h-7 text-xs text-red-500 border-red-500/30 hover:bg-red-500/10"
-                            onClick={() => setConfirmDialog({ request: req, action: 'reject' })}
+                            onClick={() =>
+                              setConfirmDialog({
+                                request: req,
+                                action: 'reject',
+                              })
+                            }
                           >
                             Reject
                           </Button>
@@ -236,11 +289,16 @@ export default function AccessRequestsPage() {
       </div>
 
       {/* Confirm dialog */}
-      <Dialog open={!!confirmDialog} onOpenChange={() => setConfirmDialog(null)}>
+      <Dialog
+        open={!!confirmDialog}
+        onOpenChange={() => setConfirmDialog(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {confirmDialog?.action === 'approve' ? 'Approve Access' : 'Reject Request'}
+              {confirmDialog?.action === 'approve'
+                ? 'Approve Access'
+                : 'Reject Request'}
             </DialogTitle>
             <DialogDescription>
               {confirmDialog?.action === 'approve'
@@ -257,11 +315,17 @@ export default function AccessRequestsPage() {
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmDialog(null)} disabled={isActioning}>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDialog(null)}
+              disabled={isActioning}
+            >
               Cancel
             </Button>
             <Button
-              variant={confirmDialog?.action === 'reject' ? 'destructive' : 'default'}
+              variant={
+                confirmDialog?.action === 'reject' ? 'destructive' : 'default'
+              }
               onClick={handleAction}
               disabled={isActioning}
             >

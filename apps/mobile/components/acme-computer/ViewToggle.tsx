@@ -8,7 +8,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import type { ViewType } from '@/stores/acme-computer-store';
+import type { ViewType } from '@/stores/aether-computer-store';
 
 interface ViewToggleProps {
   currentView: ViewType;

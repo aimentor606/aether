@@ -60,8 +60,8 @@ write_env "apps/api/.env" \
   "# Core" \
   "PORT=8008" \
   "$(kv ENV_MODE local)" \
-  "$(kv INTERNAL_ACME_ENV dev)" \
-  "$(kv ACME_BILLING_INTERNAL_ENABLED false)" \
+  "$(kv INTERNAL_AETHER_ENV dev)" \
+  "$(kv AETHER_BILLING_INTERNAL_ENABLED false)" \
   "" \
   "# Database + Supabase (REQUIRED)" \
   "$(kv DATABASE_URL)" \
@@ -116,7 +116,7 @@ write_env "apps/web/.env" \
   "" \
   "$(kv NEXT_PUBLIC_GOOGLE_CLIENT_ID)" \
   "$(kv NEXT_PUBLIC_POSTHOG_KEY)" \
-  "$(kv ACME_ADMIN_API_KEY)" \
+  "$(kv AETHER_ADMIN_API_KEY)" \
   "" \
 
 echo ""

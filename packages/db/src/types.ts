@@ -1,4 +1,4 @@
-import { sandboxes, deployments, acmeApiKeys, integrationCredentials, integrations, sandboxIntegrations, serverEntries, accounts, accountMembers, creditAccounts, tunnelConnections, tunnelPermissions, tunnelPermissionRequests, tunnelAuditLogs } from './schema/kortix';
+import { sandboxes, deployments, aetherApiKeys, integrationCredentials, integrations, sandboxIntegrations, serverEntries, accounts, accountMembers, creditAccounts, tunnelConnections, tunnelPermissions, tunnelPermissionRequests, tunnelAuditLogs } from './schema/aether';
 import { apiKeys, accountUser } from './schema/public';
 import { featureFlags, verticalConfigs, accountIntegrations } from './schema/vertical';
 
@@ -12,14 +12,14 @@ export type ApiKey = typeof apiKeys.$inferSelect;
 export type CreditAccount = typeof creditAccounts.$inferSelect;
 /** @deprecated Use AccountMember instead — basejump.account_user is being migrated to acme.account_members */
 export type AccountUser = typeof accountUser.$inferSelect;
-export type AcmeApiKey = typeof acmeApiKeys.$inferSelect;
+export type AetherApiKey = typeof aetherApiKeys.$inferSelect;
 
 // Insert types (what you pass to inserts)
 export type NewSandbox = typeof sandboxes.$inferInsert;
 export type Deployment = typeof deployments.$inferSelect;
 export type NewDeployment = typeof deployments.$inferInsert;
 export type NewApiKey = typeof apiKeys.$inferInsert;
-export type NewAcmeApiKey = typeof acmeApiKeys.$inferInsert;
+export type NewAetherApiKey = typeof aetherApiKeys.$inferInsert;
 export type IntegrationCredential = typeof integrationCredentials.$inferSelect;
 export type NewIntegrationCredential = typeof integrationCredentials.$inferInsert;
 export type Integration = typeof integrations.$inferSelect;

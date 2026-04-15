@@ -10,11 +10,11 @@ import { tmpdir } from 'os'
 let tempDir: string
 beforeEach(() => {
   tempDir = mkdtempSync(join(tmpdir(), 'channel-db-test-'))
-  process.env.ACME_WORKSPACE = tempDir
+  process.env.AETHER_WORKSPACE = tempDir
 })
 afterEach(() => {
   // Force re-init on next test
-  delete process.env.ACME_WORKSPACE
+  delete process.env.AETHER_WORKSPACE
   rmSync(tempDir, { recursive: true, force: true })
 })
 

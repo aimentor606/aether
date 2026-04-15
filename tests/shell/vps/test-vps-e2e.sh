@@ -20,7 +20,7 @@ set -euo pipefail
 DOMAIN="${1:-}"
 ADMIN_USER="${2:-admin}"
 ADMIN_PASSWORD="${3:-}"
-INSTALL_DIR="${ACME_HOME:-$HOME/.acme}"
+INSTALL_DIR="${AETHER_HOME:-$HOME/.acme}"
 
 if [ -z "$DOMAIN" ]; then
   echo "Usage: $0 <domain-or-ip> [admin-user] [admin-password]"
@@ -168,7 +168,7 @@ echo "  Container Health"
 echo ""
 
 if command -v docker &>/dev/null; then
-  for svc in caddy frontend acme-api postgres acme-sandbox; do
+  for svc in caddy frontend aether-api postgres aether-sandbox; do
     CONTAINER_STATUS=$(docker ps --filter "name=${svc}" --format "{{.Status}}" 2>/dev/null | head -1)
     if echo "$CONTAINER_STATUS" | grep -qi 'up'; then
       pass "container '${svc}' is running"
@@ -197,15 +197,15 @@ if [ -f "$INSTALL_DIR/.env" ]; then
     fail ".env has secure permissions (got: ${ENV_PERMS})"
   fi
 
-  if grep -q 'ACME_TOKEN=' "$INSTALL_DIR/.env" 2>/dev/null; then
-    TOKEN_VAL=$(grep 'ACME_TOKEN=' "$INSTALL_DIR/.env" | cut -d= -f2)
+  if grep -q 'AETHER_TOKEN=' "$INSTALL_DIR/.env" 2>/dev/null; then
+    TOKEN_VAL=$(grep 'AETHER_TOKEN=' "$INSTALL_DIR/.env" | cut -d= -f2)
     if [ ${#TOKEN_VAL} -ge 32 ]; then
-      pass "ACME_TOKEN is set (${#TOKEN_VAL} chars)"
+      pass "AETHER_TOKEN is set (${#TOKEN_VAL} chars)"
     else
-      fail "ACME_TOKEN is too short (${#TOKEN_VAL} chars)"
+      fail "AETHER_TOKEN is too short (${#TOKEN_VAL} chars)"
     fi
   else
-    fail "ACME_TOKEN is set in .env"
+    fail "AETHER_TOKEN is set in .env"
   fi
 
   if grep -q 'INTERNAL_SERVICE_KEY=' "$INSTALL_DIR/.env" 2>/dev/null; then

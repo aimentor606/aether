@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Secrets Manager | Acme',
+  title: 'Secrets Manager | Aether',
   description: 'Manage environment variables and API keys',
 };
 

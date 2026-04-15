@@ -1,13 +1,14 @@
 {
-  "brandName": "yourbrand",
-  "brandDomain": "yourbrand.com",
-  "brandTitle": "YourBrand",
-  "brandTwitter": "@yourbrand",
+  "brandName": "aether",
+  "brandDomain": "aether.dev",
+  "brandTitle": "Aether",
+  "brandTwitter": "@aether",
   "description": "Brand configuration for rebrand.sh. Override with env vars: BRAND, BRAND_DOMAIN, BRAND_TITLE, BRAND_TWITTER",
   "replacementRules": {
     "keepDirectoryNames": [
+      "core/kortix-master",
       "core/acme-master",
-      "packages/acme-ocx-registry"
+      "packages/kortix-ocx-registry"
     ],
     "skipPatterns": [
       "node_modules",
@@ -15,7 +16,13 @@
       "dist",
       ".git",
       "pnpm-lock.yaml",
-      "coverage"
+      "coverage",
+      "packages/db/drizzle"
+    ],
+    "excludedPaths": [
+      "core/kortix-master/",
+      "core/init-scripts/kortix-env-setup.sh",
+      "packages/db/drizzle/"
     ]
   }
 }

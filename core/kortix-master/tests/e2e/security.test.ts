@@ -13,7 +13,7 @@ describe("Security Tests", () => {
     fixture = createRuntimeFixture("kortix-security-");
     opencode = await startDummyOpenCode(9003);
     serverProcess = await startKortixMaster(8003, fixture, {
-      ACME_TOKEN: "security-test-token",
+      AETHER_TOKEN: "security-test-token",
       OPENCODE_PORT: "9003",
     });
   });
@@ -80,14 +80,14 @@ describe("Security Tests", () => {
     }
   });
 
-  test("different ACME_TOKEN should not break secret decryption", async () => {
+  test("different AETHER_TOKEN should not break secret decryption", async () => {
     // Set a secret with current token
     await setEnvVar("TOKEN_TEST", "secret-with-token-1");
 
     // Start server with different token on a different port.
       const newBaseUrl = "http://localhost:8004";
       const newServerProcess = await startKortixMaster(8004, fixture, {
-        ACME_TOKEN: "different-security-test-token",
+        AETHER_TOKEN: "different-security-test-token",
         OPENCODE_PORT: "9004",
       });
 

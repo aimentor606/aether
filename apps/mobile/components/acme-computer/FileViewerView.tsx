@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { View, ScrollView, TextInput, Pressable, Alert, Share, Modal, FlatList, Platform } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { AcmeLoader } from '@/components/ui';
+import { AetherLoader } from '@/components/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Home,
@@ -46,9 +46,9 @@ import {
   type FileVersion,
   type CommitInfo,
 } from '@/lib/files/hooks';
-import { useAcmeComputerStore } from '@/stores/acme-computer-store';
+import { useAetherComputerStore } from '@/stores/aether-computer-store';
 import { API_URL, getAuthToken } from '@/api/config';
-import { AcmeComputerHeader } from './AcmeComputerHeader';
+import { AetherComputerHeader } from './AetherComputerHeader';
 import { VersionBanner } from './VersionBanner';
 import { log } from '@/lib/logger';
 
@@ -91,7 +91,7 @@ export function FileViewerView({
     selectedVersionDate,
     setSelectedVersion,
     clearSelectedVersion,
-  } = useAcmeComputerStore();
+  } = useAetherComputerStore();
 
   // Get the effective project ID
   const effectiveProjectId = projectId || project?.id;
@@ -579,7 +579,7 @@ export function FileViewerView({
   return (
     <View className="flex-1">
       {/* Header */}
-      <AcmeComputerHeader
+      <AetherComputerHeader
         icon={Home}
         onIconClick={goBackToBrowser}
         iconTitle="Back to files"
@@ -645,7 +645,7 @@ export function FileViewerView({
                       className={`h-9 w-9 items-center justify-center rounded-xl bg-card border border-border active:opacity-70 ${!hasUnsavedChanges ? 'opacity-50' : ''}`}
                     >
                       {saveStatus === 'saving' ? (
-                        <AcmeLoader size="small" customSize={17} />
+                        <AetherLoader size="small" customSize={17} />
                       ) : (
                         <Icon
                           as={saveStatus === 'saved' ? Check : saveStatus === 'error' ? AlertCircle : Save}
@@ -700,7 +700,7 @@ export function FileViewerView({
                 className={`h-9 w-9 items-center justify-center rounded-xl bg-card border border-border active:opacity-70 ${isDownloading ? 'opacity-60' : ''}`}
               >
                 {isDownloading ? (
-                  <AcmeLoader size="small" customSize={17} />
+                  <AetherLoader size="small" customSize={17} />
                 ) : (
                   <Icon
                     as={Download}
@@ -728,7 +728,7 @@ export function FileViewerView({
         {/* Show loading while fetching sandbox status */}
         {isLoadingStatus && !sandboxStatus ? (
           <View className="flex-1 items-center justify-center p-8">
-            <AcmeLoader size="large" />
+            <AetherLoader size="large" />
             <Text className="text-sm text-primary opacity-50 mt-4">
               Checking computer status...
             </Text>
@@ -752,7 +752,7 @@ export function FileViewerView({
         ) : !isSandboxReady && (sandboxStatus || isAutoStarting) ? (
           /* Show sandbox status when not ready */
           <View className="flex-1 items-center justify-center p-8">
-            <AcmeLoader size="large" />
+            <AetherLoader size="large" />
             <Text className="text-sm text-primary opacity-50 mt-4">
               {(sandboxStatus === 'STARTING' || isAutoStarting) && (isAutoStarting ? 'Waking up computer...' : 'Computer starting...')}
               {sandboxStatus === 'OFFLINE' && !isAutoStarting && 'Computer offline'}
@@ -768,7 +768,7 @@ export function FileViewerView({
           </View>
         ) : isLoading ? (
           <View className="flex-1 items-center justify-center">
-            <AcmeLoader size="large" />
+            <AetherLoader size="large" />
             <Text className="text-sm text-primary opacity-50 mt-4">
               {isLoadingVersionContent ? 'Loading version...' : `Loading ${fileName}...`}
             </Text>
@@ -885,7 +885,7 @@ export function FileViewerView({
 
           {isLoadingVersions ? (
             <View className="flex-1 items-center justify-center">
-              <AcmeLoader size="large" />
+              <AetherLoader size="large" />
               <Text className="text-sm text-primary opacity-50 mt-4">Loading history...</Text>
             </View>
           ) : versions.length === 0 ? (
@@ -929,7 +929,7 @@ export function FileViewerView({
 
             {isLoadingRevertInfo ? (
               <View className="py-8 items-center">
-                <AcmeLoader size="small" />
+                <AetherLoader size="small" />
               </View>
             ) : revertCommitInfo ? (
               <View className="mb-4">
@@ -1002,7 +1002,7 @@ export function FileViewerView({
               >
                 {isReverting ? (
                   <View className="flex-row items-center gap-2">
-                    <AcmeLoader size="small" customSize={14} forceTheme="dark" />
+                    <AetherLoader size="small" customSize={14} forceTheme="dark" />
                     <Text className="text-sm font-roobert-medium text-background">Restoring...</Text>
                   </View>
                 ) : (

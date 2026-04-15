@@ -32,8 +32,8 @@ interface SandboxConnectionStore {
 // On hard refresh, wasConnected resets to false which triggers a full-screen
 // blocking overlay. By persisting it, users who were previously connected
 // see the lightweight reconnect pill instead, making reconnection feel instant.
-const STORAGE_KEY = "acme-sandbox-was-connected";
-const PROVISION_VERIFIED_KEY = "acme-sandbox-provision-verified";
+const STORAGE_KEY = "aether-sandbox-was-connected";
+const PROVISION_VERIFIED_KEY = "aether-sandbox-provision-verified";
 
 function loadWasConnected(): boolean {
 	try {

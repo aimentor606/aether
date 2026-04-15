@@ -1333,7 +1333,7 @@ function CreateTaskSheet({
               style={{ ...inputStyle, marginBottom: 8 }}
             />
             <Text style={{ fontSize: 11, fontFamily: 'Roobert', color: muted, lineHeight: 16 }}>
-              If set, requests must include the header{'\n'}X-Acme-Trigger-Secret with this value.
+              If set, requests must include the header{'\n'}X-Aether-Trigger-Secret with this value.
             </Text>
           </>)}
 

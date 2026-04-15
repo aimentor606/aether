@@ -3,7 +3,7 @@
  * Agent Tunnel CLI — self-contained script for the agent-tunnel skill.
  *
  * Zero external dependencies — TunnelClient is inlined so this works
- * standalone in the sandbox without @acme/agent-tunnel in node_modules.
+ * standalone in the sandbox without @aether/agent-tunnel in node_modules.
  *
  * Usage: bun run tunnel.ts <command> [args as JSON]
  *
@@ -185,7 +185,7 @@ class TunnelClient {
       -1,
       "No tunnel connection found. The user needs to set up Agent Tunnel first:\n" +
         "1. Create a tunnel connection in the UI\n" +
-        '2. Run `npx @acme/agent-tunnel connect` on their local machine'
+        '2. Run `npx @aether/agent-tunnel connect` on their local machine'
     );
   }
 }
@@ -195,17 +195,17 @@ class TunnelClient {
 const FALLBACK_API_URL = "http://localhost:8008";
 
 function getApiBase(): string {
-  const raw = getEnv("ACME_API_URL") || FALLBACK_API_URL;
+  const raw = getEnv("AETHER_API_URL") || FALLBACK_API_URL;
   const url = raw.startsWith("http") ? raw : FALLBACK_API_URL;
-  // Strip /v1/router suffix — ACME_API_URL sometimes includes the router path
+  // Strip /v1/router suffix — AETHER_API_URL sometimes includes the router path
   // but tunnel.ts appends its own /v1/tunnel path.
   return url.replace(/\/+$/, "").replace(/\/v1\/router\/?$/, "");
 }
 
 const client = new TunnelClient({
   apiUrl: `${getApiBase()}/v1/tunnel`,
-  token: getEnv("ACME_TOKEN") || "",
-  tunnelId: getEnv("ACME_TUNNEL_ID"),
+  token: getEnv("AETHER_TOKEN") || "",
+  tunnelId: getEnv("AETHER_TUNNEL_ID"),
 });
 
 // ── Helpers ───────────────────────────────────────────────────────────────
@@ -325,7 +325,7 @@ async function status() {
     hasOnline,
     message: hasOnline
       ? undefined
-      : "No tunnel is currently online. Ask the user to run `npx @acme/agent-tunnel connect` on their local machine.",
+      : "No tunnel is currently online. Ask the user to run `npx @aether/agent-tunnel connect` on their local machine.",
   });
 }
 

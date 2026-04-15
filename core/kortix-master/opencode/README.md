@@ -1,6 +1,6 @@
 # kortix-opencode
 
-Acme OpenCode config directory — agents, tools, skills, commands, and plugins.
+Aether OpenCode config directory — agents, tools, skills, commands, and plugins.
 
 This directory lives inside `core/kortix-master/opencode/` and is the OpenCode config dir. In the container it's at `/ephemeral/kortix-master/opencode/` (set via `OPENCODE_CONFIG_DIR`).
 
@@ -9,7 +9,7 @@ This directory lives inside `core/kortix-master/opencode/` and is the OpenCode c
 ```
 opencode.jsonc          <- OpenCode config (plugins, model, MCP servers)
 package.json            <- minimal (deps managed by parent kortix-master/package.json)
-agents/kortix.md        <- the Acme agent (natively discovered by OpenCode)
+agents/kortix.md        <- the Aether agent (natively discovered by OpenCode)
 commands/*.md           <- slash commands (natively discovered)
 tools/*.ts              <- custom tools (natively discovered)
 skills/                 <- built-in skills (natively discovered)

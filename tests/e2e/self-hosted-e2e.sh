@@ -105,8 +105,8 @@ fi
 if [ "$SKIP_INSTALL" = "false" ]; then
   step "PHASE 3: Run get-acme.sh installer"
 
-  export ACME_OWNER_EMAIL="$E2E_OWNER_EMAIL"
-  export ACME_OWNER_PASSWORD="$E2E_OWNER_PASSWORD"
+  export AETHER_OWNER_EMAIL="$E2E_OWNER_EMAIL"
+  export AETHER_OWNER_PASSWORD="$E2E_OWNER_PASSWORD"
 
   info "Running installer (local mode, Docker DB, skip integrations)..."
   # stdin: 1=local, 1=docker db, testpass123=confirm password, n=skip integrations

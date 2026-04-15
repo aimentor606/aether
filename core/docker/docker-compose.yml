@@ -41,8 +41,8 @@ services:
       dockerfile: core/docker/Dockerfile
       args:
         SANDBOX_VERSION: ${SANDBOX_VERSION:-dev}
-    image: acme/computer:${SANDBOX_VERSION:-dev}
-    container_name: acme-sandbox
+    image: aether/computer:${SANDBOX_VERSION:-dev}
+    container_name: aether-sandbox
     privileged: true
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -65,7 +65,7 @@ services:
       - SECRET_FILE_PATH=/workspace/.secrets/.secrets.json
       - SALT_FILE_PATH=/workspace/.secrets/.salt
       # ENCRYPTION_KEY_PATH is auto-derived from SECRET_FILE_PATH dir
-      # ── Sandbox identity (injected by acme-api or set manually) ─────
+      # ── Sandbox identity (injected by aether-api or set manually) ─────
       - ACME_API_URL=${ACME_API_URL:-http://host.docker.internal:8008}
       - ACME_TOKEN=${ACME_TOKEN:-}
       - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-}

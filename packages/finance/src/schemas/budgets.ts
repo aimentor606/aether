@@ -1,10 +1,10 @@
 import { uuid, varchar, text, numeric, timestamp, index, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import { acmeSchema, accounts } from '@acme/db';
+import { aetherSchema, accounts } from '@aether/db';
 import { z } from 'zod';
 
 // Budget period enum
-export const budgetPeriodEnum = acmeSchema.enum('budget_period', [
+export const budgetPeriodEnum = aetherSchema.enum('budget_period', [
   'monthly',
   'quarterly',
   'yearly',
@@ -12,15 +12,15 @@ export const budgetPeriodEnum = acmeSchema.enum('budget_period', [
 ]);
 
 // Budget status enum
-export const budgetStatusEnum = acmeSchema.enum('budget_status', [
+export const budgetStatusEnum = aetherSchema.enum('budget_status', [
   'draft',
   'active',
   'completed',
   'archived',
 ]);
 
-// Budgets table (defined in acmeSchema for multi-tenant consistency)
-export const budgets = acmeSchema.table(
+// Budgets table (defined in aetherSchema for multi-tenant consistency)
+export const budgets = aetherSchema.table(
   'budgets',
   {
     id: uuid('id').defaultRandom().primaryKey(),

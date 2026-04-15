@@ -1,5 +1,5 @@
 {
-  "name": "@acme/sandbox-master",
+  "name": "@aether/sandbox-master",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -33,7 +33,7 @@
     "@openauthjs/openauth": "^0.4.3",
     "@opencode-ai/plugin": "1.3.7",
     "@opencode-ai/sdk": "^1.2.25",
-    "agent-tunnel": "workspace:@acme/agent-tunnel@*",
+    "agent-tunnel": "workspace:@aether/agent-tunnel@*",
     "jsonc-parser": "^3.3.1",
     "bun-pty": "^0.4.8",
     "opencode-pty": "*",

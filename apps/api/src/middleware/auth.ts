@@ -1,7 +1,7 @@
 import { Context, Next } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { validateSecretKey } from '../repositories/api-keys';
-import { isAcmeToken } from '../shared/crypto';
+import { isAetherToken } from '../shared/crypto';
 import { canAccessPreviewSandbox } from '../shared/preview-ownership';
 import { getSupabase } from '../shared/supabase';
 import { verifySupabaseJwt } from '../shared/jwt-verify';
@@ -15,9 +15,9 @@ const PREVIEW_SESSION_COOKIE = '__preview_session';
 // ═══════════════════════════════════════════════════════════════════════════════
 // Auth Middleware (3 middlewares — one per auth strategy)
 //
-//   1. apiKeyAuth      — Acme API keys only (header)
+//   1. apiKeyAuth      — Aether API keys only (header)
 //   2. supabaseAuth    — Supabase JWT only (header)
-//   3. combinedAuth    — Acme OR Supabase (header + cookie fallback)
+//   3. combinedAuth    — Aether OR Supabase (header + cookie fallback)
 //
 // Token is read from query parameters ONLY as a last resort for preview proxy
 // routes (/v1/p/*) — browser WebSocket API can't set custom headers, so PTY
@@ -27,7 +27,7 @@ const PREVIEW_SESSION_COOKIE = '__preview_session';
 
 /**
  * API key auth for search, LLM, and router routes.
- * Always validates Acme tokens (acme_, acme_sb_) via validateSecretKey()
+ * Always validates Aether tokens (aether_, aether_sb_) via validateSecretKey()
  * against the api_keys table.
  */
 export async function apiKeyAuth(c: Context, next: Next) {
@@ -47,9 +47,9 @@ export async function apiKeyAuth(c: Context, next: Next) {
     });
   }
 
-  if (!isAcmeToken(token)) {
+  if (!isAetherToken(token)) {
     throw new HTTPException(401, {
-      message: 'Invalid token format — expected acme_ prefix',
+      message: 'Invalid token format — expected aether_ prefix',
     });
   }
 
@@ -129,7 +129,7 @@ export async function supabaseAuth(c: Context, next: Next) {
 }
 
 /**
- * Combined auth — accepts Acme tokens OR Supabase JWTs.
+ * Combined auth — accepts Aether tokens OR Supabase JWTs.
  *
  * Token resolution order:
  *   1. Authorization: Bearer <token> header
@@ -152,16 +152,16 @@ export async function combinedAuth(c: Context, next: Next) {
 
   const previewSandboxId = extractPreviewSandboxId(c.req.path);
 
-  // Extract token: header → X-Acme-Token (preview only) → cookie → query param
+  // Extract token: header → X-aether-Token (preview only) → cookie → query param
   const authHeader = c.req.header('Authorization');
-  const acmeTokenHeader = previewSandboxId ? c.req.header('X-Acme-Token') : undefined;
+  const acmeTokenHeader = previewSandboxId ? c.req.header('X-aether-Token') : undefined;
   let token: string | undefined;
 
   if (authHeader?.startsWith('Bearer ')) {
     token = authHeader.slice(7);
   }
 
-  if (!token && acmeTokenHeader && isAcmeToken(acmeTokenHeader)) {
+  if (!token && acmeTokenHeader && isAetherToken(acmeTokenHeader)) {
     token = acmeTokenHeader;
   }
 
@@ -196,11 +196,11 @@ export async function combinedAuth(c: Context, next: Next) {
   // Determine if this is a preview proxy route (for cookie management)
   const isPreviewRoute = c.req.path.startsWith('/v1/p/') || c.req.path === '/v1/p';
 
-  // 1. Try Acme token (acme_ or acme_sb_) — used by agents inside the sandbox
-  if (isAcmeToken(token)) {
+  // 1. Try Aether token (aether_ or aether_sb_) — used by agents inside the sandbox
+  if (isAetherToken(token)) {
     const result = await validateSecretKey(token);
     if (!result.isValid) {
-      throw new HTTPException(401, { message: result.error || 'Invalid Acme token' });
+      throw new HTTPException(401, { message: result.error || 'Invalid Aether token' });
     }
     if (previewSandboxId && !(await canAccessPreviewSandbox({
       previewSandboxId,

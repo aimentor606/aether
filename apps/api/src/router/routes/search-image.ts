@@ -11,7 +11,7 @@ const imageSearch = new Hono<{ Variables: AppContext }>();
  * POST /image-search
  *
  * Search for images using Serper API (Google Images).
- * Requires authentication via ACME_TOKEN.
+ * Requires authentication via AETHER_TOKEN.
  * Credits are deducted per search.
  */
 imageSearch.post('/', async (c) => {

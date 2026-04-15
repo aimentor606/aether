@@ -1,18 +1,18 @@
 import type { Page } from '@playwright/test';
 
-export const ownerEmail = process.env.E2E_OWNER_EMAIL || 'test@acme.ai';
+export const ownerEmail = process.env.E2E_OWNER_EMAIL || 'test@aether.ai';
 export const ownerPassword = process.env.E2E_OWNER_PASSWORD || 'testpass123';
 export const apiBase = process.env.E2E_API_URL || 'http://localhost:13738/v1';
 export const supabaseUrl = process.env.E2E_SUPABASE_URL || 'http://localhost:13740';
 
 /**
- * Read the anon key from the Acme .env file.
+ * Read the anon key from the Aether .env file.
  */
 export function getAnonKey(): string {
   const fs = require('fs');
   const envPath = `${process.env.HOME}/.acme/.env`;
   if (!fs.existsSync(envPath)) {
-    throw new Error(`Acme .env not found at ${envPath} — is it installed?`);
+    throw new Error(`Aether .env not found at ${envPath} — is it installed?`);
   }
   const content = fs.readFileSync(envPath, 'utf8');
   const match = content.match(/^SUPABASE_ANON_KEY=(.+)$/m);

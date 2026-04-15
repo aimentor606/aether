@@ -37,12 +37,12 @@
 
 **Basic:**
 ```
-Create an asset for Acme Corp
+Create an asset for Aether Corp
 ```
 
 **With context:**
 ```
-Create an asset for Acme Corp. They're a manufacturing company
+Create an asset for Aether Corp. They're a manufacturing company
 struggling with supply chain visibility. Met with their COO
 last week. Need something for the exec team.
 ```

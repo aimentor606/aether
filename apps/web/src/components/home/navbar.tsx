@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter, usePathname } from 'next/navigation';
-import { AcmeLogo } from '@/components/sidebar/acme-logo';
+import { AetherLogo } from '@/components/sidebar/aether-logo';
 import { useTranslations } from 'next-intl';
 import { trackCtaSignup } from '@/lib/analytics/gtm';
 import { AppDownloadQR } from '@/components/common/app-download-qr';
@@ -46,7 +46,7 @@ function PlayIcon({ className }: { className?: string }) {
 }
 
 // macOS-style power button
-function PowerButton({ href, onClick, label = 'Launch Acme' }: { href?: string; onClick?: () => void; label?: string }) {
+function PowerButton({ href, onClick, label = 'Launch Aether' }: { href?: string; onClick?: () => void; label?: string }) {
   const [hovered, setHovered] = useState(false);
 
   const inner = (
@@ -210,7 +210,7 @@ export function Navbar({ isAbsolute = false }: NavbarProps) {
         <ContextMenu>
           <ContextMenuTrigger asChild>
             <Link href="/" className="flex items-center shrink-0">
-              <AcmeLogo size={18} variant='logomark' />
+              <AetherLogo size={18} variant='logomark' />
             </Link>
           </ContextMenuTrigger>
           <ContextMenuContent className="w-48">
@@ -304,7 +304,7 @@ export function Navbar({ isAbsolute = false }: NavbarProps) {
               onClick={() => { trackCtaSignup(); router.push(ctaLink); }}
               variant="ghost"
               size="icon"
-              aria-label="Launch Acme"
+              aria-label="Launch Aether"
               className="opacity-80 hover:opacity-100"
             >
               <svg viewBox="0 0 24 24" className="size-[20px]" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round">
@@ -340,7 +340,7 @@ export function Navbar({ isAbsolute = false }: NavbarProps) {
             {/* Header - matches navbar positioning */}
             <div className="flex h-[56px] items-center justify-between px-6 py-2">
               <Link href="/" className="flex items-center gap-3" onClick={() => setIsDrawerOpen(false)}>
-                <AcmeLogo size={18} variant='logomark' />
+                <AetherLogo size={18} variant='logomark' />
               </Link>
               <Button
                 onClick={toggleDrawer}

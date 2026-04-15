@@ -55,7 +55,7 @@ import { useThemeColors } from '@/lib/theme-colors';
 
 const PROVIDER_LABELS: Record<string, string> = {
   anthropic: 'Anthropic', openai: 'OpenAI', google: 'Google', xai: 'xAI',
-  acme: 'Acme', openrouter: 'OpenRouter', 'github-copilot': 'GitHub Copilot',
+  acme: 'Aether', openrouter: 'OpenRouter', 'github-copilot': 'GitHub Copilot',
   vercel: 'Vercel', groq: 'Groq', deepseek: 'DeepSeek', mistral: 'Mistral',
   cohere: 'Cohere', huggingface: 'Hugging Face', cerebras: 'Cerebras',
   togetherai: 'Together AI', fireworks: 'Fireworks', deepinfra: 'DeepInfra',

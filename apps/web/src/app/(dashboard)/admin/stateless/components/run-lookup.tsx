@@ -1,19 +1,38 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Search, Loader2, Server, Clock, User, Database, AlertCircle } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { useStatelessRunLookup } from "@/hooks/admin/use-stateless";
+import { useState } from 'react';
+import {
+  Search,
+  Loader2,
+  Server,
+  Clock,
+  User,
+  Database,
+  AlertCircle,
+} from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Input,
+  Button,
+  Badge,
+} from '@aether/ui/primitives';
+import { cn } from '@/lib/utils';
+import { useStatelessRunLookup } from '@/hooks/admin/use-stateless';
 
 export function RunLookup() {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [searchId, setSearchId] = useState<string | null>(null);
-  
-  const { data: runInfo, isLoading, isError, error } = useStatelessRunLookup(searchId);
+
+  const {
+    data: runInfo,
+    isLoading,
+    isError,
+    error,
+  } = useStatelessRunLookup(searchId);
 
   const handleSearch = () => {
     if (inputValue.trim().length >= 8) {
@@ -22,20 +41,20 @@ export function RunLookup() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSearch();
     }
   };
 
   const formatDuration = (seconds: number | null) => {
-    if (!seconds) return "-";
+    if (!seconds) return '-';
     if (seconds < 60) return `${seconds.toFixed(0)}s`;
     if (seconds < 3600) return `${(seconds / 60).toFixed(1)}m`;
     return `${(seconds / 3600).toFixed(1)}h`;
   };
 
   const formatTime = (timestamp: number | null) => {
-    if (!timestamp) return "-";
+    if (!timestamp) return '-';
     return new Date(timestamp * 1000).toLocaleString();
   };
 
@@ -50,15 +69,16 @@ export function RunLookup() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-2">
-          <Input type="text"
+          <Input
+            type="text"
             placeholder="Enter run ID..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             className="font-mono text-sm"
           />
-          <Button 
-            onClick={handleSearch} 
+          <Button
+            onClick={handleSearch}
             disabled={inputValue.trim().length < 8 || isLoading}
             size="sm"
           >
@@ -83,9 +103,7 @@ export function RunLookup() {
               <code className="text-xs font-mono bg-muted px-2 py-1 rounded">
                 {runInfo.run_id}
               </code>
-              <Badge variant="outline">
-                {runInfo.status || "unknown"}
-              </Badge>
+              <Badge variant="outline">{runInfo.status || 'unknown'}</Badge>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -95,7 +113,7 @@ export function RunLookup() {
                   Owner
                 </div>
                 <p className="text-sm font-mono truncate">
-                  {runInfo.owner || "None"}
+                  {runInfo.owner || 'None'}
                 </p>
               </div>
               <div className="p-2.5 rounded-lg border">
@@ -112,10 +130,12 @@ export function RunLookup() {
                   <Database className="w-3 h-3" />
                   Pending Writes
                 </div>
-                <p className={cn(
-                  "text-sm font-mono",
-                  runInfo.pending_writes > 0 && "text-amber-500"
-                )}>
+                <p
+                  className={cn(
+                    'text-sm font-mono',
+                    runInfo.pending_writes > 0 && 'text-amber-500',
+                  )}
+                >
                   {runInfo.pending_writes}
                 </p>
               </div>
@@ -124,9 +144,7 @@ export function RunLookup() {
                   <Server className="w-3 h-3" />
                   WAL Entries
                 </div>
-                <p className="text-sm font-mono">
-                  {runInfo.wal_entries}
-                </p>
+                <p className="text-sm font-mono">{runInfo.wal_entries}</p>
               </div>
             </div>
 

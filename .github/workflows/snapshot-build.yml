@@ -52,7 +52,7 @@ jobs:
           # Push events don't have inputs — default to dev-latest/dev
           V="${{ inputs.version || 'dev-latest' }}"
           echo "version=$V" >> "$GITHUB_OUTPUT"
-          echo "image=acme/computer:$V" >> "$GITHUB_OUTPUT"
+          echo "image=aether/computer:$V" >> "$GITHUB_OUTPUT"
           echo "snapshot=acme-computer-v$V" >> "$GITHUB_OUTPUT"
           echo "Version: $V"
 

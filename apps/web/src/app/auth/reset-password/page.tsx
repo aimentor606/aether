@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, Suspense } from 'react';
 import { AlertCircle, ArrowLeft, CheckCircle } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 
 import { Input } from '@/components/ui/input';
 import { SubmitButton } from '@/components/ui/submit-button';
@@ -186,7 +186,7 @@ export default function ResetPassword() {
     <Suspense
       fallback={
         <main className="flex flex-col items-center justify-center min-h-screen w-full">
-          <AcmeLoader size="large" />
+          <AetherLoader size="large" />
         </main>
       }
     >

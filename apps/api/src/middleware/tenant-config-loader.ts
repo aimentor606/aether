@@ -11,7 +11,7 @@
 
 import { Context, Next } from 'hono';
 import { db, hasDatabase } from '../shared/db';
-import { featureFlags, verticalConfigs } from '@acme/db';
+import { featureFlags, verticalConfigs } from '@aether/db';
 import { eq, and } from 'drizzle-orm';
 import { setTenantContext, type TenantConfig } from './tenant-context';
 

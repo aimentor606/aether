@@ -1,6 +1,6 @@
 # Auth E2E Test Suite
 
-End-to-end tests for the Acme sandbox authentication system.
+End-to-end tests for the Aether sandbox authentication system.
 
 ## Quick Start
 

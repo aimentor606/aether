@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Acme",
+    "name": "Aether",
     "slug": "acme",
     "version": "1.1.2",
     "orientation": "portrait",
@@ -26,10 +26,10 @@
         "applinks:staging.acme.com"
       ],
       "infoPlist": {
-        "NSCameraUsageDescription": "Acme needs camera access to let you capture photos and attach them to your saved conversations with the AI Worker. For example, you can photograph a document, whiteboard, or product for analysis and receive insights that are stored in your conversation history.",
-        "NSPhotoLibraryUsageDescription": "Acme needs access to your photo library so you can select and share images in your saved conversations with the AI Worker. For example, you can attach screenshots, documents, or images for review—all stored in your personalized conversation history.",
-        "NSMicrophoneUsageDescription": "Acme needs microphone access to enable voice input for your conversations. For example, you can speak your messages instead of typing, and the app will transcribe your speech to text for your AI Worker conversations.",
-        "NSUserTrackingUsageDescription": "Acme uses analytics to improve your experience and understand how features are used. For example, we track which AI features are most helpful so we can make the app better for everyone."
+        "NSCameraUsageDescription": "Aether needs camera access to let you capture photos and attach them to your saved conversations with the AI Worker. For example, you can photograph a document, whiteboard, or product for analysis and receive insights that are stored in your conversation history.",
+        "NSPhotoLibraryUsageDescription": "Aether needs access to your photo library so you can select and share images in your saved conversations with the AI Worker. For example, you can attach screenshots, documents, or images for review—all stored in your personalized conversation history.",
+        "NSMicrophoneUsageDescription": "Aether needs microphone access to enable voice input for your conversations. For example, you can speak your messages instead of typing, and the app will transcribe your speech to text for your AI Worker conversations.",
+        "NSUserTrackingUsageDescription": "Aether uses analytics to improve your experience and understand how features are used. For example, we track which AI features are most helpful so we can make the app better for everyone."
       },
       "appleTeamId": "T8G9J33433"
     },
@@ -119,21 +119,21 @@
       [
         "expo-image-picker",
         {
-          "cameraPermission": "Acme needs camera access to let you capture photos and attach them to your saved conversations with the AI Worker. For example, you can photograph a document, whiteboard, or product for analysis and receive insights that are stored in your conversation history.",
-          "photosPermission": "Acme needs access to your photo library so you can select and share images in your saved conversations with the AI Worker. For example, you can attach screenshots, documents, or images for review—all stored in your personalized conversation history.",
-          "microphonePermission": "Acme needs microphone access to record videos with audio. For example, you can record a video to share with the AI Worker for analysis and save it to your conversation history."
+          "cameraPermission": "Aether needs camera access to let you capture photos and attach them to your saved conversations with the AI Worker. For example, you can photograph a document, whiteboard, or product for analysis and receive insights that are stored in your conversation history.",
+          "photosPermission": "Aether needs access to your photo library so you can select and share images in your saved conversations with the AI Worker. For example, you can attach screenshots, documents, or images for review—all stored in your personalized conversation history.",
+          "microphonePermission": "Aether needs microphone access to record videos with audio. For example, you can record a video to share with the AI Worker for analysis and save it to your conversation history."
         }
       ],
       [
         "expo-audio",
         {
-          "microphonePermission": "Acme needs microphone access to enable voice input for your conversations. For example, you can speak your messages instead of typing, and the app will transcribe your speech to text for your AI Worker conversations."
+          "microphonePermission": "Aether needs microphone access to enable voice input for your conversations. For example, you can speak your messages instead of typing, and the app will transcribe your speech to text for your AI Worker conversations."
         }
       ],
       [
         "expo-tracking-transparency",
         {
-          "userTrackingPermission": "Acme uses analytics to improve your experience and understand how features are used. For example, we track which AI features are most helpful so we can make the app better for everyone."
+          "userTrackingPermission": "Aether uses analytics to improve your experience and understand how features are used. For example, we track which AI features are most helpful so we can make the app better for everyone."
         }
       ],
       [

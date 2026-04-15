@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AnimatedBg } from '@/components/ui/animated-bg';
-import { AcmeLogo } from '@/components/sidebar/acme-logo';
+import { AetherLogo } from '@/components/sidebar/aether-logo';
 
 export default function NotFound() {
   return (
@@ -32,7 +32,7 @@ export default function NotFound() {
           className="relative z-10 w-full max-w-[456px] flex flex-col items-center gap-5 sm:gap-8"
         >
           {/* Logo - 32px height */}
-          <AcmeLogo size={28} className="sm:w-8 sm:h-8" />
+          <AetherLogo size={28} className="sm:w-8 sm:h-8" />
 
           {/* Animated 404 text */}
           <div className="relative select-none">

@@ -13,12 +13,12 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { MermaidRenderer } from '@/components/ui/mermaid-renderer';
 import { isMermaidCode } from '@/lib/mermaid-utils';
-import { autoLinkUrls } from '@acme/shared';
+import { autoLinkUrls } from '@aether/shared';
 import { useSandboxProxy } from '@/hooks/use-sandbox-proxy';
 import { useFilePreviewStore } from '@/stores/file-preview-store';
 import { wrapChildrenWithPaths } from '@/components/common/clickable-path';
 import { looksLikeFilePath as sharedLooksLikeFilePath } from '@/lib/utils/path-detection';
-import { stripAcmeSystemTags } from '@/lib/utils/acme-system-tags';
+import { stripAetherSystemTags } from '@/lib/utils/aether-system-tags';
 import { toast } from '@/lib/toast';
 
 // ---------------------------------------------------------------------------
@@ -594,7 +594,7 @@ export interface UnifiedMarkdownProps {
  * UNIFIED MARKDOWN RENDERER
  *
  * Single source of truth for all markdown rendering across the application.
- * Optimized for Acme brand with Vercel-level UX/UI polish.
+ * Optimized for Aether brand with Vercel-level UX/UI polish.
  *
  * Design principles:
  * - Clean, minimal aesthetic
@@ -946,8 +946,8 @@ export const UnifiedMarkdown = React.memo<UnifiedMarkdownProps>(({
     );
   }
 
-  // Strip <acme_system> tags, then auto-link URLs
-  const finalContent = autoLinkUrls(stripAcmeSystemTags(safeContent));
+  // Strip <aether_system> tags, then auto-link URLs
+  const finalContent = autoLinkUrls(stripAetherSystemTags(safeContent));
 
   return (
     <div

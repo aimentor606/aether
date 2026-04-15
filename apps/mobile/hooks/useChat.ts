@@ -34,7 +34,7 @@ import { useAgent } from '@/contexts/AgentContext';
 import { useAvailableModels } from '@/lib/models';
 import { useBillingContext } from '@/contexts/BillingContext';
 import { log } from '@/lib/logger';
-import { useAcmeComputerStore } from '@/stores/acme-computer-store';
+import { useAetherComputerStore } from '@/stores/aether-computer-store';
 import { 
   extractTierLimitErrorState, 
   parseTierRestrictionError, 
@@ -751,9 +751,9 @@ export function useChat(): UseChatReturn {
     
     setMessages([]);
 
-    // Reset Acme Computer state when switching threads
-    useAcmeComputerStore.getState().reset();
-    log.log('[useChat] Reset Acme Computer state');
+    // Reset Aether Computer state when switching threads
+    useAetherComputerStore.getState().reset();
+    log.log('[useChat] Reset Aether Computer state');
 
     // Dismiss keyboard before navigation to avoid stale keyboard metrics
     Keyboard.dismiss();
@@ -807,9 +807,9 @@ export function useChat(): UseChatReturn {
     clearStreamError(); // Clear any previous error state
     stopStreaming();
     
-    // Reset Acme Computer state when starting new chat
-    useAcmeComputerStore.getState().reset();
-    log.log('[useChat] Reset Acme Computer state for new chat');
+    // Reset Aether Computer state when starting new chat
+    useAetherComputerStore.getState().reset();
+    log.log('[useChat] Reset Aether Computer state for new chat');
   }, [stopStreaming, clearStreamError]);
 
   const updateThreadTitle = useCallback(async (newTitle: string) => {

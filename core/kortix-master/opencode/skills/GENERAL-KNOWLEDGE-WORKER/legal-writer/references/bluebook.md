@@ -24,7 +24,7 @@ Doe v. Roe, 800 F.2d 555, 560 (5th Cir. 1986).
 
 **District courts:**
 ```
-Acme Corp. v. Widget Inc., 400 F. Supp. 3d 100, 105 (S.D.N.Y. 2019).
+Aether Corp. v. Widget Inc., 400 F. Supp. 3d 100, 105 (S.D.N.Y. 2019).
 ```
 
 **State courts:**

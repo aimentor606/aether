@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { Download, FileType, FileText, FileCode } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -216,7 +216,7 @@ export function FileDownloadButton({
             title="Export file"
           >
             {isExporting ? (
-              <AcmeLoader customSize={16} />
+              <AetherLoader customSize={16} />
             ) : (
               <Download className="h-4 w-4" />
             )}
@@ -257,7 +257,7 @@ export function FileDownloadButton({
             title="Export file"
           >
             {isExporting ? (
-              <AcmeLoader customSize={16} />
+              <AetherLoader customSize={16} />
             ) : (
               <Download className="h-4 w-4" />
             )}
@@ -288,7 +288,7 @@ export function FileDownloadButton({
       title="Download file"
     >
       {isExporting ? (
-        <AcmeLoader customSize={16} />
+        <AetherLoader customSize={16} />
       ) : (
         <Download className="h-4 w-4" />
       )}

@@ -1,17 +1,17 @@
 import { uuid, text, numeric, timestamp, index } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { z } from 'zod';
-import { acmeSchema, accounts } from '@acme/db';
+import { aetherSchema, accounts } from '@aether/db';
 
 // Ledger entry status enum
-export const ledgerStatusEnum = acmeSchema.enum('ledger_status', [
+export const ledgerStatusEnum = aetherSchema.enum('ledger_status', [
   'posted',
   'draft',
   'reversed'
 ]);
 
 // Ledgers table - double-entry accounting support
-export const ledgers = acmeSchema.table('ledgers', {
+export const ledgers = aetherSchema.table('ledgers', {
   id: uuid('id').defaultRandom().primaryKey(),
   accountId: uuid('account_id').notNull(),
   journalEntry: text('journal_entry').notNull(),

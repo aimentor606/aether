@@ -5,22 +5,22 @@ import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypt
 
 interface SecretsData {
   secrets: Record<string, string>
-  /** Schema version. v1 = ACME_TOKEN-derived key, v2 = dedicated encryption key. */
+  /** Schema version. v1 = AETHER_TOKEN-derived key, v2 = dedicated encryption key. */
   version: number
 }
 
 /**
  * Persistent encrypted secret store.
  *
- * Encryption is decoupled from ACME_TOKEN. A dedicated random encryption key
+ * Encryption is decoupled from AETHER_TOKEN. A dedicated random encryption key
  * is generated on first use and stored at `.encryption-key` alongside the
  * secrets file. This means:
  *
- *   - Changing ACME_TOKEN (API restart, rotation, pool claim) does NOT
+ *   - Changing AETHER_TOKEN (API restart, rotation, pool claim) does NOT
  *     destroy secrets. The encryption key is independent.
  *   - The encryption key survives container restarts as long as /workspace
  *     is persisted (which it is — it's the workspace volume).
- *   - Migration from v1 (ACME_TOKEN-derived) happens automatically on
+ *   - Migration from v1 (AETHER_TOKEN-derived) happens automatically on
  *     first startup with the new code.
  *
  * Safety guarantees:
@@ -42,7 +42,7 @@ export class SecretStore {
   constructor() {
     this.secretsPath = process.env.SECRET_FILE_PATH || '/workspace/.secrets/.secrets.json'
     this.saltPath = process.env.SALT_FILE_PATH || '/workspace/.secrets/.salt'
-    // Dedicated encryption key — lives alongside secrets, independent of ACME_TOKEN
+    // Dedicated encryption key — lives alongside secrets, independent of AETHER_TOKEN
     const dir = dirname(this.secretsPath)
     this.encryptionKeyPath = process.env.ENCRYPTION_KEY_PATH || join(dir, '.encryption-key')
   }
@@ -119,11 +119,11 @@ export class SecretStore {
   }
 
   /**
-   * Derive a key using the LEGACY method (ACME_TOKEN + salt).
+   * Derive a key using the LEGACY method (AETHER_TOKEN + salt).
    * Only used during v1 → v2 migration.
    */
   private getLegacyKey(salt: Buffer): Buffer {
-    return scryptSync(process.env.ACME_TOKEN || 'default-key', salt, 32)
+    return scryptSync(process.env.AETHER_TOKEN || 'default-key', salt, 32)
   }
 
   private async getSalt(): Promise<Buffer> {
@@ -170,23 +170,23 @@ export class SecretStore {
     return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`
   }
 
-  // ─── Migration from v1 (ACME_TOKEN-derived encryption) ───────────────
+  // ─── Migration from v1 (AETHER_TOKEN-derived encryption) ───────────────
 
   /**
-   * Migrate secrets from v1 (encrypted with ACME_TOKEN-derived key) to v2
+   * Migrate secrets from v1 (encrypted with AETHER_TOKEN-derived key) to v2
    * (encrypted with a dedicated random key).
    *
    * Creates a backup before migration. On failure, leaves secrets untouched.
    */
   private async migrateFromV1(data: SecretsData): Promise<void> {
     const secretKeys = Object.keys(data.secrets)
-    console.log(`[SecretStore] Migrating ${secretKeys.length} secret(s) from v1 (ACME_TOKEN-derived) to v2 (dedicated key)...`)
+    console.log(`[SecretStore] Migrating ${secretKeys.length} secret(s) from v1 (AETHER_TOKEN-derived) to v2 (dedicated key)...`)
 
     try {
       // Create backup BEFORE touching anything
       await this.createBackup('pre-v2-migration')
 
-      // Try to decrypt with the legacy key (ACME_TOKEN + salt)
+      // Try to decrypt with the legacy key (AETHER_TOKEN + salt)
       const salt = await this.getSalt()
       const legacyKey = this.getLegacyKey(salt)
       const decrypted: Record<string, string> = {}
@@ -205,7 +205,7 @@ export class SecretStore {
       await writeFile(this.encryptionKeyPath, this.encryptionKey.toString('hex'), { mode: 0o600 })
 
       if (Object.keys(decrypted).length === 0) {
-        console.warn('[SecretStore] Migration: could not decrypt any secrets with current ACME_TOKEN. Secrets preserved as-is on disk.')
+        console.warn('[SecretStore] Migration: could not decrypt any secrets with current AETHER_TOKEN. Secrets preserved as-is on disk.')
         return
       }
 
@@ -388,9 +388,9 @@ export class SecretStore {
   }
 
   /**
-   * Rotate ACME_TOKEN.
+   * Rotate AETHER_TOKEN.
    *
-   * Since encryption is now decoupled from ACME_TOKEN, this method just
+   * Since encryption is now decoupled from AETHER_TOKEN, this method just
    * updates the token in process.env. No re-encryption needed.
    *
    * For backward compatibility, this is still called by the rotate-token
@@ -404,9 +404,9 @@ export class SecretStore {
       const count = Object.keys(data.secrets).length
 
       // Update the token in process.env — encryption key is unaffected
-      process.env.ACME_TOKEN = newToken
+      process.env.AETHER_TOKEN = newToken
 
-      console.log(`[SecretStore] ACME_TOKEN rotated. ${count} secret(s) unaffected (encryption is decoupled).`)
+      console.log(`[SecretStore] AETHER_TOKEN rotated. ${count} secret(s) unaffected (encryption is decoupled).`)
       return { rotated: count }
     })
   }

@@ -10,7 +10,7 @@ const SYMBOL =
 const BIOS_LINES: { text: string; bold?: boolean }[] = [
   { text: 'ACME BIOS v2.0.1', bold: true },
   { text: '' },
-  { text: 'CPU: Acme Inference Engine X1 @ 3.80 GHz' },
+  { text: 'CPU: Aether Inference Engine X1 @ 3.80 GHz' },
   { text: 'Memory test................. OK' },
   { text: 'Neural cores............... 8/8 online' },
   { text: 'Agent runtime.............. initialized' },

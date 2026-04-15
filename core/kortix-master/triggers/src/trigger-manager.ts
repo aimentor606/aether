@@ -11,7 +11,7 @@ import { ActionDispatcher, type DispatchEvent } from "./action-dispatch.js"
 import { WebhookTriggerServer, type WebhookRoute } from "./webhook-server.js"
 import type { MinimalOpenCodeClient, TriggerPluginOptions, TriggerRecord, TriggerSyncResult, CronSourceConfig, WebhookSourceConfig } from "./types.js"
 
-const ACME_MASTER_URL = "http://localhost:8000"
+const AETHER_MASTER_URL = "http://localhost:8000"
 
 export class TriggerManager {
   private readonly store: TriggerStore

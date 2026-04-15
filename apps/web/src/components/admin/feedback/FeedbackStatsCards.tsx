@@ -1,32 +1,62 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Star, MessageSquare, TrendingUp, TrendingDown, Users } from 'lucide-react';
-import { useAdminFeedbackStats, useAdminSentimentSummary } from '@/hooks/admin/use-admin-feedback';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+} from '@aether/ui/primitives';
+import {
+  Star,
+  MessageSquare,
+  TrendingUp,
+  TrendingDown,
+  Users,
+} from 'lucide-react';
+import {
+  useAdminFeedbackStats,
+  useAdminSentimentSummary,
+} from '@/hooks/admin/use-admin-feedback';
 
 export function FeedbackStatsCards() {
   const { data: stats, isLoading: statsLoading } = useAdminFeedbackStats();
-  const { data: sentiment, isLoading: sentimentLoading } = useAdminSentimentSummary();
+  const { data: sentiment, isLoading: sentimentLoading } =
+    useAdminSentimentSummary();
 
   const renderStarRating = (rating: number) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
-    
+
     return (
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-0.5">
           {[...Array(5)].map((_, i) => {
             if (i < fullStars) {
-              return <Star key={i} className="h-5 w-5 fill-yellow-500 text-yellow-500" />;
+              return (
+                <Star
+                  key={i}
+                  className="h-5 w-5 fill-yellow-500 text-yellow-500"
+                />
+              );
             } else if (i === fullStars && hasHalfStar) {
-              return <Star key={i} className="h-5 w-5 fill-yellow-500 text-yellow-500" style={{ clipPath: 'inset(0 50% 0 0)' }} />;
+              return (
+                <Star
+                  key={i}
+                  className="h-5 w-5 fill-yellow-500 text-yellow-500"
+                  style={{ clipPath: 'inset(0 50% 0 0)' }}
+                />
+              );
             } else {
-              return <Star key={i} className="h-5 w-5 text-muted-foreground/30" />;
+              return (
+                <Star key={i} className="h-5 w-5 text-muted-foreground/30" />
+              );
             }
           })}
         </div>
-        <span className="text-2xl font-bold tabular-nums">{rating.toFixed(2)}</span>
+        <span className="text-2xl font-bold tabular-nums">
+          {rating.toFixed(2)}
+        </span>
       </div>
     );
   };
@@ -82,7 +112,10 @@ export function FeedbackStatsCards() {
               </div>
               {stats && stats.total_feedback > 0 && (
                 <div className="text-xs text-muted-foreground">
-                  {Math.round((stats.total_with_text / stats.total_feedback) * 100)}% of total
+                  {Math.round(
+                    (stats.total_with_text / stats.total_feedback) * 100,
+                  )}
+                  % of total
                 </div>
               )}
             </div>

@@ -11,9 +11,9 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAcmeProject, useAcmeProjectSessions, useDeleteProject, useUpdateProject } from '@/hooks/acme/use-acme-projects';
-import { useAcmeTasks, type AcmeTask } from '@/hooks/acme/use-acme-tasks';
-import { useAcmeAgents, type AcmeAgent } from '@/hooks/acme/use-acme-agents';
+import { useAetherProject, useAetherProjectSessions, useDeleteProject, useUpdateProject } from '@/hooks/acme/use-acme-projects';
+import { useAetherTasks, type AetherTask } from '@/hooks/acme/use-acme-tasks';
+import { useAetherAgents, type AetherAgent } from '@/hooks/acme/use-acme-agents';
 import { openTabAndNavigate } from '@/stores/tab-store';
 import { useFilesStore } from '@/features/files/store/files-store';
 import { FileExplorerPage } from '@/features/files/components/file-explorer-page';
@@ -60,10 +60,10 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
   const pid = raw ? decodeURIComponent(raw) : '';
   const [tab, setTab] = useState<Tab>('files');
 
-  const { data: project, isLoading } = useAcmeProject(pid);
-  const { data: sessions } = useAcmeProjectSessions(pid);
-  const { data: tasks } = useAcmeTasks(project?.id);
-  const { data: agents } = useAcmeAgents(project?.id);
+  const { data: project, isLoading } = useAetherProject(pid);
+  const { data: sessions } = useAetherProjectSessions(pid);
+  const { data: tasks } = useAetherTasks(project?.id);
+  const { data: agents } = useAetherAgents(project?.id);
   const nav = useFilesStore(s => s.navigateToPath);
   const setRootPath = useFilesStore(s => s.setRootPath);
   const deleteProject = useDeleteProject();
@@ -342,7 +342,7 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
                       <span>{taskStats.pending + taskStats.inProgress} open</span>
                     </div>
                   </div>
-                  {taskList.map((t: AcmeTask) => {
+                  {taskList.map((t: AetherTask) => {
                     const si = statusIcon[t.status] || statusIcon.pending;
                     const SI = si.icon;
                     const isDone = t.status === 'done' || t.status === 'cancelled';
@@ -368,13 +368,13 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
 
             {/* ── Agents tab ── */}
             {tab === 'agents' && (!agentList.length
-              ? <EmptyState icon={Cpu} text="No agents spawned" sub="Agents appear here when Acme delegates work to sub-agents" />
+              ? <EmptyState icon={Cpu} text="No agents spawned" sub="Agents appear here when Aether delegates work to sub-agents" />
               : <div className="rounded-lg border border-border bg-card overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-2.5 bg-muted/30 border-b border-border text-sm">
                     <Cpu className="h-4 w-4 text-muted-foreground/40" />
                     <span className="font-semibold text-foreground">{agentList.length} agent{agentList.length > 1 ? 's' : ''}</span>
                   </div>
-                  {agentList.map((a: AcmeAgent) => {
+                  {agentList.map((a: AetherAgent) => {
                     const si = statusIcon[a.status] || statusIcon.running;
                     const SI = si.icon;
                     return (
@@ -591,12 +591,12 @@ function ProjectSidebar({ project, editingField, editValue, editTextareaRef, set
         )}
 
         {/* Active agents section */}
-        {agentList.some((a: AcmeAgent) => a.status === 'running') && (
+        {agentList.some((a: AetherAgent) => a.status === 'running') && (
           <>
             <div>
               <h3 className="text-sm font-semibold text-foreground mb-3">Active Agents</h3>
               <div className="space-y-2">
-                {agentList.filter((a: AcmeAgent) => a.status === 'running').map((a: AcmeAgent) => (
+                {agentList.filter((a: AetherAgent) => a.status === 'running').map((a: AetherAgent) => (
                   <button
                     key={a.id}
                     onClick={() => openTabAndNavigate({ id: a.session_id, title: a.description || 'Agent', type: 'session', href: `/sessions/${a.session_id}` })}

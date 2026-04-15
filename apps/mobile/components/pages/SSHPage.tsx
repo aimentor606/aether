@@ -47,7 +47,7 @@ async function loadSSHMeta(): Promise<SSHMeta | null> {
 
 async function saveSSHMeta(result: SSHSetupResult): Promise<void> {
   const meta: SSHMeta = {
-    ssh_command: `ssh -i ~/.ssh/acme_sandbox -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${result.port} ${result.username}@${result.host}`,
+    ssh_command: `ssh -i ~/.ssh/aether_sandbox -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${result.port} ${result.username}@${result.host}`,
     host: result.host,
     port: result.port,
     username: result.username,
@@ -138,7 +138,7 @@ export function SSHPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: SSHPa
     if (!sshResult) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
-      const keyName = `acme_${sshResult.host.replace(/\./g, '-')}`;
+      const keyName = `aether_${sshResult.host.replace(/\./g, '-')}`;
       // Copy key to clipboard and let user save it manually
       await Clipboard.setStringAsync(sshResult.private_key);
       Alert.alert(
@@ -152,23 +152,23 @@ export function SSHPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: SSHPa
 
   // Build derived commands
   const agentPrompt = sshResult
-    ? `I need you to connect to my remote machine via SSH. Here are the details:\n\nHost: ${sshResult.host}\nPort: ${sshResult.port}\nUsername: ${sshResult.username}\n\nSSH Private Key (save to ~/.ssh/acme_sandbox with chmod 600):\n${sshResult.private_key}\nConnect with: ssh -i ~/.ssh/acme_sandbox -o StrictHostKeyChecking=no -p ${sshResult.port} ${sshResult.username}@${sshResult.host}`
+    ? `I need you to connect to my remote machine via SSH. Here are the details:\n\nHost: ${sshResult.host}\nPort: ${sshResult.port}\nUsername: ${sshResult.username}\n\nSSH Private Key (save to ~/.ssh/aether_sandbox with chmod 600):\n${sshResult.private_key}\nConnect with: ssh -i ~/.ssh/aether_sandbox -o StrictHostKeyChecking=no -p ${sshResult.port} ${sshResult.username}@${sshResult.host}`
     : '';
 
   const oneLiner = sshResult
-    ? `mkdir -p ~/.ssh && cat > ~/.ssh/acme_sandbox << 'ACME_KEY'\n${sshResult.private_key}ACME_KEY\nchmod 600 ~/.ssh/acme_sandbox && ssh -i ~/.ssh/acme_sandbox -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${sshResult.port} ${sshResult.username}@${sshResult.host}`
+    ? `mkdir -p ~/.ssh && cat > ~/.ssh/aether_sandbox << 'AETHER_KEY'\n${sshResult.private_key}AETHER_KEY\nchmod 600 ~/.ssh/aether_sandbox && ssh -i ~/.ssh/aether_sandbox -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${sshResult.port} ${sshResult.username}@${sshResult.host}`
     : '';
 
   const reconnectCmd = sshResult
-    ? `ssh -i ~/.ssh/acme_sandbox -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${sshResult.port} ${sshResult.username}@${sshResult.host}`
+    ? `ssh -i ~/.ssh/aether_sandbox -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${sshResult.port} ${sshResult.username}@${sshResult.host}`
     : '';
 
   const sshConfig = sshResult
-    ? `Host acme-sandbox\n  HostName ${sshResult.host}\n  Port ${sshResult.port}\n  User ${sshResult.username}\n  IdentityFile ~/.ssh/acme_sandbox\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null\n  ServerAliveInterval 15\n  ServerAliveCountMax 4`
+    ? `Host acme-sandbox\n  HostName ${sshResult.host}\n  Port ${sshResult.port}\n  User ${sshResult.username}\n  IdentityFile ~/.ssh/aether_sandbox\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null\n  ServerAliveInterval 15\n  ServerAliveCountMax 4`
     : '';
 
   const configCmd = sshResult
-    ? `mkdir -p ~/.ssh && touch ~/.ssh/config && chmod 600 ~/.ssh/config && cat >> ~/.ssh/config << 'ACME_SSH_CONFIG'\n${sshConfig}\nACME_SSH_CONFIG`
+    ? `mkdir -p ~/.ssh && touch ~/.ssh/config && chmod 600 ~/.ssh/config && cat >> ~/.ssh/config << 'AETHER_SSH_CONFIG'\n${sshConfig}\nAETHER_SSH_CONFIG`
     : '';
 
   return (
@@ -458,7 +458,7 @@ function CodeSection({
 const TOKEN_COLORS = {
   command: '#7DD3FC',    // sky-300 — commands like mkdir, ssh, cat, chmod
   flag: '#C4B5FD',      // violet-300 — flags like -i, -o, -p
-  path: '#86EFAC',      // emerald-300 — paths like ~/.ssh/acme_sandbox
+  path: '#86EFAC',      // emerald-300 — paths like ~/.ssh/aether_sandbox
   string: '#FDE68A',    // amber-200 — quoted strings and heredoc delimiters
   number: '#FCA5A5',    // red-300 — numbers like ports
   keyword: '#F9A8D4',   // pink-300 — keywords like Host, HostName, Port
@@ -476,7 +476,7 @@ function tokenize(code: string): { text: string; color: string }[] {
     if (li > 0) tokens.push({ text: '\n', color: TOKEN_COLORS.default });
     const line = lines[li];
 
-    // Heredoc delimiter lines (e.g. ACME_KEY, ACME_SSH_CONFIG)
+    // Heredoc delimiter lines (e.g. AETHER_KEY, AETHER_SSH_CONFIG)
     if (/^[A-Z_]+$/.test(line.trim())) {
       tokens.push({ text: line, color: TOKEN_COLORS.string });
       continue;

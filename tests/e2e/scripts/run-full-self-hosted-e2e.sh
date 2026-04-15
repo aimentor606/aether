@@ -42,9 +42,9 @@ docker build -f "apps/web/Dockerfile" \
   -t "acme/acme-frontend:latest" . >/dev/null
 
 echo "[e2e] Building local API image with current source"
-docker build --build-arg SERVICE=acme-api -f "apps/api/Dockerfile" -t "acme/acme-api:latest" . >/dev/null
+docker build --build-arg SERVICE=aether-api -f "apps/api/Dockerfile" -t "acme/aether-api:latest" . >/dev/null
 
-docker compose -f "$HOME/.acme/docker-compose.yml" up -d acme-api frontend >/dev/null
+docker compose -f "$HOME/.acme/docker-compose.yml" up -d aether-api frontend >/dev/null
 
 echo "[e2e] Verifying local endpoints"
 wait_for_url "http://localhost:13737/auth"

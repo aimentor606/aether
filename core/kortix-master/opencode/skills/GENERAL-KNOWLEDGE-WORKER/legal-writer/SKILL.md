@@ -74,7 +74,7 @@ This file drives verification. Create it during scaffold:
   "governing_law": "Delaware",
   "date": "2025-01-15",
   "parties": [
-    {"name": "Acme Corporation", "short_name": "Company", "role": "client"},
+    {"name": "Aether Corporation", "short_name": "Company", "role": "client"},
     {"name": "Jane Smith Consulting LLC", "short_name": "Contractor", "role": "contractor"}
   ],
   "word_limit": null,

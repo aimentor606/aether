@@ -1,5 +1,5 @@
 {
-  "name": "@acme/vertical-retail",
+  "name": "@aether/vertical-retail",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -11,6 +11,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@acme/db": "workspace:*"
+    "@aether/db": "workspace:*"
   }
 }

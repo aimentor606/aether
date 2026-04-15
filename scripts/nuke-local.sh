@@ -53,7 +53,7 @@ echo "[2/5] Removing repo Docker containers..."
 if ! $DOCKER_AVAILABLE; then
   echo "  WARNING: Docker daemon unavailable — repo containers not removed"
 else
-  CONTAINERS=$(docker ps -a --format "{{.Names}}" | grep -E "^acme-|^acme-sandbox$|^supabase_.*_${SUPABASE_PROJECT_ID}$" || true)
+  CONTAINERS=$(docker ps -a --format "{{.Names}}" | grep -E "^acme-|^aether-sandbox$|^supabase_.*_${SUPABASE_PROJECT_ID}$" || true)
   if [[ -n "$CONTAINERS" ]]; then
     printf '%s\n' "$CONTAINERS" | xargs docker rm -f >/dev/null 2>&1 || true
     echo "  removed: $(printf '%s ' "$CONTAINERS")"
@@ -79,7 +79,7 @@ fi
 # ── 4. Verify sandbox image exists ──────────────────────────────────────────
 echo "[4/5] Checking sandbox image..."
 cd "$ROOT_DIR"
-SANDBOX_IMAGE="${SANDBOX_IMAGE:-acme/computer:latest}"
+SANDBOX_IMAGE="${SANDBOX_IMAGE:-aether/computer:latest}"
 
 if docker image inspect "$SANDBOX_IMAGE" >/dev/null 2>&1; then
   echo "  $SANDBOX_IMAGE exists locally"

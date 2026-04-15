@@ -23,8 +23,8 @@ import {
 } from '@/components/chat';
 import { parseToolMessage } from '@agentpress/shared';
 import { ThreadHeader } from '@/components/threads';
-import { AcmeComputer } from '@/components/acme-computer';
-import { useAcmeComputerStore } from '@/stores/acme-computer-store';
+import { AetherComputer } from '@/components/acme-computer';
+import { useAetherComputerStore } from '@/stores/aether-computer-store';
 import { useVoicePlayerStore } from '@/stores/voice-player-store';
 import { useChatCommons, type UseChatReturn, useDeleteThread, useShareThread, useUpgradePaywall } from '@/hooks';
 import { useThread } from '@/lib/chat';
@@ -334,11 +334,11 @@ export function ThreadPage({
   }, []);
 
   const {
-    isOpen: isAcmeComputerOpen,
+    isOpen: isAetherComputerOpen,
     openPanel,
     openFileInComputer,
     openFileBrowser,
-  } = useAcmeComputerStore();
+  } = useAetherComputerStore();
 
   const deleteThreadMutation = useDeleteThread();
   const shareThreadMutation = useShareThread();
@@ -346,13 +346,13 @@ export function ThreadPage({
   const { data: fullThreadData, refetch: refetchThreadData } = useThread(chat.activeThread?.id);
 
   React.useEffect(() => {
-    if (isAcmeComputerOpen) {
+    if (isAetherComputerOpen) {
       refetchThreadData();
     } else {
       // Clear selected tool data when panel closes
       setSelectedToolData(null);
     }
-  }, [isAcmeComputerOpen, refetchThreadData]);
+  }, [isAetherComputerOpen, refetchThreadData]);
 
   const messages = chat.messages || [];
   const streamingContent = chat.streamingContent || '';
@@ -1233,8 +1233,8 @@ export function ThreadPage({
       />
 
 
-      {isAcmeComputerOpen && (
-        <AcmeComputer
+      {isAetherComputerOpen && (
+        <AetherComputer
           toolMessages={selectedToolData?.toolMessages || []}
           currentIndex={selectedToolData?.initialIndex || 0}
           onNavigate={(newIndex) => {

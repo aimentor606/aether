@@ -10,7 +10,7 @@ import { Hono } from 'hono'
 
 const ENV_KEYS = [
   'ENV_MODE', 'JUSTAVPS_SLUG', 'JUSTAVPS_PROXY_TOKEN', 'JUSTAVPS_PROXY_DOMAIN',
-  'SANDBOX_ID', 'ACME_API_URL', 'SHARE_STORE_PATH',
+  'SANDBOX_ID', 'AETHER_API_URL', 'SHARE_STORE_PATH',
 ]
 const savedEnv: Record<string, string | undefined> = {}
 

@@ -1,4 +1,4 @@
-# Acme
+# Aether
 
 **The Autonomous Company Operating System**
 
@@ -17,7 +17,7 @@ The installer will ask where you're running:
 1. **Local machine** (laptop/desktop) — binds to `localhost`
 2. **VPS / Server** — binds to `0.0.0.0`, accessible over the network
 
-Acme works best when it can run 24/7 — even when your laptop is closed. We recommend a server or VPS: [Acme Cloud](https://acme.com/) (managed), your own server, or a VPS from [Hetzner](https://hetzner.com/) or [JustAVPS](https://justavps.com/).
+Aether works best when it can run 24/7 — even when your laptop is closed. We recommend a server or VPS: [Aether Cloud](https://acme.com/) (managed), your own server, or a VPS from [Hetzner](https://hetzner.com/) or [JustAVPS](https://justavps.com/).
 
 On any server, just SSH in and run the same install command:
 
@@ -36,7 +36,7 @@ acme logs        Tail logs
 acme status      Show service status
 acme update      Pull latest images and restart
 acme reset       Wipe local data and start fresh
-acme uninstall   Remove Acme completely
+acme uninstall   Remove Aether completely
 ```
 
 ## DEV Commands

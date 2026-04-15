@@ -17,12 +17,12 @@ services:
     profiles: [frontend, all]
     restart: unless-stopped
 
-  acme-api:
+  aether-api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
       args:
-        SERVICE: acme-api
+        SERVICE: aether-api
     ports:
       - "8008:8008"
     env_file:

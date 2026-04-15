@@ -5,9 +5,9 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Folder, Globe, TerminalSquare, Info, Table } from 'lucide-react';
 import { getUserFriendlyToolName, getToolIcon } from '@/components/thread/utils';
 import { cn } from '@/lib/utils';
-import { ToolCallInput } from '../AcmeComputer';
+import { ToolCallInput } from '../AetherComputer';
 import { AppIcon } from '../../tool-views/shared/AppIcon';
-import { ViewType } from '@/stores/acme-computer-store';
+import { ViewType } from '@/stores/aether-computer-store';
 
 const convertToolName = (toolName: string) => {
   if (toolName.includes('_')) {

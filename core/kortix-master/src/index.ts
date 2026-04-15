@@ -54,7 +54,7 @@ process.on('unhandledRejection', (reason) => {
 const app = new Hono()
 
 // ─── Bootstrap: restore core env vars if missing from process.env ───────────
-// Must run BEFORE SecretStore because ACME_TOKEN is the encryption key.
+// Must run BEFORE SecretStore because AETHER_TOKEN is the encryption key.
 loadBootstrapEnv()
 
 // Initialize secret store and load ENV variables
@@ -65,20 +65,20 @@ await secretStore.loadIntoProcessEnv()
 import { initShareStore } from './services/share-store'
 initShareStore()
 
-// ─── Guarantee ACME_TOKEN + ACME_API_URL in s6 env dir ──────────────────
+// ─── Guarantee AETHER_TOKEN + AETHER_API_URL in s6 env dir ──────────────────
 // These are injected as Docker env vars at container creation but never written
 // to the s6 env directory. Tools use getEnv() which falls back to reading
 // /run/s6/container_environment/{KEY} — so we must write them there on boot
 // to ensure they're always available regardless of how the process was started.
 {
   const S6_ENV_DIR = process.env.S6_ENV_DIR || '/run/s6/container_environment'
-  const CORE_VARS = ['ACME_TOKEN', 'ACME_API_URL', 'INTERNAL_SERVICE_KEY'] as const
+  const CORE_VARS = ['AETHER_TOKEN', 'AETHER_API_URL', 'INTERNAL_SERVICE_KEY'] as const
   let synced = 0
   for (const key of CORE_VARS) {
-    // Use injected env var, but fall back to a sane default for ACME_API_URL
-    // so OpenCode's {env:ACME_API_URL} substitution always produces a valid URL.
+    // Use injected env var, but fall back to a sane default for AETHER_API_URL
+    // so OpenCode's {env:AETHER_API_URL} substitution always produces a valid URL.
     let val: string | undefined = process.env[key]
-    if (!val && key === 'ACME_API_URL') {
+    if (!val && key === 'AETHER_API_URL') {
       val = 'http://localhost:8008'
     }
     if (val) {
@@ -98,7 +98,7 @@ initShareStore()
   saveBootstrapEnv()
 }
 
-const authSyncDisabled = process.env.ACME_DISABLE_AUTH_SYNC === 'true'
+const authSyncDisabled = process.env.AETHER_DISABLE_AUTH_SYNC === 'true'
 
 // Two-way sync: OpenCode auth.json ↔ SecretStore (provider API keys)
 if (!authSyncDisabled) {
@@ -113,7 +113,7 @@ if (!authSyncDisabled) {
 
 // Updates are Docker image-based — no crash recovery needed
 
-if (process.env.ACME_DISABLE_CORE_SUPERVISOR !== 'true') {
+if (process.env.AETHER_DISABLE_CORE_SUPERVISOR !== 'true') {
   await serviceManager.start().catch(err =>
     console.error('[Kortix Master] service manager start error:', err)
   )
@@ -246,7 +246,7 @@ app.get('/docs/openapi.json',
 
     // Use the X-Forwarded-Prefix header injected by the platform proxy to set
     // the correct server URL for Scalar "Try It". This header contains the full
-    // public base URL (e.g. "http://localhost:8008/v1/p/acme-sandbox/8000").
+    // public base URL (e.g. "http://localhost:8008/v1/p/aether-sandbox/8000").
     // Without it, fall back to the placeholder from spec-merger.
     const forwardedPrefix = c.req.header('x-forwarded-prefix')
     if (forwardedPrefix) {
@@ -333,7 +333,7 @@ app.route('/lss', lssRouter)
 app.route('/sessions', suggestionsRouter)
 
 // Deployment management (feature-flagged)
-if (config.ACME_DEPLOYMENTS_ENABLED) {
+if (config.AETHER_DEPLOYMENTS_ENABLED) {
   app.route('/kortix/deploy', deployRouter)
 }
 

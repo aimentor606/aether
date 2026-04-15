@@ -8,7 +8,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { ViewType } from '@/stores/acme-computer-store';
+import { ViewType } from '@/stores/aether-computer-store';
 
 interface ViewToggleProps {
   currentView: ViewType;

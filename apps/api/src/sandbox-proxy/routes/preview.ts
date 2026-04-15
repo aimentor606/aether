@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { eq, and, ne } from 'drizzle-orm';
-import { sandboxes, accountMembers, accountUser } from '@acme/db';
+import { sandboxes, accountMembers, accountUser } from '@aether/db';
 import { getDaytona } from '../../shared/daytona';
 import { db } from '../../shared/db';
 
@@ -268,7 +268,7 @@ export async function proxyToDaytona(
       if (previewToken) {
         headers.set('X-Daytona-Preview-Token', previewToken);
       }
-      // Authenticate to the sandbox using the stored service key (= ACME_TOKEN).
+      // Authenticate to the sandbox using the stored service key (= AETHER_TOKEN).
       // This replaces the user's Supabase JWT with the sandbox's INTERNAL_SERVICE_KEY.
       if (serviceKey) {
         headers.set('Authorization', `Bearer ${serviceKey}`);

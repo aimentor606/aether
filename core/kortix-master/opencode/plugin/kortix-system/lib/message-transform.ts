@@ -7,29 +7,29 @@
 // these tags before rendering, so internal content never appears in the UI.
 //
 // Examples:
-//   <acme_system>AGENTS.md instruction content here</acme_system>
-//   <acme_system reminder="project-gate">Project must be selected first</acme_system>
-//   <acme_system type="instruction" source="AGENTS.md">System prompt...</acme_system>
+//   <aether_system>AGENTS.md instruction content here</aether_system>
+//   <aether_system reminder="project-gate">Project must be selected first</aether_system>
+//   <aether_system type="instruction" source="AGENTS.md">System prompt...</aether_system>
 
 export const MEMORY_CONTEXT_MARKER = "<!-- kortix-mem-context -->"
 export const MEMORY_CONTEXT_MESSAGE_ID = "__kortix_mem_context__"
 
-export const ACME_SYSTEM_OPEN_TAG = "<acme_system"
-export const ACME_SYSTEM_CLOSE_TAG = "</acme_system>"
+export const AETHER_SYSTEM_OPEN_TAG = "<aether_system"
+export const AETHER_SYSTEM_CLOSE_TAG = "</aether_system>"
 
 /**
- * Check if text contains any acme_system XML tags.
+ * Check if text contains any aether_system XML tags.
  */
 export function containsKortixSystemTags(text: string): boolean {
-	return text.includes(ACME_SYSTEM_OPEN_TAG) && text.includes(ACME_SYSTEM_CLOSE_TAG)
+	return text.includes(AETHER_SYSTEM_OPEN_TAG) && text.includes(AETHER_SYSTEM_CLOSE_TAG)
 }
 
 /**
- * Wrap text content in acme_system XML tags with optional attributes.
+ * Wrap text content in aether_system XML tags with optional attributes.
  * 
  * @param content - The text content to wrap
  * @param attrs - Optional attributes (e.g., { type: "instruction", source: "AGENTS.md" })
- * @returns The wrapped text, e.g., '<acme_system type="instruction" source="AGENTS.md">content</acme_system>'
+ * @returns The wrapped text, e.g., '<aether_system type="instruction" source="AGENTS.md">content</aether_system>'
  */
 export function wrapInKortixSystemTags(
 	content: string,
@@ -43,37 +43,37 @@ export function wrapInKortixSystemTags(
 			.join(" ")
 		: ""
 	
-	return `${ACME_SYSTEM_OPEN_TAG}${attrString}>${content}${ACME_SYSTEM_CLOSE_TAG}`
+	return `${AETHER_SYSTEM_OPEN_TAG}${attrString}>${content}${AETHER_SYSTEM_CLOSE_TAG}`
 }
 
 /**
- * Strip all acme_system XML tags and their content from text.
+ * Strip all aether_system XML tags and their content from text.
  * Use this in the frontend to remove internal content before rendering.
  * 
- * @param text - Text containing acme_system tags
- * @returns Text with all acme_system content removed
+ * @param text - Text containing aether_system tags
+ * @returns Text with all aether_system content removed
  */
 export function stripacmeSystemTags(text: string): string {
 	if (!text) return ""
 	
-	// Pattern to match <acme_system ...>...</acme_system> with optional attributes
+	// Pattern to match <aether_system ...>...</aether_system> with optional attributes
 	// Handles multiline content
-	const SYSTEM_TAG_REGEX = /<acme_system[^>]*>[\s\S]*?<\/acme_system>/gi
+	const SYSTEM_TAG_REGEX = /<aether_system[^>]*>[\s\S]*?<\/aether_system>/gi
 	
 	return text.replace(SYSTEM_TAG_REGEX, "").trim()
 }
 
 /**
- * Extract all acme_system content blocks from text without removing them.
+ * Extract all aether_system content blocks from text without removing them.
  * Useful for debugging or logging what system content was injected.
  * 
- * @param text - Text containing acme_system tags
- * @returns Array of content blocks found inside acme_system tags
+ * @param text - Text containing aether_system tags
+ * @returns Array of content blocks found inside aether_system tags
  */
 export function extractKortixSystemContent(text: string): string[] {
 	if (!text) return []
 	
-	const SYSTEM_TAG_REGEX = /<acme_system[^>]*>([\s\S]*?)<\/acme_system>/gi
+	const SYSTEM_TAG_REGEX = /<aether_system[^>]*>([\s\S]*?)<\/aether_system>/gi
 	const results: string[] = []
 	let match
 	
@@ -85,7 +85,7 @@ export function extractKortixSystemContent(text: string): string[] {
 }
 
 /**
- * Wrap multiple lines or content blocks in acme_system tags.
+ * Wrap multiple lines or content blocks in aether_system tags.
  * Automatically handles multiline content.
  * 
  * @param linesOrBlocks - Array of strings to wrap, or a single string

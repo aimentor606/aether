@@ -124,10 +124,10 @@ const KortixSystemPlugin: Plugin = async (ctx) => {
 				if (!tasks.length) return
 				const icon = (s: string) => s === "in_progress" ? "→" : s === "blocked" ? "⊘" : "○"
 				output.context.push([
-					`<acme_system type="tasks" source="acme-system">`,
+					`<aether_system type="tasks" source="acme-system">`,
 					`Active tasks for project ${project.name}:`,
 					...tasks.map(t => `${icon(t.status)} [${t.priority}] ${t.id}: ${t.title}`),
-					`</acme_system>`,
+					`</aether_system>`,
 				].join("\n"))
 			} catch {}
 		},

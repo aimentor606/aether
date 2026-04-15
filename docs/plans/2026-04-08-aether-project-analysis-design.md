@@ -1,4 +1,4 @@
-# Acme (Aether) 项目技术架构分析报告
+# Aether (Aether) 项目技术架构分析报告
 
 ## 文档信息
 
@@ -13,7 +13,7 @@
 
 ### 1.1 产品定位
 
-**Acme** 是一个 **AI 自主公司操作系统 (Autonomous Company Operating System) — 一个云电脑，其上运行着 AI Agent 24/7 处理各种业务任务。
+**Aether** 是一个 **AI 自主公司操作系统 (Autonomous Company Operating System) — 一个云电脑，其上运行着 AI Agent 24/7 处理各种业务任务。
 
 ### 1.2 核心理念
 - **Everything Is files**: 以 Markdown 为基础，代码可读、可跟踪
@@ -228,7 +228,7 @@ apps/api/src/
 - `encrypted_password` - 加密密码
 - `created_at` - 创建时间
 
-#### 4.2.2 Acme Schema (`acme`)
+#### 4.2.2 Aether Schema (`acme`)
 **Tables**:
 - `accounts` - 账户(组织)
 - `account_members` - 账户成员
@@ -282,7 +282,7 @@ apps/api/src/
 ### 5.2 Agent 系统
 
 #### 5.2.1 主 Agent (柯塔克斯)
-**名称**: Acme
+**名称**: Aether
 **模式**: primary
 **职责**:
 - 任务理解与执行
@@ -625,7 +625,7 @@ pnpm test             # 运行测试
 ### 11.2 鸃署架构
 
 **部署方式**:
-- **Cloud**: Acme Cloud (acme.com)
+- **Cloud**: Aether Cloud (acme.com)
 - **Self-hosted**: Docker Compose
 - **VPS**: JustAVPS 镜像
 

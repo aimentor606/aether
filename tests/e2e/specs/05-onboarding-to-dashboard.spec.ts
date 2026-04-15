@@ -23,7 +23,7 @@ test.describe('05 — Onboarding wizard to dashboard', () => {
       await page.waitForTimeout(1_500);
     }
 
-    await expect(page.getByRole('heading', { name: 'Sign in to Acme' })).toBeVisible({
+    await expect(page.getByRole('heading', { name: 'Sign in to Aether' })).toBeVisible({
       timeout: 15_000,
     });
 

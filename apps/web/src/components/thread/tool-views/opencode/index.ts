@@ -1,5 +1,5 @@
 /**
- * OpenCode ToolView components for AcmeComputer.
+ * OpenCode ToolView components for AetherComputer.
  *
  * These are registered in the ToolViewRegistry under the "oc-" prefix
  * to avoid collision with AgentPress tool names.
@@ -154,7 +154,7 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-task': OcTaskToolView,
   'task': OcTaskToolView,
 
-  // Acme orchestrator session spawning
+  // Aether orchestrator session spawning
   'oc-session_spawn': OcSessionSpawnToolView,
   'oc-session-spawn': OcSessionSpawnToolView,
   'session_spawn': OcSessionSpawnToolView,

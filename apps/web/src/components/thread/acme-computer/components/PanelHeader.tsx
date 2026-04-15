@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { Minimize2, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DrawerTitle } from '@/components/ui/drawer';
-import { ViewType } from '@/stores/acme-computer-store';
+import { ViewType } from '@/stores/aether-computer-store';
 import { ToolbarButtons } from './ToolbarButtons';
 
 interface PanelHeaderProps {

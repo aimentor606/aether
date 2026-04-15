@@ -1,7 +1,7 @@
 /**
  * Sandbox Health Monitor
  *
- * Periodic health check that ensures acme-api can always reach the sandbox.
+ * Periodic health check that ensures aether-api can always reach the sandbox.
  * Self-heals by re-syncing INTERNAL_SERVICE_KEY on auth failures.
  *
  * Runs every HEALTH_CHECK_INTERVAL_MS. On failure:
@@ -79,7 +79,7 @@ async function checkSandboxHealth(): Promise<void> {
 
   try {
     // 1. Check basic reachability (health endpoint bypasses auth)
-    // 503 means Acme Master is running but the agent runtime isn't ready yet —
+    // 503 means Aether Master is running but the agent runtime isn't ready yet —
     // treat it as a soft failure (sandbox is reachable but not fully ready).
     const healthRes = await fetch(`${baseUrl}/acme/health`, {
       signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
@@ -152,7 +152,7 @@ async function checkSandboxHealth(): Promise<void> {
 
 /**
  * Attempt to sync all 3 core env vars to the sandbox container.
- * Syncs ACME_API_URL, ACME_TOKEN (if set), and INTERNAL_SERVICE_KEY.
+ * Syncs AETHER_API_URL, AETHER_TOKEN (if set), and INTERNAL_SERVICE_KEY.
  * Tries the secrets manager /env API first (preferred — triple-write + no restart needed).
  * Falls back to docker exec if the API is unreachable (e.g. acme-master down).
  */
@@ -162,21 +162,21 @@ async function attemptKeySync(baseUrl: string): Promise<boolean> {
 
   // Compute the correct internal API URL for the sandbox (same logic as local-docker.ts)
   let internalApiUrl = `http://host.docker.internal:${config.PORT}`;
-  if (config.ACME_URL) {
+  if (config.AETHER_URL) {
     try {
-      const parsed = new URL(config.ACME_URL);
+      const parsed = new URL(config.AETHER_URL);
       if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') {
         parsed.hostname = 'host.docker.internal';
         internalApiUrl = parsed.toString().replace(/\/$/, '');
       } else {
-        internalApiUrl = config.ACME_URL.replace(/\/$/, '');
+        internalApiUrl = config.AETHER_URL.replace(/\/$/, '');
       }
     } catch {}
   }
 
   const keysToSync: Record<string, string> = {
     INTERNAL_SERVICE_KEY: ourKey,
-    ACME_API_URL: internalApiUrl,
+    AETHER_API_URL: internalApiUrl,
     TUNNEL_API_URL: internalApiUrl,
   };
 

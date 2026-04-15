@@ -5,7 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Environment, ContactShadows, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
-interface AcmeBoxModelProps {
+interface AetherBoxModelProps {
   progressRef: MutableRefObject<number>;
   isOn: boolean;
   setIsOn: (isOn: boolean) => void;
@@ -35,10 +35,10 @@ function useGlowTexture() {
   }, []);
 }
 
-function AcmeBoxModel({ progressRef, isOn, setIsOn }: AcmeBoxModelProps) {
+function AetherBoxModel({ progressRef, isOn, setIsOn }: AetherBoxModelProps) {
   const groupRef = useRef<THREE.Group>(null!);
   const innerRef = useRef<THREE.Group>(null!);
-  const { scene } = useGLTF('/models/acme_box.glb');
+  const { scene } = useGLTF('/models/aether_box.glb');
   const [ready, setReady] = useState(false);
   const [hovered, setHovered] = useState(false);
   const ledMatRef = useRef<THREE.MeshStandardMaterial>(null!);
@@ -184,7 +184,7 @@ function AcmeBoxModel({ progressRef, isOn, setIsOn }: AcmeBoxModelProps) {
       }
     }
     
-    // Start front-on (LED visible), tilt to reveal top (Acme engraving) on scroll
+    // Start front-on (LED visible), tilt to reveal top (Aether engraving) on scroll
     const scrollRX = t * 0.55;
     const scrollRY = t * 1.8;
     const scrollY = -t * 0.5;
@@ -310,7 +310,7 @@ export default function MacMiniScene({ scrollProgressRef, isOn, setIsOn }: MacMi
       >
         <CinematicLights progressRef={scrollProgressRef} isOn={isOn} />
         <Suspense fallback={null}>
-          <AcmeBoxModel progressRef={scrollProgressRef} isOn={isOn} setIsOn={setIsOn} />
+          <AetherBoxModel progressRef={scrollProgressRef} isOn={isOn} setIsOn={setIsOn} />
           <ContactShadows
             position={[0, -1.5, 0]}
             opacity={0.4}
@@ -326,4 +326,4 @@ export default function MacMiniScene({ scrollProgressRef, isOn, setIsOn }: MacMi
   );
 }
 
-useGLTF.preload('/models/acme_box.glb');
+useGLTF.preload('/models/aether_box.glb');

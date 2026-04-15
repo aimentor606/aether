@@ -1,4 +1,4 @@
-import { platformUserRoles } from '@acme/db';
+import { platformUserRoles } from '@aether/db';
 import { eq } from 'drizzle-orm';
 import { db, hasDatabase } from './db';
 

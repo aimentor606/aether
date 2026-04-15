@@ -12,7 +12,7 @@ export const SANDBOX_VERSION = process.env.SANDBOX_VERSION || 'unknown';
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type SandboxProviderName = 'daytona' | 'local_docker' | 'justavps';
-export type InternalAcmeEnv = 'dev' | 'staging' | 'prod';
+export type InternalAetherEnv = 'dev' | 'staging' | 'prod';
 
 // ─── Zod Helpers ────────────────────────────────────────────────────────────
 
@@ -49,7 +49,7 @@ const optBoolFalse = z.string().optional().default('false').transform((v) => v =
 
 // ─── Env Schema ─────────────────────────────────────────────────────────────
 //
-// Every env var that acme-api reads is declared here.
+// Every env var that aether-api reads is declared here.
 // Categories:
 //   - REQUIRED:    server will not start without these
 //   - CONDITIONAL: required when a related feature is enabled
@@ -75,9 +75,9 @@ const envSchema = z.object({
   API_KEY_SECRET: z.string().min(1, 'API_KEY_SECRET is required — API key hashing will fail'),
 
   // ── Internal Deployment Controls (optional, safe defaults for self-hosted) ─
-  INTERNAL_ACME_ENV:              z.enum(['dev', 'staging', 'prod']).optional().default('dev'),
-  ACME_BILLING_INTERNAL_ENABLED:  optBoolFalse,  // NOTE: overridden by ENV_MODE=cloud below
-  ACME_DEPLOYMENTS_ENABLED:       optBoolFalse,
+  INTERNAL_AETHER_ENV:              z.enum(['dev', 'staging', 'prod']).optional().default('dev'),
+  AETHER_BILLING_INTERNAL_ENABLED:  optBoolFalse,  // NOTE: overridden by ENV_MODE=cloud below
+  AETHER_DEPLOYMENTS_ENABLED:       optBoolFalse,
 
   // ── Search Providers (optional — features degrade gracefully) ────────────
   TAVILY_API_URL:              optUrl('https://api.tavily.com'),
@@ -133,27 +133,27 @@ const envSchema = z.object({
   JUSTAVPS_IMAGE_ID:                  optStr,   // Optional pin — if unset, auto-resolves latest acme-computer-v* image from JustAVPS
   JUSTAVPS_DEFAULT_LOCATION:          optStrDefault('hel1'),
   JUSTAVPS_DEFAULT_SERVER_TYPE:       optStrDefault('pro'),
-  JUSTAVPS_PROXY_DOMAIN:              optStrDefault('acme.cloud'),  // CF Worker proxy domain ({slug}.acme.cloud)
+  JUSTAVPS_PROXY_DOMAIN:              optStrDefault('aether.cloud'),  // CF Worker proxy domain ({slug}.aether.cloud)
   JUSTAVPS_WEBHOOK_SECRET:            optStr,   // HMAC secret for verifying JustAVPS webhook signatures
-  JUSTAVPS_WEBHOOK_URL:               optStr,   // URL where JustAVPS should send webhook events (e.g. https://api.acme.dev/v1/platform/webhooks/justavps)
+  JUSTAVPS_WEBHOOK_URL:               optStr,   // URL where JustAVPS should send webhook events (e.g. https://api.aether.dev/v1/platform/webhooks/justavps)
 
   // ── Sandbox Pool (optional — pre-provision sandboxes for instant claiming) ──
   POOL_ENABLED:                optBoolFalse,
   POOL_MAX_AGE_HOURS:          optInt(24),
 
   // ── Sandbox Platform ──────────────────────────────────────────────────────
-  // ACME_URL is auto-derived from PORT if not explicitly set (see validateEnv).
-  ACME_URL:                  optStr,
+  // AETHER_URL is auto-derived from PORT if not explicitly set (see validateEnv).
+  AETHER_URL:                  optStr,
   ALLOWED_SANDBOX_PROVIDERS:   optStrDefault('local_docker'),
   SANDBOX_IMAGE:               optStr,  // overridden below if empty
-  ACME_LOCAL_IMAGES:         optBoolFalse,
+  AETHER_LOCAL_IMAGES:         optBoolFalse,
   DOCKER_HOST:                 optStr,
   SANDBOX_NETWORK:             optStr,
   SANDBOX_PORT_BASE:           optInt(14000),
   // Container name for the local Docker sandbox — configurable so dev and
   // self-hosted instances can coexist on the same Docker daemon.
   // Empty string treated as unset so env_file with missing key is safe.
-  SANDBOX_CONTAINER_NAME:      z.string().optional().transform(v => v || undefined).default('acme-sandbox'),
+  SANDBOX_CONTAINER_NAME:      z.string().optional().transform(v => v || undefined).default('aether-sandbox'),
 
   // ── Internal Service Key (auto-generated if missing — never fails) ───────
   INTERNAL_SERVICE_KEY:        optStr,
@@ -189,8 +189,8 @@ const envSchema = z.object({
 
   // ── Mailtrap (optional — provisioning email notifications) ────────────────
   MAILTRAP_API_TOKEN:          optStr,
-  MAILTRAP_FROM_EMAIL:         optStrDefault('noreply@acme.dev'),
-  MAILTRAP_FROM_NAME:          optStrDefault('Acme'),
+  MAILTRAP_FROM_EMAIL:         optStrDefault('noreply@aether.dev'),
+  MAILTRAP_FROM_NAME:          optStrDefault('Aether'),
 
   // ── Better Stack Observability (optional — graceful degradation) ────────
   BETTERSTACK_API_LOG_TOKEN:   optStr,  // Logtail source token for structured logs
@@ -199,9 +199,9 @@ const envSchema = z.object({
 
   // ── Stray env vars used directly in other files (centralized here) ───────
   CORS_ALLOWED_ORIGINS:        optStr,
-  ACME_MASTER_URL:           optStr,
+  AETHER_MASTER_URL:           optStr,
   OPENCODE_URL:                optStr,
-  ACME_DATA_DIR:             optStr,
+  AETHER_DATA_DIR:             optStr,
 });
 
 // ─── Validation + Conditional Checks ────────────────────────────────────────
@@ -268,7 +268,7 @@ function validateEnv(): z.infer<typeof envSchema> {
   }
 
   // ── Conditional: Billing enabled → need Stripe keys ────────────────────
-  const billingWillBeEnabled = (raw as any).ACME_BILLING_INTERNAL_ENABLED === 'true' || (raw as any).ACME_BILLING_INTERNAL_ENABLED === true || (raw as any).ENV_MODE === 'cloud';
+  const billingWillBeEnabled = (raw as any).AETHER_BILLING_INTERNAL_ENABLED === 'true' || (raw as any).AETHER_BILLING_INTERNAL_ENABLED === true || (raw as any).ENV_MODE === 'cloud';
   if (billingWillBeEnabled) {
     if (!raw.STRIPE_SECRET_KEY)    issues.push({ var: 'STRIPE_SECRET_KEY',    message: 'Required when billing is enabled (ENV_MODE=cloud)', level: 'error' });
     if (!raw.STRIPE_WEBHOOK_SECRET) issues.push({ var: 'STRIPE_WEBHOOK_SECRET', message: 'Required when billing is enabled (ENV_MODE=cloud)', level: 'error' });
@@ -280,22 +280,22 @@ function validateEnv(): z.infer<typeof envSchema> {
     issues.push({ var: 'TUNNEL_SIGNING_SECRET', message: 'Required when tunnel is enabled — used for HMAC signing key derivation', level: 'error' });
   }
 
-  // ── Conditional: ACME_URL — required for sandbox routing ──────────────
+  // ── Conditional: AETHER_URL — required for sandbox routing ──────────────
   // Used by every sandbox provider (local_docker, daytona, justavps),
   // channels webhook URL generation, pool env injection, and sandbox health.
   // Auto-derive from PORT in local mode if not set — fatal in cloud mode.
-  if (!raw.ACME_URL) {
+  if (!raw.AETHER_URL) {
     const envMode = (raw as any).ENV_MODE || 'local';
     const port = (raw as any).PORT || '8008';
     if (envMode === 'cloud') {
-      issues.push({ var: 'ACME_URL', message: 'Required in cloud mode — sandbox routing, channels webhooks, and health checks will break', level: 'error' });
+      issues.push({ var: 'AETHER_URL', message: 'Required in cloud mode — sandbox routing, channels webhooks, and health checks will break', level: 'error' });
     } else {
       // Auto-derive for local mode so it "just works"
       const derived = `http://localhost:${port}/v1/router`;
-      process.env.ACME_URL = derived;
-      if (result.success) (result.data as any).ACME_URL = derived;
-      console.warn(`[config] ACME_URL not set — auto-derived: ${derived}`);
-      issues.push({ var: 'ACME_URL', message: `Not set — auto-derived to ${derived} (add to .env to silence this)`, level: 'warn' });
+      process.env.AETHER_URL = derived;
+      if (result.success) (result.data as any).AETHER_URL = derived;
+      console.warn(`[config] AETHER_URL not set — auto-derived: ${derived}`);
+      issues.push({ var: 'AETHER_URL', message: `Not set — auto-derived to ${derived} (add to .env to silence this)`, level: 'warn' });
     }
   }
 
@@ -311,7 +311,7 @@ function validateEnv(): z.infer<typeof envSchema> {
   if (warnings.length > 0) {
     console.warn('');
     console.warn('\x1b[33m' + '='.repeat(70) + '\x1b[0m');
-    console.warn('\x1b[33m  acme-api: Environment warnings\x1b[0m');
+    console.warn('\x1b[33m  aether-api: Environment warnings\x1b[0m');
     console.warn('\x1b[33m' + '='.repeat(70) + '\x1b[0m');
     for (const w of warnings) {
       console.warn(`\x1b[33m  ${w.var.padEnd(40)} ${w.message}\x1b[0m`);
@@ -323,7 +323,7 @@ function validateEnv(): z.infer<typeof envSchema> {
   if (errors.length > 0) {
     console.error('');
     console.error('\x1b[31m' + '='.repeat(70) + '\x1b[0m');
-    console.error('\x1b[31m  acme-api: Environment validation FAILED — server cannot start\x1b[0m');
+    console.error('\x1b[31m  aether-api: Environment validation FAILED — server cannot start\x1b[0m');
     console.error('\x1b[31m' + '='.repeat(70) + '\x1b[0m');
     for (const e of errors) {
       console.error(`\x1b[31m  ${e.var.padEnd(40)} ${e.message}\x1b[0m`);
@@ -360,10 +360,10 @@ export const config = {
   ENV_MODE: env.ENV_MODE,
 
   // ─── Internal Deployment Controls ─────────────────────────────────────────
-  INTERNAL_ACME_ENV: env.INTERNAL_ACME_ENV as InternalAcmeEnv,
+  INTERNAL_AETHER_ENV: env.INTERNAL_AETHER_ENV as InternalAetherEnv,
   // Billing is enabled when ENV_MODE is 'cloud' — no separate env var needed.
-  ACME_BILLING_INTERNAL_ENABLED: env.ACME_BILLING_INTERNAL_ENABLED || env.ENV_MODE === 'cloud',
-  ACME_DEPLOYMENTS_ENABLED: env.ACME_DEPLOYMENTS_ENABLED,
+  AETHER_BILLING_INTERNAL_ENABLED: env.AETHER_BILLING_INTERNAL_ENABLED || env.ENV_MODE === 'cloud',
+  AETHER_DEPLOYMENTS_ENABLED: env.AETHER_DEPLOYMENTS_ENABLED,
 
   // ─── Database ──────────────────────────────────────────────────────────────
   DATABASE_URL: env.DATABASE_URL,
@@ -421,7 +421,7 @@ export const config = {
   DAYTONA_API_KEY: env.DAYTONA_API_KEY,
   DAYTONA_SERVER_URL: env.DAYTONA_SERVER_URL,
   DAYTONA_TARGET: env.DAYTONA_TARGET,
-  DAYTONA_SNAPSHOT: env.DAYTONA_SNAPSHOT || `acme-sandbox-v${SANDBOX_VERSION}`,
+  DAYTONA_SNAPSHOT: env.DAYTONA_SNAPSHOT || `aether-sandbox-v${SANDBOX_VERSION}`,
 
   // ─── JustAVPS (VPS Sandbox provisioning via JustAVPS) ────────────────────
   JUSTAVPS_API_URL: env.JUSTAVPS_API_URL,
@@ -438,24 +438,24 @@ export const config = {
   POOL_MAX_AGE_HOURS: env.POOL_MAX_AGE_HOURS,
 
   // ─── Sandbox Provisioning (Platform) ──────────────────────────────────────
-  ACME_URL: env.ACME_URL,
+  AETHER_URL: env.AETHER_URL,
   ALLOWED_SANDBOX_PROVIDERS: allowedProviders,
-  SANDBOX_IMAGE: env.SANDBOX_IMAGE || 'acme/computer:latest',
-  ACME_LOCAL_IMAGES: env.ACME_LOCAL_IMAGES,
+  SANDBOX_IMAGE: env.SANDBOX_IMAGE || 'aether/computer:latest',
+  AETHER_LOCAL_IMAGES: env.AETHER_LOCAL_IMAGES,
   DOCKER_HOST: env.DOCKER_HOST,
   SANDBOX_NETWORK: env.SANDBOX_NETWORK,
   SANDBOX_PORT_BASE: env.SANDBOX_PORT_BASE,
   SANDBOX_CONTAINER_NAME: env.SANDBOX_CONTAINER_NAME,
 
   /**
-   * INTERNAL_SERVICE_KEY -- direction: acme-api -> sandbox.
+   * INTERNAL_SERVICE_KEY -- direction: aether-api -> sandbox.
    *
-   * This is how acme-api authenticates itself TO the sandbox. Every request
-   * from acme-api to the sandbox (proxy, cron, health, queue drain, etc.)
+   * This is how aether-api authenticates itself TO the sandbox. Every request
+   * from aether-api to the sandbox (proxy, cron, health, queue drain, etc.)
    * includes `Authorization: Bearer <INTERNAL_SERVICE_KEY>`. The sandbox's
    * acme-master middleware validates it.
    *
-   * Counterpart: ACME_TOKEN goes the other direction (sandbox -> acme-api).
+   * Counterpart: AETHER_TOKEN goes the other direction (sandbox -> aether-api).
    *
    * Auto-generated at startup if not provided -- always present.
    * Persisted to .env so the same key survives process restarts.
@@ -529,9 +529,9 @@ export const config = {
 
   // ─── Stray env vars (centralized from other files) ────────────────────────
   CORS_ALLOWED_ORIGINS: env.CORS_ALLOWED_ORIGINS,
-  ACME_MASTER_URL: env.ACME_MASTER_URL,
+  AETHER_MASTER_URL: env.AETHER_MASTER_URL,
   OPENCODE_URL: env.OPENCODE_URL,
-  ACME_DATA_DIR: env.ACME_DATA_DIR,
+  AETHER_DATA_DIR: env.AETHER_DATA_DIR,
 
   // ─── Helper Methods ────────────────────────────────────────────────────────
 
@@ -572,11 +572,11 @@ export const config = {
 // ─── Billing Markup Constants ────────────────────────────────────────────────
 //
 // Two pricing modes based on whose API key is used:
-//   * Acme keys (user uses our keys):  1.2x provider cost (20% markup)
+//   * Aether keys (user uses our keys):  1.2x provider cost (20% markup)
 //   * User's own keys (passthrough):     0.1x provider cost (10% platform fee)
 
-/** Markup when Acme provides the API key. */
-export const ACME_MARKUP = 1.2;
+/** Markup when Aether provides the API key. */
+export const AETHER_MARKUP = 1.2;
 
 /** Platform fee when user provides their own API key. */
 export const PLATFORM_FEE_MARKUP = 0.1;

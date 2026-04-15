@@ -41,15 +41,15 @@ export interface ParsedLocalhostUrl {
 
 /** Options for proxy URL generation */
 export interface SubdomainUrlOptions {
-  /** Sandbox ID (e.g. 'acme-sandbox' for local, Daytona ID for cloud) */
+  /** Sandbox ID (e.g. 'aether-sandbox' for local, Daytona ID for cloud) */
   sandboxId: string;
-  /** Backend port (e.g. 8008) — the port acme-api listens on */
+  /** Backend port (e.g. 8008) — the port aether-api listens on */
   backendPort: number;
   /**
-   * The public-facing API base URL (e.g. 'https://e2e-test.acme.cloud/v1').
+   * The public-facing API base URL (e.g. 'https://e2e-test.aether.cloud/v1').
    * When set and the user is NOT on localhost, path-based proxy URLs are
    * generated instead of subdomain URLs:
-   *   https://e2e-test.acme.cloud/v1/p/{sandboxId}/{port}/{path}
+   *   https://e2e-test.aether.cloud/v1/p/{sandboxId}/{port}/{path}
    *
    * This makes proxy URLs work correctly on VPS/self-hosted deployments
    * where *.localhost subdomain DNS resolution isn't available.
@@ -80,8 +80,8 @@ const SUBDOMAIN_URL_REGEX =
  * by the sandbox infrastructure (VNC, OpenCode Web, presentation viewer, etc.)
  */
 const EXCLUDED_PORTS = new Set([
-  4096, // OpenCode API (proxied by Acme Master)
-  parseInt(SANDBOX_PORTS.ACME_MASTER, 10), // Acme Master itself
+  4096, // OpenCode API (proxied by Aether Master)
+  parseInt(SANDBOX_PORTS.AETHER_MASTER, 10), // Aether Master itself
 ]);
 
 // ── Internal helpers ─────────────────────────────────────────────────────────
@@ -141,11 +141,11 @@ function extractLocalhostCandidate(text: string): string | null {
 // ── Public API ───────────────────────────────────────────────────────────────
 
 /**
- * Regex to detect Acme Master proxy URLs: localhost:8000/proxy/{port}/...
+ * Regex to detect Aether Master proxy URLs: localhost:8000/proxy/{port}/...
  * The agent inside the sandbox sees these URLs; the frontend needs to
  * extract the real service port and remaining path.
  */
-const ACME_MASTER_PROXY_REGEX = /^\/proxy\/(\d{1,5})(\/.*)?$/;
+const AETHER_MASTER_PROXY_REGEX = /^\/proxy\/(\d{1,5})(\/.*)?$/;
 
 /**
  * Known frontend app route prefixes. URLs with these pathnames on
@@ -169,7 +169,7 @@ export function isAppRouteUrl(rawUrl: string | undefined): boolean {
  * Parse a localhost URL in one place so all consumers share identical rules.
  *
  * Handles a special case: `http://localhost:8000/proxy/{port}/{path}` URLs
- * from inside the sandbox (Acme Master). These are rewritten to appear as
+ * from inside the sandbox (Aether Master). These are rewritten to appear as
  * `localhost:{port}/{path}` so they get proxied correctly.
  */
 export function parseLocalhostUrl(
@@ -206,11 +206,11 @@ export function parseLocalhostUrl(
 
     let pathStr = `${parsed.pathname || '/'}${parsed.search}${parsed.hash}`;
 
-    // Special case: localhost:8000/proxy/{port}/... (Acme Master proxy URL).
+    // Special case: localhost:8000/proxy/{port}/... (Aether Master proxy URL).
     // Extract the real port and remaining path so detection/rewriting works.
-    const acmeMasterPort = parseInt(SANDBOX_PORTS.ACME_MASTER, 10);
+    const acmeMasterPort = parseInt(SANDBOX_PORTS.AETHER_MASTER, 10);
     if (port === acmeMasterPort) {
-      const proxyMatch = parsed.pathname.match(ACME_MASTER_PROXY_REGEX);
+      const proxyMatch = parsed.pathname.match(AETHER_MASTER_PROXY_REGEX);
       if (proxyMatch) {
         const realPort = parseInt(proxyMatch[1], 10);
         if (realPort >= 1 && realPort <= 65535) {
@@ -354,10 +354,10 @@ function isBrowserOnLocalhost(): boolean {
  *
  * @example
  *   // Local: rewriteLocalhostUrl(3210, '/viewer.html', '', opts)
- *   // → 'http://p3210-acme-sandbox.localhost:8008/viewer.html'
+ *   // → 'http://p3210-aether-sandbox.localhost:8008/viewer.html'
  *
  *   // VPS:   rewriteLocalhostUrl(3210, '/viewer.html', '', opts)
- *   // → 'https://e2e-test.acme.cloud/v1/p/acme-sandbox/3210/viewer.html'
+ *   // → 'https://e2e-test.aether.cloud/v1/p/aether-sandbox/3210/viewer.html'
  */
 export function rewriteLocalhostUrl(
   port: number,
@@ -374,7 +374,7 @@ export function rewriteLocalhostUrl(
 
   // Path-based proxy for VPS/remote deployments
   if (subdomainOpts.apiBaseUrl && !isBrowserOnLocalhost()) {
-    // apiBaseUrl is like "https://e2e-test.acme.cloud/v1" — strip trailing /v1 or / to get origin+prefix
+    // apiBaseUrl is like "https://e2e-test.aether.cloud/v1" — strip trailing /v1 or / to get origin+prefix
     const base = subdomainOpts.apiBaseUrl.replace(/\/+$/, '');
     return `${base}/p/${subdomainOpts.sandboxId}/${port}${safePath}`;
   }
@@ -470,8 +470,8 @@ const PATH_PROXY_URL_REGEX =
  * Parse a preview proxy URL back to its components.
  * Handles both subdomain and path-based formats:
  *
- * Subdomain: http://p3210-acme-sandbox.localhost:8008/viewer.html
- * Path:      https://e2e-test.acme.cloud/v1/p/acme-sandbox/3210/viewer.html
+ * Subdomain: http://p3210-aether-sandbox.localhost:8008/viewer.html
+ * Path:      https://e2e-test.aether.cloud/v1/p/aether-sandbox/3210/viewer.html
  */
 export function parseSubdomainUrl(url: string): {
   port: number;
@@ -561,10 +561,10 @@ export function isPreviewUrl(url: string): boolean {
 const WEB_PROXY_PATH_PREFIX = '/web-proxy/';
 
 /**
- * Build a web proxy URL that routes through the Acme Master (port 8000)
+ * Build a web proxy URL that routes through the Aether Master (port 8000)
  * which hosts the /web-proxy/ forward proxy.
  *
- * The web proxy lives on Acme Master, NOT the OpenCode server, so we
+ * The web proxy lives on Aether Master, NOT the OpenCode server, so we
  * must construct a URL targeting port 8000 via the subdomain/path proxy.
  *
  * Strategy (most robust → least):
@@ -584,7 +584,7 @@ export function buildWebProxyUrl(
     const scheme = parsed.protocol.replace(':', '');
     const proxyPath = `${WEB_PROXY_PATH_PREFIX}${scheme}/${parsed.host}${parsed.pathname}${parsed.search}${parsed.hash}`;
 
-    const kmPort = SANDBOX_PORTS.ACME_MASTER; // "8000"
+    const kmPort = SANDBOX_PORTS.AETHER_MASTER; // "8000"
 
     // 1. If subdomainOpts is provided, use the standard rewrite
     if (subdomainOpts) {
@@ -593,13 +593,13 @@ export function buildWebProxyUrl(
     }
 
     // 2. Derive from serverUrl directly (handles local subdomain proxy)
-    //    serverUrl like "http://p8008-acme-sandbox.localhost:8008"
-    //    → swap to   "http://p8000-acme-sandbox.localhost:8008"
+    //    serverUrl like "http://p8008-aether-sandbox.localhost:8008"
+    //    → swap to   "http://p8000-aether-sandbox.localhost:8008"
     try {
       const server = new URL(serverUrl);
       const subdomainMatch = server.hostname.match(/^p(\d+)-(.+)$/);
       if (subdomainMatch) {
-        const sandboxHost = subdomainMatch[2]; // "acme-sandbox.localhost"
+        const sandboxHost = subdomainMatch[2]; // "aether-sandbox.localhost"
         return `${server.protocol}//p${kmPort}-${sandboxHost}:${server.port}${proxyPath}`;
       }
 
@@ -611,7 +611,7 @@ export function buildWebProxyUrl(
       }
     } catch { /* fall through */ }
 
-    // 4. Last resort: bare localhost (only works if Acme Master is accessible directly)
+    // 4. Last resort: bare localhost (only works if Aether Master is accessible directly)
     return `http://localhost:${kmPort}${proxyPath}`;
   } catch {
     return null;

@@ -12,7 +12,7 @@ export interface BreadcrumbSegment {
   isLast: boolean;
 }
 
-interface AcmeComputerHeaderProps {
+interface AetherComputerHeaderProps {
   /** Icon to display in the header */
   icon: LucideIcon;
   /** Click handler for the icon button */
@@ -36,12 +36,12 @@ interface AcmeComputerHeaderProps {
 }
 
 /**
- * Shared header component for all Acme Computer views (Files, File Viewer, Browser).
+ * Shared header component for all Aether Computer views (Files, File Viewer, Browser).
  * Ensures consistent styling and prevents layout jumps when switching tabs.
  * 
  * ALL styling is controlled here - consumers only pass data props.
  */
-export function AcmeComputerHeader({
+export function AetherComputerHeader({
   icon: IconComponent,
   onIconClick,
   iconTitle,
@@ -50,7 +50,7 @@ export function AcmeComputerHeader({
   breadcrumbs,
   onBreadcrumbClick,
   actions,
-}: AcmeComputerHeaderProps) {
+}: AetherComputerHeaderProps) {
   const handleIconPress = () => {
     if (onIconClick) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

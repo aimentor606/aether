@@ -79,14 +79,14 @@ export default tool({
   },
   async execute(args, _context) {
     const apiBaseURL = getEnv("FIRECRAWL_API_URL");
-    // When routed through the Kortix proxy (FIRECRAWL_API_URL is set), use ACME_TOKEN
+    // When routed through the Kortix proxy (FIRECRAWL_API_URL is set), use AETHER_TOKEN
     // for auth — the proxy validates it and injects the real Firecrawl API key.
     // When hitting the real Firecrawl API directly, use the user's own FIRECRAWL_API_KEY.
     const apiKey = apiBaseURL
-      ? getEnv("ACME_TOKEN")
+      ? getEnv("AETHER_TOKEN")
       : getEnv("FIRECRAWL_API_KEY");
     if (!apiKey) return apiBaseURL
-      ? "Error: ACME_TOKEN not set."
+      ? "Error: AETHER_TOKEN not set."
       : "Error: FIRECRAWL_API_KEY not set.";
 
     const client = new FirecrawlApp({

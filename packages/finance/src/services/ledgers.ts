@@ -1,6 +1,6 @@
 import { ledgersRepository } from '../repositories';
-import { createLedgerSchema, updateLedgerSchema } from '@acme/db';
-import type { CreateLedgerInput, UpdateLedgerInput } from '@acme/db';
+import { createLedgerSchema, updateLedgerSchema } from '@aether/db';
+import type { CreateLedgerInput, UpdateLedgerInput } from '@aether/db';
 
 export const ledgersService = {
   async listAll(accountId: string) {

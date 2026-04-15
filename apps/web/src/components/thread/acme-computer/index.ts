@@ -1,3 +1,3 @@
-export { AcmeComputer, type ToolCallInput } from './AcmeComputer';
-export { AcmeComputerHeader } from './AcmeComputerHeader';
+export { AetherComputer, type ToolCallInput } from './AetherComputer';
+export { AetherComputerHeader } from './AetherComputerHeader';
 

@@ -11,7 +11,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useAuth } from '@/components/AuthProvider';
 import { Reveal } from '@/components/home/reveal';
 
-const INSTALL_CMD = 'curl -fsSL https://acme.dev/install | bash';
+const INSTALL_CMD = 'curl -fsSL https://aether.dev/install | bash';
 
 /* ─── Google Favicon helper ─── */
 const favicon = (domain: string) =>
@@ -103,7 +103,7 @@ export default function Home() {
                 className="h-12 px-8 text-sm rounded-full transition-colors"
                 onClick={handleLaunch}
               >
-                Launch Your Acme<ArrowRight className="ml-1.5 size-3.5" />
+                Launch Your Aether<ArrowRight className="ml-1.5 size-3.5" />
               </Button>
               <button
                 onClick={handleCopy}
@@ -152,7 +152,7 @@ export default function Home() {
               <div className="relative aspect-video bg-black">
                 <iframe
                   src="https://www.youtube.com/embed/Eu5mYMavctM"
-                  title="Acme launch video"
+                  title="Aether launch video"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="absolute inset-0 w-full h-full"
@@ -172,7 +172,7 @@ export default function Home() {
           </Reveal>
           <Reveal delay={0.1}>
           <p className="mt-3 text-base sm:text-lg text-muted-foreground/60 leading-relaxed max-w-2xl">
-            A Acme is a cloud computer where AI agents do the actual work of running a company. You connect your tools, define your agents, set their schedules and triggers — and the machine operates whether you&apos;re there or not. Persistent memory that compounds. A workforce that never stops.
+            A Aether is a cloud computer where AI agents do the actual work of running a company. You connect your tools, define your agents, set their schedules and triggers — and the machine operates whether you&apos;re there or not. Persistent memory that compounds. A workforce that never stops.
           </p>
           </Reveal>
         </section>
@@ -231,7 +231,7 @@ export default function Home() {
                 <span className="text-sm text-foreground/70">Connect everything</span>
               </div>
               <p className="text-sm text-muted-foreground/60 leading-relaxed mb-4 max-w-xl">
-                Every tool your company uses — OAuth apps, MCP servers, REST APIs, CLI tools, environment variables. If it has an interface, Acme connects to it. 3,000+ integrations available, and custom ones are trivial to add.
+                Every tool your company uses — OAuth apps, MCP servers, REST APIs, CLI tools, environment variables. If it has an interface, Aether connects to it. 3,000+ integrations available, and custom ones are trivial to add.
               </p>
               <div className="flex flex-wrap gap-2">
                 <IntegrationPill domain="gmail.com" name="Gmail" />
@@ -322,7 +322,7 @@ export default function Home() {
             className="group hidden sm:flex items-center gap-2 h-8 px-3 rounded-full hover:bg-foreground/[0.04] transition-colors cursor-pointer"
           >
             <span className="font-mono text-[11px] text-muted-foreground/40 select-none">$</span>
-            <code className="text-[11px] font-mono text-foreground/60 tracking-tight">curl -fsSL acme.dev/install</code>
+            <code className="text-[11px] font-mono text-foreground/60 tracking-tight">curl -fsSL aether.dev/install</code>
             {copied
               ? <Check className="size-3 text-emerald-500" />
               : <Copy className="size-3 text-muted-foreground/30 group-hover:text-muted-foreground/50 transition-colors" />
@@ -343,7 +343,7 @@ export default function Home() {
             className="px-5 text-xs rounded-full font-medium"
             onClick={handleLaunch}
           >
-            Launch Your Acme<ArrowRight className="ml-1.5 size-3" />
+            Launch Your Aether<ArrowRight className="ml-1.5 size-3" />
           </Button>
         </div>
       </div>

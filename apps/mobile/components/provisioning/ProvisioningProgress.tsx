@@ -22,7 +22,7 @@ import { useColorScheme } from 'nativewind';
 import { CheckCircle2, Loader2 } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
-import { AcmeLogo } from '@/components/ui/AcmeLogo';
+import { AetherLogo } from '@/components/ui/AetherLogo';
 import { STAGE_LABELS, type ProvisioningStageInfo } from '@/lib/platform/provisioning-stages';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -186,7 +186,7 @@ export function ProvisioningProgress({
       <View className="flex-1 items-center justify-center px-8">
         {/* Logo */}
         <View className="mb-10">
-          <AcmeLogo size={28} variant="symbol" color={isDark ? 'dark' : 'light'} />
+          <AetherLogo size={28} variant="symbol" color={isDark ? 'dark' : 'light'} />
         </View>
 
         {/* Title */}

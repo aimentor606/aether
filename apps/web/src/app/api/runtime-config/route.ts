@@ -6,7 +6,7 @@ export const revalidate = 0
 export async function GET() {
   const runtimeEnv = getServerPublicEnv()
   const payload = JSON.stringify(runtimeEnv)
-  const script = `window.__ACME_RUNTIME_CONFIG=${payload};window.__RUNTIME_ENV=window.__ACME_RUNTIME_CONFIG;`
+  const script = `window.__AETHER_RUNTIME_CONFIG=${payload};window.__RUNTIME_ENV=window.__AETHER_RUNTIME_CONFIG;`
 
   return new Response(script, {
     headers: {

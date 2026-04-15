@@ -23,11 +23,11 @@ import Animated, {
 import { API_URL } from '@/api/config';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { AcmeLoader } from '@/components/ui/acme-loader';
-import { AcmeLogo } from '@/components/ui/AcmeLogo';
+import { AetherLoader } from '@/components/ui/aether-loader';
+import { AetherLogo } from '@/components/ui/AetherLogo';
 import { ThreadContent, type ToolMessagePair } from '@/components/chat/ThreadContent';
-import { AcmeComputer } from '@/components/acme-computer';
-import { useAcmeComputerStore } from '@/stores/acme-computer-store';
+import { AetherComputer } from '@/components/acme-computer';
+import { useAetherComputerStore } from '@/stores/aether-computer-store';
 
 // Fetch public thread without requiring auth
 async function fetchPublicThread(threadId: string) {
@@ -348,14 +348,14 @@ export default function ShareThreadPage() {
   const insets = useSafeAreaInsets();
   const scrollViewRef = React.useRef<ScrollView>(null);
   
-  // Acme Computer for viewing tool calls
-  const { isOpen: isAcmeComputerOpen, openPanel } = useAcmeComputerStore();
+  // Aether Computer for viewing tool calls
+  const { isOpen: isAetherComputerOpen, openPanel } = useAetherComputerStore();
   const [selectedToolData, setSelectedToolData] = React.useState<{
     toolMessages: ToolMessagePair[];
     initialIndex: number;
   } | null>(null);
 
-  // Handle tool press - open Acme Computer
+  // Handle tool press - open Aether Computer
   const handleToolPress = React.useCallback(
     (toolMessages: ToolMessagePair[], initialIndex: number) => {
       setSelectedToolData({ toolMessages, initialIndex });
@@ -448,7 +448,7 @@ export default function ShareThreadPage() {
       <>
         <Stack.Screen options={{ headerShown: false }} />
         <View className="flex-1 bg-background items-center justify-center">
-          <AcmeLoader size="large" />
+          <AetherLoader size="large" />
         </View>
       </>
     );
@@ -474,7 +474,7 @@ export default function ShareThreadPage() {
 
           <View className="flex-1 mx-3">
             <View className="flex-row items-center gap-2">
-              <AcmeLogo size={16} variant="symbol" color={isDark ? 'dark' : 'light'} />
+              <AetherLogo size={16} variant="symbol" color={isDark ? 'dark' : 'light'} />
               <Text
                 className="font-roobert-semibold text-base text-foreground"
                 numberOfLines={1}
@@ -528,9 +528,9 @@ export default function ShareThreadPage() {
         )}
       </View>
 
-      {/* Acme Computer for viewing tool calls */}
-      {isAcmeComputerOpen && (
-        <AcmeComputer
+      {/* Aether Computer for viewing tool calls */}
+      {isAetherComputerOpen && (
+        <AetherComputer
           toolMessages={selectedToolData?.toolMessages || []}
           currentIndex={selectedToolData?.initialIndex || 0}
           onNavigate={(newIndex) => {

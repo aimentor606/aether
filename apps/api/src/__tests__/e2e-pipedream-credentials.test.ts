@@ -16,7 +16,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'bun:test'
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { sql, eq, and } from 'drizzle-orm';
-import { integrationCredentials } from '@acme/db';
+import { integrationCredentials } from '@aether/db';
 import {
   getTestDb,
   TEST_USER_ID,

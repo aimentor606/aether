@@ -11,7 +11,7 @@ const webSearch = new Hono<{ Variables: AppContext }>();
  * POST /web-search
  *
  * Search the web using Tavily API.
- * Requires authentication via ACME_TOKEN.
+ * Requires authentication via AETHER_TOKEN.
  * Credits are deducted based on search depth (basic or advanced).
  */
 webSearch.post('/', async (c) => {

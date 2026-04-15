@@ -154,12 +154,12 @@ export async function startUnifiedCreditPurchase(
     
     if (!packageIdentifier) {
       const creditPackageMap: Record<number, string> = {
-        10: 'acme_topup_starter',
-        25: 'acme_topup_plus',
-        50: 'acme_topup_popular',
-        100: 'acme_topup_pro',
-        250: 'acme_topup_business',
-        500: 'acme_topup_enterprise',
+        10: 'aether_topup_starter',
+        25: 'aether_topup_plus',
+        50: 'aether_topup_popular',
+        100: 'aether_topup_pro',
+        250: 'aether_topup_business',
+        500: 'aether_topup_enterprise',
       };
       packageIdentifier = creditPackageMap[amount];
     }

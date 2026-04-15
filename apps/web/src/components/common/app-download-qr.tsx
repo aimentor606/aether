@@ -2,8 +2,8 @@
 
 import { cn } from '@/lib/utils';
 
-// Acme symbol SVG
-function AcmeSymbol({ size = 24, className }: { size?: number; className?: string }) {
+// Aether symbol SVG
+function AetherSymbol({ size = 24, className }: { size?: number; className?: string }) {
   return (
     <svg 
       width={size} 
@@ -20,14 +20,14 @@ function AcmeSymbol({ size = 24, className }: { size?: number; className?: strin
 /**
  * Universal app download URL - middleware auto-redirects to correct store based on device
  */
-export const APP_DOWNLOAD_URL = 'https://www.acme.dev/app';
+export const APP_DOWNLOAD_URL = 'https://www.aether.dev/app';
 
 export interface AppDownloadQRProps {
   /** Size of the QR code in pixels */
   size?: number;
   /** Additional class names for the container */
   className?: string;
-  /** Whether to show the Acme logo in the center */
+  /** Whether to show the Aether logo in the center */
   showLogo?: boolean;
   /** Size of the center logo */
   logoSize?: number;
@@ -50,7 +50,7 @@ export function AppDownloadQR({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img 
         src={qrUrl}
-        alt="Scan to download Acme - redirects to App Store or Google Play based on your device"
+        alt="Scan to download Aether - redirects to App Store or Google Play based on your device"
         width={size}
         height={size}
         className="block"
@@ -58,7 +58,7 @@ export function AppDownloadQR({
       {showLogo && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="bg-white p-2 rounded-xl shadow-md">
-            <AcmeSymbol size={logoSize} className="text-black" />
+            <AetherSymbol size={logoSize} className="text-black" />
           </div>
         </div>
       )}

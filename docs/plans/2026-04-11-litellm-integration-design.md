@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-Replace OpenRouter with a self-hosted LiteLLM Proxy Server cluster as the unified LLM gateway for the Acme SaaS platform. This gives us:
+Replace OpenRouter with a self-hosted LiteLLM Proxy Server cluster as the unified LLM gateway for the Aether SaaS platform. This gives us:
 
 - **Cost control**: Direct provider connections, no middleman markup
 - **Data sovereignty**: All LLM traffic stays on our infrastructure
@@ -25,7 +25,7 @@ Replace OpenRouter with a self-hosted LiteLLM Proxy Server cluster as the unifie
 ### Current State (OpenRouter)
 
 ```
-Client → Acme API → proxyToOpenRouter() → OpenRouter → Providers
+Client → Aether API → proxyToOpenRouter() → OpenRouter → Providers
                               ↓
                     proxyToAnthropic() → OpenRouter → Anthropic
                               ↓
@@ -41,20 +41,20 @@ Client → Acme API → proxyToOpenRouter() → OpenRouter → Providers
 ### Target State (LiteLLM)
 
 ```
-Client → Acme API → proxyToLiteLLM() → LiteLLM Cluster (×4-6) → Providers
+Client → Aether API → proxyToLiteLLM() → LiteLLM Cluster (×4-6) → Providers
                               ↓              ↓
                     extractUsage()     Redis (shared state)
                               ↓              ↓
                     calculateCost()    PostgreSQL (spend logs)
                               ↓
-                    deductLLMCredits() → Acme DB
+                    deductLLMCredits() → Aether DB
 ```
 
 **Benefits**:
 - Self-hosted, full control
 - Automatic model fallbacks + retries
 - Dual-mode keys (virtual + user-provided)
-- LiteLLM spend tracking + Acme billing as cross-check
+- LiteLLM spend tracking + Aether billing as cross-check
 - Horizontal scaling via Redis
 
 ---
@@ -69,7 +69,7 @@ Client → Acme API → proxyToLiteLLM() → LiteLLM Cluster (×4-6) → Provide
 | `proxyToAnthropic(body, isStreaming)` | `services/anthropic.ts` | **Removed** — LiteLLM handles Anthropic natively |
 | `extractUsageFromStream(stream, ...)` | `routes/llm.ts` | **Keep** — LiteLLM SSE is OpenAI-compatible, parser works unchanged |
 | `extractUsageFromAnthropicStream(stream, ...)` | `routes/anthropic.ts` | **Removed** — all models use OpenAI format through LiteLLM |
-| `calculateCost(modelConfig, prompt, completion, ...)` | `services/llm.ts` | **Keep** — Acme's own billing, cross-checked with LiteLLM |
+| `calculateCost(modelConfig, prompt, completion, ...)` | `services/llm.ts` | **Keep** — Aether's own billing, cross-checked with LiteLLM |
 | `calculateAnthropicCost(modelConfig, usage, ...)` | `services/anthropic.ts` | **Removed** — unified via calculateCost |
 | `MODELS` registry (openrouterId) | `config/models.ts` | Simplified — LiteLLM `config.yaml` handles routing |
 | `resolveOpenRouterId(modelId)` | `config/models.ts` | **Removed** — LiteLLM resolves models internally |
@@ -79,12 +79,12 @@ Client → Acme API → proxyToLiteLLM() → LiteLLM Cluster (×4-6) → Provide
 
 | Function | File | Why Keep |
 |---|---|---|
-| `calculateCost()` | `services/llm.ts` | Acme's own billing logic (credits/markup) |
+| `calculateCost()` | `services/llm.ts` | Aether's own billing logic (credits/markup) |
 | `extractUsageFromStream()` | `routes/llm.ts` | SSE parser — LiteLLM SSE is identical to OpenAI |
-| `checkCredits()` / `deductLLMCredits()` | `services/billing.ts` | Acme credit system |
+| `checkCredits()` / `deductLLMCredits()` | `services/billing.ts` | Aether credit system |
 | `ProxyServiceConfig` (non-LLM entries) | `config/proxy-services.ts` | Tavily, Firecrawl, etc. still use direct proxy |
 | `ModelConfig` interface | `config/models.ts` | Keep for pricing, simplify `openrouterId` → `litellmModel` |
-| Secret store / auth sync | `core/kortix-master/` | Unchanged |
+| Secret store / auth sync | `core/aether-master/` | Unchanged |
 
 ### 3.3 New Components
 
@@ -180,7 +180,7 @@ const LITELLM_BASE = `${LITELLM_URL}`;
 
 /**
  * Get or create a virtual key for an account.
- * Maps Acme account → LiteLLM virtual key with budget enforcement.
+ * Maps Aether account → LiteLLM virtual key with budget enforcement.
  */
 export async function resolveVirtualKey(accountId: string): Promise<string> {
   // Check cache first
@@ -246,7 +246,7 @@ async function findKeyByAlias(accountId: string): Promise<{ key: string } | null
 }
 
 /**
- * Sync Acme credit balance → LiteLLM key budget.
+ * Sync Aether credit balance → LiteLLM key budget.
  * Called when credits are purchased or deducted.
  */
 export async function syncKeyBudget(
@@ -469,7 +469,7 @@ general_settings:
 ### 5.2 Environment Variables
 
 ```bash
-# .env (Acme API)
+# .env (Aether API)
 LITELLM_URL=http://litellm:4000
 LITELLM_MASTER_KEY=sk-master-xxx
 
@@ -676,10 +676,10 @@ We keep **two independent billing systems** that cross-check each other:
 
 ```
 ┌──────────────────────────────────────────────────┐
-│                  Acme Billing                     │
+│                  Aether Billing                     │
 │  (existing: credits, markup, team budgets)        │
 │                                                   │
-│  calculateCost() → deductLLMCredits() → Acme DB  │
+│  calculateCost() → deductLLMCredits() → Aether DB  │
 │  + extractUsageFromStream() for real-time extract │
 └──────────────────────┬───────────────────────────┘
                        │ cross-check
@@ -694,7 +694,7 @@ We keep **two independent billing systems** that cross-check each other:
 
 ### 7.2 Why Dual Billing?
 
-| Concern | Acme Billing | LiteLLM Billing |
+| Concern | Aether Billing | LiteLLM Billing |
 |---|---|---|
 | **Credit system** | ✅ Users buy credits | ❌ Only USD budgets |
 | **Markup** | ✅ Platform markup | ❌ Direct cost only |
@@ -710,11 +710,11 @@ We keep **two independent billing systems** that cross-check each other:
 // packages/vertical/src/billing/reconciliation.ts
 
 /**
- * Daily job: Compare Acme billing vs LiteLLM spend logs.
+ * Daily job: Compare Aether billing vs LiteLLM spend logs.
  * Alert on discrepancies > 5%.
  */
 export async function reconcileSpend(): Promise<ReconciliationReport> {
-  const acmeSpend = await getAcmeBillingSummary('1d');
+  const acmeSpend = await getAetherBillingSummary('1d');
   const litellmSpend = await getLiteLLMSpendSummary('1d');
 
   const discrepancies: Discrepancy[] = [];
@@ -794,11 +794,11 @@ async function getLiteLLMSpendSummary(period: string): Promise<Record<string, nu
 |---|---|---|
 | LiteLLM instance crash | Requests fail | Nginx health checks + 4 instances + automatic retry |
 | Redis failure | Rate limits lost | Redis persistence (AOF) + fallback to single-instance mode |
-| PostgreSQL downtime | Spend tracking lost | Read replicas + Acme billing still works independently |
+| PostgreSQL downtime | Spend tracking lost | Read replicas + Aether billing still works independently |
 | LiteLLM version upgrade breaks API | All LLM calls fail | Pin Docker image tag, test in staging first |
 | LiteLLM supply chain attack | Security breach | Pin to verified SHA, scan Docker image, run as non-root |
 | Model provider outage | Specific model fails | Fallback models in config.yaml (2+ per model name) |
-| Virtual key budget drift | Over-billing | Daily reconciliation + Acme billing as hard limit |
+| Virtual key budget drift | Over-billing | Daily reconciliation + Aether billing as hard limit |
 | >500 RPS not achieved | Performance degradation | Add more instances (scale to 6-8), tune Redis |
 
 ---
@@ -808,7 +808,7 @@ async function getLiteLLMSpendSummary(period: string): Promise<Record<string, nu
 | # | Question | Decision |
 |---|---|---|
 | 1 | Anthropic route compatibility | **统一到 `/litellm`** — 删除 `/anthropic` 和 `/llm` 路由 |
-| 2 | LiteLLM DB sharing | **共享 Acme PostgreSQL** — 同一实例，不同 schema |
+| 2 | LiteLLM DB sharing | **共享 Aether PostgreSQL** — 同一实例，不同 schema |
 | 3 | Deployment | **Docker Compose** — 全环境统一 |
 | 4 | Version pinning | **固定 tag** — 如 `v1.40.0` |
 | 5 | OpenRouter retention | **删除** — 完全移除 OpenRouter |

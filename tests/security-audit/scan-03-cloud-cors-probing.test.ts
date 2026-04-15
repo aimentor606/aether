@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - CORS Probing
  *
- * LIVE scan against https://computer-preview-api.acme.dev
+ * LIVE scan against https://computer-preview-api.aether.dev
  * Tests CORS configuration by sending requests from various origins.
  *
  * FINDINGS:
@@ -15,7 +15,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.acme.dev';
+const CLOUD = 'https://computer-preview-api.aether.dev';
 
 async function probeWithOrigin(
   method: string,
@@ -44,25 +44,25 @@ async function probeWithOrigin(
 describe('Cloud Scan: CORS Probing', () => {
 
   describe('Legitimate origins', () => {
-    test('computer-preview.acme.dev gets allow-origin', async () => {
-      const r = await probeWithOrigin('GET', '/v1/health', 'https://computer-preview.acme.dev');
-      expect(r.headers['access-control-allow-origin']).toBe('https://computer-preview.acme.dev');
+    test('computer-preview.aether.dev gets allow-origin', async () => {
+      const r = await probeWithOrigin('GET', '/v1/health', 'https://computer-preview.aether.dev');
+      expect(r.headers['access-control-allow-origin']).toBe('https://computer-preview.aether.dev');
       expect(r.headers['access-control-allow-credentials']).toBe('true');
     });
 
-    test('acme.dev gets allow-origin', async () => {
-      const r = await probeWithOrigin('GET', '/v1/health', 'https://acme.dev');
-      expect(r.headers['access-control-allow-origin']).toBe('https://acme.dev');
+    test('aether.dev gets allow-origin', async () => {
+      const r = await probeWithOrigin('GET', '/v1/health', 'https://aether.dev');
+      expect(r.headers['access-control-allow-origin']).toBe('https://aether.dev');
     });
 
-    test('www.acme.dev gets allow-origin', async () => {
-      const r = await probeWithOrigin('GET', '/v1/health', 'https://www.acme.dev');
-      expect(r.headers['access-control-allow-origin']).toBe('https://www.acme.dev');
+    test('www.aether.dev gets allow-origin', async () => {
+      const r = await probeWithOrigin('GET', '/v1/health', 'https://www.aether.dev');
+      expect(r.headers['access-control-allow-origin']).toBe('https://www.aether.dev');
     });
 
-    test('staging.acme.dev gets allow-origin', async () => {
-      const r = await probeWithOrigin('GET', '/v1/health', 'https://staging.acme.dev');
-      expect(r.headers['access-control-allow-origin']).toBe('https://staging.acme.dev');
+    test('staging.aether.dev gets allow-origin', async () => {
+      const r = await probeWithOrigin('GET', '/v1/health', 'https://staging.aether.dev');
+      expect(r.headers['access-control-allow-origin']).toBe('https://staging.aether.dev');
     });
   });
 
@@ -77,8 +77,8 @@ describe('Cloud Scan: CORS Probing', () => {
       expect(r.headers['access-control-allow-origin']).toBeUndefined();
     });
 
-    test('evil subdomain evil.acme.dev does NOT get allow-origin', async () => {
-      const r = await probeWithOrigin('GET', '/v1/health', 'https://evil.acme.dev');
+    test('evil subdomain evil.aether.dev does NOT get allow-origin', async () => {
+      const r = await probeWithOrigin('GET', '/v1/health', 'https://evil.aether.dev');
       expect(r.headers['access-control-allow-origin']).toBeUndefined();
     });
 
@@ -87,25 +87,25 @@ describe('Cloud Scan: CORS Probing', () => {
       expect(r.headers['access-control-allow-origin']).toBeUndefined();
     });
 
-    test('HTTP downgrade http://acme.dev does NOT get allow-origin', async () => {
-      const r = await probeWithOrigin('GET', '/v1/health', 'http://acme.dev');
+    test('HTTP downgrade http://aether.dev does NOT get allow-origin', async () => {
+      const r = await probeWithOrigin('GET', '/v1/health', 'http://aether.dev');
       expect(r.headers['access-control-allow-origin']).toBeUndefined();
     });
 
-    test('acme.dev.evil.com does NOT get allow-origin', async () => {
-      const r = await probeWithOrigin('GET', '/v1/health', 'https://acme.dev.evil.com');
+    test('aether.dev.evil.com does NOT get allow-origin', async () => {
+      const r = await probeWithOrigin('GET', '/v1/health', 'https://aether.dev.evil.com');
       expect(r.headers['access-control-allow-origin']).toBeUndefined();
     });
   });
 
   describe('Preflight (OPTIONS) requests', () => {
     test('OPTIONS from legit origin gets full CORS headers', async () => {
-      const r = await probeWithOrigin('OPTIONS', '/v1/accounts', 'https://computer-preview.acme.dev', {
+      const r = await probeWithOrigin('OPTIONS', '/v1/accounts', 'https://computer-preview.aether.dev', {
         'Access-Control-Request-Method': 'POST',
         'Access-Control-Request-Headers': 'Authorization',
       });
       expect(r.status).toBe(204);
-      expect(r.headers['access-control-allow-origin']).toBe('https://computer-preview.acme.dev');
+      expect(r.headers['access-control-allow-origin']).toBe('https://computer-preview.aether.dev');
       expect(r.headers['access-control-allow-methods']).toContain('POST');
       expect(r.headers['access-control-allow-headers']).toContain('Authorization');
     });
@@ -122,9 +122,9 @@ describe('Cloud Scan: CORS Probing', () => {
 
   describe('CORS on error responses', () => {
     test('401 from legit origin still includes CORS headers', async () => {
-      const r = await probeWithOrigin('GET', '/v1/accounts', 'https://computer-preview.acme.dev');
+      const r = await probeWithOrigin('GET', '/v1/accounts', 'https://computer-preview.aether.dev');
       expect(r.status).toBe(401);
-      expect(r.headers['access-control-allow-origin']).toBe('https://computer-preview.acme.dev');
+      expect(r.headers['access-control-allow-origin']).toBe('https://computer-preview.aether.dev');
     });
 
     test('401 from evil origin does NOT include allow-origin', async () => {
@@ -136,7 +136,7 @@ describe('Cloud Scan: CORS Probing', () => {
 
   describe('Vary header', () => {
     test('responses include Vary: Origin', async () => {
-      const r = await probeWithOrigin('GET', '/v1/health', 'https://computer-preview.acme.dev');
+      const r = await probeWithOrigin('GET', '/v1/health', 'https://computer-preview.aether.dev');
       expect(r.headers['vary']).toContain('Origin');
     });
   });

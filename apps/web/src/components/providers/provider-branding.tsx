@@ -30,7 +30,7 @@ export const PROVIDER_LABELS: Record<string, string> = {
   moonshotai: 'Moonshot',
   'moonshotai-cn': 'Moonshot',
   opencode: 'OpenCode Zen',
-  acme: 'Acme',
+  acme: 'Aether',
   firmware: 'Firmware',
   bedrock: 'AWS Bedrock',
   openrouter: 'OpenRouter',

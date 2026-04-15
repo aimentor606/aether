@@ -1,90 +1,83 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useTriggerWorkflow, useWorkflows } from "@/hooks/admin/use-notification-workflow";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Send, Users, User, ChevronDown, Sparkles } from "lucide-react";
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { useState } from 'react';
+import { useApiClient, useAdminNotifications } from '@aether/sdk/client';
 import {
+  Button,
+  Input,
+  Label,
+  Textarea,
+  Switch,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { toast } from "@/lib/toast";
-import { Badge } from "@/components/ui/badge";
+  Badge,
+} from '@aether/ui/primitives';
+import {
+  Send,
+  Users,
+  User,
+  ChevronDown,
+  Sparkles,
+  Loader2,
+} from 'lucide-react';
+import { toast } from '@/lib/toast';
 
 export default function NotificationManagementPage() {
-  const [workflowId, setWorkflowId] = useState("");
+  const [workflowId, setWorkflowId] = useState('');
   const [payload, setPayload] = useState(
     JSON.stringify(
       {
-        message: "Your custom message here",
-        action_url: "https://example.com"
+        message: 'Your custom message here',
+        action_url: 'https://example.com',
       },
       null,
-      2
-    )
+      2,
+    ),
   );
-  const [subscriberId, setSubscriberId] = useState("");
-  const [subscriberEmail, setSubscriberEmail] = useState("");
+  const [subscriberId, setSubscriberId] = useState('');
+  const [subscriberEmail, setSubscriberEmail] = useState('');
   const [broadcast, setBroadcast] = useState(true);
   const [useEmail, setUseEmail] = useState(true);
 
-  const { data: workflowsData, isLoading: loadingWorkflows } = useWorkflows();
-  const triggerWorkflowMutation = useTriggerWorkflow({
-    onSuccess: (data) => {
-      if (broadcast) {
-        toast.success("Broadcast triggered successfully!", {
-          description: "The notification will be sent to all active subscribers in your Novu workspace."
-        });
-      } else if (useEmail) {
-        toast.success("Notification sent!", {
-          description: `Sent to: ${subscriberEmail}`
-        });
-      } else {
-        toast.success("Notification sent!", {
-          description: `Sent to subscriber: ${subscriberId}`
-        });
-      }
-    },
-    onError: (error) => {
-      toast.error("Failed to send notification", {
-        description: error instanceof Error ? error.message : "An error occurred"
-      });
-    }
-  });
-  
+  const client = useApiClient();
+  const admin = useAdminNotifications(client);
+
+  const { data: workflowsData, isLoading: loadingWorkflows } = admin.workflows;
+
   const workflows = workflowsData?.workflows || [];
-  const selectedWorkflow = workflows.find(w => w.workflow_id === workflowId);
+  const selectedWorkflow = workflows.find((w) => w.workflow_id === workflowId);
 
   const handleTrigger = async () => {
     try {
       const parsedPayload = JSON.parse(payload);
 
-      await triggerWorkflowMutation.mutateAsync({
+      await admin.triggerWorkflow.mutateAsync({
         workflow_id: workflowId,
         payload: parsedPayload,
         subscriber_id: broadcast || useEmail ? undefined : subscriberId,
         subscriber_email: broadcast || !useEmail ? undefined : subscriberEmail,
         broadcast,
       });
+
+      toast.success('Notification sent successfully');
     } catch (e) {
       if (e instanceof SyntaxError) {
-        toast.error("Invalid JSON payload", {
-          description: "Please check your JSON syntax and try again."
+        toast.error('Invalid JSON payload', {
+          description: 'Please check your JSON syntax and try again.',
         });
+      } else {
+        toast.error('Failed to send notification');
       }
     }
   };
@@ -96,23 +89,31 @@ export default function NotificationManagementPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight">Notification Management</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Notification Management
+                </h1>
                 <Badge variant="outline" className="text-xs">
                   {broadcast ? (
-                    <><Users className="w-3 h-3 mr-1" />Broadcast</>
+                    <>
+                      <Users className="w-3 h-3 mr-1" />
+                      Broadcast
+                    </>
                   ) : (
-                    <><User className="w-3 h-3 mr-1" />Single User</>
+                    <>
+                      <User className="w-3 h-3 mr-1" />
+                      Single User
+                    </>
                   )}
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                Send notifications via Novu workflows
+                Send notifications via workflows
               </p>
             </div>
             <Button
               onClick={handleTrigger}
               disabled={
-                triggerWorkflowMutation.isPending ||
+                admin.triggerWorkflow.isPending ||
                 !workflowId ||
                 (!broadcast && !useEmail && !subscriberId) ||
                 (!broadcast && useEmail && !subscriberEmail)
@@ -120,15 +121,15 @@ export default function NotificationManagementPage() {
               size="default"
               className="gap-2 min-w-[120px]"
             >
-              {triggerWorkflowMutation.isPending ? (
+              {admin.triggerWorkflow.isPending ? (
                 <>
-                  <AcmeLoader size="small" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   Sending...
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  {broadcast ? "Broadcast" : "Send"}
+                  {broadcast ? 'Broadcast' : 'Send'}
                 </>
               )}
             </Button>
@@ -163,7 +164,7 @@ export default function NotificationManagementPage() {
                   <div>
                     <CardTitle className="text-base">Select Workflow</CardTitle>
                     <CardDescription className="text-xs">
-                      Choose from your Novu workflows
+                      Choose from available notification workflows
                     </CardDescription>
                   </div>
                 </div>
@@ -171,13 +172,17 @@ export default function NotificationManagementPage() {
               <CardContent className="space-y-3">
                 <Select value={workflowId} onValueChange={setWorkflowId}>
                   <SelectTrigger>
-                    <SelectValue placeholder={loadingWorkflows ? "Loading..." : "Select a workflow"} />
+                    <SelectValue
+                      placeholder={
+                        loadingWorkflows ? 'Loading...' : 'Select a workflow'
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {loadingWorkflows ? (
                       <SelectItem value="loading" disabled>
                         <div className="flex items-center gap-2">
-                          <AcmeLoader size="small" />
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           Loading workflows...
                         </div>
                       </SelectItem>
@@ -187,7 +192,10 @@ export default function NotificationManagementPage() {
                       </SelectItem>
                     ) : (
                       workflows.map((workflow) => (
-                        <SelectItem key={workflow.workflow_id} value={workflow.workflow_id}>
+                        <SelectItem
+                          key={workflow.workflow_id}
+                          value={workflow.workflow_id}
+                        >
                           {workflow.name}
                         </SelectItem>
                       ))
@@ -197,12 +205,18 @@ export default function NotificationManagementPage() {
                 {selectedWorkflow && (
                   <div className="space-y-2">
                     {selectedWorkflow.description && (
-                      <p className="text-xs text-muted-foreground">{selectedWorkflow.description}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {selectedWorkflow.description}
+                      </p>
                     )}
-                    {selectedWorkflow.tags.length > 0 && (
+                    {(selectedWorkflow.tags?.length ?? 0) > 0 && (
                       <div className="flex gap-1 flex-wrap">
-                        {selectedWorkflow.tags.map((tag, i) => (
-                          <Badge key={i} variant="secondary" className="text-xs">
+                        {selectedWorkflow.tags?.map((tag, i) => (
+                          <Badge
+                            key={i}
+                            variant="secondary"
+                            className="text-xs"
+                          >
                             {tag}
                           </Badge>
                         ))}
@@ -221,7 +235,9 @@ export default function NotificationManagementPage() {
                       2
                     </div>
                     <div>
-                      <CardTitle className="text-base">Target Recipient</CardTitle>
+                      <CardTitle className="text-base">
+                        Target Recipient
+                      </CardTitle>
                       <CardDescription className="text-xs">
                         Who should receive this notification
                       </CardDescription>
@@ -232,12 +248,16 @@ export default function NotificationManagementPage() {
                   <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <span className="text-sm font-medium">Target by:</span>
                     <div className="flex items-center gap-3">
-                      <span className="text-sm text-muted-foreground">User ID</span>
+                      <span className="text-sm text-muted-foreground">
+                        User ID
+                      </span>
                       <Switch
                         checked={useEmail}
                         onCheckedChange={setUseEmail}
                       />
-                      <span className="text-sm text-muted-foreground">Email</span>
+                      <span className="text-sm text-muted-foreground">
+                        Email
+                      </span>
                     </div>
                   </div>
 
@@ -259,7 +279,8 @@ export default function NotificationManagementPage() {
                   ) : (
                     <div className="space-y-2">
                       <Label htmlFor="subscriber-id">User ID</Label>
-                      <Input type="text"
+                      <Input
+                        type="text"
                         id="subscriber-id"
                         placeholder="Enter user/account ID"
                         value={subscriberId}
@@ -278,10 +299,12 @@ export default function NotificationManagementPage() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">
-                    {broadcast ? "2" : "3"}
+                    {broadcast ? '2' : '3'}
                   </div>
                   <div>
-                    <CardTitle className="text-base">Payload Data (Optional)</CardTitle>
+                    <CardTitle className="text-base">
+                      Payload Data (Optional)
+                    </CardTitle>
                     <CardDescription className="text-xs">
                       Custom data to send with the notification
                     </CardDescription>
@@ -303,8 +326,8 @@ export default function NotificationManagementPage() {
                 />
                 <p className="text-xs text-muted-foreground">
                   {broadcast
-                    ? "Use subscriber.* variables in your Novu template for personalization"
-                    : "Template variables like {{name}} will be replaced with actual user data"}
+                    ? 'Use subscriber.* variables in your template for personalization'
+                    : 'Template variables like {{name}} will be replaced with actual user data'}
                 </p>
               </CardContent>
             </Card>
@@ -314,42 +337,68 @@ export default function NotificationManagementPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-sm">
-                  {broadcast ? "Broadcast Variables" : "Template Variables"}
+                  {broadcast ? 'Broadcast Variables' : 'Template Variables'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {!broadcast ? (
                   <div className="space-y-2">
                     <div className="space-y-1">
-                      <code className="text-xs px-2 py-1 bg-muted rounded block">{"{{email}}"}</code>
-                      <p className="text-xs text-muted-foreground pl-2">User's email</p>
+                      <code className="text-xs px-2 py-1 bg-muted rounded block">
+                        {'{{email}}'}
+                      </code>
+                      <p className="text-xs text-muted-foreground pl-2">
+                        User's email
+                      </p>
                     </div>
                     <div className="space-y-1">
-                      <code className="text-xs px-2 py-1 bg-muted rounded block">{"{{name}}"}</code>
-                      <p className="text-xs text-muted-foreground pl-2">Full name</p>
+                      <code className="text-xs px-2 py-1 bg-muted rounded block">
+                        {'{{name}}'}
+                      </code>
+                      <p className="text-xs text-muted-foreground pl-2">
+                        Full name
+                      </p>
                     </div>
                     <div className="space-y-1">
-                      <code className="text-xs px-2 py-1 bg-muted rounded block">{"{{first_name}}"}</code>
-                      <p className="text-xs text-muted-foreground pl-2">First name</p>
+                      <code className="text-xs px-2 py-1 bg-muted rounded block">
+                        {'{{first_name}}'}
+                      </code>
+                      <p className="text-xs text-muted-foreground pl-2">
+                        First name
+                      </p>
                     </div>
                     <div className="space-y-1">
-                      <code className="text-xs px-2 py-1 bg-muted rounded block">{"{{phone}}"}</code>
-                      <p className="text-xs text-muted-foreground pl-2">Phone</p>
+                      <code className="text-xs px-2 py-1 bg-muted rounded block">
+                        {'{{phone}}'}
+                      </code>
+                      <p className="text-xs text-muted-foreground pl-2">
+                        Phone
+                      </p>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     <p className="text-xs text-muted-foreground mb-2">
-                      Use in Novu template:
+                      Template variables:
                     </p>
-                    <code className="text-xs px-2 py-1 bg-muted rounded block">{"{{subscriber.firstName}}"}</code>
-                    <code className="text-xs px-2 py-1 bg-muted rounded block">{"{{subscriber.lastName}}"}</code>
-                    <code className="text-xs px-2 py-1 bg-muted rounded block">{"{{subscriber.email}}"}</code>
-                    <code className="text-xs px-2 py-1 bg-muted rounded block">{"{{subscriber.phone}}"}</code>
+                    <code className="text-xs px-2 py-1 bg-muted rounded block">
+                      {'{{subscriber.firstName}}'}
+                    </code>
+                    <code className="text-xs px-2 py-1 bg-muted rounded block">
+                      {'{{subscriber.lastName}}'}
+                    </code>
+                    <code className="text-xs px-2 py-1 bg-muted rounded block">
+                      {'{{subscriber.email}}'}
+                    </code>
+                    <code className="text-xs px-2 py-1 bg-muted rounded block">
+                      {'{{subscriber.phone}}'}
+                    </code>
                     <p className="text-xs text-muted-foreground mt-3">
                       Payload data:
                     </p>
-                    <code className="text-xs px-2 py-1 bg-muted rounded block">{"{{payload.yourKey}}"}</code>
+                    <code className="text-xs px-2 py-1 bg-muted rounded block">
+                      {'{{payload.yourKey}}'}
+                    </code>
                   </div>
                 )}
               </CardContent>
@@ -361,7 +410,9 @@ export default function NotificationManagementPage() {
                   <CollapsibleTrigger className="w-full">
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-sm text-left">Example</CardTitle>
+                        <CardTitle className="text-sm text-left">
+                          Example
+                        </CardTitle>
                         <ChevronDown className="h-4 w-4 transition-transform" />
                       </div>
                     </CardHeader>
@@ -369,9 +420,11 @@ export default function NotificationManagementPage() {
                   <CollapsibleContent>
                     <CardContent className="space-y-3">
                       <div className="space-y-2">
-                        <p className="text-xs font-medium">Novu Template:</p>
+                        <p className="text-xs font-medium">
+                          Workflow Template:
+                        </p>
                         <pre className="p-2 bg-muted rounded text-[10px] overflow-x-auto">
-{`Hello {{subscriber.firstName}},
+                          {`Hello {{subscriber.firstName}},
 
 {{payload.message}}
 
@@ -382,7 +435,7 @@ export default function NotificationManagementPage() {
                       <div className="space-y-2">
                         <p className="text-xs font-medium">Your Payload:</p>
                         <pre className="p-2 bg-muted rounded text-[10px]">
-{`{
+                          {`{
   "message": "New feature!",
   "action_url": "/features"
 }`}
@@ -393,11 +446,9 @@ export default function NotificationManagementPage() {
                         <p className="text-xs font-medium">Result:</p>
                         <div className="p-2 bg-muted rounded text-[10px]">
                           <p className="font-medium">John receives:</p>
-                          <pre className="text-muted-foreground mt-1">Hello John,
-
-New feature!
-
-/features</pre>
+                          <pre className="text-muted-foreground mt-1">
+                            Hello John, New feature! /features
+                          </pre>
                         </div>
                       </div>
                     </CardContent>
@@ -413,7 +464,9 @@ New feature!
               <CardContent className="space-y-2 text-xs text-muted-foreground">
                 <div className="flex gap-2">
                   <span className="text-primary">•</span>
-                  <span>Create workflows in Novu dashboard first</span>
+                  <span>
+                    Create workflows in your notification dashboard first
+                  </span>
                 </div>
                 <div className="flex gap-2">
                   <span className="text-primary">•</span>

@@ -18,8 +18,8 @@ import { useWebNotifications } from "@/hooks/use-web-notifications";
 import { backendApi } from "@/lib/api-client";
 import { getClient } from "@/lib/opencode-sdk";
 import { Button } from "@/components/ui/button";
-import { AcmeLogo } from "@/components/sidebar/acme-logo";
-import { AcmeLoader } from "@/components/ui/acme-loader";
+import { AetherLogo } from "@/components/sidebar/aether-logo";
+import { AetherLoader } from "@/components/ui/aether-loader";
 import { featureFlags } from "@/lib/feature-flags";
 import { buildInstancePath, getActiveInstanceIdFromCookie, getCurrentInstanceIdFromPathname } from "@/lib/instance-routes";
 import { cn } from "@/lib/utils";
@@ -242,13 +242,13 @@ function DashboardSkeleton() {
 		<div className="fixed inset-0 flex items-center justify-center bg-background px-6">
 			<div className="flex w-full max-w-[360px] flex-col items-center gap-6 text-center">
 				<div className="mb-2 flex flex-col items-center gap-3">
-					<AcmeLogo size={22} />
+					<AetherLogo size={22} />
 					<p className="text-[15px] font-normal uppercase tracking-[0.15em] text-foreground/30">
 						Connecting to Workspace
 					</p>
 				</div>
 
-				<AcmeLoader size="medium" />
+				<AetherLoader size="medium" />
 
 				<p className="max-w-[300px] text-sm leading-relaxed text-muted-foreground/60">
 					Checking sandbox health and restoring your session.
@@ -257,10 +257,10 @@ function DashboardSkeleton() {
 				<p className="max-w-[300px] text-xs leading-relaxed text-muted-foreground/50">
 					Having problems? Email{" "}
 					<a
-						href="mailto:support@acme.dev"
+						href="mailto:support@aether.dev"
 						className="underline underline-offset-4 hover:text-foreground/80"
 					>
-						support@acme.dev
+						support@aether.dev
 					</a>
 					.
 				</p>
@@ -692,7 +692,7 @@ export default function DashboardLayoutContent({
 				}
 
 				if (!sid) {
-					const s = await createSessionRef.current.mutateAsync({ title: "Acme Onboarding" });
+					const s = await createSessionRef.current.mutateAsync({ title: "Aether Onboarding" });
 					persistEnv("ONBOARDING_SESSION_ID", s.id);
 					sid = s.id;
 					needsCmd = true;
@@ -706,7 +706,7 @@ export default function DashboardLayoutContent({
 				}
 
 				ob.setSessionId(sid);
-				useTabStore.getState().openTab({ id: sid, title: "Acme Onboarding", type: "session", href: `/sessions/${sid}` });
+				useTabStore.getState().openTab({ id: sid, title: "Aether Onboarding", type: "session", href: `/sessions/${sid}` });
 			} catch (err) {
 				obCreating.current = false;
 				obRetries.current++;
@@ -945,7 +945,7 @@ export default function DashboardLayoutContent({
 						{ob.active && !ob.sessionId && !ob.showBoot && !ob.showSetup && (
 							<div className="absolute inset-0 z-10 flex items-center justify-center bg-background">
 								<div className="flex flex-col items-center gap-3">
-									<AcmeLoader size="medium" />
+									<AetherLoader size="medium" />
 									<p className="text-xs text-muted-foreground">Setting up your workspace…</p>
 								</div>
 							</div>

@@ -54,4 +54,4 @@ FRONTEND_PID=$!
 
 echo "[start] Starting API..."
 cd "$ROOT_DIR"
-ACME_SKIP_ENSURE_SCHEMA=1 pnpm --filter acme-api start
+AETHER_SKIP_ENSURE_SCHEMA=1 pnpm --filter aether-api start

@@ -1,5 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr'
-import { ACME_SUPABASE_AUTH_COOKIE } from './constants'
+import { AETHER_SUPABASE_AUTH_COOKIE } from './constants'
 import { getEnv } from '@/lib/env-config'
 
 export function createClient() {
@@ -14,7 +14,7 @@ export function createClient() {
 
     return createBrowserClient('https://placeholder.invalid', 'placeholder-anon-key', {
       cookieOptions: {
-        name: ACME_SUPABASE_AUTH_COOKIE,
+        name: AETHER_SUPABASE_AUTH_COOKIE,
         path: '/',
         sameSite: 'lax',
       },
@@ -23,7 +23,7 @@ export function createClient() {
 
   return createBrowserClient(url, key, {
     cookieOptions: {
-      name: ACME_SUPABASE_AUTH_COOKIE,
+      name: AETHER_SUPABASE_AUTH_COOKIE,
       path: '/',
       sameSite: 'lax',
     },

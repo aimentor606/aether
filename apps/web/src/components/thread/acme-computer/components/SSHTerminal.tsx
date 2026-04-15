@@ -8,7 +8,7 @@ import type { Terminal as XTerm, ITheme } from '@xterm/xterm';
 import type { FitAddon } from '@xterm/addon-fit';
 import { useAuth } from '@/components/AuthProvider';
 import { RefreshCw, Copy, Check, TerminalSquare } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { toast } from '@/lib/toast';
 import { getEnv } from '@/lib/env-config';
 import { backendApi } from '@/lib/api-client';
@@ -289,7 +289,7 @@ export const SSHTerminal = memo(function SSHTerminal({ sandboxId, className }: S
       fitAddonRef.current = fitAddon;
 
       term.writeln('\x1b[38;5;141m┌──────────────────────────────────────────┐\x1b[0m');
-      term.writeln('\x1b[38;5;141m│\x1b[0m   \x1b[1;38;5;183m◉\x1b[0m \x1b[1;37mAcme\x1b[0m \x1b[38;5;245m• Terminal\x1b[0m               \x1b[38;5;141m│\x1b[0m');
+      term.writeln('\x1b[38;5;141m│\x1b[0m   \x1b[1;38;5;183m◉\x1b[0m \x1b[1;37mAether\x1b[0m \x1b[38;5;245m• Terminal\x1b[0m               \x1b[38;5;141m│\x1b[0m');
       term.writeln('\x1b[38;5;141m└──────────────────────────────────────────┘\x1b[0m');
       term.writeln('');
 

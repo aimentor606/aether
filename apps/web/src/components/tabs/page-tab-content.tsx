@@ -1,9 +1,9 @@
 'use client';
 
 import { lazy, Suspense, type ComponentType } from 'react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 
-const DEPLOYMENTS_ENABLED = process.env.NEXT_PUBLIC_ACME_DEPLOYMENTS_ENABLED === 'true';
+const DEPLOYMENTS_ENABLED = process.env.NEXT_PUBLIC_AETHER_DEPLOYMENTS_ENABLED === 'true';
 
 // ---------------------------------------------------------------------------
 // Lazy-load every route-based page component so they can be pre-mounted in the
@@ -200,7 +200,7 @@ export function PageTabContent({ href }: { href: string }) {
 		<Suspense
 			fallback={
 				<div className="flex-1 flex items-center justify-center">
-					<AcmeLoader size="medium" />
+					<AetherLoader size="medium" />
 				</div>
 			}
 		>

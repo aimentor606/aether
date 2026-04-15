@@ -14,12 +14,12 @@ import { GithubButton } from '@/components/home/github-button';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 
-const AcmeBoxScene = dynamic(() => import('@/components/landing/AcmeBoxScene'), {
+const AetherBoxScene = dynamic(() => import('@/components/landing/AetherBoxScene'), {
   ssr: false,
   loading: () => <div className="animate-pulse bg-foreground/5 w-full h-full rounded-full blur-3xl opacity-20" />
 });
 
-const INSTALL_CMD = 'curl -fsSL https://acme.dev/install | bash';
+const INSTALL_CMD = 'curl -fsSL https://aether.dev/install | bash';
 
 // ─── Reusable Components ────────────────────────────────
 
@@ -79,7 +79,7 @@ export default function Variant2Home() {
           className="fixed inset-0 z-10 pointer-events-none"
           style={{ opacity: sceneOpacity }}
         >
-          <AcmeBoxScene
+          <AetherBoxScene
             scrollProgressRef={sceneProgressRef}
             isOn={isMachineOn}
             setIsOn={setIsMachineOn}
@@ -116,7 +116,7 @@ export default function Variant2Home() {
                 className="h-14 px-10 text-base rounded-full transition-colors"
                 onClick={handleLaunch}
               >
-                Launch Acme<ArrowRight className="ml-2 size-4" />
+                Launch Aether<ArrowRight className="ml-2 size-4" />
               </Button>
 
               <div className="flex flex-col items-center gap-3 w-full">
@@ -164,7 +164,7 @@ export default function Variant2Home() {
             </Reveal>
             <Reveal delay={0.1}>
               <p className="mt-4 text-base sm:text-lg text-muted-foreground/60 leading-relaxed max-w-2xl">
-                A Acme is a cloud computer where AI agents do the actual work of running a company. You connect your tools, define your agents, set their schedules and triggers — and the machine operates whether you&apos;re there or not. Persistent memory that compounds. A workforce that never stops.
+                A Aether is a cloud computer where AI agents do the actual work of running a company. You connect your tools, define your agents, set their schedules and triggers — and the machine operates whether you&apos;re there or not. Persistent memory that compounds. A workforce that never stops.
               </p>
             </Reveal>
           </div>
@@ -225,7 +225,7 @@ export default function Variant2Home() {
                 </Reveal>
                 <Reveal delay={0.1}>
                   <p className="text-base text-muted-foreground/60 leading-relaxed mb-8">
-                    Acme runs on <a href="https://opencode.ai" target="_blank" rel="noopener noreferrer" className="hover:text-foreground/80 transition-colors">OpenCode</a>, an open foundation for building knowledge work agents, with the Acme cognitive architecture layered on top. Everything is just files.
+                    Aether runs on <a href="https://opencode.ai" target="_blank" rel="noopener noreferrer" className="hover:text-foreground/80 transition-colors">OpenCode</a>, an open foundation for building knowledge work agents, with the Aether cognitive architecture layered on top. Everything is just files.
                   </p>
                 </Reveal>
                 <Reveal delay={0.2}>
@@ -267,7 +267,7 @@ export default function Variant2Home() {
                       </div>
                     </div>
                     <div className="space-y-2 pl-3 border-l border-border/25">
-                      <div className="text-muted-foreground/35 text-[0.5625rem] uppercase tracking-widest mb-3">Acme</div>
+                      <div className="text-muted-foreground/35 text-[0.5625rem] uppercase tracking-widest mb-3">Aether</div>
                       {[
                         { done: true, text: 'Browsing competitor sites via Chromium...' },
                         { done: true, text: 'Extracting pricing pages (3 sites)...' },

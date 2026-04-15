@@ -1,13 +1,13 @@
 /**
  * Bootstrap environment persistence.
  *
- * Core vars (ACME_TOKEN, ACME_API_URL, INTERNAL_SERVICE_KEY) are the
+ * Core vars (AETHER_TOKEN, AETHER_API_URL, INTERNAL_SERVICE_KEY) are the
  * sandbox's identity credentials. They arrive as Docker env vars at container
  * creation and are synced to the s6 env dir on boot.
  *
  * Problem: if process.env loses them (container restart race, env cleared, etc.)
  * AND the s6 env dir is empty, the sandbox can't authenticate to kortix-api.
- * The SecretStore can't help because ACME_TOKEN is its own encryption key.
+ * The SecretStore can't help because AETHER_TOKEN is its own encryption key.
  *
  * Solution: persist these vars in a plaintext JSON file that's always readable.
  * On boot, load from this file BEFORE anything else to ensure they're in
@@ -17,17 +17,17 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { dirname } from 'path'
 
-const WORKSPACE_ROOT = process.env.ACME_WORKSPACE_ROOT || '/workspace'
+const WORKSPACE_ROOT = process.env.AETHER_WORKSPACE_ROOT || '/workspace'
 const BOOTSTRAP_PATH = process.env.BOOTSTRAP_PATH || `${WORKSPACE_ROOT}/.secrets/.bootstrap-env.json`
 
-const CORE_VARS = ['ACME_TOKEN', 'ACME_API_URL', 'INTERNAL_SERVICE_KEY'] as const
+const CORE_VARS = ['AETHER_TOKEN', 'AETHER_API_URL', 'INTERNAL_SERVICE_KEY'] as const
 
 /**
  * Load bootstrap env vars into process.env.
  *
  * IMPORTANT: The bootstrap file is the source of truth for core identity vars.
  * Docker env vars are frozen at container creation time and become stale when
- * the API rotates or re-issues ACME_TOKEN. The /env API and injectSandboxToken
+ * the API rotates or re-issues AETHER_TOKEN. The /env API and injectSandboxToken
  * both update the bootstrap file via updateBootstrapKey(). So on container restart,
  * the bootstrap file has the LATEST token, while Docker env has the ORIGINAL.
  *

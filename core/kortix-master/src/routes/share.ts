@@ -62,7 +62,7 @@ export function getMasterPublicBaseUrl(): string {
   const envMode = process.env.ENV_MODE || 'local'
   const slug = process.env.JUSTAVPS_SLUG || ''
   const proxyToken = process.env.JUSTAVPS_PROXY_TOKEN || ''
-  const proxyDomain = process.env.JUSTAVPS_PROXY_DOMAIN || 'acme.cloud'
+  const proxyDomain = process.env.JUSTAVPS_PROXY_DOMAIN || 'aether.cloud'
 
   // Cloud: CF Worker URL for port 8000
   if (envMode === 'cloud' && slug && proxyToken) {
@@ -71,7 +71,7 @@ export function getMasterPublicBaseUrl(): string {
 
   // Cloud without JustAVPS: via kortix-api proxy
   const sandboxId = process.env.SANDBOX_ID || ''
-  const acmeApiUrl = (process.env.ACME_API_URL || '').replace(/\/v1\/router\/?$/, '')
+  const acmeApiUrl = (process.env.AETHER_API_URL || '').replace(/\/v1\/router\/?$/, '')
   if (envMode === 'cloud' && sandboxId && acmeApiUrl) {
     return `${acmeApiUrl}/v1/p/${sandboxId}/8000`
   }

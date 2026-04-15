@@ -10,7 +10,7 @@ let _db: Database | null = null
 
 function getDb(): Database {
   if (_db) return _db
-  const root = process.env.ACME_WORKSPACE || '/workspace'
+  const root = process.env.AETHER_WORKSPACE || '/workspace'
   const dbPath = `${root}/.kortix/kortix.db`
   _db = new Database(dbPath)
   _db.exec("PRAGMA journal_mode=DELETE; PRAGMA busy_timeout=5000")

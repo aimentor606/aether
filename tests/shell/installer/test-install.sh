@@ -68,7 +68,7 @@ else
   fail "supports local and VPS deploy modes"
 fi
 
-if grep -q -- '--local' "$SCRIPT" && grep -q 'ACME_LOCAL_IMAGES' "$SCRIPT"; then
+if grep -q -- '--local' "$SCRIPT" && grep -q 'AETHER_LOCAL_IMAGES' "$SCRIPT"; then
   pass "supports local installer image mode"
 else
   fail "supports local installer image mode"
@@ -109,9 +109,9 @@ else
 fi
 
 if grep -q 'DATABASE_URL.*postgres' "$SCRIPT"; then
-  pass "compose sets DATABASE_URL for acme-api"
+  pass "compose sets DATABASE_URL for aether-api"
 else
-  fail "compose sets DATABASE_URL for acme-api"
+  fail "compose sets DATABASE_URL for aether-api"
 fi
 
 if grep -q 'supabase-db-data' "$SCRIPT"; then
@@ -252,7 +252,7 @@ else
   fail "no git clone/pull (Docker-only)"
 fi
 
-if grep -q 'acme/acme-frontend' "$SCRIPT" && grep -q 'acme/acme-api' "$SCRIPT"; then
+if grep -q 'acme/acme-frontend' "$SCRIPT" && grep -q 'acme/aether-api' "$SCRIPT"; then
   pass "uses pre-built Docker images"
 else
   fail "uses pre-built Docker images"

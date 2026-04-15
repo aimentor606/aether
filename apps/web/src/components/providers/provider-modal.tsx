@@ -528,13 +528,13 @@ export function GlobalProviderModal() {
     if (!providers) return [];
     const connectedIds = new Set(providers.connected ?? []);
     // If acme provider is connected, it serves all models — hide redundant
-    // built-in providers so users see a clean Acme-only model list.
-    const ACME_SUPERSEDED = ['anthropic', 'openai', 'google', 'xai', 'moonshotai', 'minimax', 'zhipuai'];
+    // built-in providers so users see a clean Aether-only model list.
+    const AETHER_SUPERSEDED = ['anthropic', 'openai', 'google', 'xai', 'moonshotai', 'minimax', 'zhipuai'];
     const acmeConnected = connectedIds.has('acme');
     const result: FlatModel[] = [];
     for (const provider of providers.all ?? []) {
       if (!connectedIds.has(provider.id)) continue;
-      if (acmeConnected && ACME_SUPERSEDED.includes(provider.id)) continue;
+      if (acmeConnected && AETHER_SUPERSEDED.includes(provider.id)) continue;
       for (const [modelID, model] of Object.entries(provider.models ?? {})) {
         const caps = (model as any).capabilities;
         const modalities = (model as any).modalities;

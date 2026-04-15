@@ -7,9 +7,9 @@ import {
   boolean,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import { acmeSchema, accounts } from './kortix';
+import { aetherSchema, accounts } from './aether';
 
-export const verticalTables = acmeSchema.table('vertical_entities', {
+export const verticalTables = aetherSchema.table('vertical_entities', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   type: varchar('type', { length: 100 }).notNull(),
@@ -21,7 +21,7 @@ export const verticalTables = acmeSchema.table('vertical_entities', {
   index('idx_vertical_entities_name').on(table.name),
 ]);
 
-export const featureFlags = acmeSchema.table('feature_flags', {
+export const featureFlags = aetherSchema.table('feature_flags', {
   id: uuid('id').primaryKey().defaultRandom(),
   accountId: uuid('account_id').notNull(),
   verticalId: varchar('vertical_id', { length: 100 }).notNull(),
@@ -43,7 +43,7 @@ export const featureFlagsRelations = relations(featureFlags, ({ one }) => ({
   }),
 }));
 
-export const verticalConfigs = acmeSchema.table('vertical_configs', {
+export const verticalConfigs = aetherSchema.table('vertical_configs', {
   id: uuid('id').primaryKey().defaultRandom(),
   accountId: uuid('account_id').notNull(),
   verticalId: varchar('vertical_id', { length: 100 }).notNull(),
@@ -62,7 +62,7 @@ export const verticalConfigsRelations = relations(verticalConfigs, ({ one }) => 
   }),
 }));
 
-export const accountIntegrations = acmeSchema.table('account_integrations', {
+export const accountIntegrations = aetherSchema.table('account_integrations', {
   id: uuid('id').primaryKey().defaultRandom(),
   accountId: uuid('account_id').notNull(),
   integrationType: varchar('integration_type', { length: 100 }).notNull(),

@@ -323,7 +323,7 @@ function showHelp(): void {
   console.log('');
   console.log(`  ${c.dim}Secure bridge between AI agents & local machines${c.reset}`);
   console.log('');
-  console.log(`  ${c.bold}Usage${c.reset}   ${c.dim}npx @acme/agent-tunnel <command> [options]${c.reset}`);
+  console.log(`  ${c.bold}Usage${c.reset}   ${c.dim}npx @aether/agent-tunnel <command> [options]${c.reset}`);
   console.log('');
   console.log(`${c.gray}  ── Commands ────────────────────────────────────────${c.reset}`);
   console.log(`  ${c.cyan}connect${c.reset}       Connect via device auth (opens browser)`);

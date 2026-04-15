@@ -8,7 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { Check, ImageIcon, Monitor, Moon, Palette, Sun } from 'lucide-react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { AcmeLogo } from '@/components/ui/AcmeLogo';
+import { AetherLogo } from '@/components/ui/AetherLogo';
 import {
   DEFAULT_APPEARANCE_THEME,
   DEFAULT_WALLPAPER,
@@ -50,7 +50,7 @@ const APPEARANCE_THEMES: AppearanceTheme[] = [
 ];
 
 const WALLPAPERS: WallpaperOption[] = [
-  { id: 'brandmark', name: 'Acme', badge: 'Default' },
+  { id: 'brandmark', name: 'Aether', badge: 'Default' },
 ];
 
 export default function AppearanceScreen() {
@@ -307,7 +307,7 @@ function WallpaperCard({
 
         <View className="absolute inset-0 items-center justify-center">
           <View style={{ opacity: isDark ? 0.18 : 0.14 }}>
-            <AcmeLogo size={94} variant="symbol" color={isDark ? 'dark' : 'light'} />
+            <AetherLogo size={94} variant="symbol" color={isDark ? 'dark' : 'light'} />
           </View>
         </View>
 

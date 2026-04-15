@@ -1,29 +1,33 @@
-"use client";
+'use client';
 
 import { cn } from '@/lib/utils';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import {
+  Button,
+  Input,
+  Label,
+  Textarea,
+  Switch,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { AlertTriangle, AlertCircle, XCircle, Wrench, Loader2 } from "lucide-react";
-import { AVAILABLE_SERVICES } from "./constants";
+  Checkbox,
+} from '@aether/ui/primitives';
+import {
+  AlertTriangle,
+  AlertCircle,
+  XCircle,
+  Wrench,
+  Loader2,
+} from 'lucide-react';
+import { AVAILABLE_SERVICES } from './constants';
 
 type Severity = 'degraded' | 'outage' | 'maintenance';
 
@@ -95,7 +99,10 @@ export function TechnicalIssueDialog({
             <>
               <div className="space-y-2">
                 <Label>Severity</Label>
-                <Select value={severity} onValueChange={(v: Severity) => setSeverity(v)}>
+                <Select
+                  value={severity}
+                  onValueChange={(v: Severity) => setSeverity(v)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -124,7 +131,8 @@ export function TechnicalIssueDialog({
 
               <div className="space-y-2">
                 <Label htmlFor="message">Message</Label>
-                <Input type="text"
+                <Input
+                  type="text"
                   id="message"
                   placeholder="e.g., We're experiencing high demand"
                   value={message}
@@ -153,14 +161,22 @@ export function TechnicalIssueDialog({
                       <div
                         key={service.id}
                         onClick={() => toggleService(service.label)}
-                        className={cn('flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-colors text-sm', 
-                          isSelected 
-                            ? 'border-primary bg-primary/5' 
-                            : 'border-border hover:border-primary/50'
+                        className={cn(
+                          'flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-colors text-sm',
+                          isSelected
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-primary/50',
                         )}
                       >
                         <Checkbox checked={isSelected} />
-                        <Icon className={cn('w-3.5 h-3.5', isSelected ? 'text-primary' : 'text-muted-foreground')} />
+                        <Icon
+                          className={cn(
+                            'w-3.5 h-3.5',
+                            isSelected
+                              ? 'text-primary'
+                              : 'text-muted-foreground',
+                          )}
+                        />
                         <span>{service.label}</span>
                       </div>
                     );
@@ -171,7 +187,8 @@ export function TechnicalIssueDialog({
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="resolution">Est. Resolution</Label>
-                  <Input type="text"
+                  <Input
+                    type="text"
                     id="resolution"
                     placeholder="e.g., ~2 hours"
                     value={resolution}
@@ -180,7 +197,8 @@ export function TechnicalIssueDialog({
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="status-url">Status URL</Label>
-                  <Input type="text"
+                  <Input
+                    type="text"
                     id="status-url"
                     placeholder="/status"
                     value={statusUrl}
@@ -196,7 +214,7 @@ export function TechnicalIssueDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={onSave}
             disabled={isPending || (enabled && !message)}
           >

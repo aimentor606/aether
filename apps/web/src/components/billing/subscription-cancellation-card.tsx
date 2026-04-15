@@ -11,7 +11,7 @@ import {
   Calendar,
   Shield
 } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { toast } from '@/lib/toast';
 import { useReactivateSubscription } from '@/hooks/billing';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
@@ -113,7 +113,7 @@ export function SubscriptionCancellationCard({
             >
               {reactivateSubscriptionMutation.isPending ? (
                 <>
-                  <AcmeLoader size="small" />
+                  <AetherLoader size="small" />
                   Reactivating...
                 </>
               ) : (

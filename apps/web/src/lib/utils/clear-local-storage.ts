@@ -20,7 +20,7 @@ export const clearUserLocalStorage = () => {
       }
     });
     // Clear sessionStorage sandbox connection flag
-    try { sessionStorage.removeItem('acme-sandbox-was-connected'); } catch {}
+    try { sessionStorage.removeItem('aether-sandbox-was-connected'); } catch {}
     
     console.log('✅ Local storage cleared on logout');
   } catch (error) {

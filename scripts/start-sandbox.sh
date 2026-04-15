@@ -156,7 +156,7 @@ CONTAINERSHELLEOF
 chmod +x /usr/local/bin/acme-container-shell
 
 mkdir -p /etc/ssh/sshd_config.d
-cat > /etc/ssh/sshd_config.d/acme-sandbox.conf << 'SSHEOF'
+cat > /etc/ssh/sshd_config.d/aether-sandbox.conf << 'SSHEOF'
 Match User abc
     PasswordAuthentication no
     PubkeyAuthentication yes

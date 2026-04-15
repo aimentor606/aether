@@ -91,12 +91,12 @@ describe('ENV API Routes', () => {
     savedEnv.SECRET_FILE_PATH = process.env.SECRET_FILE_PATH
     savedEnv.SALT_FILE_PATH = process.env.SALT_FILE_PATH
     savedEnv.ENCRYPTION_KEY_PATH = process.env.ENCRYPTION_KEY_PATH
-    savedEnv.ACME_TOKEN = process.env.ACME_TOKEN
+    savedEnv.AETHER_TOKEN = process.env.AETHER_TOKEN
 
     process.env.SECRET_FILE_PATH = join(tempDir, '.secrets.json')
     process.env.SALT_FILE_PATH = join(tempDir, '.salt')
     process.env.ENCRYPTION_KEY_PATH = join(tempDir, '.encryption-key')
-    process.env.ACME_TOKEN = 'test-token-env-routes'
+    process.env.AETHER_TOKEN = 'test-token-env-routes'
 
     // Build a fresh app with a new SecretStore (reads current process.env)
     const secretStore = new SecretStore()

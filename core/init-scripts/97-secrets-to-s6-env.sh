@@ -13,11 +13,11 @@ set -euo pipefail
 #
 # Recovery chain (in priority order):
 #   1. Docker env vars (injected at container create) → always present on first boot
-#   2. /workspace/.secrets/.bootstrap-env.json → core vars (ACME_TOKEN, etc.)
+#   2. /workspace/.secrets/.bootstrap-env.json → core vars (AETHER_TOKEN, etc.)
 #   3. /workspace/.secrets/.secrets.json → all user secrets (API keys, etc.)
 #
-# The SecretStore encrypts with a DEDICATED encryption key (NOT ACME_TOKEN).
-# This means secrets survive ACME_TOKEN changes, API restarts, and rotations.
+# The SecretStore encrypts with a DEDICATED encryption key (NOT AETHER_TOKEN).
+# This means secrets survive AETHER_TOKEN changes, API restarts, and rotations.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Derive secrets directory from SECRET_FILE_PATH.
@@ -40,9 +40,9 @@ if [ -d "$S6_ENV_DIR" ]; then
 fi
 
 # ── 2. Restore core vars from bootstrap file ────────────────────────────────
-# Bootstrap file contains plaintext core vars (ACME_TOKEN, ACME_API_URL,
+# Bootstrap file contains plaintext core vars (AETHER_TOKEN, AETHER_API_URL,
 # INTERNAL_SERVICE_KEY). These are needed BEFORE the SecretStore can decrypt
-# anything (ACME_TOKEN was the old encryption key; now it's just identity).
+# anything (AETHER_TOKEN was the old encryption key; now it's just identity).
 if [ -f "$BOOTSTRAP_FILE" ] && [ -d "$S6_ENV_DIR" ]; then
   echo "[Acme] Restoring core env vars from bootstrap file..."
   bun -e "

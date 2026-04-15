@@ -33,12 +33,12 @@ Then it researches, writes, designs, and builds a polished asset you can share w
 
 ### Option 1: Simple prompt
 ```
-Create an asset for Acme Corp
+Create an asset for Aether Corp
 ```
 
 ### Option 2: With context
 ```
-Create an asset for Acme Corp. I met with their VP Engineering
+Create an asset for Aether Corp. I met with their VP Engineering
 last week - they're struggling with slow release cycles and
 want to improve developer productivity. This is for a follow-up
 with their technical team.

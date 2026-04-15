@@ -16,7 +16,7 @@
 # For pure code changes (TypeScript, agents, skills, tools):
 #   Edit the file → it's already live in the container
 #   Restart the service if needed:
-#     docker exec acme-sandbox s6-svc -r /run/service/svc-acme-master
+#     docker exec aether-sandbox s6-svc -r /run/service/svc-acme-master
 #
 # Note: volume host paths are relative to this compose file's directory (core/docker/)
 

@@ -1,5 +1,5 @@
 {
-  "name": "@acme/vertical-finance",
+  "name": "@aether/vertical-finance",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@acme/db": "workspace:*",
+    "@aether/db": "workspace:*",
     "drizzle-orm": "^0.44.0",
     "zod": "^3.25.76"
   }

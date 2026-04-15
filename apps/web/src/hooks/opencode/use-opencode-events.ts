@@ -768,7 +768,7 @@ export function useOpenCodeEventStream() {
 						const questionText =
 							props.questions?.[0]?.question ||
 							props.questions?.[0]?.header ||
-							"Acme needs your input";
+							"Aether needs your input";
 						notifyQuestion(
 							props.sessionID,
 							questionText,

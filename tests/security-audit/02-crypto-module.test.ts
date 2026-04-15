@@ -120,14 +120,14 @@ describe('Security Audit: Crypto Module', () => {
     });
 
     test('generates correct prefixed key formats', () => {
-      const userKey = `acme_${randomAlphanumeric(32)}`;
-      const sandboxKey = `acme_sb_${randomAlphanumeric(32)}`;
-      const tunnelKey = `acme_tnl_${randomAlphanumeric(32)}`;
+      const userKey = `aether_${randomAlphanumeric(32)}`;
+      const sandboxKey = `aether_sb_${randomAlphanumeric(32)}`;
+      const tunnelKey = `aether_tnl_${randomAlphanumeric(32)}`;
       const publicKey = `pk_${randomAlphanumeric(32)}`;
 
-      expect(userKey).toMatch(/^acme_[A-Za-z0-9]{32}$/);
-      expect(sandboxKey).toMatch(/^acme_sb_[A-Za-z0-9]{32}$/);
-      expect(tunnelKey).toMatch(/^acme_tnl_[A-Za-z0-9]{32}$/);
+      expect(userKey).toMatch(/^aether_[A-Za-z0-9]{32}$/);
+      expect(sandboxKey).toMatch(/^aether_sb_[A-Za-z0-9]{32}$/);
+      expect(tunnelKey).toMatch(/^aether_tnl_[A-Za-z0-9]{32}$/);
       expect(publicKey).toMatch(/^pk_[A-Za-z0-9]{32}$/);
     });
   });
@@ -136,33 +136,33 @@ describe('Security Audit: Crypto Module', () => {
 
   describe('HMAC key hashing', () => {
     test('produces consistent hashes for same input', () => {
-      const key = 'acme_testkey12345678901234567890';
+      const key = 'aether_testkey12345678901234567890';
       const hash1 = hashSecretKey(key, TEST_SECRET);
       const hash2 = hashSecretKey(key, TEST_SECRET);
       expect(hash1).toBe(hash2);
     });
 
     test('produces different hashes for different keys', () => {
-      const hash1 = hashSecretKey('acme_key1', TEST_SECRET);
-      const hash2 = hashSecretKey('acme_key2', TEST_SECRET);
+      const hash1 = hashSecretKey('aether_key1', TEST_SECRET);
+      const hash2 = hashSecretKey('aether_key2', TEST_SECRET);
       expect(hash1).not.toBe(hash2);
     });
 
     test('produces different hashes with different secrets', () => {
-      const key = 'acme_testkey';
+      const key = 'aether_testkey';
       const hash1 = hashSecretKey(key, 'secret1');
       const hash2 = hashSecretKey(key, 'secret2');
       expect(hash1).not.toBe(hash2);
     });
 
     test('hash output is 64-char hex string (SHA-256)', () => {
-      const hash = hashSecretKey('acme_test', TEST_SECRET);
+      const hash = hashSecretKey('aether_test', TEST_SECRET);
       expect(hash.length).toBe(64);
       expect(hash).toMatch(/^[0-9a-f]{64}$/);
     });
 
     test('hash is not the same as plain SHA-256 (HMAC vs hash)', () => {
-      const key = 'acme_test';
+      const key = 'aether_test';
       const hmac = hashSecretKey(key, TEST_SECRET);
       const plainHash = createHash('sha256').update(key).digest('hex');
       expect(hmac).not.toBe(plainHash);
@@ -173,25 +173,25 @@ describe('Security Audit: Crypto Module', () => {
 
   describe('Timing-safe key verification', () => {
     test('verifies correct key successfully', () => {
-      const key = 'acme_valid_key_12345678901234';
+      const key = 'aether_valid_key_12345678901234';
       const hash = hashSecretKey(key, TEST_SECRET);
       expect(verifySecretKey(key, hash, TEST_SECRET)).toBe(true);
     });
 
     test('rejects incorrect key', () => {
-      const key = 'acme_valid_key_12345678901234';
+      const key = 'aether_valid_key_12345678901234';
       const hash = hashSecretKey(key, TEST_SECRET);
-      expect(verifySecretKey('acme_wrong_key_1234567890123', hash, TEST_SECRET)).toBe(false);
+      expect(verifySecretKey('aether_wrong_key_1234567890123', hash, TEST_SECRET)).toBe(false);
     });
 
     test('rejects hash of different length', () => {
-      const key = 'acme_test';
+      const key = 'aether_test';
       // Hash should be 64 chars; providing a shorter one should fail
       expect(verifySecretKey(key, 'abc123', TEST_SECRET)).toBe(false);
     });
 
     test('rejects invalid hex in stored hash', () => {
-      const key = 'acme_test';
+      const key = 'aether_test';
       expect(verifySecretKey(key, 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz', TEST_SECRET)).toBe(false);
     });
 
@@ -227,7 +227,7 @@ describe('Security Audit: Crypto Module', () => {
   // ── Tunnel message signing ─────────────────────────────────────────────
 
   describe('Tunnel message signing & verification', () => {
-    const token = 'acme_tnl_test_token_123456789';
+    const token = 'aether_tnl_test_token_123456789';
     const signingKey = deriveSigningKey(token);
 
     test('signing key is derived deterministically', () => {

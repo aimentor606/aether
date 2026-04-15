@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Cross-User Access & Billing Protection
  *
- * LIVE scan against https://computer-preview-api.acme.dev
+ * LIVE scan against https://computer-preview-api.aether.dev
  *
  * Verifies that all sandbox, billing, and account operations
  * properly require authentication. No cross-user access possible
@@ -12,7 +12,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.acme.dev';
+const CLOUD = 'https://computer-preview-api.aether.dev';
 
 async function probe(method: string, path: string, body?: any): Promise<{ status: number; body: any }> {
   const opts: RequestInit = {

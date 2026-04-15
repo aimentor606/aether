@@ -11,7 +11,7 @@ import { join } from 'path'
 const agentsRouter = new Hono()
 
 function getDb(): Database {
-  const workspace = process.env.WORKSPACE_DIR || process.env.ACME_WORKSPACE || '/workspace'
+  const workspace = process.env.WORKSPACE_DIR || process.env.AETHER_WORKSPACE || '/workspace'
   const dbPath = join(workspace, '.kortix', 'kortix.db')
   if (!existsSync(dbPath)) throw new Error('kortix.db not found')
   const db = new Database(dbPath)

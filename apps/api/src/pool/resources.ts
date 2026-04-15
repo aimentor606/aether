@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { poolResources } from '@acme/db';
+import { poolResources } from '@aether/db';
 import { db } from '../shared/db';
 import type { PoolResource, ResourceInput } from './types';
 

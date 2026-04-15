@@ -28,7 +28,7 @@
 set -uo pipefail
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${ACME_HOME:-$HOME/.acme}"
+INSTALL_DIR="${AETHER_HOME:-$HOME/.acme}"
 OWNER_EMAIL="${OWNER_EMAIL:-e2e@acme.ai}"
 OWNER_PASSWORD="${OWNER_PASSWORD:-e2e-test-pass-42}"
 PUBLIC_URL="${PUBLIC_URL:-}"
@@ -83,7 +83,7 @@ echo ""
 section "PHASE 1: Prerequisites"
 
 # Sandbox running
-if docker ps --format '{{.Names}}' 2>/dev/null | grep -q 'acme-sandbox\|sandbox'; then
+if docker ps --format '{{.Names}}' 2>/dev/null | grep -q 'aether-sandbox\|sandbox'; then
   pass "Sandbox container running"
 else
   fail "Sandbox container running"
@@ -102,7 +102,7 @@ fi
 # ═══════════════════════════════════════════════════════════════════════════════
 section "PHASE 2: Path-based proxy routing"
 
-SANDBOX_ID="acme-sandbox"
+SANDBOX_ID="aether-sandbox"
 PROXY_BASE="${PUBLIC_URL}/v1/p/${SANDBOX_ID}"
 
 # Test each key port via the path-based proxy
@@ -194,9 +194,9 @@ fi
 # ═══════════════════════════════════════════════════════════════════════════════
 section "PHASE 5: Subdomain NOT accessible externally"
 
-# On VPS, p6080-acme-sandbox.localhost should NOT resolve from the host
+# On VPS, p6080-aether-sandbox.localhost should NOT resolve from the host
 # (it resolves to 127.0.0.1, so curl from VPS hits VPS itself on port 443)
-SUBDOMAIN_CODE=$(curl -s --connect-timeout 3 -o /dev/null -w "%{http_code}" "http://p6080-acme-sandbox.localhost:8008/" 2>/dev/null || echo "000")
+SUBDOMAIN_CODE=$(curl -s --connect-timeout 3 -o /dev/null -w "%{http_code}" "http://p6080-aether-sandbox.localhost:8008/" 2>/dev/null || echo "000")
 if [ "$SUBDOMAIN_CODE" = "000" ]; then
   pass "Subdomain proxy NOT externally reachable (connection refused/timeout)"
 else
@@ -208,7 +208,7 @@ fi
 section "PHASE 6: URL format validation"
 
 # Verify that path-based URLs follow the expected pattern
-EXPECTED_DESKTOP_URL="${PUBLIC_URL}/v1/p/acme-sandbox/6080/"
+EXPECTED_DESKTOP_URL="${PUBLIC_URL}/v1/p/aether-sandbox/6080/"
 echo "  ${BLUE}[info]${NC} Expected desktop URL: ${DIM}${EXPECTED_DESKTOP_URL}${NC}"
 
 # Verify URL returns proper content
@@ -220,7 +220,7 @@ else
 fi
 
 # Same for static server
-EXPECTED_STATIC_URL="${PUBLIC_URL}/v1/p/acme-sandbox/3211/"
+EXPECTED_STATIC_URL="${PUBLIC_URL}/v1/p/aether-sandbox/3211/"
 VALIDATE_STATIC=$(curl -k -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $TOKEN" "$EXPECTED_STATIC_URL" 2>/dev/null)
 if [ "$VALIDATE_STATIC" = "200" ] || [ "$VALIDATE_STATIC" = "404" ] || [ "$VALIDATE_STATIC" = "502" ]; then
   pass "Expected VPS static server URL responds ($EXPECTED_STATIC_URL → $VALIDATE_STATIC)"

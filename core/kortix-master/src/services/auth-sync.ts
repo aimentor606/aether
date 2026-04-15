@@ -40,7 +40,7 @@ export { PROVIDER_TO_ENV, ENV_TO_PROVIDER }
 // { "openai": { "type": "api", "key": "sk-..." }, "github-copilot": { "type": "oauth", ... } }
 type AuthData = Record<string, { type: string; key?: string; [k: string]: unknown }>
 
-const WORKSPACE_ROOT = process.env.ACME_WORKSPACE_ROOT || '/workspace'
+const WORKSPACE_ROOT = process.env.AETHER_WORKSPACE_ROOT || '/workspace'
 const AUTH_JSON = process.env.AUTH_JSON_PATH || `${WORKSPACE_ROOT}/.local/share/opencode/auth.json`
 const S6_ENV    = process.env.S6_ENV_DIR || '/run/s6/container_environment'
 

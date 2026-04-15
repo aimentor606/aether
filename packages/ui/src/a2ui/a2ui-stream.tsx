@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import type { A2UIBlock, A2UIStreamEvent, A2UICatalog } from '@acme/sdk/a2ui';
+import type { A2UIBlock, A2UIStreamEvent, A2UICatalog } from '@aether/sdk/a2ui';
 import { A2UIRenderer } from './a2ui-renderer';
 import type { A2UIRendererProps } from './a2ui-renderer';
 

@@ -33,7 +33,7 @@ function generateKeypair(): { privateKey: string; publicKey: string } {
   const keyPath = join(tmpPath, 'key');
 
   try {
-    execSync(`ssh-keygen -t ed25519 -f "${keyPath}" -N "" -C "acme-sandbox" -q`, { stdio: 'pipe' });
+    execSync(`ssh-keygen -t ed25519 -f "${keyPath}" -N "" -C "aether-sandbox" -q`, { stdio: 'pipe' });
   } catch {
     throw new Error('Failed to generate SSH keypair via ssh-keygen');
   }
@@ -171,11 +171,11 @@ async function setupLocalDockerSSH(containerName: string, c: any) {
   let host = 'localhost';
   const fwdHost = c.req.header('x-forwarded-host') || c.req.header('host') || '';
   const fwdHostOnly = fwdHost.split(':')[0];
-  if (fwdHostOnly && fwdHostOnly !== 'localhost' && !fwdHostOnly.includes('acme-api')) {
+  if (fwdHostOnly && fwdHostOnly !== 'localhost' && !fwdHostOnly.includes('aether-api')) {
     host = fwdHostOnly;
   }
 
-  const sshCmd = `ssh -i ~/.ssh/acme_sandbox -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${port} abc@${host}`;
+  const sshCmd = `ssh -i ~/.ssh/aether_sandbox -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${port} abc@${host}`;
 
   return {
     private_key: privateKey,
@@ -241,7 +241,7 @@ async function setupJustavpsSSH(externalId: string) {
   // workload container as user abc.
   const port = 22;
   const host = machine.ip;
-  const sshCmd = `ssh -i ~/.ssh/acme_sandbox -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${port} abc@${host}`;
+  const sshCmd = `ssh -i ~/.ssh/aether_sandbox -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -p ${port} abc@${host}`;
 
   return {
     private_key: privateKey,
@@ -270,7 +270,7 @@ sshRouter.post('/setup', async (c) => {
         const { createClient } = await import('@supabase/supabase-js');
         const { resolveAccountId } = await import('../../shared/resolve-account');
         const { db } = await import('../../shared/db');
-        const { sandboxes } = await import('@acme/db');
+        const { sandboxes } = await import('@aether/db');
         const { eq, and } = await import('drizzle-orm');
 
         const supabase = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_ROLE_KEY);

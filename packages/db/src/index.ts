@@ -5,23 +5,23 @@ export * as schema from './schema';
 // Re-export frequently used schemas and types for convenience
 export {
   // Schema namespace
-  acmeSchema,
+  aetherSchema,
   // Enums
   sandboxStatusEnum,
   deploymentStatusEnum,
   deploymentSourceEnum,
   apiKeyStatusEnum,
   apiKeyTypeEnum,
-  // Acme tables — accounts
+  // Aether tables — accounts
   accounts,
   accountMembers,
   accountRoleEnum,
   accountsRelations,
   accountMembersRelations,
-  // Acme tables
+  // Aether tables
   sandboxes,
   deployments,
-  acmeApiKeys,
+  aetherApiKeys,
   integrationCredentials,
   integrations,
   sandboxIntegrations,
@@ -31,7 +31,7 @@ export {
   // Relations
   sandboxesRelations,
   deploymentsRelations,
-  acmeApiKeysRelations,
+  aetherApiKeysRelations,
   integrationsRelations,
   sandboxIntegrationsRelations,
   // Billing / Credits (moved from public → acme schema)
@@ -72,7 +72,7 @@ export {
   // Pool
   poolResources,
   poolSandboxes,
-} from './schema/kortix';
+} from './schema/aether';
 
 export type {
   TunnelMachineInfo,
@@ -80,7 +80,7 @@ export type {
   TunnelShellScope,
   TunnelNetworkScope,
   TunnelPermissionScope,
-} from './schema/kortix';
+} from './schema/aether';
 
 export {
   invoiceStatusEnum,
@@ -147,8 +147,8 @@ export type {
   AccountUser,
   NewApiKey,
   SandboxSelect,
-  AcmeApiKey,
-  NewAcmeApiKey,
+  AetherApiKey,
+  NewAetherApiKey,
   IntegrationCredential,
   NewIntegrationCredential,
   Integration,

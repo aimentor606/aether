@@ -42,7 +42,7 @@ function findRepoRoot(): string | null {
 
 function getMasterUrlCandidates(): string[] {
   const candidates: string[] = [];
-  const explicit = process.env.ACME_MASTER_URL;
+  const explicit = process.env.AETHER_MASTER_URL;
   if (explicit && explicit.trim()) candidates.push(explicit.trim());
   candidates.push('http://sandbox:8000');
   candidates.push(`http://localhost:${config.SANDBOX_PORT_BASE || 14000}`);
@@ -323,7 +323,7 @@ providersApp.put('/:id/connect', async (c) => {
     if (existsSync(examplePath)) {
       writeFileSync(rootEnvPath, readFileSync(examplePath, 'utf-8'));
     } else {
-      writeFileSync(rootEnvPath, '# Acme Environment Configuration\nENV_MODE=local\n');
+      writeFileSync(rootEnvPath, '# Aether Environment Configuration\nENV_MODE=local\n');
     }
   }
 
@@ -346,13 +346,13 @@ providersApp.put('/:id/connect', async (c) => {
       if (existsSync(examplePath)) {
         writeFileSync(sandboxEnvPath, readFileSync(examplePath, 'utf-8'));
       } else {
-        writeFileSync(sandboxEnvPath, '# Acme Sandbox Environment\nENV_MODE=local\n');
+        writeFileSync(sandboxEnvPath, '# Aether Sandbox Environment\nENV_MODE=local\n');
       }
     }
     sandboxData.ENV_MODE = 'local';
     sandboxData.SANDBOX_ID = config.SANDBOX_CONTAINER_NAME;
     sandboxData.PROJECT_ID = 'local';
-    sandboxData.ACME_API_URL = 'http://acme-api:8008';
+    sandboxData.AETHER_API_URL = 'http://aether-api:8008';
     writeEnvFile(sandboxEnvPath, sandboxData);
   }
 

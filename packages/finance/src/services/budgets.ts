@@ -1,6 +1,6 @@
 import { budgetsRepository } from '../repositories';
-import { createBudgetSchema, updateBudgetSchema } from '@acme/db';
-import type { CreateBudgetInput, UpdateBudgetInput } from '@acme/db';
+import { createBudgetSchema, updateBudgetSchema } from '@aether/db';
+import type { CreateBudgetInput, UpdateBudgetInput } from '@aether/db';
 
 export const budgetsService = {
   async listAll(accountId: string) {

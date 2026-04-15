@@ -1,10 +1,10 @@
 import { uuid, varchar, text, numeric, timestamp, index, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import { acmeSchema, accounts } from '@acme/db';
+import { aetherSchema, accounts } from '@aether/db';
 import { z } from 'zod';
 
 // Expense category enum
-export const expenseCategoryEnum = acmeSchema.enum('expense_category', [
+export const expenseCategoryEnum = aetherSchema.enum('expense_category', [
   'travel',
   'meals',
   'equipment',
@@ -17,7 +17,7 @@ export const expenseCategoryEnum = acmeSchema.enum('expense_category', [
 ]);
 
 // Expense status enum
-export const expenseStatusEnum = acmeSchema.enum('expense_status', [
+export const expenseStatusEnum = aetherSchema.enum('expense_status', [
   'draft',
   'submitted',
   'approved',
@@ -25,8 +25,8 @@ export const expenseStatusEnum = acmeSchema.enum('expense_status', [
   'rejected',
 ]);
 
-// Expenses table (defined in acmeSchema for multi-tenant consistency)
-export const expenses = acmeSchema.table(
+// Expenses table (defined in aetherSchema for multi-tenant consistency)
+export const expenses = aetherSchema.table(
   'expenses',
   {
     id: uuid('id').defaultRandom().primaryKey(),

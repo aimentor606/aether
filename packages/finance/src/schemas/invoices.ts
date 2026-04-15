@@ -1,10 +1,10 @@
 import { uuid, varchar, text, numeric, timestamp, index, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import { acmeSchema, accounts } from '@acme/db';
+import { aetherSchema, accounts } from '@aether/db';
 import { z } from 'zod';
 
 // Invoice status enum
-export const invoiceStatusEnum = acmeSchema.enum('invoice_status', [
+export const invoiceStatusEnum = aetherSchema.enum('invoice_status', [
   'draft',
   'sent',
   'paid',
@@ -12,8 +12,8 @@ export const invoiceStatusEnum = acmeSchema.enum('invoice_status', [
   'cancelled',
 ]);
 
-// Invoices table (defined in acmeSchema for multi-tenant consistency)
-export const invoices = acmeSchema.table(
+// Invoices table (defined in aetherSchema for multi-tenant consistency)
+export const invoices = aetherSchema.table(
   'invoices',
   {
     id: uuid('id').defaultRandom().primaryKey(),

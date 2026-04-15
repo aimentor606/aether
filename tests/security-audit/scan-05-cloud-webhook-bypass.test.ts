@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Webhook Signature Bypass
  *
- * LIVE scan against https://computer-preview-api.acme.dev
+ * LIVE scan against https://computer-preview-api.aether.dev
  * Tests whether webhook endpoints can be triggered without valid signatures.
  *
  * FINDINGS:
@@ -15,7 +15,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.acme.dev';
+const CLOUD = 'https://computer-preview-api.aether.dev';
 
 async function probeWebhook(
   path: string,

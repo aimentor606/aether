@@ -516,7 +516,7 @@ function IntegrationsContent({
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 18, fontFamily: 'Roobert-SemiBold', color: fg }}>Pipedream Credentials</Text>
               <Text style={{ fontSize: 12, fontFamily: 'Roobert', color: muted, marginTop: 2 }}>
-                {isCustomCreds ? 'Using your own Pipedream project' : 'Using Acme defaults'}
+                {isCustomCreds ? 'Using your own Pipedream project' : 'Using Aether defaults'}
               </Text>
             </View>
           </View>
@@ -536,7 +536,7 @@ function IntegrationsContent({
             }}>
               <Icon as={isCustomCreds ? Check : Shield} size={10} color={isCustomCreds ? '#10b981' : muted} strokeWidth={2} />
               <Text style={{ fontSize: 10, fontFamily: 'Roobert-Medium', color: isCustomCreds ? '#10b981' : muted, marginLeft: 4 }}>
-                {isCustomCreds ? 'Your credentials' : 'Acme Default'}
+                {isCustomCreds ? 'Your credentials' : 'Aether Default'}
               </Text>
             </View>
           </View>

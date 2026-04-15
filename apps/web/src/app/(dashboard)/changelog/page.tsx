@@ -385,7 +385,7 @@ export default function ChangelogPage() {
                     )}
                   </>
                 ) : (
-                  'Version history for Acme Computer'
+                  'Version history for Aether Computer'
                 )}
                 {latestVersion && currentVersion && latestVersion !== currentVersion && (
                   <>

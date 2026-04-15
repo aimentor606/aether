@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { ledgersService } from '@acme/vertical-finance';
-import { createLedgerSchema, updateLedgerSchema } from '@acme/db';
+import { ledgersService } from '@aether/vertical-finance';
+import { createLedgerSchema, updateLedgerSchema } from '@aether/db';
 import type { AppContext } from '../../../types';
 
 const ledgersRoutes = new Hono<{ Variables: AppContext }>()

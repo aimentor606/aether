@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { View, type ViewProps, type ViewStyle } from 'react-native';
 import { useColorScheme } from 'nativewind';
-import AcmeSymbolBlack from '@/assets/brand/acme-symbol.svg';
-import AcmeSymbolWhite from '@/assets/brand/Symbol.svg';
+import AetherSymbolBlack from '@/assets/brand/acme-symbol.svg';
+import AetherSymbolWhite from '@/assets/brand/Symbol.svg';
 import LogomarkBlack from '@/assets/brand/Logomark-Black.svg';
 import LogomarkWhite from '@/assets/brand/Logomark-White.svg';
 
-interface AcmeLogoProps extends Omit<ViewProps, 'style'> {
+interface AetherLogoProps extends Omit<ViewProps, 'style'> {
   size?: number;
   variant?: 'symbol' | 'logomark';
   className?: string;
@@ -14,14 +14,14 @@ interface AcmeLogoProps extends Omit<ViewProps, 'style'> {
   color?: 'light' | 'dark';
 }
 
-export function AcmeLogo({ 
+export function AetherLogo({ 
   size = 24, 
   variant = 'symbol',
   className,
   style,
   color = 'dark',
   ...props 
-}: AcmeLogoProps) {
+}: AetherLogoProps) {
   const { colorScheme } = useColorScheme();
   
   const isDark = colorScheme === 'dark';
@@ -62,7 +62,7 @@ export function AcmeLogo({
     ...style,
   };
 
-  const SymbolComponent = color === 'dark' ? AcmeSymbolWhite : AcmeSymbolBlack;
+  const SymbolComponent = color === 'dark' ? AetherSymbolWhite : AetherSymbolBlack;
 
   return (
     <View 

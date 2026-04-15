@@ -2,7 +2,7 @@
 
 import { Project } from '@/types/project';
 import { HIDE_BROWSER_TAB } from '@/components/thread/utils';
-import { isHiddenTool } from '@acme/shared/tools';
+import { isHiddenTool } from '@aether/shared/tools';
 import React, { memo, useMemo, useCallback, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useIsMobile } from '@/hooks/utils';
@@ -13,10 +13,10 @@ import { useTranslations } from 'next-intl';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useDocumentModalStore } from '@/stores/use-document-modal-store';
 import { 
-  useAcmeComputerStore,
-  useAcmeComputerPendingToolNavIndex,
-  useAcmeComputerClearPendingToolNav,
-} from '@/stores/acme-computer-store';
+  useAetherComputerStore,
+  useAetherComputerPendingToolNavIndex,
+  useAetherComputerClearPendingToolNav,
+} from '@/stores/aether-computer-store';
 import { ToolCallData, ToolResultData } from '../tool-views/types';
 import { PanelHeader } from './components/PanelHeader';
 import { NavigationControls } from './components/NavigationControls';
@@ -33,7 +33,7 @@ export interface ToolCallInput {
   isSuccess?: boolean;
 }
 
-interface AcmeComputerProps {
+interface AetherComputerProps {
   isOpen: boolean;
   onClose: () => void;
   toolCalls: ToolCallInput[];
@@ -60,7 +60,7 @@ interface AcmeComputerProps {
   sandboxId?: string;
   projectId?: string;
   sidePanelRef?: React.RefObject<any>;
-  /** When true, AcmeComputer skips rendering its own PanelHeader (tabs are provided externally, e.g. by SessionLayout). */
+  /** When true, AetherComputer skips rendering its own PanelHeader (tabs are provided externally, e.g. by SessionLayout). */
   hideTopBar?: boolean;
   /** Custom header rendered inside the main container, above the content. Used by SessionLayout to inject its own header row. */
   headerSlot?: React.ReactNode;
@@ -77,7 +77,7 @@ type NavigationMode = 'live' | 'manual';
 
 const FLOATING_LAYOUT_ID = 'acme-computer-float';
 
-export const AcmeComputer = memo(function AcmeComputer({
+export const AetherComputer = memo(function AetherComputer({
   isOpen,
   onClose,
   toolCalls,
@@ -98,7 +98,7 @@ export const AcmeComputer = memo(function AcmeComputer({
   sidePanelRef,
   hideTopBar = false,
   headerSlot,
-}: AcmeComputerProps) {
+}: AetherComputerProps) {
   const t = useTranslations('thread');
   const [dots, setDots] = useState('');
   const [internalIndex, setInternalIndex] = useState(0);
@@ -119,10 +119,10 @@ export const AcmeComputer = memo(function AcmeComputer({
     setActiveView,
     isExpanded,
     toggleExpanded,
-  } = useAcmeComputerStore();
+  } = useAetherComputerStore();
   
-  const pendingToolNavIndex = useAcmeComputerPendingToolNavIndex();
-  const clearPendingToolNav = useAcmeComputerClearPendingToolNav();
+  const pendingToolNavIndex = useAetherComputerPendingToolNavIndex();
+  const clearPendingToolNav = useAetherComputerClearPendingToolNav();
 
   const currentViewRef = useRef(activeView);
 
@@ -140,7 +140,7 @@ export const AcmeComputer = memo(function AcmeComputer({
     const sandboxChanged = prevSandboxIdRef.current !== null && prevSandboxIdRef.current !== sandboxId && sandboxId !== null;
     
     if (projectChanged || sandboxChanged) {
-      console.log('[AcmeComputer] Project or sandbox changed, resetting local state', { projectId, sandboxId });
+      console.log('[AetherComputer] Project or sandbox changed, resetting local state', { projectId, sandboxId });
       // Reset local component state
       setInternalIndex(0);
       setNavigationMode('live');

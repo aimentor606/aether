@@ -1,4 +1,4 @@
-export { invoices, expenses, budgets, ledgers } from '@acme/db';
+export { invoices, expenses, budgets, ledgers } from '@aether/db';
 
 export {
   invoiceStatusEnum,
@@ -7,7 +7,7 @@ export {
   budgetPeriodEnum,
   budgetStatusEnum,
   ledgerStatusEnum,
-} from '@acme/db';
+} from '@aether/db';
 
 export type {
   CreateInvoiceInput,
@@ -18,4 +18,4 @@ export type {
   UpdateBudgetInput,
   CreateLedgerInput,
   UpdateLedgerInput,
-} from '@acme/db';
+} from '@aether/db';

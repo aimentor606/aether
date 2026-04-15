@@ -1,6 +1,6 @@
 import { expensesRepository } from '../repositories';
-import { createExpenseSchema, updateExpenseSchema } from '@acme/db';
-import type { CreateExpenseInput, UpdateExpenseInput } from '@acme/db';
+import { createExpenseSchema, updateExpenseSchema } from '@aether/db';
+import type { CreateExpenseInput, UpdateExpenseInput } from '@aether/db';
 
 export const expensesService = {
   async listAll(accountId: string) {

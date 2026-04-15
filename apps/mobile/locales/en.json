@@ -89,7 +89,7 @@
     "openEmailApp": "Open email app",
     "goToSignIn": "Go to sign in",
     "verifyEmailInstructions": "Click the link in the email to verify your account, then sign in.",
-    "welcomeTitle": "Hire Acme for",
+    "welcomeTitle": "Hire Aether for",
     "rotatingPhrases": {
       "presentations": "presentations",
       "writing": "writing",
@@ -114,13 +114,13 @@
       "passwordTooShort": "Password must be at least 8 characters"
     },
     "drawer": {
-      "defaultTitle": "Welcome to Acme",
+      "defaultTitle": "Welcome to Aether",
       "defaultMessage": "The AI Super Mega Giga app.",
-      "signInToChat": "Welcome to Acme",
+      "signInToChat": "Welcome to Aether",
       "signInToChatMessage": "The AI Super Mega Giga app.",
-      "signUpUnlock": "Welcome to Acme",
+      "signUpUnlock": "Welcome to Aether",
       "signUpUnlockMessage": "The AI Super Mega Giga app.",
-      "welcomeBack": "Welcome to Acme",
+      "welcomeBack": "Welcome to Aether",
       "welcomeBackMessage": "The AI Super Mega Giga app.",
       "signUpToContinue": "Sign up to continue",
       "signUpToContinueMessage": "Please sign up or sign in to create and select workers, connect apps and much more"
@@ -128,7 +128,7 @@
     "guest": {
       "label": "Guest",
       "title": "Browse Without\nan Account",
-      "description": "Try Acme with limited features. No signup required!",
+      "description": "Try Aether with limited features. No signup required!",
       "continue": "Continue as Guest",
       "signUp": "Sign Up Instead",
       "agreement": "By continuing, you agree to our",
@@ -138,12 +138,12 @@
     }
   },
   "onboarding": {
-    "welcome": "See what Acme can do",
+    "welcome": "See what Aether can do",
     "welcomeSubtitle": "Your AI assistant that takes action",
     "skip": "Skip",
     "next": "Next",
     "getStarted": "Get Started",
-    "acmeComputer": "Acme Computer",
+    "acmeComputer": "Aether Computer",
     "ready": "Ready",
     "examples": {
       "presentations": {
@@ -260,8 +260,8 @@
   },
   "chat": {
     "newChat": "New Chat",
-    "placeholder": "Give Acme a task...",
-    "inputPlaceholder": "Ask Acme anything...",
+    "placeholder": "Give Aether a task...",
+    "inputPlaceholder": "Ask Aether anything...",
     "recording": "Recording...",
     "cancelRecording": "Cancel recording",
     "stopRecording": "Stop recording",
@@ -274,7 +274,7 @@
     "rateThisResult": "Rate this result",
     "feedbackHelpsImprove": "Your feedback helps us improve",
     "additionalFeedbackOptional": "Additional feedback (optional)",
-    "helpAcmeImprove": "Help Acme improve with my feedback",
+    "helpAetherImprove": "Help Aether improve with my feedback",
     "submit": "Submit",
     "submitting": "Submitting...",
     "suggestedFollowUps": "Suggested follow-ups",
@@ -295,7 +295,7 @@
     "newWorker": "New Worker",
     "myWorkers": "My Workers",
     "searchAgents": "Search workers",
-    "defaultAgent": "Acme",
+    "defaultAgent": "Aether",
     "defaultDescription": "General purpose AI for all tasks",
     "superWorker": "Super Worker",
     "coder": "Coder",
@@ -516,7 +516,7 @@
     "mode": "Mode"
   },
   "placeholders": {
-    "default": "Give Acme a task...",
+    "default": "Give Aether a task...",
     "search": "Search...",
     "searchConversations": "Search chats",
     "searchAgents": "Search workers",
@@ -600,12 +600,12 @@
   "beta": {
     "title": "Beta Features",
     "webSupportTitle": "Fully Supported on Web",
-    "webSupportDescription": "Available on Acme.com. Coming to mobile soon—still work-in-progress here.",
-    "visitAcme": "Visit Acme.com",
+    "webSupportDescription": "Available on Aether.com. Coming to mobile soon—still work-in-progress here.",
+    "visitAether": "Visit Aether.com",
     "advancedFeatures": "Advanced Features",
     "mobileBeta": "Mobile Beta",
     "pleaseNote": "Please Note",
-    "mobileWarning": "Work-in-progress on mobile and may have issues. For the best experience, use Acme.com."
+    "mobileWarning": "Work-in-progress on mobile and may have issues. For the best experience, use Aether.com."
   },
   "accountDeletion": {
     "title": "Delete Account",

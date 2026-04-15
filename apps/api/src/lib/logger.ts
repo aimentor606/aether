@@ -1,5 +1,5 @@
 /**
- * Structured logger for Acme API.
+ * Structured logger for Aether API.
  *
  * Uses @logtail/node to ship structured logs to Better Stack Telemetry.
  * Automatically enriches every log with request context (userId, accountId,
@@ -45,8 +45,8 @@ if (LOG_TOKEN) {
 // ─── Static enrichment (same for every log) ─────────────────────────────────
 
 const BASE_CONTEXT = {
-  service: 'acme-api',
-  env: process.env.INTERNAL_ACME_ENV || 'dev',
+  service: 'aether-api',
+  env: process.env.INTERNAL_AETHER_ENV || 'dev',
   version: process.env.SANDBOX_VERSION || 'dev',
 };
 

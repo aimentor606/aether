@@ -2,7 +2,7 @@
  * A2UI Protocol Types
  *
  * Framework-agnostic types for the A2UI rendering protocol.
- * React component mapping lives in @acme/ui/a2ui, not here.
+ * React component mapping lives in @aether/ui/a2ui, not here.
  */
 
 export interface A2UIBlock {
@@ -27,7 +27,7 @@ export interface A2UIAction {
 
 /**
  * Generic catalog — component type is left as `unknown`.
- * The UI layer (@acme/ui) casts to React.ComponentType when rendering.
+ * The UI layer (@aether/ui) casts to React.ComponentType when rendering.
  */
 export interface A2UICatalog<TComponent = unknown> {
   name: string;

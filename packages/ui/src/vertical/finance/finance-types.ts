@@ -1,6 +1,6 @@
 /**
  * Finance UI — shared types for invoice/expense/budget/ledger records.
- * Mirrors the DB schema from @acme/db/schema/finance but as plain interfaces
+ * Mirrors the DB schema from @aether/db/schema/finance but as plain interfaces
  * for use in the UI layer without importing Drizzle types.
  */
 

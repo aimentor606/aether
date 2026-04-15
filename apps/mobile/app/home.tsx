@@ -1,5 +1,5 @@
 /**
- * Home — Main app screen for Acme Computer Mobile.
+ * Home — Main app screen for Aether Computer Mobile.
  *
  * Uses a drawer layout:
  * - Drawer: Session list + "New Session" button
@@ -81,7 +81,7 @@ import {
 } from 'lucide-react-native';
 import type { BottomBarMenuItem } from '@/components/session/BottomBar';
 import { log } from '@/lib/logger';
-import { AcmeLogo } from '@/components/ui/AcmeLogo';
+import { AetherLogo } from '@/components/ui/AetherLogo';
 import { useTabScreenshotStore } from '@/stores/tab-screenshot-store';
 
 // Safe import of react-native-view-shot — requires native rebuild.
@@ -741,7 +741,7 @@ export default function HomeScreen() {
     if (isSigningOut) return;
     Alert.alert(
       'Sign out',
-      'Sign out of Acme?',
+      'Sign out of Aether?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -974,7 +974,7 @@ export default function HomeScreen() {
         <RNStatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: isDark ? '#09090b' : '#FFFFFF', paddingHorizontal: 40 }}>
           <View style={{ flexDirection: 'column', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-            <AcmeLogo size={22} variant="symbol" color={isDark ? 'dark' : 'light'} />
+            <AetherLogo size={22} variant="symbol" color={isDark ? 'dark' : 'light'} />
             <Text style={{ fontSize: 13, fontFamily: 'Roobert', letterSpacing: 2, textTransform: 'uppercase', color: isDark ? 'rgba(248,248,248,0.3)' : 'rgba(18,18,21,0.3)' }}>
               Connecting to Workspace
             </Text>
@@ -1275,7 +1275,7 @@ export default function HomeScreen() {
                       <Ionicons name="menu" size={24} color={isDark ? '#F8F8F8' : '#121215'} />
                     </TouchableOpacity>
                     <Text className="text-lg font-bold text-foreground">
-                      Acme
+                      Aether
                     </Text>
                   </View>
                   <TouchableOpacity

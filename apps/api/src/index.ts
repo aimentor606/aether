@@ -20,7 +20,7 @@ import { platformApp } from './platform';
 import { sandboxProxyApp, resolveProvider } from './sandbox-proxy';
 import { getSandboxBaseUrl, proxyToSandbox } from './sandbox-proxy/routes/local-preview';
 import { validateSecretKey } from './repositories/api-keys';
-import { isAcmeToken } from './shared/crypto';
+import { isAetherToken } from './shared/crypto';
 import { getSupabase } from './shared/supabase';
 import { verifySupabaseJwt } from './shared/jwt-verify';
 import { canAccessPreviewSandbox } from './shared/preview-ownership';
@@ -45,6 +45,7 @@ import { legacyApp } from './legacy';
 import { adminApp } from './admin';
 import { sandboxPoolAdminApp } from './platform/routes/sandbox-pool-admin';
 import { oauthApp } from './oauth';
+import { verticalsApp } from './verticals';
 
 // ─── App Setup ──────────────────────────────────────────────────────────────
 
@@ -54,15 +55,15 @@ const app = new Hono();
 
 // CORS origins: production domains + localhost for local dev + any extras from env.
 const cloudOrigins = [
-  'https://www.acme.dev',
-  'https://acme.dev',
-  'https://dev.acme.dev',
-  'https://new-dev.acme.dev',
-  'https://dev-new.acme.dev',
-  'https://staging.acme.dev',
-  'https://acme.cloud',
-  'https://www.acme.cloud',
-  'https://new.acme.dev',
+  'https://www.aether.dev',
+  'https://aether.dev',
+  'https://dev.aether.dev',
+  'https://new-dev.aether.dev',
+  'https://dev-new.aether.dev',
+  'https://staging.aether.dev',
+  'https://aether.cloud',
+  'https://www.aether.cloud',
+  'https://new.aether.dev',
 ];
 const justavpsOrigins = [
   'https://justavps.com',
@@ -89,7 +90,7 @@ app.use(
   cors({
     origin: corsOrigins,
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization', 'X-Acme-Token', 'X-Api-Key', 'Accept'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-aether-Token', 'X-Api-Key', 'Accept'],
     credentials: true,
   })
 );
@@ -143,7 +144,7 @@ app.use('*', async (c, next) => {
   const isProxyLongPoll = isSandboxProxyPath && path.includes('/global/event');
   const isProxyStartupProbe = isSandboxProxyPath && (
     path.includes('/global/health') ||
-    path.includes('/acme/health') ||
+    path.includes('/aether/health') ||
     /\/sessions(?:\/|$)/.test(path)
   );
   const isExpectedProxyNoise = method === 'GET' && (
@@ -166,21 +167,21 @@ app.use('*', async (c, next) => {
 });
 
 // Pretty JSON in dev mode for easier debugging
-if (config.INTERNAL_ACME_ENV === 'dev') {
+if (config.INTERNAL_AETHER_ENV === 'dev') {
   app.use('*', prettyJSON());
 }
 
 // === Top-Level Health Check (no auth) ===
 
 // API version is injected at container start by deploy-zero-downtime.sh,
-// which extracts it from the Docker image tag (e.g. acme/acme-api:0.8.29 → 0.8.29).
+// which extracts it from the Docker image tag (e.g. aether/aether-api:0.8.29 → 0.8.29).
 // Falls back to 'dev' for local development.
 const API_VERSION = process.env.SANDBOX_VERSION || 'dev';
 
 app.get('/health', (c) => {
   return c.json({
     status: 'ok',
-    service: 'acme-api',
+    service: 'aether-api',
     version: API_VERSION,
     timestamp: new Date().toISOString(),
     env: config.ENV_MODE,
@@ -192,7 +193,7 @@ app.get('/health', (c) => {
 app.get('/v1/health', (c) => {
   return c.json({
     status: 'ok',
-    service: 'acme-api',
+    service: 'aether-api',
     version: API_VERSION,
     timestamp: new Date().toISOString(),
     env: config.ENV_MODE,
@@ -225,7 +226,7 @@ app.get('/v1/accounts', supabaseAuth, async (c: any) => {
   const userEmail = c.get('userEmail') as string;
 
   const { eq } = await import('drizzle-orm');
-  const { accountMembers, accounts, accountUser } = await import('@acme/db');
+  const { accountMembers, accounts, accountUser } = await import('@aether/db');
   const { db } = await import('./shared/db');
 
   // 1. Try acme.account_members (new table)
@@ -317,7 +318,7 @@ app.get('/v1/user-roles', supabaseAuth, async (c: any) => {
 app.route('/v1/router', router);        // /v1/router/chat/completions, /v1/router/models, /v1/router/web-search, /v1/router/tavily/*, etc.
 app.route('/v1/billing', billingApp);   // /v1/billing/account-state, /v1/billing/webhooks/*, /v1/billing/setup/*
 app.route('/v1/platform', platformApp); // /v1/platform/providers, /v1/platform/sandbox/*, /v1/platform/sandbox/version
-if (config.ACME_DEPLOYMENTS_ENABLED) {
+if (config.AETHER_DEPLOYMENTS_ENABLED) {
   const { deploymentsApp } = await import('./deployments');
   app.route('/v1/deployments', deploymentsApp); // /v1/deployments/*
 }
@@ -343,7 +344,11 @@ app.route('/v1/admin/sandbox-pool', sandboxPoolAdminApp); // /v1/admin/sandbox-p
 // OAuth2 provider — public token endpoint, auth on authorize/consent
 app.route('/v1/oauth', oauthApp);
 
-// All remaining routes require authentication (JWT or acme_ token).
+// Verticals — multi-tenant vertical-specific routes (require auth + tenant context)
+app.use('/v1/verticals/*', combinedAuth);
+app.route('/v1/verticals', verticalsApp); // /v1/verticals/finance/*, /v1/verticals/healthcare/*, /v1/verticals/retail/*
+
+// All remaining routes require authentication (JWT or aether_ token).
 app.use('/v1/providers/*', combinedAuth);
 app.route('/v1/providers', providersApp);   // /v1/providers, /v1/providers/schema, /v1/providers/:id/connect, /v1/providers/:id/disconnect, /v1/providers/health
 
@@ -373,21 +378,21 @@ app.route('/v1/tunnel', tunnelApp);
 
 // WoA moved to /v1/router/woa — see router/index.ts
 
-// ── Acme API — proxies /v1/acme/* to the sandbox's /acme/* ─────────────
+// ── Aether API — proxies /v1/aether/* to the sandbox's /acme/* ────────────
 // Direct server-to-server proxy. Avoids double-CORS from the /v1/p/ path.
 // Auth: Supabase JWT (global middleware). Sandbox auth: INTERNAL_SERVICE_KEY.
-import { acmeProxyHandler } from './routes/acme-projects';
-app.use('/v1/acme/*', combinedAuth);
-app.use('/v1/acme', combinedAuth);
-app.all('/v1/acme/*', acmeProxyHandler);
-app.all('/v1/acme', acmeProxyHandler);
+import { aetherProxyHandler } from './routes/aether-projects';
+app.use('/v1/aether/*', combinedAuth);
+app.use('/v1/aether', combinedAuth);
+app.all('/v1/aether/*', aetherProxyHandler);
+app.all('/v1/aether', aetherProxyHandler);
 
 // Preview Proxy — unified route for both cloud (Daytona) and local mode.
 // Pattern: /v1/p/{sandboxId}/{port}/* for ALL modes.
 // Cloud:  sandboxId = Daytona external ID → proxied via Daytona SDK
-// Local:  sandboxId = container name (e.g. 'acme-sandbox') → Docker DNS resolution
-// JustAVPS: sandboxId → CF Worker proxy at {port}--{slug}.acme.cloud
-// Auth: unified previewProxyAuth (accepts Supabase JWT and acme_ tokens).
+// Local:  sandboxId = container name (e.g. 'aether-sandbox') → Docker DNS resolution
+// JustAVPS: sandboxId → CF Worker proxy at {port}--{slug}.aether.cloud
+// Auth: unified previewProxyAuth (accepts Supabase JWT and aether_ tokens).
 // MUST be after all explicit routes (wildcard catch-all).
 app.route('/v1/p', sandboxProxyApp);
 
@@ -484,7 +489,7 @@ app.notFound((c) => {
 // ─── Auto-register local Docker sandbox in DB ──────────────────────────────
 
 /**
- * Ensure a valid ACME_TOKEN exists in the DB and is synced to the sandbox.
+ * Ensure a valid AETHER_TOKEN exists in the DB and is synced to the sandbox.
  *
  * Architecture:
  *   Source of truth: acme.api_keys table (hash) + sandboxes.config.serviceKey (plaintext)
@@ -497,8 +502,8 @@ app.notFound((c) => {
  */
 async function injectSandboxToken(sandboxId: string, accountId: string): Promise<void> {
   const { db } = await import('./shared/db');
-  const { acmeApiKeys } = await import('@acme/db');
-  const { sandboxes } = await import('@acme/db');
+  const { aetherApiKeys } = await import('@aether/db');
+  const { sandboxes } = await import('@aether/db');
   const { eq, and } = await import('drizzle-orm');
   const { execSync: rawExecSync } = await import('child_process');
   const rawDockerHost = config.DOCKER_HOST || process.env.DOCKER_HOST || '';
@@ -509,16 +514,16 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
     ? `http://${config.SANDBOX_CONTAINER_NAME}:8000`
     : `http://localhost:${config.SANDBOX_PORT_BASE}`;
 
-  // Resolve how sandbox reaches acme-api
-  const rawUrl = (config.ACME_URL || '').replace(/\/v1\/router\/?$/, '');
-  let acmeApiUrl = `http://host.docker.internal:${config.PORT}`;
+  // Resolve how sandbox reaches aether-api
+  const rawUrl = (config.AETHER_URL || '').replace(/\/v1\/router\/?$/, '');
+  let aetherApiUrl = `http://host.docker.internal:${config.PORT}`;
   try {
     const parsed = new URL(rawUrl || `http://localhost:${config.PORT}`);
     if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') {
       parsed.hostname = 'host.docker.internal';
-      acmeApiUrl = parsed.toString().replace(/\/$/, '');
+      aetherApiUrl = parsed.toString().replace(/\/$/, '');
     } else if (rawUrl) {
-      acmeApiUrl = rawUrl.replace(/\/$/, '');
+      aetherApiUrl = rawUrl.replace(/\/$/, '');
     }
   } catch { /* keep default */ }
 
@@ -533,13 +538,13 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
     const validation = await validateSecretKey(existingServiceKey).catch(() => ({ isValid: false }));
     if (validation.isValid) {
       token = existingServiceKey;
-      console.log('[startup] Reusing existing valid ACME_TOKEN from sandbox config');
+      console.log('[startup] Reusing existing valid AETHER_TOKEN from sandbox config');
     } else {
       // Key exists in config but not valid in DB — re-issue
-      console.log('[startup] Existing ACME_TOKEN invalid in DB — re-issuing');
-      const [oldKey] = await db.select().from(acmeApiKeys)
-        .where(and(eq(acmeApiKeys.sandboxId, sandboxId), eq(acmeApiKeys.type, 'sandbox')));
-      if (oldKey) await db.delete(acmeApiKeys).where(eq(acmeApiKeys.keyId, oldKey.keyId));
+      console.log('[startup] Existing AETHER_TOKEN invalid in DB — re-issuing');
+      const [oldKey] = await db.select().from(aetherApiKeys)
+        .where(and(eq(aetherApiKeys.sandboxId, sandboxId), eq(aetherApiKeys.type, 'sandbox')));
+      if (oldKey) await db.delete(aetherApiKeys).where(eq(aetherApiKeys.keyId, oldKey.keyId));
       const newKey = await createApiKey({ sandboxId, accountId, title: 'Sandbox Token', type: 'sandbox' });
       token = newKey.secretKey;
       await db.update(sandboxes)
@@ -548,7 +553,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
     }
   } else {
     // No key at all — first provision
-    console.log('[startup] No ACME_TOKEN in sandbox config — creating');
+    console.log('[startup] No AETHER_TOKEN in sandbox config — creating');
     const newKey = await createApiKey({ sandboxId, accountId, title: 'Sandbox Token', type: 'sandbox' });
     token = newKey.secretKey;
     await db.update(sandboxes)
@@ -557,32 +562,32 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
   }
 
   // ─── Check if sandbox already has the correct token ─────────────────────
-  // Read the sandbox's current ACME_TOKEN via its /env API. If it already
+  // Read the sandbox's current AETHER_TOKEN via its /env API. If it already
   // matches, skip the sync entirely — no restart, no downtime.
   const sandboxAlreadyHasToken = async (): Promise<boolean> => {
     try {
-      const res = await fetch(`${sandboxBaseUrl}/env/ACME_TOKEN`, {
+      const res = await fetch(`${sandboxBaseUrl}/env/AETHER_TOKEN`, {
         headers: { Authorization: `Bearer ${config.INTERNAL_SERVICE_KEY}` },
         signal: AbortSignal.timeout(5_000),
       });
       if (!res.ok) return false;
       const data = await res.json() as Record<string, string | null>;
-      return data?.ACME_TOKEN === token;
+      return data?.AETHER_TOKEN === token;
     } catch {
       return false;
     }
   };
 
-  // Also check ACME_API_URL
+  // Also check AETHER_API_URL
   const sandboxAlreadyHasUrl = async (): Promise<boolean> => {
     try {
-      const res = await fetch(`${sandboxBaseUrl}/env/ACME_API_URL`, {
+      const res = await fetch(`${sandboxBaseUrl}/env/AETHER_API_URL`, {
         headers: { Authorization: `Bearer ${config.INTERNAL_SERVICE_KEY}` },
         signal: AbortSignal.timeout(5_000),
       });
       if (!res.ok) return false;
       const data = await res.json() as Record<string, string | null>;
-      return data?.ACME_API_URL === acmeApiUrl;
+      return data?.AETHER_API_URL === aetherApiUrl;
     } catch {
       return false;
     }
@@ -595,7 +600,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
     sandboxAlreadyHasUrl(),
   ]);
   if (hasToken && hasUrl) {
-    console.log('[startup] Sandbox already has correct ACME_TOKEN + ACME_API_URL — skipping sync');
+    console.log('[startup] Sandbox already has correct AETHER_TOKEN + AETHER_API_URL — skipping sync');
     // Still ensure ONBOARDING_COMPLETE is set for self-hosted mode
     if (config.SANDBOX_NETWORK) {
       try {
@@ -628,9 +633,9 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
   // NOTE: The /env POST handler is now idempotent — it won't restart
   // OpenCode if the values are unchanged (belt-and-suspenders with the check above).
   const keysToSync: Record<string, string> = {
-    ACME_TOKEN: token,
-    ACME_API_URL: acmeApiUrl,
-    TUNNEL_API_URL: acmeApiUrl,
+    AETHER_TOKEN: token,
+    AETHER_API_URL: aetherApiUrl,
+    TUNNEL_API_URL: aetherApiUrl,
     // Self-hosted: skip onboarding wizard (no setup needed for local Docker)
     ...(config.SANDBOX_NETWORK ? { ONBOARDING_COMPLETE: 'true' } : {}),
   };
@@ -648,7 +653,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
       });
       if (res.ok) {
         const result = await res.json() as { restarted?: boolean };
-        console.log(`[startup] ACME_TOKEN synced via /env API (restarted=${result?.restarted ?? 'unknown'})`);
+        console.log(`[startup] AETHER_TOKEN synced via /env API (restarted=${result?.restarted ?? 'unknown'})`);
         return true;
       }
       console.warn(`[startup] /env API returned ${res.status} — falling back to docker exec`);
@@ -670,12 +675,12 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
       );
       // Also write to bootstrap file so token survives container restart
       rawExecSync(
-        `docker exec ${config.SANDBOX_CONTAINER_NAME} bash -c 'mkdir -p /workspace/.secrets && cat /workspace/.secrets/.bootstrap-env.json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin) if sys.stdin.readable() else {}; d.update(${JSON.stringify(JSON.stringify({ ACME_TOKEN: token, ACME_API_URL: acmeApiUrl }))}); print(json.dumps(d))" > /workspace/.secrets/.bootstrap-env.json.tmp && mv /workspace/.secrets/.bootstrap-env.json.tmp /workspace/.secrets/.bootstrap-env.json'`,
+        `docker exec ${config.SANDBOX_CONTAINER_NAME} bash -c 'mkdir -p /workspace/.secrets && cat /workspace/.secrets/.bootstrap-env.json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin) if sys.stdin.readable() else {}; d.update(${JSON.stringify(JSON.stringify({ AETHER_TOKEN: token, AETHER_API_URL: aetherApiUrl }))}); print(json.dumps(d))" > /workspace/.secrets/.bootstrap-env.json.tmp && mv /workspace/.secrets/.bootstrap-env.json.tmp /workspace/.secrets/.bootstrap-env.json'`,
         { stdio: 'pipe', timeout: 15_000, env: dockerEnv },
       ).toString();
       // No restart — getEnv() reads from s6 env dir live. OpenCode picks up
       // the new values on the next tool call without a process restart.
-      console.log('[startup] ACME_TOKEN synced via docker exec fallback + bootstrap file');
+      console.log('[startup] AETHER_TOKEN synced via docker exec fallback + bootstrap file');
       return true;
     } catch (e: any) {
       console.error(`[startup] docker exec fallback failed: ${e?.message}`);
@@ -686,13 +691,13 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
   // Try /env API first, fall back to docker exec
   const synced = await syncViaEnvApi() || syncViaDockerExec();
   if (!synced) {
-    console.error('[startup] FATAL: Could not sync ACME_TOKEN to sandbox. LLM calls will fail with 401.');
+    console.error('[startup] FATAL: Could not sync AETHER_TOKEN to sandbox. LLM calls will fail with 401.');
   }
 }
 
 async function ensureLocalSandboxRegistered() {
   const { db } = await import('./shared/db');
-  const { sandboxes } = await import('@acme/db');
+  const { sandboxes } = await import('@aether/db');
   const { eq, and } = await import('drizzle-orm');
   const { execSync } = await import('child_process');
 
@@ -755,7 +760,7 @@ async function ensureLocalSandboxRegistered() {
 
   // No existing sandbox — auto-provision for local single-user setup.
   // Only create if the container is actually running (image pulled, container started).
-  const { accounts } = await import('@acme/db');
+  const { accounts } = await import('@aether/db');
   const [account] = await db.select().from(accounts).limit(1);
   if (!account) {
     console.log('[startup] No account yet — sandbox will be created on first login via POST /init');
@@ -816,17 +821,17 @@ function startLocalSandboxSelfHeal(): void {
 
 console.log(`
 ╔═══════════════════════════════════════════════════════════╗
-║                  Acme API Starting                      ║
+║                  Aether API Starting                      ║
 ╠═══════════════════════════════════════════════════════════╣
 ║  Port: ${config.PORT.toString().padEnd(49)}║
 ║  Mode: ${config.ENV_MODE.padEnd(49)}║
-║  Env:  ${config.INTERNAL_ACME_ENV.padEnd(49)}║
+║  Env:  ${config.INTERNAL_AETHER_ENV.padEnd(49)}║
 ╠═══════════════════════════════════════════════════════════╣
 ║  Services:                                                ║
 ║    /v1/router     (search, LLM, proxy)                    ║
 ║    /v1/billing    (subscriptions, credits, webhooks)       ║
 ║    /v1/platform   (sandbox lifecycle)                      ║
-${config.ACME_DEPLOYMENTS_ENABLED ? '║    /v1/deployments (deploy lifecycle)                      ║\n' : ''}║    /v1/pipedream   (Pipedream OAuth integrations)           ║
+${config.AETHER_DEPLOYMENTS_ENABLED ? '║    /v1/deployments (deploy lifecycle)                      ║\n' : ''}║    /v1/pipedream   (Pipedream OAuth integrations)           ║
 ║    /v1/setup      (setup & env management)                 ║
 ║    /v1/queue      (persistent message queue)               ║
 ║    /v1/tunnel     (reverse-tunnel to local machines)         ║
@@ -835,7 +840,7 @@ ${config.ACME_DEPLOYMENTS_ENABLED ? '║    /v1/deployments (deploy lifecycle)  
 ║  Database:   ${config.DATABASE_URL ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
 ║  Supabase:   ${config.SUPABASE_URL ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
 ║  Stripe:     ${config.STRIPE_SECRET_KEY ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
-║  Billing:    ${(config.ACME_BILLING_INTERNAL_ENABLED ? 'ENABLED' : 'DISABLED').padEnd(42)}║
+║  Billing:    ${(config.AETHER_BILLING_INTERNAL_ENABLED ? 'ENABLED' : 'DISABLED').padEnd(42)}║
 ║  Tunnel:     ${(config.TUNNEL_ENABLED ? 'ENABLED' : 'DISABLED').padEnd(42)}║
 ║  Providers:  ${config.ALLOWED_SANDBOX_PROVIDERS.join(', ').padEnd(42)}║
 ╚═══════════════════════════════════════════════════════════╝
@@ -920,7 +925,7 @@ process.on('SIGINT', () => shutdown('SIGINT'));
 // ─── WebSocket proxy for sandbox PTY ─────────────────────────────────────────
 // The Bun server needs to handle WebSocket upgrades at the top level.
 // We intercept WS upgrade requests for /v1/p/{sandboxId}/* and proxy them
-// to the sandbox's Acme Master (which further proxies to OpenCode).
+// to the sandbox's Aether Master (which further proxies to OpenCode).
 
 const WS_CONNECT_TIMEOUT_MS = 10_000;
 const WS_BUFFER_MAX_BYTES = 1024 * 1024; // 1MB
@@ -974,7 +979,7 @@ function extractCookieToken(req: Request): string | null {
 }
 
 async function validatePreviewToken(token: string, sandboxId: string): Promise<boolean> {
-  if (isAcmeToken(token)) {
+  if (isAetherToken(token)) {
     const result = await validateSecretKey(token);
     return !!result.isValid && !!result.accountId && await canAccessPreviewSandbox({
       previewSandboxId: sandboxId,
@@ -1153,12 +1158,12 @@ export default {
       if (!isSubdomainAuthenticated(sandboxId, port)) {
         const authHeader = req.headers.get('Authorization');
         const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-        const acmeTokenHeader = req.headers.get('X-Acme-Token');
+        const aetherTokenHeader = req.headers.get('X-aether-Token');
         const cookieToken = extractCookieToken(req);
         // Also accept ?token= query param — browser WebSocket API can't set
         // custom headers, and initial page loads may not have cookies yet.
         const queryToken = url.searchParams.get('token');
-        const token = bearerToken || cookieToken || acmeTokenHeader || queryToken;
+        const token = bearerToken || cookieToken || aetherTokenHeader || queryToken;
 
         if (!token || !(await validatePreviewToken(token, sandboxId))) {
           return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -1216,7 +1221,7 @@ export default {
       try {
         // JustAVPS: route through CF Worker proxy at {port}--{slug}.{domain}
         if (config.isJustAVPSEnabled()) {
-          const { sandboxes } = await import('@acme/db');
+          const { sandboxes } = await import('@aether/db');
           const { db } = await import('./shared/db');
           const { eq, and, ne } = await import('drizzle-orm');
           const [sandbox] = await db
@@ -1312,10 +1317,10 @@ export default {
 
         const wsAuthHeader = req.headers.get('Authorization');
         const wsBearerToken = wsAuthHeader?.startsWith('Bearer ') ? wsAuthHeader.slice(7) : null;
-        const wsAcmeTokenHeader = req.headers.get('X-Acme-Token');
+        const wsAetherTokenHeader = req.headers.get('X-aether-Token');
         const wsCookieToken = extractCookieToken(req);
         const wsQueryToken = url.searchParams.get('token');
-        const wsToken = wsBearerToken || wsCookieToken || wsAcmeTokenHeader || wsQueryToken;
+        const wsToken = wsBearerToken || wsCookieToken || wsAetherTokenHeader || wsQueryToken;
 
         if (wsToken && (await validatePreviewToken(wsToken, wsSandboxId))) {
           const resolved = await resolveProvider(wsSandboxId).catch(() => null);

@@ -914,7 +914,7 @@ export function InstanceManagerDialog({
 
   async function savePrivateKey() {
     if (!sshResult) return;
-    const keyName = `acme_${sshResult.host.replace(/\./g, '-')}`;
+    const keyName = `aether_${sshResult.host.replace(/\./g, '-')}`;
     const blob = new Blob([sshResult.private_key], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -929,9 +929,9 @@ export function InstanceManagerDialog({
 
   // Compute description text based on mode
   const modeDescription: Record<string, string> = {
-    list: 'Manage your Acme instances.',
+    list: 'Manage your Aether instances.',
     add: 'Choose how to connect.',
-    custom: 'Connect to a Acme instance by entering its address.',
+    custom: 'Connect to a Aether instance by entering its address.',
     edit: 'Update the connection details for this instance.',
     ssh: 'Connect via SSH or VS Code Remote SSH.',
   };
@@ -1217,7 +1217,7 @@ export function InstanceManagerDialog({
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground">Custom URL</p>
                   <p className="text-xs text-muted-foreground/70 mt-0.5">
-                    Connect to any Acme instance by address
+                    Connect to any Aether instance by address
                   </p>
                 </div>
               </button>
@@ -1259,7 +1259,7 @@ export function InstanceManagerDialog({
                   required
                 />
                 <p className="text-[10px] text-muted-foreground/50">
-                  The full URL of the Acme server, e.g. http://192.168.1.50:8008/v1/p/acme-sandbox/8000
+                  The full URL of the Aether server, e.g. http://192.168.1.50:8008/v1/p/acme-sandbox/8000
                 </p>
               </div>
 

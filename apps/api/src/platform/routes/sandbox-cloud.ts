@@ -13,7 +13,7 @@
 
 import { Hono } from 'hono';
 import { eq, and, desc, sql, inArray } from 'drizzle-orm';
-import { sandboxes, type Database } from '@acme/db';
+import { sandboxes, type Database } from '@aether/db';
 import { db as defaultDb } from '../../shared/db';
 import { createApiKey } from '../../repositories/api-keys';
 import { supabaseAuth as authMiddleware } from '../../middleware/auth';
@@ -239,7 +239,7 @@ export function createCloudSandboxRouter(
       const sandboxName = await generateSandboxName(accountId, customName);
 
       // Managed VPS sandboxes are billed independently as their own Stripe subscriptions.
-      if (isManagedVpsProvider(providerName) && config.ACME_BILLING_INTERNAL_ENABLED) {
+      if (isManagedVpsProvider(providerName) && config.AETHER_BILLING_INTERNAL_ENABLED) {
         const { getCustomerByAccountId } = await import('../../billing/repositories/customers');
         const { getOrCreateStripeCustomer } = await import('../../billing/services/subscriptions');
         const { getComputeProductId, getComputeDisplayPriceCents, getComputeDescription, COMPUTE_PRICE_MARKUP } = await import('../../billing/services/tiers');
@@ -300,7 +300,7 @@ export function createCloudSandboxRouter(
           try {
             const portalSession = await stripe.billingPortal.sessions.create({
               customer: customer.id,
-              return_url: `${config.FRONTEND_URL ?? 'https://app.acme.dev'}/subscription`,
+              return_url: `${config.FRONTEND_URL ?? 'https://app.aether.dev'}/subscription`,
             });
             portalUrl = portalSession.url;
           } catch {
@@ -371,7 +371,7 @@ export function createCloudSandboxRouter(
         .returning();
       createdSandboxId = sandbox.sandboxId;
 
-      // Create a sandbox-managed API key (acme_sb_)
+      // Create a sandbox-managed API key (aether_sb_)
       const sandboxKey = await createApiKey({
         sandboxId: sandbox.sandboxId,
         accountId,
@@ -432,7 +432,7 @@ export function createCloudSandboxRouter(
         serverType: requestedServerType,
         location: requestedLocation,
         envVars: {
-          ACME_TOKEN: sandboxKey.secretKey,
+          AETHER_TOKEN: sandboxKey.secretKey,
         },
       };
 
@@ -846,7 +846,7 @@ export function createCloudSandboxRouter(
       let cancelAt: string | null = null;
 
       const stripeSubId = existingMeta.stripe_subscription_id as string | undefined;
-      if (stripeSubId && config.ACME_BILLING_INTERNAL_ENABLED) {
+      if (stripeSubId && config.AETHER_BILLING_INTERNAL_ENABLED) {
         try {
           const { getStripe } = await import('../../shared/stripe');
           const stripe = getStripe();
@@ -915,7 +915,7 @@ export function createCloudSandboxRouter(
       }
 
       const stripeSubId = existingMeta.stripe_subscription_id as string | undefined;
-      if (stripeSubId && config.ACME_BILLING_INTERNAL_ENABLED) {
+      if (stripeSubId && config.AETHER_BILLING_INTERNAL_ENABLED) {
         try {
           const { getStripe } = await import('../../shared/stripe');
           const stripe = getStripe();

@@ -66,7 +66,7 @@ function getEnv(key: string): string | undefined {
 
 // ─── Shared helpers ──────────────────────────────────────────────────────────
 
-const masterUrl = (getEnv("ACME_MASTER_URL") || "http://localhost:8000").trim()
+const masterUrl = (getEnv("AETHER_MASTER_URL") || "http://localhost:8000").trim()
 
 function authHeaders(): Record<string, string> {
   const key = getEnv("INTERNAL_SERVICE_KEY")

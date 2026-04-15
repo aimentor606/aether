@@ -1,4 +1,4 @@
-export interface AcmeTheme {
+export interface AetherTheme {
   id: string;
   name: string;
   /** Hex color for the accent dot in the theme picker */
@@ -13,7 +13,7 @@ export const DEFAULT_THEME_ID = 'graphite';
  * All backgrounds, surfaces, borders, and text are pure neutral (zero chroma).
  * Only primary, ring, sidebar-primary, and charts carry the accent hue.
  */
-export const THEMES: AcmeTheme[] = [
+export const THEMES: AetherTheme[] = [
   {
     id: 'graphite',
     name: 'Classic',
@@ -58,7 +58,7 @@ export const THEMES: AcmeTheme[] = [
   },
 ];
 
-export function getThemeById(id: string): AcmeTheme | undefined {
+export function getThemeById(id: string): AetherTheme | undefined {
   return THEMES.find((t) => t.id === id);
 }
 

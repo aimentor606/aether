@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Sparkles, Search, Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { FilterBar, FilterBarItem } from '@/components/ui/tabs';
@@ -97,7 +97,7 @@ export function SkillList() {
           {/* Content */}
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
-              <AcmeLoader size="medium" />
+              <AetherLoader size="medium" />
             </div>
           ) : error ? (
             <div className="rounded-lg border border-destructive/50 bg-destructive/5 p-6 text-center">

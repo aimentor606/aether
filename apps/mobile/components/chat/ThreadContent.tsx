@@ -42,8 +42,8 @@ import { SelectableMarkdownText } from '@/components/ui/selectable-markdown';
 import { autoLinkUrls } from '@agentpress/shared';
 import { FileAttachmentsGrid } from './FileAttachmentRenderer';
 import { CheckCircle2, AlertCircle, Info, CircleDashed } from 'lucide-react-native';
-import { AcmeLoader } from '@/components/ui/acme-loader';
-import { AcmeLogo } from '@/components/ui/AcmeLogo';
+import { AetherLoader } from '@/components/ui/aether-loader';
+import { AetherLogo } from '@/components/ui/AetherLogo';
 import { AgentLoader } from './AgentLoader';
 import { StreamingToolCard } from './StreamingToolCard';
 import { CompactToolCard, CompactStreamingToolCard } from './CompactToolCard';
@@ -55,8 +55,8 @@ import { TaskCompletedFeedback } from './tool-views/complete-tool/TaskCompletedF
 import { renderAssistantMessage } from './assistant-message-renderer';
 import { PromptExamples } from '@/components/shared';
 import { ReasoningSection } from './ReasoningSection';
-import { useAcmeComputerStore } from '@/stores/acme-computer-store';
-import { isAcmeDefaultAgentId } from '@/lib/agents';
+import { useAetherComputerStore } from '@/stores/aether-computer-store';
+import { isAetherDefaultAgentId } from '@/lib/agents';
 import { log } from '@/lib/logger';
 
 export interface ToolMessagePair {
@@ -271,7 +271,7 @@ const MarkdownContent = React.memo(function MarkdownContent({
               <View className="flex-row items-start gap-2.5 rounded-xl border border-border bg-muted/40 px-3 py-2.5 dark:bg-muted/20">
                 <Icon as={Info} size={16} className="mt-0.5 flex-shrink-0 text-muted-foreground" />
                 <Text className="flex-1 font-roobert text-sm leading-relaxed text-muted-foreground">
-                  Acme will automatically continue working once you provide your response.
+                  Aether will automatically continue working once you provide your response.
                 </Text>
               </View>
 
@@ -470,7 +470,7 @@ const ToolCard = React.memo(function ToolCard({
         disabled={!onPress}
         className="flex-row items-center gap-3 rounded-3xl border border-border bg-card p-3">
         <View className="h-8 w-8 items-center justify-center rounded-xl border border-border bg-background">
-          <AcmeLoader size="small" />
+          <AetherLoader size="small" />
         </View>
         <View className="flex-1">
           <Text className="mb-0.5 font-roobert-medium text-sm text-foreground">{displayName}</Text>
@@ -614,7 +614,7 @@ const StreamingToolCallIndicator = React.memo(function StreamingToolCallIndicato
           {isCompleted ? (
             <Icon as={CheckCircle2} size={16} className="text-emerald-500" />
           ) : (
-            <AcmeLoader size="small" />
+            <AetherLoader size="small" />
           )}
         </View>
         
@@ -665,7 +665,7 @@ const StreamingToolCallIndicator = React.memo(function StreamingToolCallIndicato
       {isCompleted ? (
         <Icon as={CheckCircle2} size={16} className="text-emerald-500" />
       ) : (
-        <AcmeLoader size="small" />
+        <AetherLoader size="small" />
       )}
     </View>
   );
@@ -717,7 +717,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = React.memo(
     streamHookStatus = 'idle',
     sandboxId,
     sandboxUrl,
-    agentName = 'Acme',
+    agentName = 'Aether',
     onPromptFill,
     isSendingMessage = false,
     onRequestScroll,
@@ -805,12 +805,12 @@ export const ThreadContent: React.FC<ThreadContentProps> = React.memo(
 
     // Helper to render agent indicator based on agent type
     const renderAgentIndicator = useCallback((agentId: string | null | undefined) => {
-      // Default Acme agent or no agent ID - show full logomark
-      const isAcmeDefault = isAcmeDefaultAgentId(agentId, agents);
+      // Default Aether agent or no agent ID - show full logomark
+      const isAetherDefault = isAetherDefaultAgentId(agentId, agents);
       
-      if (isAcmeDefault) {
-        // Full Acme logomark (icon + text) - same height as symbol+text combo
-        return <AcmeLogo size={14} variant="logomark" color={isDark ? 'dark' : 'light'} />;
+      if (isAetherDefault) {
+        // Full Aether logomark (icon + text) - same height as symbol+text combo
+        return <AetherLogo size={14} variant="logomark" color={isDark ? 'dark' : 'light'} />;
       }
       
       // Custom agent - show symbol + name
@@ -819,7 +819,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = React.memo(
       
       return (
         <View className="flex-row items-center gap-1.5">
-          <AcmeLogo size={16} variant="symbol" color={isDark ? 'dark' : 'light'} />
+          <AetherLogo size={16} variant="symbol" color={isDark ? 'dark' : 'light'} />
           <Text className="text-sm font-medium text-muted-foreground">{displayName}</Text>
         </View>
       );
@@ -970,7 +970,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = React.memo(
       return maps;
     }, [groupedMessages]);
 
-    const { navigateToToolCall } = useAcmeComputerStore();
+    const { navigateToToolCall } = useAetherComputerStore();
 
     const handleToolPressInternal = useCallback(
       (clickedToolMsg: UnifiedMessage) => {
@@ -1275,14 +1275,14 @@ export const ThreadContent: React.FC<ThreadContentProps> = React.memo(
                                   style={{ borderRadius: 16 }}
                                 >
                                   <View className="bg-white/20 rounded-full p-2">
-                                    <AcmeLoader size="small" />
+                                    <AetherLoader size="small" />
                                   </View>
                                 </View>
                               )}
                             </>
                           ) : (
                             <View className="flex-1 items-center justify-center bg-card">
-                              {isUploading && <AcmeLoader size="small" />}
+                              {isUploading && <AetherLoader size="small" />}
                               <Text className="text-xs text-muted-foreground text-center px-2 mt-2" numberOfLines={2}>
                                 {attachment.name}
                               </Text>
@@ -1486,7 +1486,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = React.memo(
 
             return (
               <View key={group.key} className="mb-6">
-                {/* Reasoning section with integrated Acme icon (like frontend) */}
+                {/* Reasoning section with integrated Aether icon (like frontend) */}
                 {reasoningSectionElement}
                 {/* Show agent header only when reasoning section is NOT displayed */}
                 {!reasoningSectionElement && (
@@ -1987,7 +1987,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = React.memo(
           return (
             <View className="mb-6">
               {/* Show agent header only when reasoning section is NOT displayed */}
-              {/* ReasoningSection has its own Acme logo, so we hide the header when showing reasoning */}
+              {/* ReasoningSection has its own Aether logo, so we hide the header when showing reasoning */}
               {!showReasoning && (
                 <View className="mb-3 flex-row items-center">
                   {renderAgentIndicator(null)}

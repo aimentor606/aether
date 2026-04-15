@@ -9,7 +9,7 @@ import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { eq } from 'drizzle-orm';
-import { sandboxes } from '@acme/db';
+import { sandboxes } from '@aether/db';
 import { db } from '../../shared/db';
 import { combinedAuth } from '../../middleware/auth';
 import { config } from '../../config';

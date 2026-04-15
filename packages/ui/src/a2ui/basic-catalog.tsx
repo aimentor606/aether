@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { createCatalog } from '@acme/sdk/a2ui';
-import type { A2UICatalog } from '@acme/sdk/a2ui';
+import { createCatalog } from '@aether/sdk/a2ui';
+import type { A2UICatalog } from '@aether/sdk/a2ui';
 import {
   Button,
   Card,
@@ -185,7 +185,7 @@ function SwitchBlock({ id, label, checked }: { id?: string; label?: string; chec
 
 /**
  * Create a basic A2UI catalog with standard block type mappings.
- * Uses @acme/ui primitives where available, plain HTML otherwise.
+ * Uses @aether/ui primitives where available, plain HTML otherwise.
  * Extend with domain-specific types via `catalog.register()`.
  */
 export function createBasicCatalog(): A2UICatalog<AnyComponent> {

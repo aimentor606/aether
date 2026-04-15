@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { sandboxes } from '@acme/db';
+import { sandboxes } from '@aether/db';
 import { db } from '../../shared/db';
 import { config, SANDBOX_VERSION } from '../../config';
 import type {
@@ -13,7 +13,7 @@ import type {
   ProvisioningStatus,
 } from './index';
 
-const ACME_MASTER_PORT = 8000;
+const AETHER_MASTER_PORT = 8000;
 const API_TIMEOUT_MS = 300_000;
 const PROVISION_TIMEOUT_MS = 600_000;
 const POLL_INTERVAL_MS = 3_000;
@@ -33,7 +33,7 @@ interface JustAVPSMachine {
   price_monthly: number | null;
   backups_enabled: boolean;
   source: string;
-  acme_sandbox_id: string | null;
+  aether_sandbox_id: string | null;
   created_at: string;
   ready_at: string | null;
   urls: { vscode: string; pty: string; port_template: string } | null;
@@ -254,7 +254,7 @@ async function ensureWebhookRegistered(): Promise<void> {
   const webhookUrl = config.JUSTAVPS_WEBHOOK_URL;
   const webhookSecret = config.JUSTAVPS_WEBHOOK_SECRET;
   if (!webhookUrl) {
-    console.warn('[JUSTAVPS] JUSTAVPS_WEBHOOK_URL not configured — provisioning events will not flow back to Acme');
+    console.warn('[JUSTAVPS] JUSTAVPS_WEBHOOK_URL not configured — provisioning events will not flow back to Aether');
     webhookRegistered = true;
     return;
   }
@@ -289,8 +289,8 @@ function shellEscape(value: string): string {
   return `'${value.replace(/'/g, `'"'"'`)}'`;
 }
 
-function resolveReachableAcmeApiUrl(): string {
-  const directBase = config.ACME_URL.replace(/\/v1\/router\/?$/, '');
+function resolveReachableAetherApiUrl(): string {
+  const directBase = config.AETHER_URL.replace(/\/v1\/router\/?$/, '');
 
   try {
     const parsed = new URL(directBase);
@@ -378,21 +378,21 @@ export class JustAVPSProvider implements SandboxProvider {
 
     const serverType = opts.serverType || config.JUSTAVPS_DEFAULT_SERVER_TYPE;
     const location = opts.location || config.JUSTAVPS_DEFAULT_LOCATION;
-    const sandboxApiBase = resolveReachableAcmeApiUrl().replace(/\/v1\/router\/?$/, '');
+    const sandboxApiBase = resolveReachableAetherApiUrl().replace(/\/v1\/router\/?$/, '');
     const routerBase = `${sandboxApiBase}/v1/router`;
 
-    const serviceKey = opts.envVars?.ACME_TOKEN || '';
+    const serviceKey = opts.envVars?.AETHER_TOKEN || '';
     // Inject the API's own version into the sandbox container so the sandbox
     // health endpoint reports the correct version. All components share one
     // version number (set by deploy-zero-downtime.sh from the Docker image tag).
     // This works even when SANDBOX_IMAGE defaults to :latest.
     const envVars: Record<string, string> = {
-      ACME_API_URL: sandboxApiBase,
+      AETHER_API_URL: sandboxApiBase,
       ENV_MODE: 'cloud',
       INTERNAL_SERVICE_KEY: serviceKey,
-      ACME_TOKEN: serviceKey,
+      AETHER_TOKEN: serviceKey,
       SANDBOX_VERSION: SANDBOX_VERSION,
-      ACME_SANDBOX_VERSION: SANDBOX_VERSION,
+      AETHER_SANDBOX_VERSION: SANDBOX_VERSION,
       TUNNEL_API_URL: sandboxApiBase,
       TUNNEL_TOKEN: serviceKey,
       TAVILY_API_URL: `${routerBase}/tavily`,
@@ -408,7 +408,7 @@ export class JustAVPSProvider implements SandboxProvider {
       provider: 'cloud',
       server_type: serverType,
       region: location,
-      name: `acme-sandbox-${opts.accountId.slice(0, 8)}-${Date.now().toString(36)}`,
+      name: `aether-sandbox-${opts.accountId.slice(0, 8)}-${Date.now().toString(36)}`,
       env_vars: envVars,
       cloud_init_script: buildCustomerCloudInitScript(config.SANDBOX_IMAGE),
       enable_backups: true,
@@ -436,7 +436,7 @@ export class JustAVPSProvider implements SandboxProvider {
         method: 'POST',
         body: {
           machine_id: machine.id,
-          label: `acme-sandbox-${machine.id}`,
+          label: `aether-sandbox-${machine.id}`,
           expires_in_seconds: 7 * 24 * 60 * 60, // 30 days
         },
       });
@@ -535,7 +535,7 @@ export class JustAVPSProvider implements SandboxProvider {
           method: 'POST',
           body: {
             machine_id: externalId,
-            label: `acme-sandbox-${externalId}`,
+            label: `aether-sandbox-${externalId}`,
             expires_in_seconds: 7 * 24 * 60 * 60,
           },
         });

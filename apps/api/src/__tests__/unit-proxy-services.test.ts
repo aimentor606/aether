@@ -1,6 +1,6 @@
 /**
  * Unit tests for matchAllowedRoute() — the route-matching function used by
- * the proxy handler to gate Acme-user requests to allowed upstream paths.
+ * the proxy handler to gate Aether-user requests to allowed upstream paths.
  *
  * Route data is imported from the real getProxyServices() registry to avoid
  * test data drifting from production config.
@@ -199,7 +199,7 @@ describe('matchAllowedRoute', () => {
       for (const [name, svc] of Object.entries(allServices)) {
         expect(svc.name).toBe(name);
         expect(svc.targetBaseUrl).toBeDefined();
-        expect(typeof svc.getAcmeApiKey).toBe('function');
+        expect(typeof svc.getAetherApiKey).toBe('function');
         expect(svc.keyInjection).toBeDefined();
         expect(Array.isArray(svc.allowedRoutes)).toBe(true);
         expect(svc.allowedRoutes.length).toBeGreaterThan(0);

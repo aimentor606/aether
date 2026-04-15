@@ -1,11 +1,17 @@
-"use client";
+'use client';
 
 import { cn } from '@/lib/utils';
-import { Gauge, TrendingUp, TrendingDown } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import type { Backpressure } from "@/hooks/admin/use-stateless";
+import { Gauge, TrendingUp, TrendingDown } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Badge,
+  Progress,
+} from '@aether/ui/primitives';
+import type { Backpressure } from '@/hooks/admin/use-stateless';
 
 interface BackpressurePanelProps {
   backpressure: Backpressure | undefined;
@@ -32,22 +38,22 @@ export function BackpressurePanel({ backpressure }: BackpressurePanelProps) {
 
   const getLevelColor = (level: string) => {
     const colors: Record<string, string> = {
-      normal: "text-emerald-500",
-      elevated: "text-amber-500",
-      high: "text-orange-500",
-      critical: "text-red-500",
+      normal: 'text-emerald-500',
+      elevated: 'text-amber-500',
+      high: 'text-orange-500',
+      critical: 'text-red-500',
     };
-    return colors[level] || "text-muted-foreground";
+    return colors[level] || 'text-muted-foreground';
   };
 
   const getLevelBgColor = (level: string) => {
     const colors: Record<string, string> = {
-      normal: "bg-emerald-500",
-      elevated: "bg-amber-500",
-      high: "bg-orange-500",
-      critical: "bg-red-500",
+      normal: 'bg-emerald-500',
+      elevated: 'bg-amber-500',
+      high: 'bg-orange-500',
+      critical: 'bg-red-500',
     };
-    return colors[level] || "bg-muted";
+    return colors[level] || 'bg-muted';
   };
 
   const levelProgress: Record<string, number> = {
@@ -64,14 +70,18 @@ export function BackpressurePanel({ backpressure }: BackpressurePanelProps) {
           <Gauge className="w-5 h-5 text-blue-500" />
           Backpressure
         </CardTitle>
-        <CardDescription>
-          System load and adaptive controls
-        </CardDescription>
+        <CardDescription>System load and adaptive controls</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="text-center">
-          <p className={cn('text-4xl font-bold', getLevelColor(backpressure.level))}>
-            {backpressure.level.charAt(0).toUpperCase() + backpressure.level.slice(1)}
+          <p
+            className={cn(
+              'text-4xl font-bold',
+              getLevelColor(backpressure.level),
+            )}
+          >
+            {backpressure.level.charAt(0).toUpperCase() +
+              backpressure.level.slice(1)}
           </p>
           <Progress
             value={levelProgress[backpressure.level]}
@@ -90,11 +100,15 @@ export function BackpressurePanel({ backpressure }: BackpressurePanelProps) {
           </div>
           <div className="p-3 rounded-xl border">
             <p className="text-xs text-muted-foreground">Flush Latency</p>
-            <p className="text-lg font-bold">{backpressure.flush_latency_ms.toFixed(0)}ms</p>
+            <p className="text-lg font-bold">
+              {backpressure.flush_latency_ms.toFixed(0)}ms
+            </p>
           </div>
           <div className="p-3 rounded-xl border">
             <p className="text-xs text-muted-foreground">Memory</p>
-            <p className="text-lg font-bold">{backpressure.memory_percent.toFixed(1)}%</p>
+            <p className="text-lg font-bold">
+              {backpressure.memory_percent.toFixed(1)}%
+            </p>
           </div>
         </div>
 
@@ -104,11 +118,11 @@ export function BackpressurePanel({ backpressure }: BackpressurePanelProps) {
             <Badge
               className={
                 backpressure.should_accept_work
-                  ? "bg-emerald-500/10 text-emerald-400"
-                  : "bg-red-500/10 text-red-400"
+                  ? 'bg-emerald-500/10 text-emerald-400'
+                  : 'bg-red-500/10 text-red-400'
               }
             >
-              {backpressure.should_accept_work ? "Yes" : "No"}
+              {backpressure.should_accept_work ? 'Yes' : 'No'}
             </Badge>
           </div>
           <div className="flex items-center justify-between">
@@ -116,11 +130,11 @@ export function BackpressurePanel({ backpressure }: BackpressurePanelProps) {
             <Badge
               className={
                 backpressure.should_shed_load
-                  ? "bg-amber-500/10 text-amber-400"
-                  : "bg-emerald-500/10 text-emerald-400"
+                  ? 'bg-amber-500/10 text-amber-400'
+                  : 'bg-emerald-500/10 text-emerald-400'
               }
             >
-              {backpressure.should_shed_load ? "Yes" : "No"}
+              {backpressure.should_shed_load ? 'Yes' : 'No'}
             </Badge>
           </div>
         </div>
@@ -131,11 +145,15 @@ export function BackpressurePanel({ backpressure }: BackpressurePanelProps) {
           </p>
           <div className="flex items-center justify-between text-sm">
             <span>Batch Size</span>
-            <span className="font-mono">{backpressure.recommended_batch_size}</span>
+            <span className="font-mono">
+              {backpressure.recommended_batch_size}
+            </span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span>Flush Interval</span>
-            <span className="font-mono">{backpressure.recommended_flush_interval}s</span>
+            <span className="font-mono">
+              {backpressure.recommended_flush_interval}s
+            </span>
           </div>
         </div>
       </CardContent>

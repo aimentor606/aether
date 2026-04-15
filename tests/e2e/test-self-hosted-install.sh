@@ -73,8 +73,8 @@ cd /Users/markokraemer/Projects/heyagi/computer
 
 # Run installer with all inputs provided via stdin
 # 1 = local mode, 1 = Docker database, email, password, password, n = skip integrations
-export ACME_OWNER_EMAIL="$OWNER_EMAIL"
-export ACME_OWNER_PASSWORD="$OWNER_PASSWORD"
+export AETHER_OWNER_EMAIL="$OWNER_EMAIL"
+export AETHER_OWNER_PASSWORD="$OWNER_PASSWORD"
 
 printf "1\n1\nn\n" | bash scripts/get-acme.sh --local 2>&1 | tee /tmp/acme-install.log | while read line; do
     if [[ "$line" == *"Acme is running"* ]]; then
@@ -101,10 +101,10 @@ run_test "Frontend container running" \
     "docker ps | grep -q 'acme-frontend-1'"
 
 run_test "API container running" \
-    "docker ps | grep -q 'acme-acme-api-1'"
+    "docker ps | grep -q 'acme-aether-api-1'"
 
 run_test "Sandbox container running" \
-    "docker ps | grep -q 'acme-sandbox'"
+    "docker ps | grep -q 'aether-sandbox'"
 
 run_test "Supabase Kong running" \
     "docker ps | grep -q 'acme-supabase-kong-1'"

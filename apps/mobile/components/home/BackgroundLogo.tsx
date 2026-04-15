@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Dimensions, Animated } from 'react-native';
 import { useColorScheme } from 'nativewind';
-import AcmeSymbolBlack from '@/assets/brand/acme-symbol-scale-effect-black.svg';
-import AcmeSymbolWhite from '@/assets/brand/acme-symbol-scale-effect-white.svg';
+import AetherSymbolBlack from '@/assets/brand/acme-symbol-scale-effect-black.svg';
+import AetherSymbolWhite from '@/assets/brand/acme-symbol-scale-effect-white.svg';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -23,7 +23,7 @@ export function BackgroundLogo() {
   }, []);
 
   const leftOffset = (SCREEN_WIDTH - 393) / 2;
-  const SymbolComponent = colorScheme === 'dark' ? AcmeSymbolWhite : AcmeSymbolBlack;
+  const SymbolComponent = colorScheme === 'dark' ? AetherSymbolWhite : AetherSymbolBlack;
 
   return (
     <Animated.View

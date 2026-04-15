@@ -14,7 +14,7 @@ accountStateRouter.get('/', async (c) => {
   try {
     const state = await buildAccountState(accountId);
     // Billing disabled — return real data but never block the user
-    if (!config.ACME_BILLING_INTERNAL_ENABLED) {
+    if (!config.AETHER_BILLING_INTERNAL_ENABLED) {
       state.credits.can_run = true;
     }
     return c.json(state);
@@ -33,7 +33,7 @@ accountStateRouter.get('/minimal', async (c) => {
   const accountId = c.get('userId');
   try {
     const state = await buildMinimalAccountState(accountId);
-    if (!config.ACME_BILLING_INTERNAL_ENABLED) {
+    if (!config.AETHER_BILLING_INTERNAL_ENABLED) {
       state.credits.can_run = true;
     }
     return c.json(state);

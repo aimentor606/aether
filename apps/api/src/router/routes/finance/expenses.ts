@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { expensesService } from '@acme/vertical-finance';
-import { createExpenseSchema, updateExpenseSchema } from '@acme/db';
+import { expensesService } from '@aether/vertical-finance';
+import { createExpenseSchema, updateExpenseSchema } from '@aether/db';
 import type { AppContext } from '../../../types';
 
 const expensesRoutes = new Hono<{ Variables: AppContext }>()

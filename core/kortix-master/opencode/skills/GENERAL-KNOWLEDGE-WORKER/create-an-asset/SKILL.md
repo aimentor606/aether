@@ -784,7 +784,7 @@ Before delivering, verify:
 ### Example 1: Executive Landing Page
 
 **Input:**
-- Prospect: Acme Corp (manufacturing)
+- Prospect: Aether Corp (manufacturing)
 - Audience: C-suite
 - Purpose: Exec alignment after discovery
 - Format: Interactive landing page
@@ -795,7 +795,7 @@ Before delivering, verify:
 Strategic Fit | Business Impact | ROI Calculator | Security & Trust | Next Steps
 
 [Strategic Fit tab]
-- Acme's stated priorities (from discovery call)
+- Aether's stated priorities (from discovery call)
 - How [Product] aligns
 - Relevant manufacturing customers
 ```

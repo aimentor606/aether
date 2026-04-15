@@ -24,7 +24,7 @@ const PROMPT_TIMEOUT_MS = 30000;
 
 function getOpenCodeUrl(): string {
   // Same candidates as setup/index.ts
-  const explicit = process.env.OPENCODE_URL || process.env.ACME_MASTER_URL;
+  const explicit = process.env.OPENCODE_URL || process.env.AETHER_MASTER_URL;
   if (explicit?.trim()) return explicit.trim().replace(/\/+$/, '');
 
   // Inside docker-compose, the sandbox is reachable at http://sandbox:8000

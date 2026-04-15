@@ -46,7 +46,7 @@ function parseArgs(argv: string[]): { command: string; args: string[]; flags: Re
 // ─── DB path resolution (same as channel-db.ts) ─────────────────────────────
 
 function resolveDbPath(): string {
-  const root = process.env.ACME_WORKSPACE?.trim()
+  const root = process.env.AETHER_WORKSPACE?.trim()
     || (process.env.OPENCODE_CONFIG_DIR?.trim()
       ? path.dirname(path.resolve(process.env.OPENCODE_CONFIG_DIR))
       : (process.env.HOME ? path.join(process.env.HOME, "") : process.cwd()))
@@ -104,8 +104,8 @@ interface ConnectorRow {
 // ─── File-based connector discovery ──────────────────────────────────────────
 
 function resolveConnectorRoot(): string | null {
-  // Check ACME_WORKSPACE first — that's where runtime data lives in the sandbox
-  const workspace = process.env.ACME_WORKSPACE?.trim()
+  // Check AETHER_WORKSPACE first — that's where runtime data lives in the sandbox
+  const workspace = process.env.AETHER_WORKSPACE?.trim()
   if (workspace) {
     const wsPath = path.join(path.resolve(workspace), ".opencode", "connectors")
     if (existsSync(wsPath)) return wsPath

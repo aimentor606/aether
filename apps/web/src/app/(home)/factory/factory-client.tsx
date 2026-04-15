@@ -175,7 +175,7 @@ export default function FactoryPageClient() {
 
         <Reveal delay={0.05}>
           <p className="text-sm text-muted-foreground/50 leading-relaxed max-w-xl mb-4">
-            We run our own company on Acme. Every day. Our engineering, our operations, our 
+            We run our own company on Aether. Every day. Our engineering, our operations, our 
             growth — agents doing the work, humans governing the system. We eat our own output 
             before we ship it to anyone else.
           </p>
@@ -200,7 +200,7 @@ export default function FactoryPageClient() {
 
         <Reveal delay={0.05}>
           <p className="text-base text-muted-foreground/60 leading-relaxed max-w-xl mb-5">
-            Acme is infrastructure. The platform is not the point.
+            Aether is infrastructure. The platform is not the point.
           </p>
         </Reveal>
 

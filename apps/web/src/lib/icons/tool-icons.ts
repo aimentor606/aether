@@ -5,8 +5,8 @@
 
 import type React from 'react';
 import type { ElementType } from 'react';
-import { getToolIconKey } from '@acme/shared';
-import type { ToolIconKey } from '@acme/shared';
+import { getToolIconKey } from '@aether/shared';
+import type { ToolIconKey } from '@aether/shared';
 import {
   Globe,
   FileEdit,

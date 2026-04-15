@@ -10,7 +10,7 @@ function DocsLogo() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/acme-symbol.svg"
-        alt="Acme"
+        alt="Aether"
         className="dark:invert flex-shrink-0"
         style={{ width: 18, height: 18 }}
       />

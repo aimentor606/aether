@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
+import { useState, useMemo } from 'react';
 import {
   Loader2,
   RotateCcw,
@@ -19,19 +19,21 @@ import {
   Clock,
   CheckSquare,
   Square,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+} from 'lucide-react';
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Button,
+  Badge,
+  Input,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -39,16 +41,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
-} from "@/components/ui/dropdown-menu";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
-import { toast } from "@/lib/toast";
-import type { DLQEntry } from "@/hooks/admin/use-stateless";
+} from '@aether/ui/primitives';
+import { cn } from '@/lib/utils';
+import { toast } from '@/lib/toast';
+import type { DLQEntry } from '@/hooks/admin/use-stateless';
 
 interface DLQTableProps {
   entries: DLQEntry[];
@@ -61,12 +61,27 @@ interface DLQTableProps {
   onBulkDelete?: (entryIds: string[]) => void;
 }
 
-type WriteType = "message" | "credit" | "status" | string;
+type WriteType = 'message' | 'credit' | 'status' | string;
 
-const writeTypeConfig: Record<WriteType, { label: string; color: string; bgColor: string }> = {
-  message: { label: "Message", color: "text-blue-400", bgColor: "bg-blue-500/10 border-blue-500/30" },
-  credit: { label: "Credit", color: "text-emerald-400", bgColor: "bg-emerald-500/10 border-emerald-500/30" },
-  status: { label: "Status", color: "text-purple-400", bgColor: "bg-purple-500/10 border-purple-500/30" },
+const writeTypeConfig: Record<
+  WriteType,
+  { label: string; color: string; bgColor: string }
+> = {
+  message: {
+    label: 'Message',
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-500/10 border-blue-500/30',
+  },
+  credit: {
+    label: 'Credit',
+    color: 'text-emerald-400',
+    bgColor: 'bg-emerald-500/10 border-emerald-500/30',
+  },
+  status: {
+    label: 'Status',
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-500/10 border-purple-500/30',
+  },
 };
 
 export function DLQTable({
@@ -79,12 +94,14 @@ export function DLQTable({
   onBulkRetry,
   onBulkDelete,
 }: DLQTableProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedTypes, setSelectedTypes] = useState<Set<string>>(new Set());
-  const [selectedEntries, setSelectedEntries] = useState<Set<string>>(new Set());
+  const [selectedEntries, setSelectedEntries] = useState<Set<string>>(
+    new Set(),
+  );
   const [detailEntry, setDetailEntry] = useState<DLQEntry | null>(null);
-  const [sortBy, setSortBy] = useState<"failed_at" | "attempts">("failed_at");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [sortBy, setSortBy] = useState<'failed_at' | 'attempts'>('failed_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // Get unique types from entries
   const availableTypes = useMemo(() => {
@@ -103,7 +120,7 @@ export function DLQTable({
         (e) =>
           e.entry_id.toLowerCase().includes(query) ||
           e.run_id.toLowerCase().includes(query) ||
-          e.error.toLowerCase().includes(query)
+          e.error.toLowerCase().includes(query),
       );
     }
 
@@ -114,9 +131,9 @@ export function DLQTable({
 
     // Sort
     result = [...result].sort((a, b) => {
-      const aVal = sortBy === "failed_at" ? a.failed_at : a.attempt_count;
-      const bVal = sortBy === "failed_at" ? b.failed_at : b.attempt_count;
-      return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
+      const aVal = sortBy === 'failed_at' ? a.failed_at : a.attempt_count;
+      const bVal = sortBy === 'failed_at' ? b.failed_at : b.attempt_count;
+      return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
     });
 
     return result;
@@ -158,9 +175,13 @@ export function DLQTable({
   };
 
   const getTypeBadge = (type: string) => {
-    const config = writeTypeConfig[type] || { label: type, color: "text-muted-foreground", bgColor: "bg-muted" };
+    const config = writeTypeConfig[type] || {
+      label: type,
+      color: 'text-muted-foreground',
+      bgColor: 'bg-muted',
+    };
     return (
-      <Badge className={cn("font-medium", config.bgColor)}>
+      <Badge className={cn('font-medium', config.bgColor)}>
         {config.label}
       </Badge>
     );
@@ -186,7 +207,7 @@ export function DLQTable({
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard");
+    toast.success('Copied to clipboard');
   };
 
   const handleBulkRetry = () => {
@@ -214,7 +235,8 @@ export function DLQTable({
                 Dead Letter Queue
               </CardTitle>
               <CardDescription className="mt-1">
-                Failed writes that exceeded retry limits • {entries.length} total entries
+                Failed writes that exceeded retry limits • {entries.length}{' '}
+                total entries
               </CardDescription>
             </div>
 
@@ -239,15 +261,17 @@ export function DLQTable({
           <div className="flex items-center gap-3 mt-4">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input type="text"
-                placeholder="Search by ID, run ID, or error..." autoComplete="off"
+              <Input
+                type="text"
+                placeholder="Search by ID, run ID, or error..."
+                autoComplete="off"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 h-9"
               />
               {searchQuery && (
                 <button
-                  onClick={() => setSearchQuery("")}
+                  onClick={() => setSearchQuery('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-4 h-4" />
@@ -291,7 +315,9 @@ export function DLQTable({
                 {selectedTypes.size > 0 && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setSelectedTypes(new Set())}>
+                    <DropdownMenuItem
+                      onClick={() => setSelectedTypes(new Set())}
+                    >
                       Clear filters
                     </DropdownMenuItem>
                   </>
@@ -307,13 +333,28 @@ export function DLQTable({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={() => { setSortBy("failed_at"); setSortOrder("desc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy('failed_at');
+                    setSortOrder('desc');
+                  }}
+                >
                   Newest first
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("failed_at"); setSortOrder("asc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy('failed_at');
+                    setSortOrder('asc');
+                  }}
+                >
                   Oldest first
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("attempts"); setSortOrder("desc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy('attempts');
+                    setSortOrder('desc');
+                  }}
+                >
                   Most attempts
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -359,12 +400,14 @@ export function DLQTable({
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <CheckCircle className="w-12 h-12 text-emerald-500/50 mb-3" />
               <p className="text-muted-foreground font-medium">
-                {entries.length === 0 ? "No entries in DLQ" : "No entries match filters"}
+                {entries.length === 0
+                  ? 'No entries in DLQ'
+                  : 'No entries match filters'}
               </p>
               <p className="text-sm text-muted-foreground/70 mt-1">
                 {entries.length === 0
-                  ? "All writes have been processed successfully"
-                  : "Try adjusting your search or filters"}
+                  ? 'All writes have been processed successfully'
+                  : 'Try adjusting your search or filters'}
               </p>
             </div>
           ) : (
@@ -409,8 +452,8 @@ export function DLQTable({
                     <tr
                       key={entry.entry_id}
                       className={cn(
-                        "border-b transition-colors hover:bg-muted/30",
-                        selectedEntries.has(entry.entry_id) && "bg-primary/5"
+                        'border-b transition-colors hover:bg-muted/30',
+                        selectedEntries.has(entry.entry_id) && 'bg-primary/5',
                       )}
                     >
                       <td className="h-14 px-4">
@@ -431,15 +474,21 @@ export function DLQTable({
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <button
-                                  onClick={() => copyToClipboard(entry.entry_id)}
+                                  onClick={() =>
+                                    copyToClipboard(entry.entry_id)
+                                  }
                                   className="font-mono text-sm hover:text-primary transition-colors"
                                 >
                                   {entry.entry_id.slice(0, 8)}...
                                 </button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p className="font-mono text-xs">{entry.entry_id}</p>
-                                <p className="text-xs text-muted-foreground mt-1">Click to copy</p>
+                                <p className="font-mono text-xs">
+                                  {entry.entry_id}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Click to copy
+                                </p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -454,19 +503,26 @@ export function DLQTable({
                                 </button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p className="font-mono text-xs">{entry.run_id}</p>
-                                <p className="text-xs text-muted-foreground mt-1">Click to copy</p>
+                                <p className="font-mono text-xs">
+                                  {entry.run_id}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Click to copy
+                                </p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                         </div>
                       </td>
-                      <td className="h-14 px-4">{getTypeBadge(entry.write_type)}</td>
+                      <td className="h-14 px-4">
+                        {getTypeBadge(entry.write_type)}
+                      </td>
                       <td className="h-14 px-4 text-center">
                         <Badge
                           variant="outline"
                           className={cn(
-                            entry.attempt_count >= 3 && "border-red-500/30 text-red-400"
+                            entry.attempt_count >= 3 &&
+                              'border-red-500/30 text-red-400',
                           )}
                         >
                           {entry.attempt_count}
@@ -482,7 +538,9 @@ export function DLQTable({
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-xs">{formatTime(entry.failed_at)}</p>
+                              <p className="text-xs">
+                                {formatTime(entry.failed_at)}
+                              </p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -501,7 +559,7 @@ export function DLQTable({
                             <TooltipContent className="max-w-sm">
                               <p className="text-xs font-mono whitespace-pre-wrap break-all">
                                 {entry.error.slice(0, 300)}
-                                {entry.error.length > 300 && "..."}
+                                {entry.error.length > 300 && '...'}
                               </p>
                               <p className="text-xs text-muted-foreground mt-1">
                                 Click to view full error
@@ -643,7 +701,10 @@ export function DLQTable({
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Attempts
                   </label>
-                  <Badge variant="outline" className="border-red-500/30 text-red-400">
+                  <Badge
+                    variant="outline"
+                    className="border-red-500/30 text-red-400"
+                  >
                     {detailEntry.attempt_count}
                   </Badge>
                 </div>
@@ -726,8 +787,8 @@ export function DLQTable({
 
 function extractErrorType(error: string): string {
   const match = error.match(/([a-zA-Z]+\.errors\.[a-zA-Z]+)/);
-  if (match) return match[1].split(".").pop() || error.slice(0, 30);
+  if (match) return match[1].split('.').pop() || error.slice(0, 30);
   const pyMatch = error.match(/^([A-Z][a-zA-Z]+Error|[A-Z][a-zA-Z]+Exception)/);
   if (pyMatch) return pyMatch[1];
-  return error.slice(0, 30) + (error.length > 30 ? "..." : "");
+  return error.slice(0, 30) + (error.length > 30 ? '...' : '');
 }

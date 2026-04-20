@@ -1,5 +1,5 @@
 export const siteConfig = {
-  url: process.env.ACME_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
+  url: process.env.AETHER_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
   nav: {
     links: [
       { id: 1, name: 'OS', href: '/' },
@@ -10,18 +10,18 @@ export const siteConfig = {
   },
   hero: {
     description:
-      'Acme – open-source platform to build, manage and train your AI Workforce.',
+      'Aether – open-source platform to build, manage and train your AI Workforce.',
   },
   footerLinks: [
     {
-      title: 'Acme',
+      title: 'Aether',
       links: [
         { id: 1, title: 'About', url: '/about' },
         { id: 2, title: 'Careers', url: '/careers' },
         // { id: 3, title: 'Partnerships', url: '/partnerships' },
         { id: 4, title: 'Support', url: '/support' },
-        { id: 5, title: 'Contact', url: 'mailto:hey@acme.dev' },
-        { id: 13, title: 'Status', url: 'https://status.acme.dev' },
+        { id: 5, title: 'Contact', url: 'mailto:hey@aether.dev' },
+        { id: 13, title: 'Status', url: 'https://status.aether.dev' },
       ],
     },
     {

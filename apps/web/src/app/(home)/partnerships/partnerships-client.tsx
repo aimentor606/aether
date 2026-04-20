@@ -43,7 +43,7 @@ export default function PartnershipsPageClient() {
 
         <Reveal delay={0.08}>
           <p className="text-base text-muted-foreground/60 leading-relaxed max-w-xl">
-            We work with a handful of selected companies to build autonomous operations — the same way we build them for ourselves. Acme leadership and engineers, embedded with your team.
+            We work with a handful of selected companies to build autonomous operations — the same way we build them for ourselves. Aether leadership and engineers, embedded with your team.
           </p>
         </Reveal>
 
@@ -63,7 +63,7 @@ export default function PartnershipsPageClient() {
               $20,000<span className="text-base font-normal text-muted-foreground/50">/month</span>
             </p>
             <p className="text-sm text-muted-foreground/50 mt-2">
-              Acme leadership and engineers embedded with your team. Cancel anytime.
+              Aether leadership and engineers embedded with your team. Cancel anytime.
             </p>
           </div>
         </Reveal>
@@ -86,7 +86,7 @@ export default function PartnershipsPageClient() {
                 <p className="text-xs text-muted-foreground/35 mb-1">Phase 2</p>
                 <p className="text-base font-medium text-foreground/70">Build & Deploy</p>
                 <p className="text-base text-muted-foreground/60 leading-relaxed mt-1.5">
-                  We build autonomous operations on Acme — agents, automations, autonomous teams — wired into your tools and data. Fully deployed, in production. This requires low politics, low bureaucracy, and real access. Credentials, systems, green lights. We need ownership to move. This is a partnership, not a consulting engagement.
+                  We build autonomous operations on Aether — agents, automations, autonomous teams — wired into your tools and data. Fully deployed, in production. This requires low politics, low bureaucracy, and real access. Credentials, systems, green lights. We need ownership to move. This is a partnership, not a consulting engagement.
                 </p>
               </div>
               <div>
@@ -117,10 +117,10 @@ export default function PartnershipsPageClient() {
 
             <div className="flex flex-col gap-1.5 mt-5">
               <a
-                href="mailto:marko@acme.dev"
+                href="mailto:marko@aether.dev"
                 className="text-base text-foreground/70 hover:text-foreground underline underline-offset-4 decoration-foreground/20 hover:decoration-foreground/50 transition-colors w-fit"
               >
-                marko@acme.dev
+                marko@aether.dev
               </a>
               <a
                 href="https://x.com/markokraemer"

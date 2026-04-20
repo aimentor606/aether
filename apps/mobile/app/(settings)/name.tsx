@@ -14,7 +14,7 @@ import { Icon } from '@/components/ui/icon';
 import { Save, Mail, AlertTriangle } from 'lucide-react-native';
 import { supabase } from '@/api/supabase';
 import * as Haptics from 'expo-haptics';
-import { AcmeLoader } from '@/components/ui';
+import { AetherLoader } from '@/components/ui';
 import { ProfilePicture } from '@/components/settings/ProfilePicture';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { log } from '@/lib/logger';
@@ -222,7 +222,7 @@ function SaveButton({ onPress, disabled, isLoading }: SaveButtonProps) {
     >
       {isLoading ? (
         <>
-          <AcmeLoader size="small" forceTheme={colorScheme === 'dark' ? 'dark' : 'light'} />
+          <AetherLoader size="small" forceTheme={colorScheme === 'dark' ? 'dark' : 'light'} />
           <Text className="text-primary-foreground text-sm font-roobert-medium">
             {t('nameEdit.saving')}
           </Text>

@@ -9,12 +9,12 @@
  */
 function resolveAuthCookieName() {
   const appUrl =
-    process.env.ACME_PUBLIC_APP_URL ||
+    process.env.AETHER_PUBLIC_APP_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.NEXT_PUBLIC_URL ||
     process.env.PUBLIC_URL;
 
-  if (!appUrl) return 'sb-acme-auth-token';
+  if (!appUrl) return 'sb-aether-auth-token';
 
   try {
     const url = new URL(appUrl);
@@ -22,13 +22,13 @@ function resolveAuthCookieName() {
     const port = url.port;
 
     if (isLocalhost && port) {
-      return `sb-acme-auth-token-${port}`;
+      return `sb-aether-auth-token-${port}`;
     }
   } catch {
     // Fall back to the historical cookie name.
   }
 
-  return 'sb-acme-auth-token';
+  return 'sb-aether-auth-token';
 }
 
-export const ACME_SUPABASE_AUTH_COOKIE = resolveAuthCookieName();
+export const AETHER_SUPABASE_AUTH_COOKIE = resolveAuthCookieName();

@@ -1,5 +1,5 @@
 /**
- * Sentry error tracking for Acme API.
+ * Sentry error tracking for Aether API.
  *
  * Uses @sentry/bun SDK pointed at Better Stack's Sentry-compatible ingestion endpoint.
  * Better Stack provides the same Sentry SDK interface at 1/6th the price.
@@ -14,7 +14,7 @@ import * as Sentry from '@sentry/bun';
 // ─── Configuration ──────────────────────────────────────────────────────────
 
 const SENTRY_DSN = process.env.BETTERSTACK_API_SENTRY_DSN;
-const ENV = process.env.INTERNAL_ACME_ENV || 'dev';
+const ENV = process.env.INTERNAL_AETHER_ENV || 'dev';
 const VERSION = process.env.SANDBOX_VERSION || 'dev';
 
 // ─── Initialize ─────────────────────────────────────────────────────────────
@@ -23,7 +23,7 @@ if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
     environment: ENV,
-    release: `acme-api@${VERSION}`,
+    release: `aether-api@${VERSION}`,
 
     // Capture 100% of errors, sample 20% of transactions for performance
     tracesSampleRate: ENV === 'prod' ? 0.2 : 1.0,
@@ -59,7 +59,7 @@ if (SENTRY_DSN) {
       // Redact sensitive headers
       if (event.request?.headers) {
         const headers = event.request.headers as Record<string, string>;
-        for (const key of ['authorization', 'cookie', 'x-acme-token', 'x-api-key']) {
+        for (const key of ['authorization', 'cookie', 'x-aether-token', 'x-api-key']) {
           if (headers[key]) {
             headers[key] = '[Filtered]';
           }
@@ -69,7 +69,7 @@ if (SENTRY_DSN) {
     },
   });
 
-  console.log(`[sentry] Initialized (env=${ENV}, release=acme-api@${VERSION})`);
+  console.log(`[sentry] Initialized (env=${ENV}, release=aether-api@${VERSION})`);
 } else {
   console.log('[sentry] Disabled (BETTERSTACK_API_SENTRY_DSN not set)');
 }

@@ -1,8 +1,14 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { cn } from "@/lib/utils";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useMemo } from 'react';
+import { cn } from '@/lib/utils';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@aether/ui/primitives';
 import {
   ChartConfig,
   ChartContainer,
@@ -10,7 +16,7 @@ import {
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
-} from "@/components/ui/chart";
+} from '@/components/ui/chart';
 import {
   Area,
   AreaChart,
@@ -26,8 +32,8 @@ import {
   Cell,
   ResponsiveContainer,
   Tooltip,
-} from "recharts";
-import { Loader2 } from "lucide-react";
+} from 'recharts';
+import { Loader2 } from 'lucide-react';
 
 interface ChartDataPoint {
   [key: string]: string | number;
@@ -43,7 +49,7 @@ interface MetricsChartProps {
     color: string;
   }>;
   xAxisKey?: string;
-  type?: "area" | "line" | "bar";
+  type?: 'area' | 'line' | 'bar';
   stacked?: boolean;
   height?: number;
   isLoading?: boolean;
@@ -58,15 +64,15 @@ export function MetricsChart({
   description,
   data,
   dataKeys,
-  xAxisKey = "time",
-  type = "area",
+  xAxisKey = 'time',
+  type = 'area',
   stacked = false,
   height = 300,
   isLoading = false,
   showLegend = true,
   showGrid = true,
   className,
-  emptyMessage = "No data available",
+  emptyMessage = 'No data available',
 }: MetricsChartProps) {
   // Build chart config from dataKeys
   const chartConfig = useMemo(() => {
@@ -94,17 +100,21 @@ export function MetricsChart({
         tickMargin={8}
         fontSize={11}
       />
-      <YAxis
-        tickLine={false}
-        axisLine={false}
-        tickMargin={8}
-        fontSize={11}
-      />
+      <YAxis tickLine={false} axisLine={false} tickMargin={8} fontSize={11} />
       <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-      {showLegend && <ChartLegend content={<ChartLegendContent payload={[]} />} />}
+      {showLegend && (
+        <ChartLegend content={<ChartLegendContent payload={[]} />} />
+      )}
       <defs>
         {dataKeys.map((dk) => (
-          <linearGradient key={dk.key} id={`fill-${dk.key}`} x1="0" y1="0" x2="0" y2="1">
+          <linearGradient
+            key={dk.key}
+            id={`fill-${dk.key}`}
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
             <stop offset="5%" stopColor={dk.color} stopOpacity={0.8} />
             <stop offset="95%" stopColor={dk.color} stopOpacity={0.1} />
           </linearGradient>
@@ -119,7 +129,7 @@ export function MetricsChart({
           fillOpacity={0.4}
           stroke={dk.color}
           strokeWidth={2}
-          stackId={stacked ? "stack" : undefined}
+          stackId={stacked ? 'stack' : undefined}
         />
       ))}
     </AreaChart>
@@ -129,7 +139,7 @@ export function MetricsChart({
     <BarChart
       accessibilityLayer
       data={data}
-      margin={{ left:-30, right: 12, top: 12, bottom: 12 }}
+      margin={{ left: -30, right: 12, top: 12, bottom: 12 }}
     >
       {showGrid && <CartesianGrid vertical={false} />}
       <XAxis
@@ -139,21 +149,18 @@ export function MetricsChart({
         tickMargin={8}
         fontSize={11}
       />
-      <YAxis
-        tickLine={false}
-        axisLine={false}
-        tickMargin={8}
-        fontSize={11}
-      />
+      <YAxis tickLine={false} axisLine={false} tickMargin={8} fontSize={11} />
       <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-      {showLegend && <ChartLegend content={<ChartLegendContent payload={[]} />} />}
+      {showLegend && (
+        <ChartLegend content={<ChartLegendContent payload={[]} />} />
+      )}
       {dataKeys.map((dk) => (
         <Bar
           key={dk.key}
           dataKey={dk.key}
           fill={dk.color}
           radius={[4, 4, 0, 0]}
-          stackId={stacked ? "stack" : undefined}
+          stackId={stacked ? 'stack' : undefined}
         />
       ))}
     </BarChart>
@@ -173,14 +180,11 @@ export function MetricsChart({
         tickMargin={8}
         fontSize={11}
       />
-      <YAxis
-        tickLine={false}
-        axisLine={false}
-        tickMargin={8}
-        fontSize={11}
-      />
+      <YAxis tickLine={false} axisLine={false} tickMargin={8} fontSize={11} />
       <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-      {showLegend && <ChartLegend content={<ChartLegendContent payload={[]} />} />}
+      {showLegend && (
+        <ChartLegend content={<ChartLegendContent payload={[]} />} />
+      )}
       {dataKeys.map((dk) => (
         <Line
           key={dk.key}
@@ -197,11 +201,11 @@ export function MetricsChart({
 
   const renderChart = () => {
     switch (type) {
-      case "area":
+      case 'area':
         return renderAreaChart();
-      case "bar":
+      case 'bar':
         return renderBarChart();
-      case "line":
+      case 'line':
         return renderLineChart();
       default:
         return renderAreaChart();
@@ -209,7 +213,7 @@ export function MetricsChart({
   };
 
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn('overflow-hidden', className)}>
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-semibold">{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
@@ -220,11 +224,18 @@ export function MetricsChart({
             <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
           </div>
         ) : data.length === 0 ? (
-          <div className="flex items-center justify-center text-muted-foreground" style={{ height }}>
+          <div
+            className="flex items-center justify-center text-muted-foreground"
+            style={{ height }}
+          >
             {emptyMessage}
           </div>
         ) : (
-          <ChartContainer config={chartConfig} className="w-full" style={{ height }}>
+          <ChartContainer
+            config={chartConfig}
+            className="w-full"
+            style={{ height }}
+          >
             {renderChart()}
           </ChartContainer>
         )}
@@ -255,7 +266,10 @@ export function DonutChart({
   centerLabel,
   centerValue,
 }: DonutChartProps) {
-  const total = useMemo(() => data.reduce((acc, d) => acc + d.value, 0), [data]);
+  const total = useMemo(
+    () => data.reduce((acc, d) => acc + d.value, 0),
+    [data],
+  );
 
   // Build chart config from data
   const chartConfig = useMemo(() => {
@@ -270,7 +284,7 @@ export function DonutChart({
   }, [data]);
 
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn('overflow-hidden', className)}>
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-semibold">{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
@@ -281,7 +295,10 @@ export function DonutChart({
             <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
           </div>
         ) : data.length === 0 || total === 0 ? (
-          <div className="flex items-center justify-center text-muted-foreground" style={{ height }}>
+          <div
+            className="flex items-center justify-center text-muted-foreground"
+            style={{ height }}
+          >
             No data available
           </div>
         ) : (
@@ -304,7 +321,11 @@ export function DonutChart({
                     nameKey="name"
                   >
                     {data.map((entry, index) => (
-                      <Cell key={index} fill={entry.color} stroke="transparent" />
+                      <Cell
+                        key={index}
+                        fill={entry.color}
+                        stroke="transparent"
+                      />
                     ))}
                   </Pie>
                 </PieChart>
@@ -315,14 +336,19 @@ export function DonutChart({
                     <span className="text-2xl font-bold">{centerValue}</span>
                   )}
                   {centerLabel && (
-                    <span className="text-xs text-muted-foreground">{centerLabel}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {centerLabel}
+                    </span>
                   )}
                 </div>
               )}
             </div>
             <div className="flex-1 space-y-2">
               {data.map((entry, index) => (
-                <div key={index} className="flex items-center justify-between text-sm">
+                <div
+                  key={index}
+                  className="flex items-center justify-between text-sm"
+                >
                   <div className="flex items-center gap-2">
                     <div
                       className="w-3 h-3 rounded-full"

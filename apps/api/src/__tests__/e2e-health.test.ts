@@ -18,7 +18,7 @@ describe('Health & System endpoints', () => {
 
     const body = await res.json();
     expect(body.status).toBe('ok');
-    expect(body.service).toBe('acme-api');
+    expect(body.service).toBe('aether-api');
     expect(body.timestamp).toBeDefined();
   });
 
@@ -30,7 +30,7 @@ describe('Health & System endpoints', () => {
 
     const body = await res.json();
     expect(body.status).toBe('ok');
-    expect(body.service).toBe('acme');
+    expect(body.service).toBe('aether');
     expect(body.timestamp).toBeDefined();
   });
 

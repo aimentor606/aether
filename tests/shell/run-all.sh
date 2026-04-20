@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Acme — Test Runner                                                      ║
+# ║  aether — Test Runner                                                      ║
 # ║                                                                            ║
 # ║  Runs all test suites:                                                     ║
 # ║    1. Installer structure (test-install.sh)                                ║
@@ -35,7 +35,7 @@ run_suite() {
 }
 
 echo ""
-printf "${BOLD}${CYAN}  Acme — Full Test Suite${NC}\n"
+printf "${BOLD}${CYAN}  aether — Full Test Suite${NC}\n"
 
 run_suite "Installer Structure" "bash $SCRIPT_DIR/installer/test-install.sh"
 run_suite "Embedded CLI"        "bash $SCRIPT_DIR/cli/test-cli.sh"

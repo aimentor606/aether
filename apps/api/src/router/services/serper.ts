@@ -58,7 +58,7 @@ export async function imageSearchSerper(
     height: item.imageHeight || null,
   }));
 
-  console.log(`[ACME] Image search for '${query}' returned ${results.length} results`);
+  console.log(`[AETHER] Image search for '${query}' returned ${results.length} results`);
 
   return results;
 }

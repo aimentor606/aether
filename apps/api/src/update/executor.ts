@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { sandboxes } from '@acme/db';
+import { sandboxes } from '@aether/db';
 import { db } from '../shared/db';
 import { config } from '../config';
 import { getProvider, type ProviderName } from '../platform/providers';

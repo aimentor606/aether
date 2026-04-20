@@ -42,7 +42,7 @@
  *
  * Option 1: SECRET IN WEBHOOK URL (easiest, immediate)
  *   - Configure Pipedream webhook URL as:
- *     https://api.acme.dev/v1/integrations/webhook?secret=<random>
+ *     https://api.aether.dev/v1/integrations/webhook?secret=<random>
  *   - Add PIPEDREAM_WEBHOOK_SECRET to config
  *   - Validate: if (c.req.query('secret') !== config.PIPEDREAM_WEBHOOK_SECRET) → 401
  *   - Pros: One-line code change + Pipedream dashboard update
@@ -80,7 +80,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.acme.dev';
+const CLOUD = 'https://computer-preview-api.aether.dev';
 
 describe('Integration Webhook: Deep Investigation', () => {
 

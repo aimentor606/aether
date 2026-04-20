@@ -5,7 +5,7 @@ import { Icon } from '@/components/ui/icon';
 import { X } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { useAcmeComputerStore } from '@/stores/acme-computer-store';
+import { useAetherComputerStore } from '@/stores/aether-computer-store';
 import { ViewToggle } from './ViewToggle';
 import { NavigationControls } from './NavigationControls';
 import { ToolsView } from './ToolsView';
@@ -17,7 +17,7 @@ import type { UnifiedMessage } from '@/api/types';
 import type { ToolMessagePair } from '@/components/chat';
 import { log } from '@/lib/logger';
 
-interface AcmeComputerProps {
+interface AetherComputerProps {
   toolMessages: ToolMessagePair[];
   currentIndex: number;
   onNavigate: (newIndex: number) => void;
@@ -41,7 +41,7 @@ interface AcmeComputerProps {
   sandboxId?: string;
 }
 
-export function AcmeComputer({
+export function AetherComputer({
   toolMessages,
   currentIndex,
   onNavigate,
@@ -54,10 +54,10 @@ export function AcmeComputer({
   onPromptFill,
   streamingText,
   sandboxId,
-}: AcmeComputerProps) {
-  log.log('[AcmeComputer] Render - toolMessages:', toolMessages.length, 'currentIndex:', currentIndex);
-  log.log('[AcmeComputer] project:', project ? { id: project.id, name: project.name, hasSandbox: !!project.sandbox } : 'undefined');
-  log.log('[AcmeComputer] sandboxId prop:', sandboxId);
+}: AetherComputerProps) {
+  log.log('[AetherComputer] Render - toolMessages:', toolMessages.length, 'currentIndex:', currentIndex);
+  log.log('[AetherComputer] project:', project ? { id: project.id, name: project.name, hasSandbox: !!project.sandbox } : 'undefined');
+  log.log('[AetherComputer] sandboxId prop:', sandboxId);
   
   const insets = useSafeAreaInsets();
 
@@ -70,7 +70,7 @@ export function AcmeComputer({
     closePanel,
     setActiveView,
     clearPendingToolNav,
-  } = useAcmeComputerStore();
+  } = useAetherComputerStore();
 
   const [internalIndex, setInternalIndex] = useState(currentIndex);
   const [navigationMode, setNavigationMode] = useState<'live' | 'manual'>('live');
@@ -97,16 +97,16 @@ export function AcmeComputer({
     ? toolMessages[safeIndex]
     : undefined;
   
-  log.log('[AcmeComputer] currentPair:', currentPair ? 'has pair' : 'undefined');
-  log.log('[AcmeComputer] currentPair.toolMessage:', currentPair?.toolMessage?.message_id || 'null');
-  log.log('[AcmeComputer] currentPair.assistantMessage:', currentPair?.assistantMessage?.message_id || 'null');
+  log.log('[AetherComputer] currentPair:', currentPair ? 'has pair' : 'undefined');
+  log.log('[AetherComputer] currentPair.toolMessage:', currentPair?.toolMessage?.message_id || 'null');
+  log.log('[AetherComputer] currentPair.assistantMessage:', currentPair?.assistantMessage?.message_id || 'null');
   
   const { toolCall, toolResult, isSuccess, assistantTimestamp, toolTimestamp } = useMemo(() => {
     if (!currentPair?.toolMessage) {
-      log.log('[AcmeComputer] No toolMessage in currentPair, returning null');
+      log.log('[AetherComputer] No toolMessage in currentPair, returning null');
       return { toolCall: null, toolResult: null, isSuccess: false, assistantTimestamp: undefined, toolTimestamp: undefined };
     }
-    log.log('[AcmeComputer] Calling extractToolCallAndResult');
+    log.log('[AetherComputer] Calling extractToolCallAndResult');
     return extractToolCallAndResult(currentPair.assistantMessage, currentPair.toolMessage);
   }, [currentPair]);
 
@@ -181,7 +181,7 @@ export function AcmeComputer({
         >
           <View className="flex-row items-center gap-3">
             <Text className="text-lg font-roobert-semibold text-primary">
-              Acme Computer
+              Aether Computer
             </Text>
           </View>
 

@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { eq, and, or } from 'drizzle-orm';
-import { tunnelConnections, tunnelPermissionRequests } from '@acme/db';
+import { tunnelConnections, tunnelPermissionRequests } from '@aether/db';
 import { db } from '../../shared/db';
 import { TunnelRelayError, TunnelMethods, TunnelErrorCode, type TunnelCapability } from 'agent-tunnel';
 import { tunnelRelay } from '../core/relay';

@@ -6,8 +6,8 @@ import {
   type ProxyServiceConfig,
 } from '../config/proxy-services';
 import { validateSecretKey } from '../../repositories/api-keys';
-import { isAcmeToken } from '../../shared/crypto';
-import { config, ACME_MARKUP, PLATFORM_FEE_MARKUP } from '../../config';
+import { isAetherToken } from '../../shared/crypto';
+import { config, AETHER_MARKUP, PLATFORM_FEE_MARKUP } from '../../config';
 import { checkCredits, deductToolCredits, deductLLMCredits } from '../services/billing';
 import { getModel, type ModelConfig } from '../config/models';
 import { calculateCost, extractUsage } from '../services/llm';
@@ -25,14 +25,14 @@ for (const [prefix, serviceConfig] of Object.entries(services)) {
 //
 // Three authentication/billing modes:
 //
-// 1. Acme token (acme_/acme_sb_ in our DB) in Authorization header
-//    → Inject Acme's API key, forward, bill at ACME_MARKUP (1.2×).
+// 1. Aether token (aether_/aether_sb_ in our DB) in Authorization header
+//    → Inject Aether's API key, forward, bill at AETHER_MARKUP (1.2×).
 //
-// 2. User's own API key in Authorization + Acme token in X-Acme-Token header
+// 2. User's own API key in Authorization + Aether token in X-aether-Token header
 //    → Passthrough (no key injection), bill at PLATFORM_FEE_MARKUP (0.1×).
 //
-// 3. User's own API key, no Acme token anywhere
-//    → Pure passthrough. No billing, no gating (self-hosted / non-Acme user).
+// 3. User's own API key, no Aether token anywhere
+//    → Pure passthrough. No billing, no gating (self-hosted / non-Aether user).
 
 async function handleProxy(c: any, service: ProxyServiceConfig, prefix: string) {
   const fullPath = new URL(c.req.url).pathname;
@@ -47,18 +47,18 @@ async function handleProxy(c: any, service: ProxyServiceConfig, prefix: string) 
 
   const auth = await tryAuthenticate(c);
 
-  if (auth.isAcmeUser && auth.accountId && !auth.isPassthrough) {
-    // Mode 1: Acme-owned key — inject our key, bill at 1.2×
-    return handleAcmeProxy(c, service, subPath, queryString, method, auth.accountId);
+  if (auth.isAetherUser && auth.accountId && !auth.isPassthrough) {
+    // Mode 1: Aether-owned key — inject our key, bill at 1.2×
+    return handleAetherProxy(c, service, subPath, queryString, method, auth.accountId);
   } else if (auth.isPassthrough && auth.accountId) {
     // Mode 2: User's own key — passthrough, bill at 0.1×
-    return handleAcmePassthrough(c, service, subPath, queryString, method, auth.accountId);
+    return handleAetherPassthrough(c, service, subPath, queryString, method, auth.accountId);
   } else {
-    // Mode 3: No Acme token — pure passthrough, no billing.
-    // In cloud mode, reject: only acme_ tokens with billing are accepted.
+    // Mode 3: No Aether token — pure passthrough, no billing.
+    // In cloud mode, reject: only aether_ tokens with billing are accepted.
     if (config.isCloud()) {
       throw new HTTPException(401, {
-        message: 'Acme API key required. Get one at https://acme.dev',
+        message: 'Aether API key required. Get one at https://aether.dev',
       });
     }
     // Local/self-hosted: allow passthrough for BYOC users with their own API keys.
@@ -66,9 +66,9 @@ async function handleProxy(c: any, service: ProxyServiceConfig, prefix: string) 
   }
 }
 
-// === Acme User: match allowed route, inject our key, bill with route-specific pricing ===
+// === Aether User: match allowed route, inject our key, bill with route-specific pricing ===
 
-async function handleAcmeProxy(
+async function handleAetherProxy(
   c: any,
   service: ProxyServiceConfig,
   subPath: string,
@@ -88,30 +88,30 @@ async function handleAcmeProxy(
     throw new HTTPException(402, { message: creditCheck.message });
   }
 
-  const acmeKey = service.getAcmeApiKey();
-  if (!acmeKey) {
+  const aetherKey = service.getAetherApiKey();
+  if (!aetherKey) {
     throw new HTTPException(503, {
       message: `${service.name} not configured`,
     });
   }
 
-  // Use alternate target/key injection for Acme-managed if configured (e.g. OpenRouter)
-  const baseUrl = service.acmeTargetBaseUrl || service.targetBaseUrl;
+  // Use alternate target/key injection for Aether-managed if configured (e.g. OpenRouter)
+  const baseUrl = service.aetherTargetBaseUrl || service.targetBaseUrl;
   const targetUrl = `${baseUrl}${subPath}${queryString}`;
   const headers = buildForwardHeaders(c);
-  // Strip Acme-specific and auth headers — upstream gets injected key only
-  headers.delete('x-acme-token');
+  // Strip Aether-specific and auth headers — upstream gets injected key only
+  headers.delete('x-aether-token');
   headers.delete('x-api-key');
   headers.delete('authorization');
   let body = await getRequestBody(c, method);
 
-  body = injectApiKey(service, headers, body, /* useAcmeInjection */ true);
+  body = injectApiKey(service, headers, body, /* useAetherInjection */ true);
   body = maybeNormalizeOpenAIResponsesInput(service, method, subPath, body, headers);
 
   // Route-specific billing overrides service default
   const billingToolName = matchedRoute.billingToolName || service.billingToolName;
 
-  console.log(`[PROXY] ${service.name} (acme:${accountId}) ${method} ${subPath} → ${targetUrl} [bill:${billingToolName}]`);
+  console.log(`[PROXY] ${service.name} (aether:${accountId}) ${method} ${subPath} → ${targetUrl} [bill:${billingToolName}]`);
 
   const upstream = await fetch(targetUrl, {
     method,
@@ -121,13 +121,13 @@ async function handleAcmeProxy(
     duplex: 'half',
   });
 
-  // LLM services: bill per-token at ACME_MARKUP (1.2×)
+  // LLM services: bill per-token at AETHER_MARKUP (1.2×)
   if (service.isLlm === true) {
     if (upstream.ok) {
-      return billLlmAcmeProxy(upstream, service, subPath, accountId);
+      return billLlmAetherProxy(upstream, service, subPath, accountId);
     }
     // Upstream error — don't bill for failed requests
-    console.warn(`[PROXY] LLM acme proxy ${service.name} upstream error ${upstream.status} — no billing`);
+    console.warn(`[PROXY] LLM aether proxy ${service.name} upstream error ${upstream.status} — no billing`);
     return new Response(upstream.body, {
       status: upstream.status,
       statusText: upstream.statusText,
@@ -152,13 +152,13 @@ async function handleAcmeProxy(
   });
 }
 
-// === Acme-managed LLM Billing ===
+// === Aether-managed LLM Billing ===
 //
 // Handles both response formats based on upstream:
 // - OpenAI-compatible: usage.prompt_tokens / completion_tokens
 // - Anthropic-native: usage.input_tokens / output_tokens
 
-async function billLlmAcmeProxy(
+async function billLlmAetherProxy(
   upstream: Response,
   service: ProxyServiceConfig,
   subPath: string,
@@ -176,7 +176,7 @@ async function billLlmAcmeProxy(
     const [clientStream, billingStream] = upstreamBody.tee();
 
     // Fire-and-forget: extract usage from billing stream
-    extractUsageFromAcmeProxyStream(billingStream, service, subPath, accountId);
+    extractUsageFromAetherProxyStream(billingStream, service, subPath, accountId);
 
     return new Response(clientStream, {
       status: upstream.status,
@@ -219,7 +219,7 @@ async function billLlmAcmeProxy(
       completionTokens,
       cachedTokens,
       cacheWriteTokens,
-      ACME_MARKUP,
+      AETHER_MARKUP,
     );
 
     deductLLMCredits(
@@ -228,11 +228,11 @@ async function billLlmAcmeProxy(
       promptTokens,
       completionTokens,
       cost,
-    ).catch((err) => console.error(`[PROXY] LLM acme billing error: ${err}`));
+    ).catch((err) => console.error(`[PROXY] LLM aether billing error: ${err}`));
 
-    console.log(`[PROXY] LLM acme ${modelId}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${ACME_MARKUP}x)`);
+    console.log(`[PROXY] LLM aether ${modelId}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${AETHER_MARKUP}x)`);
   } else {
-    console.warn(`[PROXY] LLM acme ${service.name}: no usage data in response — billing skipped`);
+    console.warn(`[PROXY] LLM aether ${service.name}: no usage data in response — billing skipped`);
   }
 
   return new Response(JSON.stringify(responseBody), {
@@ -242,11 +242,11 @@ async function billLlmAcmeProxy(
 }
 
 /**
- * Extract usage from an SSE stream and bill at ACME_MARKUP.
+ * Extract usage from an SSE stream and bill at AETHER_MARKUP.
  * Handles both OpenAI-compatible and Anthropic-native SSE formats.
  * Runs in background (fire-and-forget).
  */
-async function extractUsageFromAcmeProxyStream(
+async function extractUsageFromAetherProxyStream(
   stream: ReadableStream<Uint8Array>,
   service: ProxyServiceConfig,
   subPath: string,
@@ -302,38 +302,38 @@ async function extractUsageFromAcmeProxyStream(
 
     if (isAnthropic) {
       if (!(anthropicInputTokens > 0 || anthropicOutputTokens > 0)) {
-        console.warn(`[PROXY] LLM acme stream (${service.name}): zero tokens — billing skipped`);
+        console.warn(`[PROXY] LLM aether stream (${service.name}): zero tokens — billing skipped`);
         return;
       }
       const modelConfig = getModel(detectedModel);
-      const cost = calculateCost(modelConfig, anthropicInputTokens, anthropicOutputTokens, 0, 0, ACME_MARKUP);
+      const cost = calculateCost(modelConfig, anthropicInputTokens, anthropicOutputTokens, 0, 0, AETHER_MARKUP);
       await deductLLMCredits(accountId, detectedModel, anthropicInputTokens, anthropicOutputTokens, cost);
-      console.log(`[PROXY] LLM acme stream ${detectedModel}: ${anthropicInputTokens}/${anthropicOutputTokens} tokens, cost=$${cost.toFixed(6)} (${ACME_MARKUP}x)`);
+      console.log(`[PROXY] LLM aether stream ${detectedModel}: ${anthropicInputTokens}/${anthropicOutputTokens} tokens, cost=$${cost.toFixed(6)} (${AETHER_MARKUP}x)`);
       return;
     }
 
     if (!lastUsage) {
-      console.warn(`[PROXY] LLM acme stream (${service.name}): no usage data — billing skipped`);
+      console.warn(`[PROXY] LLM aether stream (${service.name}): no usage data — billing skipped`);
       return;
     }
 
     const { promptTokens, completionTokens, cachedTokens, cacheWriteTokens } = lastUsage;
     if (promptTokens > 0 || completionTokens > 0) {
       const modelConfig = getModel(detectedModel);
-      const cost = calculateCost(modelConfig, promptTokens, completionTokens, cachedTokens, cacheWriteTokens, ACME_MARKUP);
+      const cost = calculateCost(modelConfig, promptTokens, completionTokens, cachedTokens, cacheWriteTokens, AETHER_MARKUP);
       await deductLLMCredits(accountId, detectedModel, promptTokens, completionTokens, cost);
-      console.log(`[PROXY] LLM acme stream ${detectedModel}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${ACME_MARKUP}x)`);
+      console.log(`[PROXY] LLM aether stream ${detectedModel}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${AETHER_MARKUP}x)`);
     } else {
-      console.warn(`[PROXY] LLM acme stream (${service.name}): zero tokens — billing skipped`);
+      console.warn(`[PROXY] LLM aether stream (${service.name}): zero tokens — billing skipped`);
     }
   } catch (err) {
-    console.error(`[PROXY] Error extracting usage from acme proxy stream:`, err);
+    console.error(`[PROXY] Error extracting usage from aether proxy stream:`, err);
   }
 }
 
-// === Acme user with own key: passthrough + bill at platform fee (0.1×) ===
+// === Aether user with own key: passthrough + bill at platform fee (0.1×) ===
 
-async function handleAcmePassthrough(
+async function handleAetherPassthrough(
   c: any,
   service: ProxyServiceConfig,
   subPath: string,
@@ -348,8 +348,8 @@ async function handleAcmePassthrough(
 
   const targetUrl = `${service.targetBaseUrl}${subPath}${queryString}`;
   const headers = buildForwardHeaders(c);
-  // Remove X-Acme-Token from forwarded headers — upstream doesn't need it
-  headers.delete('x-acme-token');
+  // Remove X-aether-Token from forwarded headers — upstream doesn't need it
+  headers.delete('x-aether-token');
   let body = await getRequestBody(c, method);
 
   body = maybeNormalizeOpenAIResponsesInput(service, method, subPath, body, headers);
@@ -399,7 +399,7 @@ async function handleAcmePassthrough(
   });
 }
 
-// === Not Acme user: pure passthrough ===
+// === Not Aether user: pure passthrough ===
 
 async function handlePassthrough(
   c: any,
@@ -616,9 +616,9 @@ async function extractUsageFromPassthroughStream(
 // === Helpers ===
 
 interface AuthResult {
-  isAcmeUser: boolean;
+  isAetherUser: boolean;
   accountId?: string;
-  /** True when the user's own API key is in Authorization (passthrough) but we identified the account via X-Acme-Token. */
+  /** True when the user's own API key is in Authorization (passthrough) but we identified the account via X-aether-Token. */
   isPassthrough?: boolean;
 }
 
@@ -626,71 +626,71 @@ async function tryAuthenticate(c: any): Promise<AuthResult> {
   const authHeader = c.req.header('Authorization');
   const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
 
-  // --- Mode 1: Acme token directly in Authorization header ---
-  // The user sent acme_ or acme_sb_ as the Bearer token — full Acme-managed flow.
-  // If it looks like a Acme token but fails validation → hard reject.
+  // --- Mode 1: Aether token directly in Authorization header ---
+  // The user sent aether_ or aether_sb_ as the Bearer token — full Aether-managed flow.
+  // If it looks like a Aether token but fails validation → hard reject.
 
-  if (bearerToken && isAcmeToken(bearerToken) && config.DATABASE_URL) {
+  if (bearerToken && isAetherToken(bearerToken) && config.DATABASE_URL) {
     try {
       const result = await validateSecretKey(bearerToken);
       if (result.isValid && result.accountId) {
-        return { isAcmeUser: true, accountId: result.accountId };
+        return { isAetherUser: true, accountId: result.accountId };
       }
     } catch {
       // Fall through to reject below
     }
-    // Looks like a Acme token but didn't validate — reject.
-    // Never allow an invalid Acme token to fall through to free passthrough.
-    throw new HTTPException(401, { message: 'Invalid Acme token' });
+    // Looks like a Aether token but didn't validate — reject.
+    // Never allow an invalid Aether token to fall through to free passthrough.
+    throw new HTTPException(401, { message: 'Invalid Aether token' });
   }
 
-  // --- Mode 1a: Acme token in Authorization: Token <token> (Replicate SDK) ---
+  // --- Mode 1a: Aether token in Authorization: Token <token> (Replicate SDK) ---
   // The Replicate SDK uses "Token " prefix instead of "Bearer ".
   const tokenPrefixed = authHeader?.startsWith('Token ') ? authHeader.slice(6) : undefined;
-  if (tokenPrefixed && isAcmeToken(tokenPrefixed) && config.DATABASE_URL) {
+  if (tokenPrefixed && isAetherToken(tokenPrefixed) && config.DATABASE_URL) {
     try {
       const result = await validateSecretKey(tokenPrefixed);
       if (result.isValid && result.accountId) {
-        return { isAcmeUser: true, accountId: result.accountId };
+        return { isAetherUser: true, accountId: result.accountId };
       }
     } catch {
       // Fall through to reject below
     }
-    throw new HTTPException(401, { message: 'Invalid Acme token' });
+    throw new HTTPException(401, { message: 'Invalid Aether token' });
   }
 
-  // --- Mode 1b: Acme token in x-api-key header (Anthropic SDK) ---
+  // --- Mode 1b: Aether token in x-api-key header (Anthropic SDK) ---
   // The Anthropic SDK sends the API key via x-api-key instead of Authorization.
-  // If the value is a Acme token, treat it as Mode 1 (Acme-managed).
+  // If the value is a Aether token, treat it as Mode 1 (Aether-managed).
   const xApiKey = c.req.header('x-api-key');
-  if (xApiKey && isAcmeToken(xApiKey) && config.DATABASE_URL) {
+  if (xApiKey && isAetherToken(xApiKey) && config.DATABASE_URL) {
     try {
       const result = await validateSecretKey(xApiKey);
       if (result.isValid && result.accountId) {
-        return { isAcmeUser: true, accountId: result.accountId };
+        return { isAetherUser: true, accountId: result.accountId };
       }
     } catch {
       // Fall through to reject below
     }
-    throw new HTTPException(401, { message: 'Invalid Acme token in x-api-key' });
+    throw new HTTPException(401, { message: 'Invalid Aether token in x-api-key' });
   }
 
-  // --- Mode 1c: Acme token in JSON body field (Tavily SDK) ---
+  // --- Mode 1c: Aether token in JSON body field (Tavily SDK) ---
   // The Tavily SDK sends the API key in the JSON body as "api_key" instead of a header.
-  // Check the body for a Acme token so sandbox tools can auth through the proxy.
+  // Check the body for a Aether token so sandbox tools can auth through the proxy.
   if (config.DATABASE_URL && c.req.method === 'POST') {
     try {
       const cloned = c.req.raw.clone();
       const bodyText = await cloned.text();
-      if (bodyText && bodyText.includes('acme_')) {
+      if (bodyText && bodyText.includes('aether_')) {
         const json = JSON.parse(bodyText);
         const bodyApiKey = json?.api_key;
-        if (bodyApiKey && isAcmeToken(bodyApiKey)) {
+        if (bodyApiKey && isAetherToken(bodyApiKey)) {
           const result = await validateSecretKey(bodyApiKey);
           if (result.isValid && result.accountId) {
-            return { isAcmeUser: true, accountId: result.accountId };
+            return { isAetherUser: true, accountId: result.accountId };
           }
-          throw new HTTPException(401, { message: 'Invalid Acme token in request body' });
+          throw new HTTPException(401, { message: 'Invalid Aether token in request body' });
         }
       }
     } catch (e) {
@@ -699,29 +699,29 @@ async function tryAuthenticate(c: any): Promise<AuthResult> {
     }
   }
 
-  // --- Mode 2: User's own key + Acme token in X-Acme-Token ---
+  // --- Mode 2: User's own key + Aether token in X-aether-Token ---
   // The user's own API key is in Authorization (Bearer) or a provider-specific
-  // header (e.g. Anthropic's x-api-key). The Acme token rides in
-  // X-Acme-Token so we can identify the account for platform-fee billing.
-  // If X-Acme-Token looks like a Acme token but fails → hard reject.
+  // header (e.g. Anthropic's x-api-key). The Aether token rides in
+  // X-aether-Token so we can identify the account for platform-fee billing.
+  // If X-aether-Token looks like a Aether token but fails → hard reject.
 
   if (config.DATABASE_URL) {
-    const acmeTokenHeader = c.req.header('X-Acme-Token');
-    if (acmeTokenHeader && isAcmeToken(acmeTokenHeader)) {
+    const aetherTokenHeader = c.req.header('X-aether-Token');
+    if (aetherTokenHeader && isAetherToken(aetherTokenHeader)) {
       try {
-        const result = await validateSecretKey(acmeTokenHeader);
+        const result = await validateSecretKey(aetherTokenHeader);
         if (result.isValid && result.accountId) {
-          return { isAcmeUser: true, accountId: result.accountId, isPassthrough: true };
+          return { isAetherUser: true, accountId: result.accountId, isPassthrough: true };
         }
       } catch {
         // Fall through to reject below
       }
-      throw new HTTPException(401, { message: 'Invalid X-Acme-Token' });
+      throw new HTTPException(401, { message: 'Invalid X-aether-Token' });
     }
   }
 
-  // --- Mode 3: No Acme token anywhere — pure passthrough, no billing ---
-  return { isAcmeUser: false };
+  // --- Mode 3: No Aether token anywhere — pure passthrough, no billing ---
+  return { isAetherUser: false };
 }
 
 /**
@@ -835,10 +835,10 @@ function injectApiKey(
   service: ProxyServiceConfig,
   headers: Headers,
   body: ArrayBuffer | string | undefined,
-  useAcmeInjection = false,
+  useAetherInjection = false,
 ): ArrayBuffer | string | undefined {
-  const injection = (useAcmeInjection && service.acmeKeyInjection) || service.keyInjection;
-  const key = service.getAcmeApiKey();
+  const injection = (useAetherInjection && service.aetherKeyInjection) || service.keyInjection;
+  const key = service.getAetherApiKey();
 
   switch (injection.type) {
     case 'header': {

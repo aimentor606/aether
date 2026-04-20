@@ -68,7 +68,7 @@ type PermissionMode = 'allow' | 'ask' | 'deny';
 
 const PROVIDER_LABELS: Record<string, string> = {
   anthropic: 'Anthropic', openai: 'OpenAI', google: 'Google', xai: 'xAI',
-  opencode: 'OpenCode', acme: 'Acme', bedrock: 'AWS Bedrock',
+  opencode: 'OpenCode', aether: 'Aether', bedrock: 'AWS Bedrock',
   openrouter: 'OpenRouter', copilot: 'GitHub Copilot', vercel: 'Vercel',
 };
 

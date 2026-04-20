@@ -1,7 +1,7 @@
 import { resolve, normalize } from 'path';
 import { eq, and } from 'drizzle-orm';
-import { tunnelPermissions } from '@acme/db';
-import type { TunnelFilesystemScope, TunnelShellScope, TunnelPermissionScope } from '@acme/db';
+import { tunnelPermissions } from '@aether/db';
+import type { TunnelFilesystemScope, TunnelShellScope, TunnelPermissionScope } from '@aether/db';
 import { db } from '../../shared/db';
 import type { TunnelCapability } from 'agent-tunnel';
 

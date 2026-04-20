@@ -13,7 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ToolViewIconTitle } from '../shared/ToolViewIconTitle';
 import { ToolViewFooter } from '../shared/ToolViewFooter';
 import { LoadingState } from '../shared/LoadingState';
-import { parseConnectorSetupOutput } from '@/lib/utils/acme-tool-output';
+import { parseConnectorSetupOutput } from '@/lib/utils/aether-tool-output';
 
 export function OcConnectorSetupToolView({
   toolCall,

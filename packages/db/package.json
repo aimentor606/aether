@@ -1,7 +1,7 @@
 {
-  "name": "@acme/db",
+  "name": "@aether/db",
   "version": "1.0.0",
-  "description": "Acme Database - Drizzle ORM schemas and client",
+  "description": "Aether Database - Drizzle ORM schemas and client",
   "private": true,
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -9,6 +9,7 @@
     ".": "./src/index.ts",
     "./client": "./src/client.ts",
     "./schema": "./src/schema/index.ts",
+    "./schema/finance": "./src/schema/finance.ts",
     "./schema/legacy": "./src/schema/legacy/index.ts",
     "./schema/legacy/schema": "./src/schema/legacy/schema.ts",
     "./types": "./src/types.ts"
@@ -24,7 +25,8 @@
   "dependencies": {
     "drizzle-kit": "^0.31.0",
     "drizzle-orm": "^0.44.0",
-    "postgres": "^3.4.0"
+    "postgres": "^3.4.0",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/bun": "^1.1.0",

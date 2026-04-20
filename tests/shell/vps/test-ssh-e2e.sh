@@ -10,7 +10,7 @@
 # ║    5. Regeneration produces a new key that also works                      ║
 # ║    6. Multiple keys can coexist (append, not overwrite)                    ║
 # ║                                                                            ║
-# ║  Requires: Acme installed & running (sandbox container active)           ║
+# ║  Requires: aether installed & running (sandbox container active)           ║
 # ║                                                                            ║
 # ║  Usage:                                                                    ║
 # ║    bash test-ssh-e2e.sh [--api-url URL] [--auth-token TOKEN]               ║
@@ -18,15 +18,15 @@
 # ║  Environment:                                                              ║
 # ║    API_URL         API base URL (default: auto-detect from .env)           ║
 # ║    AUTH_TOKEN       Supabase access token (default: auto-login)            ║
-# ║    OWNER_EMAIL      For auto-login (default: e2e@acme.ai)               ║
+# ║    OWNER_EMAIL      For auto-login (default: e2e@aether.ai)               ║
 # ║    OWNER_PASSWORD   For auto-login (default: e2e-test-pass-42)            ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 set -uo pipefail
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${ACME_HOME:-$HOME/.acme}"
-OWNER_EMAIL="${OWNER_EMAIL:-e2e@acme.ai}"
+INSTALL_DIR="${AETHER_HOME:-$HOME/.aether}"
+OWNER_EMAIL="${OWNER_EMAIL:-e2e@aether.ai}"
 OWNER_PASSWORD="${OWNER_PASSWORD:-e2e-test-pass-42}"
 API_URL="${API_URL:-}"
 AUTH_TOKEN="${AUTH_TOKEN:-}"
@@ -97,7 +97,7 @@ get_auth_token() {
 echo ""
 echo "${BOLD}${CYAN}"
 echo "  ╔═══════════════════════════════════════════════╗"
-echo "  ║  Acme — SSH Key E2E Test Suite              ║"
+echo "  ║  aether — SSH Key E2E Test Suite              ║"
 echo "  ╚═══════════════════════════════════════════════╝"
 echo "${NC}"
 echo "  ${DIM}API:${NC}      ${BOLD}${API_URL}${NC}"
@@ -113,7 +113,7 @@ section "PHASE 1: Prerequisites"
 # This is required for local_docker verification, but remote providers like
 # JustAVPS can still be tested even when no local container is present.
 LOCAL_CONTAINER_AVAILABLE=0
-if docker ps --format '{{.Names}}' 2>/dev/null | grep -q 'acme-sandbox\|sandbox'; then
+if docker ps --format '{{.Names}}' 2>/dev/null | grep -q 'aether-sandbox\|sandbox'; then
   LOCAL_CONTAINER_AVAILABLE=1
   pass "Local sandbox container is running"
 else
@@ -188,10 +188,10 @@ else
   fail "Public key is ed25519 type"
 fi
 
-if echo "$PUBLIC_KEY" | grep -q 'acme-sandbox$'; then
-  pass "Public key has acme-sandbox comment"
+if echo "$PUBLIC_KEY" | grep -q 'aether-sandbox$'; then
+  pass "Public key has aether-sandbox comment"
 else
-  fail "Public key has acme-sandbox comment"
+  fail "Public key has aether-sandbox comment"
 fi
 
 # Validate private key with ssh-keygen
@@ -255,21 +255,21 @@ if [ "$IS_REMOTE_PROVIDER" -eq 0 ]; then
   if [ "$LOCAL_CONTAINER_AVAILABLE" -ne 1 ]; then
     fail "Local container checks require a running sandbox container"
   fi
-  CONTAINER_KEYS=$(docker exec acme-sandbox cat /config/.ssh/authorized_keys 2>/dev/null || docker exec acme-sandbox cat /workspace/.ssh/authorized_keys 2>/dev/null || true)
+  CONTAINER_KEYS=$(docker exec aether-sandbox cat /config/.ssh/authorized_keys 2>/dev/null || docker exec aether-sandbox cat /workspace/.ssh/authorized_keys 2>/dev/null || true)
   if echo "$CONTAINER_KEYS" | grep -q "$PUB_KEY_DATA"; then
     pass "Public key found in container authorized_keys"
   else
     fail "Public key found in container authorized_keys"
   fi
 
-  PERMS=$(docker exec acme-sandbox stat -c '%a' /config/.ssh/authorized_keys 2>/dev/null || docker exec acme-sandbox stat -c '%a' /workspace/.ssh/authorized_keys 2>/dev/null || echo "unknown")
+  PERMS=$(docker exec aether-sandbox stat -c '%a' /config/.ssh/authorized_keys 2>/dev/null || docker exec aether-sandbox stat -c '%a' /workspace/.ssh/authorized_keys 2>/dev/null || echo "unknown")
   if [ "$PERMS" = "600" ]; then
     pass "authorized_keys has 600 permissions"
   else
     fail "authorized_keys has 600 permissions (got: $PERMS)"
   fi
 
-  OWNER=$(docker exec acme-sandbox stat -c '%U' /config/.ssh/authorized_keys 2>/dev/null || docker exec acme-sandbox stat -c '%U' /workspace/.ssh/authorized_keys 2>/dev/null || echo "unknown")
+  OWNER=$(docker exec aether-sandbox stat -c '%U' /config/.ssh/authorized_keys 2>/dev/null || docker exec aether-sandbox stat -c '%U' /workspace/.ssh/authorized_keys 2>/dev/null || echo "unknown")
   if [ "$OWNER" = "abc" ]; then
     pass "authorized_keys owned by abc"
   else
@@ -377,7 +377,7 @@ fi
 # Both keys in authorized_keys
 PUB_KEY_DATA_2=$(echo "$PUBLIC_KEY_2" | awk '{print $2}')
 if [ "$IS_REMOTE_PROVIDER" -eq 0 ]; then
-  KEY_COUNT=$(docker exec acme-sandbox cat /config/.ssh/authorized_keys 2>/dev/null | grep -c 'ssh-ed25519' || true)
+  KEY_COUNT=$(docker exec aether-sandbox cat /config/.ssh/authorized_keys 2>/dev/null | grep -c 'ssh-ed25519' || true)
 else
   KEY_COUNT=$(ssh -i "$KEY_TMP" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 -p "$SSH_PORT" "$SSH_DESTINATION" "grep -c 'ssh-ed25519' ~/.ssh/authorized_keys" 2>/dev/null || true)
 fi

@@ -1,6 +1,6 @@
 'use client';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@aether/ui/primitives';
 import { AdminFeedbackTable } from '@/components/admin/admin-feedback-table';
 import {
   FeedbackStatsCards,

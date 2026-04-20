@@ -1,4 +1,4 @@
-import { createDb, type Database } from '@acme/db';
+import { createDb, type Database } from '@aether/db';
 import { config } from '../config';
 
 /**

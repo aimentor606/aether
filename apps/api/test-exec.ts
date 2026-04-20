@@ -11,7 +11,7 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { sandboxes } from '@acme/db';
+import { sandboxes } from '@aether/db';
 import { db } from './src/shared/db';
 import { getProvider, type ProviderName } from './src/platform/providers';
 import { execOnHost } from './src/update/exec';
@@ -84,7 +84,7 @@ async function cmdUpdate(sandboxId: string, targetVersion: string) {
     console.log('Image already cached locally, skipping pull');
   } else {
     console.log('Pulling', targetImage, '(detached)...');
-    await execOnHost(endpoint, `systemd-run --unit=acme-image-pull docker pull ${targetImage}`, 15);
+    await execOnHost(endpoint, `systemd-run --unit=aether-image-pull docker pull ${targetImage}`, 15);
     for (let i = 0; i < 60; i++) {
       await new Promise((r) => setTimeout(r, 5000));
       const check = await execOnHost(endpoint, `docker image inspect ${targetImage} >/dev/null 2>&1 && echo ready`, 10);
@@ -108,17 +108,17 @@ for db in glob.glob('/workspace/.local/share/opencode/*.db'):
     '#!/bin/bash',
     'set -e',
     'systemctl disable --now justavps-docker 2>/dev/null || true',
-    'systemctl disable --now acme-sandbox 2>/dev/null || true',
+    'systemctl disable --now aether-sandbox 2>/dev/null || true',
     `docker stop -t 10 ${config.name} 2>/dev/null || true`,
     `docker rm -f ${config.name} 2>/dev/null || true`,
     `for i in $(seq 1 10); do docker inspect ${config.name} >/dev/null 2>&1 || break; sleep 1; done`,
     runCmd,
   ].join('\n');
   const b64 = Buffer.from(scriptLines).toString('base64');
-  await execOnHost(endpoint, `echo '${b64}' | base64 -d > /tmp/acme-update.sh && chmod +x /tmp/acme-update.sh`, 5);
-  const unitName = `acme-test-${Date.now()}`;
-  await execOnHost(endpoint, `systemctl reset-failed acme-test-restart 2>/dev/null || true`, 5);
-  const restart = await execOnHost(endpoint, `systemd-run --unit=${unitName} /tmp/acme-update.sh`, 15);
+  await execOnHost(endpoint, `echo '${b64}' | base64 -d > /tmp/aether-update.sh && chmod +x /tmp/aether-update.sh`, 5);
+  const unitName = `aether-test-${Date.now()}`;
+  await execOnHost(endpoint, `systemctl reset-failed aether-test-restart 2>/dev/null || true`, 5);
+  const restart = await execOnHost(endpoint, `systemd-run --unit=${unitName} /tmp/aether-update.sh`, 15);
   console.log('Restart:', restart.exitCode === 0 ? 'OK' : '(expected — connection dropped)');
 
   // Wait

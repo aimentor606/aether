@@ -167,7 +167,7 @@ async function uploadAndExtractOnNewSandbox(
 
   console.log(`[file-transfer] Archive uploaded, extracting on new sandbox...`);
 
-  const execRes = await fetch(`${baseUrl}/acme/core/exec`, {
+  const execRes = await fetch(`${baseUrl}/aether/core/exec`, {
     method: 'POST',
     headers: { ...headers, 'Content-Type': 'application/json' },
     body: JSON.stringify({

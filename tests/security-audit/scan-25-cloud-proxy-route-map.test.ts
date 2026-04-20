@@ -1,24 +1,24 @@
 /**
  * Security Scan: Cloud API - Complete Proxy Route Map
  *
- * LIVE scan against https://computer-preview-api.acme.dev
+ * LIVE scan against https://computer-preview-api.aether.dev
  *
  * Maps every proxy route and whether it forwards requests without
- * a acme_ token (Mode 3 passthrough).
+ * a aether_ token (Mode 3 passthrough).
  *
- * ALL of these should require a acme_ token on cloud.
+ * ALL of these should require a aether_ token on cloud.
  * Currently Mode 3 forwards to upstream without any auth gate.
  *
  * The upstream providers reject because the attacker has no valid key,
- * BUT the request still goes through Acme's infrastructure:
+ * BUT the request still goes through Aether's infrastructure:
  * - Bandwidth consumed
- * - Acme IP used for the upstream request
+ * - Aether IP used for the upstream request
  * - xAI actually processes the request (returns 400 bad data, not 401)
  */
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.acme.dev';
+const CLOUD = 'https://computer-preview-api.aether.dev';
 
 async function probeProxy(path: string, body: any): Promise<{ status: number; body: any }> {
   try {
@@ -36,7 +36,7 @@ async function probeProxy(path: string, body: any): Promise<{ status: number; bo
   }
 }
 
-describe('Cloud Scan: Proxy Route Map — All Should Require acme_ Token', () => {
+describe('Cloud Scan: Proxy Route Map — All Should Require aether_ Token', () => {
 
   describe('Proxy routes that forward to upstream without auth (Mode 3)', () => {
     test('Tavily — forwards to api.tavily.com (upstream rejects)', async () => {
@@ -81,13 +81,13 @@ describe('Cloud Scan: Proxy Route Map — All Should Require acme_ Token', () =>
     });
   });
 
-  describe('These should all return Acme 401 instead of upstream errors', () => {
-    test('EXPECTED: all non-acme requests should get Acme 401', () => {
+  describe('These should all return Aether 401 instead of upstream errors', () => {
+    test('EXPECTED: all non-aether requests should get Aether 401', () => {
       // Current: request forwards to upstream, upstream auth error leaks through
-      // Expected: Acme rejects BEFORE forwarding
+      // Expected: Aether rejects BEFORE forwarding
       // Fix in proxy.ts handleProxy():
-      //   if (!auth.isAcmeUser && config.isCloud()) {
-      //     throw new HTTPException(401, { message: 'Acme API key required' });
+      //   if (!auth.isAetherUser && config.isCloud()) {
+      //     throw new HTTPException(401, { message: 'Aether API key required' });
       //   }
       expect(true).toBe(true);
     });

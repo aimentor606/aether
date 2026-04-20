@@ -1,5 +1,5 @@
 import { Icon } from '@/components/ui/icon';
-import { AcmeLogo } from '@/components/ui/AcmeLogo';
+import { AetherLogo } from '@/components/ui/AetherLogo';
 import * as React from 'react';
 import { View, type ViewProps, Text } from 'react-native';
 import { useColorScheme } from 'nativewind';
@@ -31,8 +31,8 @@ interface AvatarProps extends ViewProps {
   /** Show border (default: true) */
   showBorder?: boolean;
   
-  /** Use Acme symbol instead of icon (for SUNA agent) */
-  useAcmeSymbol?: boolean;
+  /** Use Aether symbol instead of icon (for SUNA agent) */
+  useAetherSymbol?: boolean;
   
   /** Fallback text (first letter shown if no icon) */
   fallbackText?: string;
@@ -52,7 +52,7 @@ interface AvatarProps extends ViewProps {
  * - Default size: 48px × 48px
  * - Border radius: 16px (33.3% of size) - matches Figma
  * - Icon size: 40% of container (smaller than before for better spacing)
- * - Acme symbol: 50% of container (larger for brand recognition)
+ * - Aether symbol: 50% of container (larger for brand recognition)
  * - Border: 1.5px solid
  * - Adapts to dark/light theme
  * 
@@ -77,7 +77,7 @@ export function Avatar({
   backgroundColor,
   borderColor,
   showBorder = true,
-  useAcmeSymbol = false,
+  useAetherSymbol = false,
   fallbackText,
   style,
   ...props
@@ -86,15 +86,15 @@ export function Avatar({
   
   // Calculate sizes - optimized for minimalist design
   const iconSize = Math.round(size * 0.45); // 45% of container for better visibility
-  const symbolSize = Math.round(size * 0.55); // 55% for Acme symbol (more prominent)
+  const symbolSize = Math.round(size * 0.55); // 55% for Aether symbol (more prominent)
   const borderRadius = Math.round(size * 0.32); // 32% for slightly softer corners
   
   // Get default colors based on variant and theme
   const getDefaultColors = () => {
     const isDark = colorScheme === 'dark';
     
-    // Acme symbol always uses solid black bg with white icon
-    if (useAcmeSymbol) {
+    // Aether symbol always uses solid black bg with white icon
+    if (useAetherSymbol) {
       return {
         bg: '#000000',
         icon: '#FFFFFF',
@@ -145,15 +145,15 @@ export function Avatar({
           height: size,
           backgroundColor: finalBg,
           borderRadius: borderRadius,
-          borderWidth: useAcmeSymbol ? 0 : (showBorder ? 1.5 : 0),
+          borderWidth: useAetherSymbol ? 0 : (showBorder ? 1.5 : 0),
           borderColor: finalBorderColor,
         },
         style
       ]}
       {...props}
     >
-      {useAcmeSymbol ? (
-        <AcmeLogo 
+      {useAetherSymbol ? (
+        <AetherLogo 
           size={symbolSize}
           variant="symbol"
           color="dark"

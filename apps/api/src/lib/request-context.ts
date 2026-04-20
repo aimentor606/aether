@@ -20,7 +20,7 @@ export interface RequestContext {
   path: string;
   /** Supabase user ID (set after auth middleware) */
   userId?: string;
-  /** Acme account ID (set after auth middleware) */
+  /** Aether account ID (set after auth middleware) */
   accountId?: string;
   /** User email (set after auth middleware) */
   userEmail?: string;

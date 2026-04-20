@@ -45,7 +45,7 @@ mock.module('../middleware/auth', () => ({
       throw new HTTPException(401, { message: 'Missing authentication token' });
     }
     c.set('userId', TEST_USER_ID);
-    c.set('userEmail', 'test@acme.dev');
+    c.set('userEmail', 'test@aether.dev');
     await next();
   },
   combinedAuth: async (c: any, next: any) => {
@@ -57,7 +57,7 @@ mock.module('../middleware/auth', () => ({
       throw new HTTPException(401, { message: 'Missing authentication token' });
     }
     c.set('userId', TEST_USER_ID);
-    c.set('userEmail', 'test@acme.dev');
+    c.set('userEmail', 'test@aether.dev');
     await next();
   },
   supabaseAuth: async (c: any, next: any) => { await next(); },
@@ -400,9 +400,9 @@ describe('Preview proxy: CORS', () => {
     mockFetchResponses = [{ status: 200, body: 'OK' }];
     const app = createProxyTestApp();
     const res = await app.request(`/v1/p/${TEST_SANDBOX_ID}/${TEST_PORT}/`, {
-      headers: { Authorization: 'Bearer test', Origin: 'https://app.acme.dev' },
+      headers: { Authorization: 'Bearer test', Origin: 'https://app.aether.dev' },
     });
-    expect(res.headers.get('access-control-allow-origin')).toBe('https://app.acme.dev');
+    expect(res.headers.get('access-control-allow-origin')).toBe('https://app.aether.dev');
     expect(res.headers.get('access-control-allow-credentials')).toBe('true');
   });
 

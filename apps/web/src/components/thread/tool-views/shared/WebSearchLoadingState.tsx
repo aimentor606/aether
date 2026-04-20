@@ -24,7 +24,7 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 
 interface QueryStyle {
   icon: LucideIcon;
@@ -335,8 +335,8 @@ export function WebSearchLoadingState({
                     {query}
                   </span>
 
-                  {/* Acme loading animation */}
-                  <AcmeLoader customSize={16} />
+                  {/* Aether loading animation */}
+                  <AetherLoader customSize={16} />
                 </motion.div>
               );
             })}

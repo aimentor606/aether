@@ -101,7 +101,7 @@
     },
     "referrals": {
       "title": "Freunde empfehlen & Credits verdienen",
-      "description": "Lade Freunde zu Acme ein und verdient beide",
+      "description": "Lade Freunde zu Aether ein und verdient beide",
       "creditsPerReferral": "+400 Credits",
       "youEarn": "Du verdienst",
       "friendGets": "Dein Freund bekommt",
@@ -328,7 +328,7 @@
       ],
       "random": [
         "Schön, dass du da bist!",
-        "Ahoi! Was kann Acme für dich tun?",
+        "Ahoi! Was kann Aether für dich tun?",
         "Was möchtest du erledigen?",
         "Lass uns was Geniales bauen",
         "Bin startklar!",
@@ -358,7 +358,7 @@
     "chatDescription": "Einfache Unterhaltung",
     "sampleAnswers": "Beispielantworten",
     "samplePrompts": "Beispiel-Prompts",
-    "waitingForUserResponse": "Acme wird nach deiner Antwort eigenständig weiterarbeiten.",
+    "waitingForUserResponse": "Aether wird nach deiner Antwort eigenständig weiterarbeiten.",
     "taskCompleted": "Aufgabe abgeschlossen",
     "uploadingFiles": "Lade {count} Datei{plural} hoch...",
     "uploadingFilesOne": "Lade {count} Datei hoch...",
@@ -374,7 +374,7 @@
     "running": "Läuft",
     "minimizeToFloatingPreview": "Auf schwebende Vorschau minimieren",
     "close": "Schließen",
-    "noActionsYet": "Acme Computer",
+    "noActionsYet": "Aether Computer",
     "workerActionsDescription": "Wird gestartet",
     "emptyActionsDescription": "Worker-Aktionen werden hier angezeigt",
     "toolIsRunning": "Tool läuft",
@@ -384,7 +384,7 @@
     "rateThisResult": "Dieses Ergebnis bewerten",
     "feedbackHelpsImprove": "Dein Feedback hilft uns, uns zu verbessern",
     "additionalFeedbackOptional": "Zusätzliches Feedback (optional)",
-    "helpAcmeImprove": "Hilf Acme mit deinem Feedback, sich zu verbessern",
+    "helpAetherImprove": "Hilf Aether mit deinem Feedback, sich zu verbessern",
     "submit": "Absenden",
     "submitting": "Wird gesendet...",
     "feedbackSubmittedSuccess": "Feedback erfolgreich übermittelt",
@@ -446,10 +446,10 @@
     },
     "creditsExplainedPage": {
       "title": "Credits erklärt",
-      "subtitle": "Alles, was du über die Funktionsweise von Credits bei Acme wissen musst",
+      "subtitle": "Alles, was du über die Funktionsweise von Credits bei Aether wissen musst",
       "understandingCredits": {
         "title": "Credits verstehen",
-        "description": "Credits dienen als universelle Währung von Acme für Plattformoperationen. Jede Aktion, die deine KI-Agenten ausführen – von der Datenanalyse bis zur Codegenerierung – verbraucht Credits basierend auf der Komplexität der Aufgabe und den erforderlichen Ressourcen."
+        "description": "Credits dienen als universelle Währung von Aether für Plattformoperationen. Jede Aktion, die deine KI-Agenten ausführen – von der Datenanalyse bis zur Codegenerierung – verbraucht Credits basierend auf der Komplexität der Aufgabe und den erforderlichen Ressourcen."
       },
       "howCreditsWork": {
         "title": "Wie Credits funktionieren",
@@ -467,7 +467,7 @@
       },
       "gettingMoreCredits": {
         "title": "Mehr Credits erhalten",
-        "description": "Es gibt mehrere Möglichkeiten, Credits bei Acme zu erhalten:",
+        "description": "Es gibt mehrere Möglichkeiten, Credits bei Aether zu erhalten:",
         "monthlySubscription": {
           "title": "Monatliche Abonnement-Credits",
           "description": "Im Rahmen deines kostenpflichtigen Plans enthalten und jeden Monat automatisch erneuert. Dies sind ablaufende Credits."
@@ -487,7 +487,7 @@
       },
       "typesOfCredits": {
         "title": "Arten von Credits",
-        "description": "Acme verwendet zwei Arten von Credits, um dir Flexibilität bei der Verwaltung deiner Nutzung zu geben:",
+        "description": "Aether verwendet zwei Arten von Credits, um dir Flexibilität bei der Verwaltung deiner Nutzung zu geben:",
         "expiringCredits": {
           "title": "Ablaufende Credits",
           "description": "Monatliche Abonnement-Credits",
@@ -500,7 +500,7 @@
         },
         "creditPriority": {
           "title": "Credit-Priorität:",
-          "description": "Wenn du Acme verwendest, werden zuerst ablaufende Credits verbraucht. Erst nachdem deine ablaufenden Credits aufgebraucht sind, werden nicht ablaufende Credits verwendet."
+          "description": "Wenn du Aether verwendest, werden zuerst ablaufende Credits verbraucht. Erst nachdem deine ablaufenden Credits aufgebraucht sind, werden nicht ablaufende Credits verwendet."
         }
       }
     },
@@ -558,16 +558,16 @@
       "continue": "Weiter",
       "keepCurrentPlan": "Meinen aktuellen Plan behalten",
       "feedbackTitle": "Helfen Sie uns, besser zu werden",
-      "feedbackSubtitle": "Ihr Feedback prägt die Zukunft von Acme",
+      "feedbackSubtitle": "Ihr Feedback prägt die Zukunft von Aether",
       "whatWouldMakeYouStay": "Was würde Sie zum Bleiben bewegen?",
-      "feedbackPlaceholder": "Wenn wir eine Sache ändern oder hinzufügen könnten, die Acme für Sie lohnenswert machen würde, was wäre das?",
+      "feedbackPlaceholder": "Wenn wir eine Sache ändern oder hinzufügen könnten, die Aether für Sie lohnenswert machen würde, was wäre das?",
       "feedbackFooter": "Unser Team liest jede Antwort. Ihre Worte beeinflussen direkt, was wir als Nächstes entwickeln.",
       "confirmDowngrade": "Downgrade bestätigen",
       "processing": "Wird verarbeitet...",
       "pleaseSelectReason": "Bitte wählen Sie einen Grund",
       "reasons": {
         "tooExpensive": "Es ist zu teuer für meine Bedürfnisse",
-        "notUsingOften": "Ich nutze Acme nicht genug",
+        "notUsingOften": "Ich nutze Aether nicht genug",
         "foundAlternative": "Ich habe eine andere Lösung gefunden",
         "technicalIssues": "Ich hatte technische Probleme",
         "resultsNotGood": "Die Ergebnisse entsprachen nicht meinen Erwartungen",
@@ -581,7 +581,7 @@
     "enterCode": "Code eingeben",
     "logIntoAccount": "In dein Konto einloggen",
     "createAccount": "Konto erstellen",
-    "signInOrCreateAccount": "Melde dich an oder erstelle dein Acme-Konto",
+    "signInOrCreateAccount": "Melde dich an oder erstelle dein Aether-Konto",
     "continueWithGoogle": "Mit Google fortfahren",
     "continueWithGitHub": "Mit GitHub fortfahren",
     "orEmail": "oder E-Mail",
@@ -626,7 +626,7 @@
     "alreadySignedIn": "Du bist bereits angemeldet. Keine Aktion erforderlich.",
     "goToDashboard": "Zum Dashboard",
     "signInToContinue": "Anmelden, um fortzufahren",
-    "signInOrCreateAccountToTalk": "Melde dich an oder erstelle ein Konto, um mit Acme zu sprechen",
+    "signInOrCreateAccountToTalk": "Melde dich an oder erstelle ein Konto, um mit Aether zu sprechen",
     "orContinueWithEmail": "oder mit E-Mail fortfahren",
     "signInWithEmail": "Mit E-Mail anmelden",
     "createNewAccount": "Neues Konto erstellen",
@@ -790,10 +790,10 @@
     "heroPlaceholder": "Beschreibe die Aufgabe, die dein Worker erledigen soll..."
   },
   "showcase": {
-    "title": "Acme: Dein autonomer KI-Worker",
+    "title": "Aether: Dein autonomer KI-Worker",
     "subtitle": "Gebaut für komplexe Aufgaben, entwickelt für alles. Der ultimative KI-Assistent, der alles bewältigt—von einfachen Anfragen bis hin zu mega-komplexen Projekten.",
     "tryItOut": "Ausprobieren",
-    "acmeComputer": "Acme Computer",
+    "aetherComputer": "Aether Computer",
     "running": "Läuft",
     "workers": {
       "images": {
@@ -1107,7 +1107,7 @@
   "announcements": {
     "memories": {
       "title": "Wir stellen Erinnerungen vor",
-      "description": "Acme merkt sich jetzt Ihre Präferenzen und den Kontext über alle Gespräche hinweg",
+      "description": "Aether merkt sich jetzt Ihre Präferenzen und den Kontext über alle Gespräche hinweg",
       "features": {
         "personalized": {
           "title": "Personalisierte Erfahrung",

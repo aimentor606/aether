@@ -1,12 +1,12 @@
 import { eq, and } from 'drizzle-orm';
-import { acmeApiKeys } from '@acme/db';
+import { aetherApiKeys } from '@aether/db';
 import { db } from '../shared/db';
 import {
   hashSecretKey,
   generateApiKeyPair,
   generateSandboxKeyPair,
   isApiKeySecretConfigured,
-  isAcmeToken,
+  isAetherToken,
 } from '../shared/crypto';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -55,8 +55,8 @@ const lastUsedCache = new Map<string, number>();
  * Create a new API key scoped to a sandbox.
  * Returns the secret key in plaintext ONCE — only the hash is stored.
  *
- * type='user'    → acme_<32> secret key (user-created, external access)
- * type='sandbox' → acme_sb_<32> secret key (auto-managed, injected into sandbox)
+ * type='user'    → aether_<32> secret key (user-created, external access)
+ * type='sandbox' → aether_sb_<32> secret key (auto-managed, injected into sandbox)
  */
 export async function createApiKey(params: CreateApiKeyParams): Promise<CreateApiKeyResult> {
   if (!isApiKeySecretConfigured()) {
@@ -70,7 +70,7 @@ export async function createApiKey(params: CreateApiKeyParams): Promise<CreateAp
   const secretKeyHash = hashSecretKey(secretKey);
 
   const [row] = await db
-    .insert(acmeApiKeys)
+    .insert(aetherApiKeys)
     .values({
       sandboxId: params.sandboxId,
       accountId: params.accountId,
@@ -107,19 +107,19 @@ export async function createApiKey(params: CreateApiKeyParams): Promise<CreateAp
 export async function listApiKeys(sandboxId: string) {
   return db
     .select({
-      keyId: acmeApiKeys.keyId,
-      publicKey: acmeApiKeys.publicKey,
-      title: acmeApiKeys.title,
-      description: acmeApiKeys.description,
-      type: acmeApiKeys.type,
-      status: acmeApiKeys.status,
-      sandboxId: acmeApiKeys.sandboxId,
-      expiresAt: acmeApiKeys.expiresAt,
-      lastUsedAt: acmeApiKeys.lastUsedAt,
-      createdAt: acmeApiKeys.createdAt,
+      keyId: aetherApiKeys.keyId,
+      publicKey: aetherApiKeys.publicKey,
+      title: aetherApiKeys.title,
+      description: aetherApiKeys.description,
+      type: aetherApiKeys.type,
+      status: aetherApiKeys.status,
+      sandboxId: aetherApiKeys.sandboxId,
+      expiresAt: aetherApiKeys.expiresAt,
+      lastUsedAt: aetherApiKeys.lastUsedAt,
+      createdAt: aetherApiKeys.createdAt,
     })
-    .from(acmeApiKeys)
-    .where(eq(acmeApiKeys.sandboxId, sandboxId));
+    .from(aetherApiKeys)
+    .where(eq(aetherApiKeys.sandboxId, sandboxId));
 }
 
 /**
@@ -127,16 +127,16 @@ export async function listApiKeys(sandboxId: string) {
  */
 export async function revokeApiKey(keyId: string, accountId: string): Promise<boolean> {
   const result = await db
-    .update(acmeApiKeys)
+    .update(aetherApiKeys)
     .set({ status: 'revoked' })
     .where(
       and(
-        eq(acmeApiKeys.keyId, keyId),
-        eq(acmeApiKeys.accountId, accountId),
-        eq(acmeApiKeys.status, 'active'),
+        eq(aetherApiKeys.keyId, keyId),
+        eq(aetherApiKeys.accountId, accountId),
+        eq(aetherApiKeys.status, 'active'),
       ),
     )
-    .returning({ keyId: acmeApiKeys.keyId });
+    .returning({ keyId: aetherApiKeys.keyId });
 
   return result.length > 0;
 }
@@ -146,14 +146,14 @@ export async function revokeApiKey(keyId: string, accountId: string): Promise<bo
  */
 export async function deleteApiKey(keyId: string, accountId: string): Promise<boolean> {
   const result = await db
-    .delete(acmeApiKeys)
+    .delete(aetherApiKeys)
     .where(
       and(
-        eq(acmeApiKeys.keyId, keyId),
-        eq(acmeApiKeys.accountId, accountId),
+        eq(aetherApiKeys.keyId, keyId),
+        eq(aetherApiKeys.accountId, accountId),
       ),
     )
-    .returning({ keyId: acmeApiKeys.keyId });
+    .returning({ keyId: aetherApiKeys.keyId });
 
   return result.length > 0;
 }
@@ -161,7 +161,7 @@ export async function deleteApiKey(keyId: string, accountId: string): Promise<bo
 // ─── Validation ──────────────────────────────────────────────────────────────
 
 /**
- * Validate a Acme API key (acme_ or acme_sb_ prefix).
+ * Validate a Aether API key (aether_ or aether_sb_ prefix).
  * Single validation path for all key types — returns account_id, sandbox_id, and key type.
  */
 export async function validateSecretKey(secretKey: string): Promise<ApiKeyValidationResult> {
@@ -169,8 +169,8 @@ export async function validateSecretKey(secretKey: string): Promise<ApiKeyValida
     return { isValid: false, error: 'API_KEY_SECRET not configured' };
   }
 
-  if (!isAcmeToken(secretKey)) {
-    return { isValid: false, error: 'Invalid API key format — expected acme_ prefix' };
+  if (!isAetherToken(secretKey)) {
+    return { isValid: false, error: 'Invalid API key format — expected aether_ prefix' };
   }
 
   try {
@@ -178,24 +178,24 @@ export async function validateSecretKey(secretKey: string): Promise<ApiKeyValida
 
     const [row] = await db
       .select({
-        keyId: acmeApiKeys.keyId,
-        accountId: acmeApiKeys.accountId,
-        sandboxId: acmeApiKeys.sandboxId,
-        type: acmeApiKeys.type,
-        status: acmeApiKeys.status,
-        expiresAt: acmeApiKeys.expiresAt,
+        keyId: aetherApiKeys.keyId,
+        accountId: aetherApiKeys.accountId,
+        sandboxId: aetherApiKeys.sandboxId,
+        type: aetherApiKeys.type,
+        status: aetherApiKeys.status,
+        expiresAt: aetherApiKeys.expiresAt,
       })
-      .from(acmeApiKeys)
+      .from(aetherApiKeys)
       .where(
         and(
-          eq(acmeApiKeys.secretKeyHash, secretKeyHash),
-          eq(acmeApiKeys.status, 'active'),
+          eq(aetherApiKeys.secretKeyHash, secretKeyHash),
+          eq(aetherApiKeys.status, 'active'),
         ),
       )
       .limit(1);
 
     if (!row) {
-      const hasAnyKeys = await db.select({ keyId: acmeApiKeys.keyId }).from(acmeApiKeys).limit(1);
+      const hasAnyKeys = await db.select({ keyId: aetherApiKeys.keyId }).from(aetherApiKeys).limit(1);
       console.warn(`[validateSecretKey] Token not found in DB. hash=${secretKeyHash.slice(0, 8)}... prefix="${secretKey.slice(0, 20)}..." anyKeysInDb=${hasAnyKeys.length > 0}`);
       return { isValid: false, error: 'API key not found or invalid' };
     }
@@ -243,9 +243,9 @@ async function updateLastUsedThrottled(keyId: string): Promise<void> {
 
   try {
     await db
-      .update(acmeApiKeys)
+      .update(aetherApiKeys)
       .set({ lastUsedAt: new Date() })
-      .where(eq(acmeApiKeys.keyId, keyId));
+      .where(eq(aetherApiKeys.keyId, keyId));
   } catch (err) {
     console.warn('Failed to update last_used_at:', err);
   }

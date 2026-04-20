@@ -35,7 +35,7 @@ describe('pool/env-injector', () => {
         resourceId: 'r-1',
         provider: 'justavps',
         externalId: 'ext-123',
-        baseUrl: 'https://abc.acme.cloud',
+        baseUrl: 'https://abc.aether.cloud',
         serverType: 'basic',
         location: 'hel1',
         status: 'ready',
@@ -66,7 +66,7 @@ describe('pool/env-injector', () => {
         resourceId: 'r-1',
         provider: 'justavps',
         externalId: 'ext-123',
-        baseUrl: 'https://abc.acme.cloud',
+        baseUrl: 'https://abc.aether.cloud',
         serverType: 'basic',
         location: 'hel1',
         status: 'ready',
@@ -97,7 +97,7 @@ describe('pool/env-injector', () => {
         resourceId: 'r-1',
         provider: 'justavps',
         externalId: 'ext-123',
-        baseUrl: 'https://abc.acme.cloud',
+        baseUrl: 'https://abc.aether.cloud',
         serverType: 'basic',
         location: 'hel1',
         status: 'ready',
@@ -112,12 +112,12 @@ describe('pool/env-injector', () => {
       // Verify the fetch was called with correct headers
       const call = (globalThis.fetch as any).mock.calls[0];
       const [url, opts] = call;
-      expect(url).toBe('https://8000--abc.acme.cloud/env');
+      expect(url).toBe('https://8000--abc.aether.cloud/env');
       expect(opts.headers['Authorization']).toBe('Bearer pool_abc123');
       expect(opts.headers['X-Proxy-Token']).toBe('proxy_tok');
 
       const body = JSON.parse(opts.body);
-      expect(body.keys.ACME_TOKEN).toBe('sk_test_key');
+      expect(body.keys.AETHER_TOKEN).toBe('sk_test_key');
       expect(body.keys.INTERNAL_SERVICE_KEY).toBe('sk_test_key');
     } finally {
       globalThis.fetch = originalFetch;

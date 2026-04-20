@@ -25,20 +25,20 @@
 
 | Component | Image | Source | What it does |
 |---|---|---|---|
-| **API** | `acme/acme-api` | `apps/api/` | Backend API (Bun + Hono) |
-| **Frontend** | `acme/acme-frontend` | `apps/web/` | Next.js web app |
-| **Computer** | `acme/computer` | `core/` | Sandbox container (Alpine, s6, browser, tools) |
+| **API** | `aether/aether-api` | `apps/api/` | Backend API (Bun + Hono) |
+| **Frontend** | `aether/aether-frontend` | `apps/web/` | Next.js web app |
+| **Computer** | `aether/computer` | `core/` | Sandbox container (Alpine, s6, browser, tools) |
 
 ### Two environments
 
 | Environment | URL | API | Frontend | Computer |
 |---|---|---|---|---|
-| **Dev** | `dev.acme.com` | `dev-api.acme.com` (VPS) | Vercel (main branch) | JustAVPS (dev org) |
-| **Prod** | `acme.com` | `new-api.acme.com` (VPS) | Vercel (production branch) | JustAVPS (prod org) |
+| **Dev** | `dev.aether.com` | `dev-api.aether.com` (VPS) | Vercel (main branch) | JustAVPS (dev org) |
+| **Prod** | `aether.com` | `new-api.aether.com` (VPS) | Vercel (production branch) | JustAVPS (prod org) |
 
 ### Single registry
 
-All Docker images live on **Docker Hub** in the `acme/` namespace.
+All Docker images live on **Docker Hub** in the `aether/` namespace.
 
 ---
 
@@ -60,7 +60,7 @@ pnpm dev:sandbox
 
 ```bash
 pnpm dev:frontend   # Next.js on http://localhost:3000
-pnpm dev:api        # acme-api on http://localhost:8008
+pnpm dev:api        # aether-api on http://localhost:8008
 pnpm dev            # Both at once
 pnpm dev:sandbox    # Sandbox container with bind mounts
 ```
@@ -75,10 +75,10 @@ pnpm dev:sandbox    # Sandbox container with bind mounts
 
 | Local path | Container path |
 |---|---|
-| `core/acme-master/src` | `/ephemeral/acme-master/src` |
-| `core/acme-master/opencode/` | `/ephemeral/acme-master/opencode/` |
-| `core/acme-master/channels/src` | `/ephemeral/acme-master/channels/src` |
-| `core/acme-master/triggers/src` | `/ephemeral/acme-master/triggers/src` |
+| `core/aether-master/src` | `/ephemeral/aether-master/src` |
+| `core/aether-master/opencode/` | `/ephemeral/aether-master/opencode/` |
+| `core/aether-master/channels/src` | `/ephemeral/aether-master/channels/src` |
+| `core/aether-master/triggers/src` | `/ephemeral/aether-master/triggers/src` |
 
 ### When to rebuild
 
@@ -88,20 +88,20 @@ You **do not** need to rebuild for:
 
 You **do** need `pnpm dev:sandbox --build` when:
 - `Dockerfile` changes
-- `core/package.json` or `acme-master/package.json` changes
+- `core/package.json` or `aether-master/package.json` changes
 - `bun.lock` in a sandbox package changes
 
 ### Restarting services inside the container
 
 ```bash
-docker exec acme-sandbox s6-svc -r /run/service/svc-acme-master
-docker exec -it acme-sandbox bash
+docker exec aether-sandbox s6-svc -r /run/service/svc-aether-master
+docker exec -it aether-sandbox bash
 ```
 
 ### Health check
 
 ```bash
-curl http://127.0.0.1:14000/acme/health
+curl http://127.0.0.1:14000/aether/health
 ```
 
 ---
@@ -134,9 +134,9 @@ push to main (if AUTO_DEPLOY_DEV=true) OR manual dispatch
   ├─► build-computer-amd64                   │
   └─► build-computer-arm64                   ┘
         │
-        ├─► merge-api       → acme/acme-api:dev-{sha8} + :dev-latest (multi-arch)
-        ├─► merge-frontend  → acme/acme-frontend:dev-{sha8} + :dev-latest
-        └─► merge-computer  → acme/computer:dev-{sha8} + :dev-latest
+        ├─► merge-api       → aether/aether-api:dev-{sha8} + :dev-latest (multi-arch)
+        ├─► merge-frontend  → aether/aether-frontend:dev-{sha8} + :dev-latest
+        └─► merge-computer  → aether/computer:dev-{sha8} + :dev-latest
               │
               └─► deploy-api → SSH to dev VPS → blue/green deploy
 ```
@@ -194,12 +194,12 @@ Run workflow (version=0.8.30)
   │
   ├─► retag-images (30 sec — NO REBUILD)
   │     docker buildx imagetools create \
-  │       acme/acme-api:0.8.30 ← acme/acme-api:dev-latest
+  │       aether/aether-api:0.8.30 ← aether/aether-api:dev-latest
   │     (same for frontend + computer)
   │     Also tags as :latest
   │
   ├─► deploy-prod → SSH to prod VPS → blue/green deploy
-  ├─► update-production-branch → fast-forward production branch → Vercel deploys acme.com
+  ├─► update-production-branch → fast-forward production branch → Vercel deploys aether.com
   ├─► create-release → git tag + GitHub Release with auto-changelog
   └─► build-prod-snapshot → async JustAVPS snapshot (non-blocking)
 ```
@@ -219,7 +219,7 @@ Prod promotion re-tags the multi-arch manifests that were already built on the d
 
 ## Docker Hub Tags
 
-All images live in the `acme/` Docker Hub namespace.
+All images live in the `aether/` Docker Hub namespace.
 
 ### Tag convention
 
@@ -234,9 +234,9 @@ All images live in the `acme/` Docker Hub namespace.
 
 | Image | Component |
 |---|---|
-| `acme/acme-api` | Backend API |
-| `acme/acme-frontend` | Next.js frontend |
-| `acme/computer` | Sandbox container |
+| `aether/aether-api` | Backend API |
+| `aether/aether-frontend` | Next.js frontend |
+| `aether/computer` | Sandbox container |
 
 All images are **multi-arch (amd64 + arm64)**. Works on x86 servers and Apple Silicon / ARM machines.
 
@@ -248,8 +248,8 @@ Single source of truth per component:
 
 | Component | How version is set | Where it's read |
 |---|---|---|
-| **API** (`acme-api`) | `SANDBOX_VERSION` env var injected by `deploy-zero-downtime.sh` from image tag | `config.SANDBOX_VERSION`, `/health` endpoint, `/v1/platform/sandbox/version` |
-| **Computer** (`acme/computer`) | `SANDBOX_VERSION` env var injected by `justavps.ts`/`local-docker.ts` from image tag | `acme-master` `/acme/health` endpoint, falls back to `/ephemeral/metadata/.version` baked at build time |
+| **API** (`aether-api`) | `SANDBOX_VERSION` env var injected by `deploy-zero-downtime.sh` from image tag | `config.SANDBOX_VERSION`, `/health` endpoint, `/v1/platform/sandbox/version` |
+| **Computer** (`aether/computer`) | `SANDBOX_VERSION` env var injected by `justavps.ts`/`local-docker.ts` from image tag | `aether-master` `/aether/health` endpoint, falls back to `/ephemeral/metadata/.version` baked at build time |
 | **Frontend** | Not tracked (Vercel deployment hashes) | — |
 
 ### Version endpoints
@@ -298,8 +298,8 @@ Snapshots use the `dev` or `prod` GitHub Environment to select the correct `JUST
 
 When a new machine is needed, the API:
 1. Explicit `JUSTAVPS_IMAGE_ID` override? Use it.
-2. Dev snapshots (`acme-computer-vdev-*`) ready? Use the newest one.
-3. Stable snapshots (`acme-computer-v0.8.*`) ready? Use the highest semver.
+2. Dev snapshots (`aether-computer-vdev-*`) ready? Use the newest one.
+3. Stable snapshots (`aether-computer-v0.8.*`) ready? Use the highest semver.
 4. Nothing found? Provision without an image_id (bare machine, slower).
 
 Machine provisioning is always available — it never blocks on the latest snapshot being ready.
@@ -312,7 +312,7 @@ All ports are on `127.0.0.1` in dev (no public exposure).
 
 | Host port | Container port | Service |
 |---|---|---|
-| `14000` | `8000` | Acme Master (proxy entry point) |
+| `14000` | `8000` | Aether Master (proxy entry point) |
 | `14001` | `3111` | OpenCode Web UI |
 | `14002` | `6080` | Desktop (noVNC HTTP) |
 | `14003` | `6081` | Desktop (noVNC HTTPS) |
@@ -338,9 +338,9 @@ pnpm dev:sandbox --build  # force rebuild after dep change
 ### Health checks
 
 ```bash
-curl http://127.0.0.1:14000/acme/health         # local sandbox
-curl https://dev-api.acme.com/v1/platform/sandbox/version   # dev API
-curl https://new-api.acme.com/v1/platform/sandbox/version   # prod API
+curl http://127.0.0.1:14000/aether/health         # local sandbox
+curl https://dev-api.aether.com/v1/platform/sandbox/version   # dev API
+curl https://new-api.aether.com/v1/platform/sandbox/version   # prod API
 ```
 
 ### CI/CD operations
@@ -369,7 +369,7 @@ gh workflow run release.yml --repo aimentor606/aether \
 ### Sandbox container operations
 
 ```bash
-docker exec acme-sandbox s6-svc -r /run/service/svc-acme-master
-docker exec -it acme-sandbox bash
+docker exec aether-sandbox s6-svc -r /run/service/svc-aether-master
+docker exec -it aether-sandbox bash
 docker compose -f core/docker/docker-compose.yml build
 ```

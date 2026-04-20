@@ -81,7 +81,7 @@
     "guest": {
       "label": "Invitado",
       "title": "Browse Without\nan Account",
-      "description": "Try Acme with limited features. No signup required!",
+      "description": "Try Aether with limited features. No signup required!",
       "continue": "Continue as Guest",
       "signUp": "Sign Up Instead",
       "agreement": "By continuing, you agree to our",
@@ -99,7 +99,7 @@
     "resetFailed": "No pudimos enviar el email. Intenta de nuevo.",
     "passwordsDontMatch": "Las contraseñas no coinciden",
     "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
-    "welcomeTitle": "Contrata Acme para",
+    "welcomeTitle": "Contrata Aether para",
     "rotatingPhrases": {
       "presentations": "presentaciones",
       "writing": "redacción",
@@ -123,12 +123,12 @@
     }
   },
   "onboarding": {
-    "welcome": "Descubre lo que Acme puede hacer",
+    "welcome": "Descubre lo que Aether puede hacer",
     "welcomeSubtitle": "Tu asistente IA que toma acción",
     "skip": "Saltar",
     "next": "Siguiente",
     "getStarted": "Comenzar",
-    "acmeComputer": "Acme Computer",
+    "aetherComputer": "Aether Computer",
     "ready": "Listo",
     "examples": {
       "presentations": {
@@ -237,8 +237,8 @@
   },
   "chat": {
     "newChat": "Nuevo Chat",
-    "placeholder": "Dale a Acme una tarea...",
-    "inputPlaceholder": "Pregúntale a Acme cualquier cosa...",
+    "placeholder": "Dale a Aether una tarea...",
+    "inputPlaceholder": "Pregúntale a Aether cualquier cosa...",
     "recording": "Grabando...",
     "cancelRecording": "Cancelar grabación",
     "stopRecording": "Detener grabación",
@@ -251,7 +251,7 @@
     "rateThisResult": "Califica este resultado",
     "feedbackHelpsImprove": "Tu comentario nos ayuda a mejorar",
     "additionalFeedbackOptional": "Comentario adicional (opcional)",
-    "helpAcmeImprove": "Ayuda a Acme a mejorar con mi comentario",
+    "helpAetherImprove": "Ayuda a Aether a mejorar con mi comentario",
     "submit": "Enviar",
     "submitting": "Enviando...",
     "suggestedFollowUps": "Sugerencias de seguimiento",
@@ -266,7 +266,7 @@
     "newWorker": "Nuevo Worker",
     "myWorkers": "Mis Workers",
     "searchAgents": "Buscar workers",
-    "defaultAgent": "Acme",
+    "defaultAgent": "Aether",
     "defaultDescription": "IA para todo tipo de tareas",
     "superWorker": "Super Worker",
     "coder": "Coder",
@@ -484,8 +484,8 @@
   "billing": {
     "loadingPaywall": "Cargando planes...",
     "checkoutUnavailable": "Checkout móvil no disponible",
-    "checkoutUnavailableMessage": "Para suscribirte a un plan, visita acme.com en la web.",
-    "goToWeb": "Ir a acme.com",
+    "checkoutUnavailableMessage": "Para suscribirte a un plan, visita aether.com en la web.",
+    "goToWeb": "Ir a aether.com",
     "billingStatus": "Estado de Facturación",
     "loading": "Cargando información de facturación...",
     "error": "Error al cargar información de facturación",
@@ -534,12 +534,12 @@
   "beta": {
     "title": "Funciones Beta",
     "webSupportTitle": "Totalmente Compatible en Web",
-    "webSupportDescription": "Disponible en Acme.com. Próximamente en móvil—aún en desarrollo aquí.",
-    "visitAcme": "Visitar Acme.com",
+    "webSupportDescription": "Disponible en Aether.com. Próximamente en móvil—aún en desarrollo aquí.",
+    "visitAether": "Visitar Aether.com",
     "advancedFeatures": "Funciones Avanzadas",
     "mobileBeta": "Beta Móvil",
     "pleaseNote": "Ten en Cuenta",
-    "mobileWarning": "En desarrollo en móvil y puede tener problemas. Para la mejor experiencia, usa Acme.com."
+    "mobileWarning": "En desarrollo en móvil y puede tener problemas. Para la mejor experiencia, usa Aether.com."
   },
   "accountDeletion": {
     "title": "Eliminar Cuenta",
@@ -575,7 +575,7 @@
     "chooseModelFor": "Elige un modelo para el worker {{agent}}"
   },
   "placeholders": {
-    "default": "Dale a Acme una tarea...",
+    "default": "Dale a Aether una tarea...",
     "search": "Buscar...",
     "searchConversations": "Buscar chats",
     "searchAgents": "Buscar workers",

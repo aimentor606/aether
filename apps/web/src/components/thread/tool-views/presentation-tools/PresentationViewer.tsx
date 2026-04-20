@@ -27,7 +27,7 @@ import {
   ExternalLink,
   ChevronDown,
 } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { ToolViewProps } from '../types';
 import { formatTimestamp, getToolTitle } from '../utils';
 import { downloadPresentation, handleGoogleSlidesUpload } from '../utils/presentation-utils';
@@ -760,7 +760,7 @@ export function PresentationViewer({
                       disabled={isDownloading}
                     >
                       {isDownloading ? (
-                        <AcmeLoader customSize={14} />
+                        <AetherLoader customSize={14} />
                       ) : (
                         <Download className="h-3.5 w-3.5" />
                       )}

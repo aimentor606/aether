@@ -1,9 +1,14 @@
-"use client";
+'use client';
 
-import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Badge,
+} from '@aether/ui/primitives';
 import {
   CheckCircle,
   XCircle,
@@ -15,8 +20,11 @@ import {
   Shield,
   Loader2,
   RefreshCw,
-} from "lucide-react";
-import type { StatelessHealth, Backpressure } from "@/hooks/admin/use-stateless";
+} from 'lucide-react';
+import type {
+  StatelessHealth,
+  Backpressure,
+} from '@/hooks/admin/use-stateless';
 
 interface SystemHealthProps {
   health: StatelessHealth | undefined;
@@ -24,39 +32,39 @@ interface SystemHealthProps {
   isLoading?: boolean;
 }
 
-type HealthStatus = "healthy" | "degraded" | "unhealthy" | "unknown";
+type HealthStatus = 'healthy' | 'degraded' | 'unhealthy' | 'unknown';
 
 interface StatusIndicatorProps {
   status: HealthStatus;
   label: string;
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
 }
 
-function StatusIndicator({ status, label, size = "md" }: StatusIndicatorProps) {
+function StatusIndicator({ status, label, size = 'md' }: StatusIndicatorProps) {
   const config = {
     healthy: {
       icon: CheckCircle,
-      color: "text-emerald-500",
-      bg: "bg-emerald-500/10",
-      pulse: "bg-emerald-500",
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-500/10',
+      pulse: 'bg-emerald-500',
     },
     degraded: {
       icon: AlertTriangle,
-      color: "text-amber-500",
-      bg: "bg-amber-500/10",
-      pulse: "bg-amber-500",
+      color: 'text-amber-500',
+      bg: 'bg-amber-500/10',
+      pulse: 'bg-amber-500',
     },
     unhealthy: {
       icon: XCircle,
-      color: "text-red-500",
-      bg: "bg-red-500/10",
-      pulse: "bg-red-500",
+      color: 'text-red-500',
+      bg: 'bg-red-500/10',
+      pulse: 'bg-red-500',
     },
     unknown: {
       icon: Activity,
-      color: "text-muted-foreground",
-      bg: "bg-muted",
-      pulse: "bg-muted-foreground",
+      color: 'text-muted-foreground',
+      bg: 'bg-muted',
+      pulse: 'bg-muted-foreground',
     },
   };
 
@@ -64,28 +72,43 @@ function StatusIndicator({ status, label, size = "md" }: StatusIndicatorProps) {
   const Icon = c.icon;
 
   const sizeClasses = {
-    sm: { wrapper: "gap-1.5", icon: "w-3.5 h-3.5", text: "text-xs", pulse: "w-1.5 h-1.5" },
-    md: { wrapper: "gap-2", icon: "w-4 h-4", text: "text-sm", pulse: "w-2 h-2" },
-    lg: { wrapper: "gap-2.5", icon: "w-5 h-5", text: "text-base", pulse: "w-2.5 h-2.5" },
+    sm: {
+      wrapper: 'gap-1.5',
+      icon: 'w-3.5 h-3.5',
+      text: 'text-xs',
+      pulse: 'w-1.5 h-1.5',
+    },
+    md: {
+      wrapper: 'gap-2',
+      icon: 'w-4 h-4',
+      text: 'text-sm',
+      pulse: 'w-2 h-2',
+    },
+    lg: {
+      wrapper: 'gap-2.5',
+      icon: 'w-5 h-5',
+      text: 'text-base',
+      pulse: 'w-2.5 h-2.5',
+    },
   };
 
   const s = sizeClasses[size];
 
   return (
-    <div className={cn("flex items-center", s.wrapper)}>
+    <div className={cn('flex items-center', s.wrapper)}>
       <div className="relative">
         <Icon className={cn(s.icon, c.color)} />
-        {status !== "unknown" && (
+        {status !== 'unknown' && (
           <span
             className={cn(
-              "absolute -top-0.5 -right-0.5 rounded-full animate-pulse",
+              'absolute -top-0.5 -right-0.5 rounded-full animate-pulse',
               s.pulse,
-              c.pulse
+              c.pulse,
             )}
           />
         )}
       </div>
-      <span className={cn(s.text, c.color, "font-medium")}>{label}</span>
+      <span className={cn(s.text, c.color, 'font-medium')}>{label}</span>
     </div>
   );
 }
@@ -101,49 +124,63 @@ function ServiceStatus({ name, running, icon, details }: ServiceStatusProps) {
   return (
     <div className="flex items-center justify-between p-3 rounded-lg border transition-colors">
       <div className="flex items-center gap-3">
-        <div className={cn("p-2", running ? "text-emerald-500" : "text-red-500")}>
+        <div
+          className={cn('p-2', running ? 'text-emerald-500' : 'text-red-500')}
+        >
           {icon}
         </div>
         <div>
           <p className="font-medium text-sm">{name}</p>
-          {details && <p className="text-xs text-muted-foreground">{details}</p>}
+          {details && (
+            <p className="text-xs text-muted-foreground">{details}</p>
+          )}
         </div>
       </div>
       <div className="flex items-center gap-2">
         <span
           className={cn(
-            "w-2 h-2 rounded-full",
-            running ? "bg-emerald-500 animate-pulse" : "bg-red-500"
+            'w-2 h-2 rounded-full',
+            running ? 'bg-emerald-500 animate-pulse' : 'bg-red-500',
           )}
         />
-        <span className={cn("text-sm", running ? "text-emerald-500" : "text-red-500")}>
-          {running ? "Running" : "Stopped"}
+        <span
+          className={cn(
+            'text-sm',
+            running ? 'text-emerald-500' : 'text-red-500',
+          )}
+        >
+          {running ? 'Running' : 'Stopped'}
         </span>
       </div>
     </div>
   );
 }
 
-export function SystemHealthPanel({ health, backpressure, isLoading }: SystemHealthProps) {
+export function SystemHealthPanel({
+  health,
+  backpressure,
+  isLoading,
+}: SystemHealthProps) {
   const getOverallStatus = (): HealthStatus => {
-    if (!health) return "unknown";
-    if (!health.healthy) return "unhealthy";
-    if (backpressure?.level === "critical" || backpressure?.level === "high") return "degraded";
-    return "healthy";
+    if (!health) return 'unknown';
+    if (!health.healthy) return 'unhealthy';
+    if (backpressure?.level === 'critical' || backpressure?.level === 'high')
+      return 'degraded';
+    return 'healthy';
   };
 
   const getBackpressureStatus = (): HealthStatus => {
-    if (!backpressure) return "unknown";
+    if (!backpressure) return 'unknown';
     switch (backpressure.level) {
-      case "normal":
-        return "healthy";
-      case "elevated":
-        return "degraded";
-      case "high":
-      case "critical":
-        return "unhealthy";
+      case 'normal':
+        return 'healthy';
+      case 'elevated':
+        return 'degraded';
+      case 'high':
+      case 'critical':
+        return 'unhealthy';
       default:
-        return "unknown";
+        return 'unknown';
     }
   };
 
@@ -167,7 +204,13 @@ export function SystemHealthPanel({ health, backpressure, isLoading }: SystemHea
             <Activity className="w-5 h-5 text-primary" />
             System Health
           </CardTitle>
-          <StatusIndicator status={overallStatus} label={overallStatus.charAt(0).toUpperCase() + overallStatus.slice(1)} size="md" />
+          <StatusIndicator
+            status={overallStatus}
+            label={
+              overallStatus.charAt(0).toUpperCase() + overallStatus.slice(1)
+            }
+            size="md"
+          />
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -183,7 +226,11 @@ export function SystemHealthPanel({ health, backpressure, isLoading }: SystemHea
             name="Recovery Service"
             running={health?.recovery?.running ?? false}
             icon={<RefreshCw className="w-4 h-4" />}
-            details={health?.recovery?.sharded ? `Shard ${health.recovery.shard_id}/${health.recovery.total_shards}` : "Not sharded"}
+            details={
+              health?.recovery?.sharded
+                ? `Shard ${health.recovery.shard_id}/${health.recovery.total_shards}`
+                : 'Not sharded'
+            }
           />
           <ServiceStatus
             name="Ownership Tracker"
@@ -198,27 +245,49 @@ export function SystemHealthPanel({ health, backpressure, isLoading }: SystemHea
           <div className="pt-3 border-t">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium">Backpressure</span>
-              <StatusIndicator status={getBackpressureStatus()} label={backpressure.level} size="sm" />
+              <StatusIndicator
+                status={getBackpressureStatus()}
+                label={backpressure.level}
+                size="sm"
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="p-2.5 rounded-lg bg-muted/50">
                 <p className="text-xs text-muted-foreground">Memory</p>
-                <p className="text-sm font-medium">{backpressure.memory_percent.toFixed(1)}%</p>
+                <p className="text-sm font-medium">
+                  {backpressure.memory_percent.toFixed(1)}%
+                </p>
               </div>
               <div className="p-2.5 rounded-lg bg-muted/50">
                 <p className="text-xs text-muted-foreground">Flush Latency</p>
-                <p className="text-sm font-medium">{backpressure.flush_latency_ms.toFixed(0)}ms</p>
+                <p className="text-sm font-medium">
+                  {backpressure.flush_latency_ms.toFixed(0)}ms
+                </p>
               </div>
               <div className="p-2.5 rounded-lg bg-muted/50">
                 <p className="text-xs text-muted-foreground">Accept Work</p>
-                <p className={cn("text-sm font-medium", backpressure.should_accept_work ? "text-emerald-500" : "text-red-500")}>
-                  {backpressure.should_accept_work ? "Yes" : "No"}
+                <p
+                  className={cn(
+                    'text-sm font-medium',
+                    backpressure.should_accept_work
+                      ? 'text-emerald-500'
+                      : 'text-red-500',
+                  )}
+                >
+                  {backpressure.should_accept_work ? 'Yes' : 'No'}
                 </p>
               </div>
               <div className="p-2.5 rounded-lg bg-muted/50">
                 <p className="text-xs text-muted-foreground">Shed Load</p>
-                <p className={cn("text-sm font-medium", backpressure.should_shed_load ? "text-red-500" : "text-emerald-500")}>
-                  {backpressure.should_shed_load ? "Yes" : "No"}
+                <p
+                  className={cn(
+                    'text-sm font-medium',
+                    backpressure.should_shed_load
+                      ? 'text-red-500'
+                      : 'text-emerald-500',
+                  )}
+                >
+                  {backpressure.should_shed_load ? 'Yes' : 'No'}
                 </p>
               </div>
             </div>
@@ -248,7 +317,11 @@ interface HealthBadgesProps {
   alertCount?: number;
 }
 
-export function HealthBadges({ health, backpressure, alertCount = 0 }: HealthBadgesProps) {
+export function HealthBadges({
+  health,
+  backpressure,
+  alertCount = 0,
+}: HealthBadgesProps) {
   const getHealthBadge = () => {
     if (!health) {
       return (
@@ -267,7 +340,8 @@ export function HealthBadges({ health, backpressure, alertCount = 0 }: HealthBad
     if (alertCount > 0) {
       return (
         <Badge variant="outline" className="gap-1.5 px-3 py-1">
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> {alertCount} Alert{alertCount > 1 ? "s" : ""}
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> {alertCount}{' '}
+          Alert{alertCount > 1 ? 's' : ''}
         </Badge>
       );
     }
@@ -281,17 +355,18 @@ export function HealthBadges({ health, backpressure, alertCount = 0 }: HealthBad
   const getBackpressureBadge = () => {
     if (!backpressure) return null;
     const config: Record<string, { color: string; icon: typeof Shield }> = {
-      normal: { color: "text-emerald-500", icon: Shield },
-      elevated: { color: "text-amber-500", icon: AlertTriangle },
-      high: { color: "text-orange-500", icon: AlertTriangle },
-      critical: { color: "text-red-500", icon: XCircle },
+      normal: { color: 'text-emerald-500', icon: Shield },
+      elevated: { color: 'text-amber-500', icon: AlertTriangle },
+      high: { color: 'text-orange-500', icon: AlertTriangle },
+      critical: { color: 'text-red-500', icon: XCircle },
     };
     const c = config[backpressure.level] || config.normal;
     const Icon = c.icon;
     return (
       <Badge variant="outline" className="gap-1.5 px-3 py-1">
-        <Icon className={cn("w-3.5 h-3.5", c.color)} />
-        {backpressure.level.charAt(0).toUpperCase() + backpressure.level.slice(1)}
+        <Icon className={cn('w-3.5 h-3.5', c.color)} />
+        {backpressure.level.charAt(0).toUpperCase() +
+          backpressure.level.slice(1)}
       </Badge>
     );
   };

@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import React, { useState, useEffect, memo } from 'react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 
 interface StreamingLoaderProps {
   message?: string;
@@ -25,7 +25,7 @@ export const StreamingLoader = memo(function StreamingLoader({
   return (
     <div className={cn('flex items-center justify-center h-full w-full min-h-[300px]', className || '')}>
       <div className="flex flex-col items-center gap-4">
-        <AcmeLoader customSize={32} speed={1} />
+        <AetherLoader customSize={32} speed={1} />
         <span className="text-sm text-muted-foreground">
           {message || 'Generating content'}{dots}
         </span>

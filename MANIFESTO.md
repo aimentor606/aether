@@ -1,10 +1,10 @@
-# Acme
+# Aether
 
 ## Turn Any Computer Into an AI Computer
 
 ---
 
-Acme is a computer that runs itself.
+Aether is a computer that runs itself.
 
 It's a full Linux machine — real filesystem, real shell, real tools — with an AI cortex wired into it. It connects to every tool you use, remembers everything it's ever learned, and runs autonomous workers around the clock. It writes its own code, builds its own tools, creates its own automations. The longer it runs, the smarter it gets.
 
@@ -22,13 +22,13 @@ Meanwhile, your actual life is scattered across thirty different tools. Your cod
 
 The problem isn't that AI isn't smart enough. The problem is that AI is blind. It has no persistent memory, no access to your systems, no understanding of your context. It's a genius with amnesia sitting in an empty room.
 
-Acme gives it the room. And everything in it.
+Aether gives it the room. And everything in it.
 
 ---
 
 ## The Idea
 
-A Acme instance is a full computer — Ubuntu, KDE desktop, bash, Python, Node.js, the whole stack — with an AI agent framework running on top. The agent has root access. It can install packages, write scripts, hit APIs, create files, run servers, deploy code. It has the same capabilities as a human sitting at a terminal, except it doesn't sleep, doesn't forget, and can run a hundred tasks in parallel.
+A Aether instance is a full computer — Ubuntu, KDE desktop, bash, Python, Node.js, the whole stack — with an AI agent framework running on top. The agent has root access. It can install packages, write scripts, hit APIs, create files, run servers, deploy code. It has the same capabilities as a human sitting at a terminal, except it doesn't sleep, doesn't forget, and can run a hundred tasks in parallel.
 
 It's three things layered together:
 
@@ -66,7 +66,7 @@ The computer builds itself.
 
 Every tool, every API, every data source you use — connected with full authenticated access. Your GitHub repos. Your Cloudflare zones. Your AWS infrastructure. Your Vercel deployments. Your Slack workspace. Your LinkedIn. Your Gmail. Your Google Drive. Your banking in Mercury. Your legal in Firstbase. Your payroll in Deel. Your tasks in Linear. Your social in X. Your domains in Namecheap.
 
-All of it wired in. All of it queryable. All of it actionable. You chat with your Acme instance and it can pull data from any system, push changes to any system, and cross-reference information across all of them. One AI cortex that spans your entire digital footprint.
+All of it wired in. All of it queryable. All of it actionable. You chat with your Aether instance and it can pull data from any system, push changes to any system, and cross-reference information across all of them. One AI cortex that spans your entire digital footprint.
 
 ### Perfect Memory
 
@@ -79,13 +79,13 @@ Four-tier persistent memory that grows over time:
 
 The agent also has full access to its own session history — every past conversation, every tool call, every result. It can search its own history, recall past approaches, and build on previous work. Nothing is ever truly out of context.
 
-The longer a Acme instance runs, the more it knows. It compounds. Day one, it's a capable agent. Day thirty, it understands your entire operation. Day three hundred, it knows things about your business that you've forgotten.
+The longer a Aether instance runs, the more it knows. It compounds. Day one, it's a capable agent. Day thirty, it understands your entire operation. Day three hundred, it knows things about your business that you've forgotten.
 
 ### Autonomous Workers
 
 This is the core of it. Agents aren't chatbots — they're workers.
 
-A Acme agent runs code. It executes shell commands. It writes scripts. It hits APIs. It installs packages. It builds applications. It deploys services. It creates files, edits files, deletes files. It operates with the full power of a human developer sitting at a terminal — except it can run continuously, in parallel, without breaks.
+A Aether agent runs code. It executes shell commands. It writes scripts. It hits APIs. It installs packages. It builds applications. It deploys services. It creates files, edits files, deletes files. It operates with the full power of a human developer sitting at a terminal — except it can run continuously, in parallel, without breaks.
 
 You can spin up a worker that reviews every pull request on your GitHub org. Another that processes incoming invoices from email and logs them in your accounting system. Another that monitors your infrastructure and pages you if something breaks. Another that writes and publishes your weekly newsletter from your notes. Another that handles customer support emails with full context of your product.
 
@@ -95,15 +95,15 @@ An agent can create other agents. An agent can build a new tool it needs, write 
 
 ### Always On
 
-Acme doesn't wait for you to type a message. It runs.
+Aether doesn't wait for you to type a message. It runs.
 
 Scheduled triggers fire agents on cron — every morning, every Monday, every first of the month. Event-based triggers fire on webhooks — a new PR opened, a payment received, an email arrived, a deploy failed. Background workers run continuously — monitoring, processing, reacting.
 
-While you sleep, your Acme instance is working. It processed overnight emails, flagged what matters, auto-replied to routine ones. It reviewed and merged PRs that passed CI. It generated your weekly report. It posted your scheduled content. It renewed an expiring domain. You wake up to a scratchpad that says: here's what happened.
+While you sleep, your Aether instance is working. It processed overnight emails, flagged what matters, auto-replied to routine ones. It reviewed and merged PRs that passed CI. It generated your weekly report. It posted your scheduled content. It renewed an expiring domain. You wake up to a scratchpad that says: here's what happened.
 
 ### Everywhere at Once
 
-You reach your Acme instance wherever you already are. Chat interface. Email. Slack. WhatsApp. SMS. Telegram. Microsoft Teams.
+You reach your Aether instance wherever you already are. Chat interface. Email. Slack. WhatsApp. SMS. Telegram. Microsoft Teams.
 
 It's not a single app you have to open. It's a presence across all your communication channels. Message it on WhatsApp from your phone. Email it a document to process. Tag it in a Slack thread to research something. It's always there, always in context, always ready.
 
@@ -111,7 +111,7 @@ It's not a single app you have to open. It's a presence across all your communic
 
 ## A Company in a Computer
 
-One person with a Acme instance has the operational capacity of a team.
+One person with a Aether instance has the operational capacity of a team.
 
 The agents handle email, code, deployments, finance, content, legal, research, data analysis, customer communication, infrastructure. Each agent has access to the full system — every integration, every memory file, every tool. They coordinate through the filesystem. They build on each other's work.
 
@@ -132,7 +132,7 @@ A living, breathing company inside a computer. It grows with you.
 
 ## What Exists Today
 
-The foundation is built. A Acme instance is a Docker-based sandbox running a full KDE desktop with the OpenCode agent framework. Inside it:
+The foundation is built. A Aether instance is a Docker-based sandbox running a full KDE desktop with the OpenCode agent framework. Inside it:
 
 - **7 agents** — one primary orchestrator plus specialists for research, browser automation, web development, presentations, spreadsheets, and image generation
 - **12 skills** — persistent memory, deep research, browser automation (agent-browser), email (agent's own inbox), documents (DOCX, PDF, XLSX), presentations, video (Remotion), text-to-speech (ElevenLabs), skill creation
@@ -155,7 +155,7 @@ The agent framework is OpenCode — open-source, provider-agnostic, with a TUI a
 
 **Communication channels.** WhatsApp, Slack, SMS, Teams, Telegram, email — all wired as input/output channels. The agent is reachable everywhere the user already communicates.
 
-**SDK.** Programmatic access to the full Acme instance. Create sessions, send prompts, subscribe to events, inject context — from any application, any language, any platform. Build products on top of Acme.
+**SDK.** Programmatic access to the full Aether instance. Create sessions, send prompts, subscribe to events, inject context — from any application, any language, any platform. Build products on top of Aether.
 
 **Self-improving agents.** Agents that monitor their own performance, identify gaps in their skills, and build new tools and automations to fill them. The compounding flywheel at the system level.
 
@@ -169,10 +169,10 @@ The agent framework is OpenCode — open-source, provider-agnostic, with a TUI a
 
 **Memory over repetition.** Learn once, remember forever. The agent never asks the same question twice. Every correction makes it permanently better.
 
-**Context is everything.** The biggest unlock isn't a smarter model — it's a model that can see everything it needs to see. Acme is a context engineering machine.
+**Context is everything.** The biggest unlock isn't a smarter model — it's a model that can see everything it needs to see. Aether is a context engineering machine.
 
 **Everything is code and text.** Agents, skills, tools, commands, memory, integrations — all text files that become operational. Anyone can read them, edit them, create them.
 
 **The agent that builds itself.** An agent can create agents, build tools, write skills, schedule automations. The system extends itself. The computer grows.
 
-**An AI company of one.** One person. One Acme instance. The operational capacity of an entire team. That's the end state.
+**An AI company of one.** One person. One Aether instance. The operational capacity of an entire team. That's the end state.

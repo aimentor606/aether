@@ -177,7 +177,7 @@ git commit -m "docs: add detailed backend architecture documentation"
 **ORM**: Drizzle ORM 0.44.x
 **连接**: 连接池, Supabase client
 **Schema 设计原则**:
-- 使用 `acme` schema 分离业务数据
+- 使用 `aether` schema 分离业务数据
 - 使用 `public` schema 存储认证数据
 - 所有表都有适当的索引
 - 使用 Drizzle 的类型安全查询

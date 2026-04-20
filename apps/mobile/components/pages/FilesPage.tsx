@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { AcmeLoader } from '@/components/ui';
+import { AetherLoader } from '@/components/ui';
 import {
   Upload,
   FolderPlus,
@@ -684,7 +684,7 @@ export const FilesPage = forwardRef<FilesPageRef, FilesPageProps>(function Files
                 }}
                 className={`text-sm ${isAtRoot ? 'font-roobert-medium' : 'font-roobert'}`}
               >
-                My Acme
+                My Aether
               </Text>
             </Pressable>
 
@@ -733,7 +733,7 @@ export const FilesPage = forwardRef<FilesPageRef, FilesPageProps>(function Files
       <View className="flex-1">
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
-            <AcmeLoader size="large" />
+            <AetherLoader size="large" />
             <Text
               className="text-sm mt-4 font-roobert"
               style={{
@@ -1105,7 +1105,7 @@ export const FilesPage = forwardRef<FilesPageRef, FilesPageProps>(function Files
                 }}
                 numberOfLines={1}
               >
-                {currentPath === '/workspace' ? 'My Acme' : currentPath.split('/').pop()}
+                {currentPath === '/workspace' ? 'My Aether' : currentPath.split('/').pop()}
               </Text>
             </View>
           </View>

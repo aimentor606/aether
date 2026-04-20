@@ -3,7 +3,7 @@ import { View, ScrollView, NativeScrollEvent, NativeSyntheticEvent } from 'react
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { CheckCircle2, CircleDashed, AlertCircle } from 'lucide-react-native';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { getUserFriendlyToolName } from '@agentpress/shared';
 // NOTE: useSmoothText removed - displaying content immediately (following frontend pattern)
 import { getToolIcon } from '@/lib/icons/tool-icons';
@@ -220,7 +220,7 @@ export const StreamingToolCard = React.memo(function StreamingToolCard({ content
         {fallbackIsCompleted ? (
           <Icon as={CheckCircle2} size={16} className="text-emerald-500" />
         ) : (
-          <AcmeLoader size="small" />
+          <AetherLoader size="small" />
         )}
       </View>
     );
@@ -308,7 +308,7 @@ export const StreamingToolCard = React.memo(function StreamingToolCard({ content
             <Icon as={CheckCircle2} size={16} className="text-emerald-500" />
           )
         ) : (
-          <AcmeLoader size="small" />
+          <AetherLoader size="small" />
         )}
       </View>
     );
@@ -342,7 +342,7 @@ export const StreamingToolCard = React.memo(function StreamingToolCard({ content
             <Icon as={CheckCircle2} size={16} className="text-emerald-500" />
           )
         ) : (
-          <AcmeLoader size="small" />
+          <AetherLoader size="small" />
         )}
       </View>
 

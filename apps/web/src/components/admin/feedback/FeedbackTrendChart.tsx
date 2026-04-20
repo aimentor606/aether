@@ -1,8 +1,18 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Skeleton,
+} from '@aether/ui/primitives';
 import { useState } from 'react';
 import { useAdminFeedbackTimeSeries } from '@/hooks/admin/use-admin-feedback';
 import {
@@ -34,24 +44,38 @@ const chartConfig = {
 export function FeedbackTrendChart() {
   const [days, setDays] = useState(30);
   const [granularity, setGranularity] = useState('day');
-  
-  const { data: timeSeries, isLoading } = useAdminFeedbackTimeSeries(days, granularity);
 
-  const chartData = timeSeries?.map(point => {
-    const neutral = (point.count || 0) - (point.positive_count || 0) - (point.negative_count || 0);
-    return {
-      date: point.period ? format(parseISO(point.period), granularity === 'month' ? 'MMM yyyy' : 'MMM d') : '',
-      positive: point.positive_count || 0,
-      neutral: Math.max(0, neutral),
-      negative: point.negative_count || 0,
-    };
-  }) || [];
+  const { data: timeSeries, isLoading } = useAdminFeedbackTimeSeries(
+    days,
+    granularity,
+  );
+
+  const chartData =
+    timeSeries?.map((point) => {
+      const neutral =
+        (point.count || 0) -
+        (point.positive_count || 0) -
+        (point.negative_count || 0);
+      return {
+        date: point.period
+          ? format(
+              parseISO(point.period),
+              granularity === 'month' ? 'MMM yyyy' : 'MMM d',
+            )
+          : '',
+        positive: point.positive_count || 0,
+        neutral: Math.max(0, neutral),
+        negative: point.negative_count || 0,
+      };
+    }) || [];
 
   return (
-    <Card className='h-full'>
+    <Card className="h-full">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
-          <CardTitle className="text-base font-medium">Feedback Volume</CardTitle>
+          <CardTitle className="text-base font-medium">
+            Feedback Volume
+          </CardTitle>
           <CardDescription>Stacked by sentiment over time</CardDescription>
         </div>
         <div className="flex gap-2">
@@ -65,7 +89,10 @@ export function FeedbackTrendChart() {
               <SelectItem value="month">Monthly</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={days.toString()} onValueChange={(v) => setDays(parseInt(v))}>
+          <Select
+            value={days.toString()}
+            onValueChange={(v) => setDays(parseInt(v))}
+          >
             <SelectTrigger className="w-[100px] h-8">
               <SelectValue />
             </SelectTrigger>

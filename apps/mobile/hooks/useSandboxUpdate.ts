@@ -153,7 +153,7 @@ export function useGlobalSandboxUpdate() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`${sandboxUrl}/acme/health`);
+        const res = await fetch(`${sandboxUrl}/aether/health`);
         if (!res.ok) return;
         const data = await res.json();
         if (!cancelled && data?.version) {

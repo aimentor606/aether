@@ -15,7 +15,7 @@ import zh from '@/locales/zh.json';
 import ja from '@/locales/ja.json';
 import { log } from '@/lib/logger';
 
-const LANGUAGE_KEY = '@acme_language';
+const LANGUAGE_KEY = '@aether_language';
 
 // Language resources
 const resources = {

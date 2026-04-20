@@ -10,7 +10,7 @@
  * Each file contains a single statement so both `supabase db reset`
  * and this runner can execute them without prepared-statement issues.
  *
- * In production (INTERNAL_ACME_ENV=prod), schema is managed by external
+ * In production (INTERNAL_AETHER_ENV=prod), schema is managed by external
  * migration pipelines, so this is a no-op.
  */
 
@@ -25,13 +25,13 @@ export async function ensureSchema(): Promise<void> {
     return;
   }
 
-  if (process.env.ACME_SKIP_ENSURE_SCHEMA === '1') {
-    console.log('[schema] ACME_SKIP_ENSURE_SCHEMA=1 — skipping');
+  if (process.env.AETHER_SKIP_ENSURE_SCHEMA === '1') {
+    console.log('[schema] AETHER_SKIP_ENSURE_SCHEMA=1 — skipping');
     return;
   }
 
   // Production: schema managed externally (CI/CD migrations)
-  if (config.INTERNAL_ACME_ENV === 'prod') {
+  if (config.INTERNAL_AETHER_ENV === 'prod') {
     console.log('[schema] Production mode — skipping auto-push (managed externally)');
     return;
   }

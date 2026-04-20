@@ -20,7 +20,7 @@ export function OcSessionSpawnToolView({
   isStreaming = false,
 }: ToolViewProps) {
   const args = toolCall?.arguments || {};
-  const agent = (args.agent as string) || 'AcmeWorker';
+  const agent = (args.agent as string) || 'AetherWorker';
   const project = (args.project as string) || '';
   const prompt = (args.prompt as string) || '';
   const ocState = args._oc_state as any;

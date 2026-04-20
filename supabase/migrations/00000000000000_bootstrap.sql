@@ -8,37 +8,37 @@
 -- ╚══════════════════════════════════════════════════════════════════════════════╝
 
 -- ─── Schemas ─────────────────────────────────────────────────────────────────
-CREATE SCHEMA IF NOT EXISTS acme;
+CREATE SCHEMA IF NOT EXISTS aether;
 CREATE SCHEMA IF NOT EXISTS basejump;
 
 -- ─── Schema Permissions ─────────────────────────────────────────────────────
 -- Supabase PostgREST requires USAGE on a schema before it can query tables
--- in that schema via .schema('acme'). Without this, queries silently return
+-- in that schema via .schema('aether'). Without this, queries silently return
 -- null even if table-level SELECT is granted.
-GRANT USAGE ON SCHEMA acme TO anon;
-GRANT USAGE ON SCHEMA acme TO authenticated;
-GRANT USAGE ON SCHEMA acme TO service_role;
+GRANT USAGE ON SCHEMA aether TO anon;
+GRANT USAGE ON SCHEMA aether TO authenticated;
+GRANT USAGE ON SCHEMA aether TO service_role;
 
--- ─── Drizzle-managed tables (acme.* schema) ────────────────────────────
+-- ─── Drizzle-managed tables (aether.* schema) ────────────────────────────
 -- These tables are normally created by 'drizzle-kit push' but must exist
 -- before subsequent ALTER migrations can run.
 
 
-CREATE TYPE "acme"."access_request_status" AS ENUM('pending', 'approved', 'rejected');
-CREATE TYPE "acme"."account_role" AS ENUM('owner', 'admin', 'member');
-CREATE TYPE "acme"."api_key_status" AS ENUM('active', 'revoked', 'expired');
-CREATE TYPE "acme"."api_key_type" AS ENUM('user', 'sandbox');
-CREATE TYPE "acme"."deployment_source" AS ENUM('git', 'code', 'files', 'tar');
-CREATE TYPE "acme"."deployment_status" AS ENUM('pending', 'building', 'deploying', 'active', 'failed', 'stopped');
-CREATE TYPE "acme"."integration_status" AS ENUM('active', 'revoked', 'expired', 'error');
-CREATE TYPE "acme"."platform_role" AS ENUM('user', 'admin', 'super_admin');
-CREATE TYPE "acme"."sandbox_provider" AS ENUM('daytona', 'local_docker', 'justavps');
-CREATE TYPE "acme"."sandbox_status" AS ENUM('provisioning', 'active', 'stopped', 'archived', 'pooled', 'error');
-CREATE TYPE "acme"."tunnel_capability" AS ENUM('filesystem', 'shell', 'network', 'apps', 'hardware', 'desktop', 'gpu');
-CREATE TYPE "acme"."tunnel_permission_request_status" AS ENUM('pending', 'approved', 'denied', 'expired');
-CREATE TYPE "acme"."tunnel_permission_status" AS ENUM('active', 'revoked', 'expired');
-CREATE TYPE "acme"."tunnel_status" AS ENUM('online', 'offline', 'connecting');
-CREATE TABLE "acme"."access_allowlist" (
+CREATE TYPE "aether"."access_request_status" AS ENUM('pending', 'approved', 'rejected');
+CREATE TYPE "aether"."account_role" AS ENUM('owner', 'admin', 'member');
+CREATE TYPE "aether"."api_key_status" AS ENUM('active', 'revoked', 'expired');
+CREATE TYPE "aether"."api_key_type" AS ENUM('user', 'sandbox');
+CREATE TYPE "aether"."deployment_source" AS ENUM('git', 'code', 'files', 'tar');
+CREATE TYPE "aether"."deployment_status" AS ENUM('pending', 'building', 'deploying', 'active', 'failed', 'stopped');
+CREATE TYPE "aether"."integration_status" AS ENUM('active', 'revoked', 'expired', 'error');
+CREATE TYPE "aether"."platform_role" AS ENUM('user', 'admin', 'super_admin');
+CREATE TYPE "aether"."sandbox_provider" AS ENUM('daytona', 'local_docker', 'justavps');
+CREATE TYPE "aether"."sandbox_status" AS ENUM('provisioning', 'active', 'stopped', 'archived', 'pooled', 'error');
+CREATE TYPE "aether"."tunnel_capability" AS ENUM('filesystem', 'shell', 'network', 'apps', 'hardware', 'desktop', 'gpu');
+CREATE TYPE "aether"."tunnel_permission_request_status" AS ENUM('pending', 'approved', 'denied', 'expired');
+CREATE TYPE "aether"."tunnel_permission_status" AS ENUM('active', 'revoked', 'expired');
+CREATE TYPE "aether"."tunnel_status" AS ENUM('online', 'offline', 'connecting');
+CREATE TABLE "aether"."access_allowlist" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"entry_type" varchar(20) NOT NULL,
 	"value" varchar(255) NOT NULL,
@@ -46,17 +46,17 @@ CREATE TABLE "acme"."access_allowlist" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."access_requests" (
+CREATE TABLE "aether"."access_requests" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"email" varchar(255) NOT NULL,
 	"company" varchar(255),
 	"use_case" text,
-	"status" "acme"."access_request_status" DEFAULT 'pending' NOT NULL,
+	"status" "aether"."access_request_status" DEFAULT 'pending' NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."account_deletion_requests" (
+CREATE TABLE "aether"."account_deletion_requests" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"user_id" uuid NOT NULL,
@@ -68,14 +68,14 @@ CREATE TABLE "acme"."account_deletion_requests" (
 	"cancelled_at" timestamp with time zone
 );
 
-CREATE TABLE "acme"."account_members" (
+CREATE TABLE "aether"."account_members" (
 	"user_id" uuid NOT NULL,
 	"account_id" uuid NOT NULL,
-	"account_role" "acme"."account_role" DEFAULT 'owner' NOT NULL,
+	"account_role" "aether"."account_role" DEFAULT 'owner' NOT NULL,
 	"joined_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."accounts" (
+CREATE TABLE "aether"."accounts" (
 	"account_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"personal_account" boolean DEFAULT true NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE "acme"."accounts" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."billing_customers" (
+CREATE TABLE "aether"."billing_customers" (
 	"account_id" uuid NOT NULL,
 	"id" text PRIMARY KEY NOT NULL,
 	"email" text,
@@ -93,7 +93,7 @@ CREATE TABLE "acme"."billing_customers" (
 	"provider" text
 );
 
-CREATE TABLE "acme"."credit_accounts" (
+CREATE TABLE "aether"."credit_accounts" (
 	"account_id" uuid PRIMARY KEY NOT NULL,
 	"balance" numeric(12, 4) DEFAULT '0' NOT NULL,
 	"lifetime_granted" numeric(12, 4) DEFAULT '0' NOT NULL,
@@ -143,7 +143,7 @@ CREATE TABLE "acme"."credit_accounts" (
 	"auto_topup_last_charged" timestamp with time zone
 );
 
-CREATE TABLE "acme"."credit_ledger" (
+CREATE TABLE "aether"."credit_ledger" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"amount" numeric(12, 4) NOT NULL,
@@ -160,10 +160,10 @@ CREATE TABLE "acme"."credit_ledger" (
 	"stripe_event_id" varchar(255),
 	"idempotency_key" text,
 	"processing_source" text,
-	CONSTRAINT "acme_unique_stripe_event" UNIQUE("stripe_event_id")
+	CONSTRAINT "aether_unique_stripe_event" UNIQUE("stripe_event_id")
 );
 
-CREATE TABLE "acme"."credit_purchases" (
+CREATE TABLE "aether"."credit_purchases" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"amount_dollars" numeric(10, 2) NOT NULL,
@@ -179,7 +179,7 @@ CREATE TABLE "acme"."credit_purchases" (
 	"revenuecat_product_id" varchar(255)
 );
 
-CREATE TABLE "acme"."credit_usage" (
+CREATE TABLE "aether"."credit_usage" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"amount_dollars" numeric(10, 2) NOT NULL,
@@ -190,13 +190,13 @@ CREATE TABLE "acme"."credit_usage" (
 	"metadata" jsonb DEFAULT '{}'::jsonb
 );
 
-CREATE TABLE "acme"."deployments" (
+CREATE TABLE "aether"."deployments" (
 	"deployment_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"sandbox_id" uuid,
 	"freestyle_id" text,
-	"status" "acme"."deployment_status" DEFAULT 'pending' NOT NULL,
-	"source_type" "acme"."deployment_source" NOT NULL,
+	"status" "aether"."deployment_status" DEFAULT 'pending' NOT NULL,
+	"source_type" "aether"."deployment_source" NOT NULL,
 	"source_ref" text,
 	"framework" varchar(50),
 	"domains" jsonb DEFAULT '[]'::jsonb,
@@ -211,7 +211,7 @@ CREATE TABLE "acme"."deployments" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."integrations" (
+CREATE TABLE "aether"."integrations" (
 	"integration_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"app" varchar(255) NOT NULL,
@@ -219,7 +219,7 @@ CREATE TABLE "acme"."integrations" (
 	"provider_name" varchar(50) NOT NULL,
 	"provider_account_id" varchar(255) NOT NULL,
 	"label" varchar(255),
-	"status" "acme"."integration_status" DEFAULT 'active' NOT NULL,
+	"status" "aether"."integration_status" DEFAULT 'active' NOT NULL,
 	"scopes" jsonb DEFAULT '[]'::jsonb,
 	"metadata" jsonb DEFAULT '{}'::jsonb,
 	"connected_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -228,7 +228,7 @@ CREATE TABLE "acme"."integrations" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."api_keys" (
+CREATE TABLE "aether"."api_keys" (
 	"key_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"sandbox_id" uuid NOT NULL,
 	"account_id" uuid NOT NULL,
@@ -236,14 +236,14 @@ CREATE TABLE "acme"."api_keys" (
 	"secret_key_hash" varchar(128) NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"description" text,
-	"type" "acme"."api_key_type" DEFAULT 'user' NOT NULL,
-	"status" "acme"."api_key_status" DEFAULT 'active' NOT NULL,
+	"type" "aether"."api_key_type" DEFAULT 'user' NOT NULL,
+	"status" "aether"."api_key_status" DEFAULT 'active' NOT NULL,
 	"expires_at" timestamp with time zone,
 	"last_used_at" timestamp with time zone,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."oauth_access_tokens" (
+CREATE TABLE "aether"."oauth_access_tokens" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"token_hash" varchar(128) NOT NULL,
 	"client_id" uuid NOT NULL,
@@ -255,7 +255,7 @@ CREATE TABLE "acme"."oauth_access_tokens" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."oauth_authorization_codes" (
+CREATE TABLE "aether"."oauth_authorization_codes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"code" varchar(128) NOT NULL,
 	"client_id" uuid NOT NULL,
@@ -270,7 +270,7 @@ CREATE TABLE "acme"."oauth_authorization_codes" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."oauth_clients" (
+CREATE TABLE "aether"."oauth_clients" (
 	"client_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"client_secret_hash" varchar(128) NOT NULL,
 	"name" varchar(255) NOT NULL,
@@ -280,7 +280,7 @@ CREATE TABLE "acme"."oauth_clients" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."oauth_refresh_tokens" (
+CREATE TABLE "aether"."oauth_refresh_tokens" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"token_hash" varchar(128) NOT NULL,
 	"access_token_id" uuid NOT NULL,
@@ -292,23 +292,23 @@ CREATE TABLE "acme"."oauth_refresh_tokens" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."platform_settings" (
+CREATE TABLE "aether"."platform_settings" (
 	"key" varchar(255) PRIMARY KEY NOT NULL,
 	"value" jsonb NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."platform_user_roles" (
+CREATE TABLE "aether"."platform_user_roles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
-	"role" "acme"."platform_role" DEFAULT 'user' NOT NULL,
+	"role" "aether"."platform_role" DEFAULT 'user' NOT NULL,
 	"granted_by" uuid,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."pool_resources" (
+CREATE TABLE "aether"."pool_resources" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"provider" "acme"."sandbox_provider" NOT NULL,
+	"provider" "aether"."sandbox_provider" NOT NULL,
 	"server_type" varchar(64) NOT NULL,
 	"location" varchar(64) NOT NULL,
 	"desired_count" integer DEFAULT 2 NOT NULL,
@@ -317,10 +317,10 @@ CREATE TABLE "acme"."pool_resources" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."pool_sandboxes" (
+CREATE TABLE "aether"."pool_sandboxes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"resource_id" uuid,
-	"provider" "acme"."sandbox_provider" NOT NULL,
+	"provider" "aether"."sandbox_provider" NOT NULL,
 	"external_id" text NOT NULL,
 	"base_url" text DEFAULT '' NOT NULL,
 	"server_type" varchar(64) NOT NULL,
@@ -331,20 +331,20 @@ CREATE TABLE "acme"."pool_sandboxes" (
 	"ready_at" timestamp with time zone
 );
 
-CREATE TABLE "acme"."sandbox_integrations" (
+CREATE TABLE "aether"."sandbox_integrations" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"sandbox_id" uuid NOT NULL,
 	"integration_id" uuid NOT NULL,
 	"granted_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."sandboxes" (
+CREATE TABLE "aether"."sandboxes" (
 	"sandbox_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
-	"provider" "acme"."sandbox_provider" DEFAULT 'daytona' NOT NULL,
+	"provider" "aether"."sandbox_provider" DEFAULT 'daytona' NOT NULL,
 	"external_id" text,
-	"status" "acme"."sandbox_status" DEFAULT 'provisioning' NOT NULL,
+	"status" "aether"."sandbox_status" DEFAULT 'provisioning' NOT NULL,
 	"base_url" text NOT NULL,
 	"config" jsonb DEFAULT '{}'::jsonb,
 	"metadata" jsonb DEFAULT '{}'::jsonb,
@@ -355,25 +355,25 @@ CREATE TABLE "acme"."sandboxes" (
 	"stripe_subscription_item_id" text
 );
 
-CREATE TABLE "acme"."server_entries" (
+CREATE TABLE "aether"."server_entries" (
 	"entry_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"id" varchar(128) NOT NULL,
 	"account_id" uuid,
 	"label" varchar(255) NOT NULL,
 	"url" text NOT NULL,
 	"is_default" boolean DEFAULT false NOT NULL,
-	"provider" "acme"."sandbox_provider",
+	"provider" "aether"."sandbox_provider",
 	"sandbox_id" text,
 	"mapped_ports" jsonb,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."tunnel_audit_logs" (
+CREATE TABLE "aether"."tunnel_audit_logs" (
 	"log_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"tunnel_id" uuid NOT NULL,
 	"account_id" uuid NOT NULL,
-	"capability" "acme"."tunnel_capability" NOT NULL,
+	"capability" "aether"."tunnel_capability" NOT NULL,
 	"operation" varchar(100) NOT NULL,
 	"request_summary" jsonb DEFAULT '{}'::jsonb,
 	"success" boolean NOT NULL,
@@ -383,12 +383,12 @@ CREATE TABLE "acme"."tunnel_audit_logs" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."tunnel_connections" (
+CREATE TABLE "aether"."tunnel_connections" (
 	"tunnel_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"sandbox_id" uuid,
 	"name" varchar(255) NOT NULL,
-	"status" "acme"."tunnel_status" DEFAULT 'offline' NOT NULL,
+	"status" "aether"."tunnel_status" DEFAULT 'offline' NOT NULL,
 	"capabilities" jsonb DEFAULT '[]'::jsonb,
 	"machine_info" jsonb DEFAULT '{}'::jsonb,
 	"setup_token_hash" varchar(128),
@@ -397,98 +397,98 @@ CREATE TABLE "acme"."tunnel_connections" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."tunnel_permission_requests" (
+CREATE TABLE "aether"."tunnel_permission_requests" (
 	"request_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"tunnel_id" uuid NOT NULL,
 	"account_id" uuid NOT NULL,
-	"capability" "acme"."tunnel_capability" NOT NULL,
+	"capability" "aether"."tunnel_capability" NOT NULL,
 	"requested_scope" jsonb DEFAULT '{}'::jsonb,
 	"reason" text,
-	"status" "acme"."tunnel_permission_request_status" DEFAULT 'pending' NOT NULL,
+	"status" "aether"."tunnel_permission_request_status" DEFAULT 'pending' NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-CREATE TABLE "acme"."tunnel_permissions" (
+CREATE TABLE "aether"."tunnel_permissions" (
 	"permission_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"tunnel_id" uuid NOT NULL,
 	"account_id" uuid NOT NULL,
-	"capability" "acme"."tunnel_capability" NOT NULL,
+	"capability" "aether"."tunnel_capability" NOT NULL,
 	"scope" jsonb DEFAULT '{}'::jsonb,
-	"status" "acme"."tunnel_permission_status" DEFAULT 'active' NOT NULL,
+	"status" "aether"."tunnel_permission_status" DEFAULT 'active' NOT NULL,
 	"expires_at" timestamp with time zone,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 
-ALTER TABLE "acme"."account_members" ADD CONSTRAINT "account_members_account_id_accounts_account_id_fk" FOREIGN KEY ("account_id") REFERENCES "acme"."accounts"("account_id") ON DELETE cascade ON UPDATE no action;
-ALTER TABLE "acme"."deployments" ADD CONSTRAINT "deployments_sandbox_id_sandboxes_sandbox_id_fk" FOREIGN KEY ("sandbox_id") REFERENCES "acme"."sandboxes"("sandbox_id") ON DELETE set null ON UPDATE no action;
-ALTER TABLE "acme"."api_keys" ADD CONSTRAINT "api_keys_sandbox_id_sandboxes_sandbox_id_fk" FOREIGN KEY ("sandbox_id") REFERENCES "acme"."sandboxes"("sandbox_id") ON DELETE cascade ON UPDATE no action;
-ALTER TABLE "acme"."oauth_access_tokens" ADD CONSTRAINT "oauth_access_tokens_client_id_oauth_clients_client_id_fk" FOREIGN KEY ("client_id") REFERENCES "acme"."oauth_clients"("client_id") ON DELETE cascade ON UPDATE no action;
-ALTER TABLE "acme"."oauth_authorization_codes" ADD CONSTRAINT "oauth_authorization_codes_client_id_oauth_clients_client_id_fk" FOREIGN KEY ("client_id") REFERENCES "acme"."oauth_clients"("client_id") ON DELETE cascade ON UPDATE no action;
-ALTER TABLE "acme"."oauth_refresh_tokens" ADD CONSTRAINT "oauth_refresh_tokens_access_token_id_oauth_access_tokens_id_fk" FOREIGN KEY ("access_token_id") REFERENCES "acme"."oauth_access_tokens"("id") ON DELETE cascade ON UPDATE no action;
-ALTER TABLE "acme"."oauth_refresh_tokens" ADD CONSTRAINT "oauth_refresh_tokens_client_id_oauth_clients_client_id_fk" FOREIGN KEY ("client_id") REFERENCES "acme"."oauth_clients"("client_id") ON DELETE cascade ON UPDATE no action;
-ALTER TABLE "acme"."pool_sandboxes" ADD CONSTRAINT "pool_sandboxes_resource_id_pool_resources_id_fk" FOREIGN KEY ("resource_id") REFERENCES "acme"."pool_resources"("id") ON DELETE set null ON UPDATE no action;
-ALTER TABLE "acme"."sandbox_integrations" ADD CONSTRAINT "sandbox_integrations_sandbox_id_sandboxes_sandbox_id_fk" FOREIGN KEY ("sandbox_id") REFERENCES "acme"."sandboxes"("sandbox_id") ON DELETE cascade ON UPDATE no action;
-ALTER TABLE "acme"."sandbox_integrations" ADD CONSTRAINT "sandbox_integrations_integration_id_integrations_integration_id_fk" FOREIGN KEY ("integration_id") REFERENCES "acme"."integrations"("integration_id") ON DELETE cascade ON UPDATE no action;
-ALTER TABLE "acme"."tunnel_audit_logs" ADD CONSTRAINT "tunnel_audit_logs_tunnel_id_tunnel_connections_tunnel_id_fk" FOREIGN KEY ("tunnel_id") REFERENCES "acme"."tunnel_connections"("tunnel_id") ON DELETE cascade ON UPDATE no action;
-ALTER TABLE "acme"."tunnel_connections" ADD CONSTRAINT "tunnel_connections_sandbox_id_sandboxes_sandbox_id_fk" FOREIGN KEY ("sandbox_id") REFERENCES "acme"."sandboxes"("sandbox_id") ON DELETE set null ON UPDATE no action;
-ALTER TABLE "acme"."tunnel_permission_requests" ADD CONSTRAINT "tunnel_permission_requests_tunnel_id_tunnel_connections_tunnel_id_fk" FOREIGN KEY ("tunnel_id") REFERENCES "acme"."tunnel_connections"("tunnel_id") ON DELETE cascade ON UPDATE no action;
-ALTER TABLE "acme"."tunnel_permissions" ADD CONSTRAINT "tunnel_permissions_tunnel_id_tunnel_connections_tunnel_id_fk" FOREIGN KEY ("tunnel_id") REFERENCES "acme"."tunnel_connections"("tunnel_id") ON DELETE cascade ON UPDATE no action;
-CREATE UNIQUE INDEX "idx_access_allowlist_type_value" ON "acme"."access_allowlist" USING btree ("entry_type","value");
-CREATE INDEX "idx_access_requests_email" ON "acme"."access_requests" USING btree ("email");
-CREATE INDEX "idx_access_requests_status" ON "acme"."access_requests" USING btree ("status");
-CREATE INDEX "idx_account_members_user_id" ON "acme"."account_members" USING btree ("user_id");
-CREATE INDEX "idx_account_members_account_id" ON "acme"."account_members" USING btree ("account_id");
-CREATE UNIQUE INDEX "idx_account_members_user_account" ON "acme"."account_members" USING btree ("user_id","account_id");
-CREATE INDEX "idx_acme_billing_customers_account_id" ON "acme"."billing_customers" USING btree ("account_id");
-CREATE INDEX "acme_credit_accounts_account_id_idx" ON "acme"."credit_accounts" USING btree ("account_id");
-CREATE INDEX "idx_acme_credit_ledger_idempotency" ON "acme"."credit_ledger" USING btree ("idempotency_key") WHERE "acme"."credit_ledger"."idempotency_key" IS NOT NULL;
-CREATE INDEX "idx_deployments_account" ON "acme"."deployments" USING btree ("account_id");
-CREATE INDEX "idx_deployments_sandbox" ON "acme"."deployments" USING btree ("sandbox_id");
-CREATE INDEX "idx_deployments_status" ON "acme"."deployments" USING btree ("status");
-CREATE INDEX "idx_deployments_live_url" ON "acme"."deployments" USING btree ("live_url");
-CREATE INDEX "idx_deployments_created" ON "acme"."deployments" USING btree ("created_at");
-CREATE INDEX "idx_integrations_account" ON "acme"."integrations" USING btree ("account_id");
-CREATE INDEX "idx_integrations_app" ON "acme"."integrations" USING btree ("app");
-CREATE INDEX "idx_integrations_provider_account" ON "acme"."integrations" USING btree ("provider_account_id");
-CREATE UNIQUE INDEX "idx_integrations_account_provider_account" ON "acme"."integrations" USING btree ("account_id","provider_account_id");
-CREATE UNIQUE INDEX "idx_acme_api_keys_public_key" ON "acme"."api_keys" USING btree ("public_key");
-CREATE INDEX "idx_acme_api_keys_secret_hash" ON "acme"."api_keys" USING btree ("secret_key_hash");
-CREATE INDEX "idx_acme_api_keys_sandbox" ON "acme"."api_keys" USING btree ("sandbox_id");
-CREATE INDEX "idx_acme_api_keys_account" ON "acme"."api_keys" USING btree ("account_id");
-CREATE UNIQUE INDEX "idx_oauth_access_token_hash" ON "acme"."oauth_access_tokens" USING btree ("token_hash");
-CREATE INDEX "idx_oauth_access_tokens_client" ON "acme"."oauth_access_tokens" USING btree ("client_id");
-CREATE INDEX "idx_oauth_access_tokens_user" ON "acme"."oauth_access_tokens" USING btree ("user_id");
-CREATE UNIQUE INDEX "idx_oauth_codes_code" ON "acme"."oauth_authorization_codes" USING btree ("code");
-CREATE INDEX "idx_oauth_codes_client" ON "acme"."oauth_authorization_codes" USING btree ("client_id");
-CREATE INDEX "idx_oauth_codes_expires" ON "acme"."oauth_authorization_codes" USING btree ("expires_at");
-CREATE UNIQUE INDEX "idx_oauth_refresh_token_hash" ON "acme"."oauth_refresh_tokens" USING btree ("token_hash");
-CREATE INDEX "idx_oauth_refresh_tokens_client" ON "acme"."oauth_refresh_tokens" USING btree ("client_id");
-CREATE UNIQUE INDEX "idx_platform_user_roles_account_id" ON "acme"."platform_user_roles" USING btree ("account_id");
-CREATE INDEX "idx_platform_user_roles_role" ON "acme"."platform_user_roles" USING btree ("role");
-CREATE UNIQUE INDEX "idx_pool_resources_unique" ON "acme"."pool_resources" USING btree ("provider","server_type","location");
-CREATE INDEX "idx_pool_sandboxes_claim" ON "acme"."pool_sandboxes" USING btree ("status","created_at");
-CREATE UNIQUE INDEX "idx_pool_sandboxes_external_id_active" ON "acme"."pool_sandboxes" USING btree ("external_id");
-CREATE UNIQUE INDEX "idx_sandbox_integration_unique" ON "acme"."sandbox_integrations" USING btree ("sandbox_id","integration_id");
-CREATE INDEX "idx_sandbox_integrations_sandbox" ON "acme"."sandbox_integrations" USING btree ("sandbox_id");
-CREATE INDEX "idx_sandboxes_account" ON "acme"."sandboxes" USING btree ("account_id");
-CREATE INDEX "idx_sandboxes_external_id" ON "acme"."sandboxes" USING btree ("external_id");
-CREATE INDEX "idx_sandboxes_status" ON "acme"."sandboxes" USING btree ("status");
-CREATE INDEX "idx_server_entries_default" ON "acme"."server_entries" USING btree ("is_default");
-CREATE INDEX "idx_server_entries_account" ON "acme"."server_entries" USING btree ("account_id");
-CREATE UNIQUE INDEX "idx_server_entries_account_id" ON "acme"."server_entries" USING btree ("account_id","id");
-CREATE INDEX "idx_tunnel_audit_tunnel" ON "acme"."tunnel_audit_logs" USING btree ("tunnel_id");
-CREATE INDEX "idx_tunnel_audit_account" ON "acme"."tunnel_audit_logs" USING btree ("account_id");
-CREATE INDEX "idx_tunnel_audit_capability" ON "acme"."tunnel_audit_logs" USING btree ("capability");
-CREATE INDEX "idx_tunnel_audit_created" ON "acme"."tunnel_audit_logs" USING btree ("created_at");
-CREATE INDEX "idx_tunnel_connections_account" ON "acme"."tunnel_connections" USING btree ("account_id");
-CREATE INDEX "idx_tunnel_connections_sandbox" ON "acme"."tunnel_connections" USING btree ("sandbox_id");
-CREATE INDEX "idx_tunnel_connections_status" ON "acme"."tunnel_connections" USING btree ("status");
-CREATE INDEX "idx_tunnel_perm_requests_tunnel" ON "acme"."tunnel_permission_requests" USING btree ("tunnel_id");
-CREATE INDEX "idx_tunnel_perm_requests_account" ON "acme"."tunnel_permission_requests" USING btree ("account_id");
-CREATE INDEX "idx_tunnel_perm_requests_status" ON "acme"."tunnel_permission_requests" USING btree ("status");
-CREATE INDEX "idx_tunnel_permissions_tunnel" ON "acme"."tunnel_permissions" USING btree ("tunnel_id");
-CREATE INDEX "idx_tunnel_permissions_account" ON "acme"."tunnel_permissions" USING btree ("account_id");
-CREATE INDEX "idx_tunnel_permissions_capability" ON "acme"."tunnel_permissions" USING btree ("capability");
-CREATE INDEX "idx_tunnel_permissions_status" ON "acme"."tunnel_permissions" USING btree ("status");
+ALTER TABLE "aether"."account_members" ADD CONSTRAINT "account_members_account_id_accounts_account_id_fk" FOREIGN KEY ("account_id") REFERENCES "aether"."accounts"("account_id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "aether"."deployments" ADD CONSTRAINT "deployments_sandbox_id_sandboxes_sandbox_id_fk" FOREIGN KEY ("sandbox_id") REFERENCES "aether"."sandboxes"("sandbox_id") ON DELETE set null ON UPDATE no action;
+ALTER TABLE "aether"."api_keys" ADD CONSTRAINT "api_keys_sandbox_id_sandboxes_sandbox_id_fk" FOREIGN KEY ("sandbox_id") REFERENCES "aether"."sandboxes"("sandbox_id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "aether"."oauth_access_tokens" ADD CONSTRAINT "oauth_access_tokens_client_id_oauth_clients_client_id_fk" FOREIGN KEY ("client_id") REFERENCES "aether"."oauth_clients"("client_id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "aether"."oauth_authorization_codes" ADD CONSTRAINT "oauth_authorization_codes_client_id_oauth_clients_client_id_fk" FOREIGN KEY ("client_id") REFERENCES "aether"."oauth_clients"("client_id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "aether"."oauth_refresh_tokens" ADD CONSTRAINT "oauth_refresh_tokens_access_token_id_oauth_access_tokens_id_fk" FOREIGN KEY ("access_token_id") REFERENCES "aether"."oauth_access_tokens"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "aether"."oauth_refresh_tokens" ADD CONSTRAINT "oauth_refresh_tokens_client_id_oauth_clients_client_id_fk" FOREIGN KEY ("client_id") REFERENCES "aether"."oauth_clients"("client_id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "aether"."pool_sandboxes" ADD CONSTRAINT "pool_sandboxes_resource_id_pool_resources_id_fk" FOREIGN KEY ("resource_id") REFERENCES "aether"."pool_resources"("id") ON DELETE set null ON UPDATE no action;
+ALTER TABLE "aether"."sandbox_integrations" ADD CONSTRAINT "sandbox_integrations_sandbox_id_sandboxes_sandbox_id_fk" FOREIGN KEY ("sandbox_id") REFERENCES "aether"."sandboxes"("sandbox_id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "aether"."sandbox_integrations" ADD CONSTRAINT "sandbox_integrations_integration_id_integrations_integration_id_fk" FOREIGN KEY ("integration_id") REFERENCES "aether"."integrations"("integration_id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "aether"."tunnel_audit_logs" ADD CONSTRAINT "tunnel_audit_logs_tunnel_id_tunnel_connections_tunnel_id_fk" FOREIGN KEY ("tunnel_id") REFERENCES "aether"."tunnel_connections"("tunnel_id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "aether"."tunnel_connections" ADD CONSTRAINT "tunnel_connections_sandbox_id_sandboxes_sandbox_id_fk" FOREIGN KEY ("sandbox_id") REFERENCES "aether"."sandboxes"("sandbox_id") ON DELETE set null ON UPDATE no action;
+ALTER TABLE "aether"."tunnel_permission_requests" ADD CONSTRAINT "tunnel_permission_requests_tunnel_id_tunnel_connections_tunnel_id_fk" FOREIGN KEY ("tunnel_id") REFERENCES "aether"."tunnel_connections"("tunnel_id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "aether"."tunnel_permissions" ADD CONSTRAINT "tunnel_permissions_tunnel_id_tunnel_connections_tunnel_id_fk" FOREIGN KEY ("tunnel_id") REFERENCES "aether"."tunnel_connections"("tunnel_id") ON DELETE cascade ON UPDATE no action;
+CREATE UNIQUE INDEX "idx_access_allowlist_type_value" ON "aether"."access_allowlist" USING btree ("entry_type","value");
+CREATE INDEX "idx_access_requests_email" ON "aether"."access_requests" USING btree ("email");
+CREATE INDEX "idx_access_requests_status" ON "aether"."access_requests" USING btree ("status");
+CREATE INDEX "idx_account_members_user_id" ON "aether"."account_members" USING btree ("user_id");
+CREATE INDEX "idx_account_members_account_id" ON "aether"."account_members" USING btree ("account_id");
+CREATE UNIQUE INDEX "idx_account_members_user_account" ON "aether"."account_members" USING btree ("user_id","account_id");
+CREATE INDEX "idx_aether_billing_customers_account_id" ON "aether"."billing_customers" USING btree ("account_id");
+CREATE INDEX "aether_credit_accounts_account_id_idx" ON "aether"."credit_accounts" USING btree ("account_id");
+CREATE INDEX "idx_aether_credit_ledger_idempotency" ON "aether"."credit_ledger" USING btree ("idempotency_key") WHERE "aether"."credit_ledger"."idempotency_key" IS NOT NULL;
+CREATE INDEX "idx_deployments_account" ON "aether"."deployments" USING btree ("account_id");
+CREATE INDEX "idx_deployments_sandbox" ON "aether"."deployments" USING btree ("sandbox_id");
+CREATE INDEX "idx_deployments_status" ON "aether"."deployments" USING btree ("status");
+CREATE INDEX "idx_deployments_live_url" ON "aether"."deployments" USING btree ("live_url");
+CREATE INDEX "idx_deployments_created" ON "aether"."deployments" USING btree ("created_at");
+CREATE INDEX "idx_integrations_account" ON "aether"."integrations" USING btree ("account_id");
+CREATE INDEX "idx_integrations_app" ON "aether"."integrations" USING btree ("app");
+CREATE INDEX "idx_integrations_provider_account" ON "aether"."integrations" USING btree ("provider_account_id");
+CREATE UNIQUE INDEX "idx_integrations_account_provider_account" ON "aether"."integrations" USING btree ("account_id","provider_account_id");
+CREATE UNIQUE INDEX "idx_aether_api_keys_public_key" ON "aether"."api_keys" USING btree ("public_key");
+CREATE INDEX "idx_aether_api_keys_secret_hash" ON "aether"."api_keys" USING btree ("secret_key_hash");
+CREATE INDEX "idx_aether_api_keys_sandbox" ON "aether"."api_keys" USING btree ("sandbox_id");
+CREATE INDEX "idx_aether_api_keys_account" ON "aether"."api_keys" USING btree ("account_id");
+CREATE UNIQUE INDEX "idx_oauth_access_token_hash" ON "aether"."oauth_access_tokens" USING btree ("token_hash");
+CREATE INDEX "idx_oauth_access_tokens_client" ON "aether"."oauth_access_tokens" USING btree ("client_id");
+CREATE INDEX "idx_oauth_access_tokens_user" ON "aether"."oauth_access_tokens" USING btree ("user_id");
+CREATE UNIQUE INDEX "idx_oauth_codes_code" ON "aether"."oauth_authorization_codes" USING btree ("code");
+CREATE INDEX "idx_oauth_codes_client" ON "aether"."oauth_authorization_codes" USING btree ("client_id");
+CREATE INDEX "idx_oauth_codes_expires" ON "aether"."oauth_authorization_codes" USING btree ("expires_at");
+CREATE UNIQUE INDEX "idx_oauth_refresh_token_hash" ON "aether"."oauth_refresh_tokens" USING btree ("token_hash");
+CREATE INDEX "idx_oauth_refresh_tokens_client" ON "aether"."oauth_refresh_tokens" USING btree ("client_id");
+CREATE UNIQUE INDEX "idx_platform_user_roles_account_id" ON "aether"."platform_user_roles" USING btree ("account_id");
+CREATE INDEX "idx_platform_user_roles_role" ON "aether"."platform_user_roles" USING btree ("role");
+CREATE UNIQUE INDEX "idx_pool_resources_unique" ON "aether"."pool_resources" USING btree ("provider","server_type","location");
+CREATE INDEX "idx_pool_sandboxes_claim" ON "aether"."pool_sandboxes" USING btree ("status","created_at");
+CREATE UNIQUE INDEX "idx_pool_sandboxes_external_id_active" ON "aether"."pool_sandboxes" USING btree ("external_id");
+CREATE UNIQUE INDEX "idx_sandbox_integration_unique" ON "aether"."sandbox_integrations" USING btree ("sandbox_id","integration_id");
+CREATE INDEX "idx_sandbox_integrations_sandbox" ON "aether"."sandbox_integrations" USING btree ("sandbox_id");
+CREATE INDEX "idx_sandboxes_account" ON "aether"."sandboxes" USING btree ("account_id");
+CREATE INDEX "idx_sandboxes_external_id" ON "aether"."sandboxes" USING btree ("external_id");
+CREATE INDEX "idx_sandboxes_status" ON "aether"."sandboxes" USING btree ("status");
+CREATE INDEX "idx_server_entries_default" ON "aether"."server_entries" USING btree ("is_default");
+CREATE INDEX "idx_server_entries_account" ON "aether"."server_entries" USING btree ("account_id");
+CREATE UNIQUE INDEX "idx_server_entries_account_id" ON "aether"."server_entries" USING btree ("account_id","id");
+CREATE INDEX "idx_tunnel_audit_tunnel" ON "aether"."tunnel_audit_logs" USING btree ("tunnel_id");
+CREATE INDEX "idx_tunnel_audit_account" ON "aether"."tunnel_audit_logs" USING btree ("account_id");
+CREATE INDEX "idx_tunnel_audit_capability" ON "aether"."tunnel_audit_logs" USING btree ("capability");
+CREATE INDEX "idx_tunnel_audit_created" ON "aether"."tunnel_audit_logs" USING btree ("created_at");
+CREATE INDEX "idx_tunnel_connections_account" ON "aether"."tunnel_connections" USING btree ("account_id");
+CREATE INDEX "idx_tunnel_connections_sandbox" ON "aether"."tunnel_connections" USING btree ("sandbox_id");
+CREATE INDEX "idx_tunnel_connections_status" ON "aether"."tunnel_connections" USING btree ("status");
+CREATE INDEX "idx_tunnel_perm_requests_tunnel" ON "aether"."tunnel_permission_requests" USING btree ("tunnel_id");
+CREATE INDEX "idx_tunnel_perm_requests_account" ON "aether"."tunnel_permission_requests" USING btree ("account_id");
+CREATE INDEX "idx_tunnel_perm_requests_status" ON "aether"."tunnel_permission_requests" USING btree ("status");
+CREATE INDEX "idx_tunnel_permissions_tunnel" ON "aether"."tunnel_permissions" USING btree ("tunnel_id");
+CREATE INDEX "idx_tunnel_permissions_account" ON "aether"."tunnel_permissions" USING btree ("account_id");
+CREATE INDEX "idx_tunnel_permissions_capability" ON "aether"."tunnel_permissions" USING btree ("capability");
+CREATE INDEX "idx_tunnel_permissions_status" ON "aether"."tunnel_permissions" USING btree ("status");

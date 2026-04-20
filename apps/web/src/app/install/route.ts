@@ -3,12 +3,13 @@ import path from 'node:path';
 import { NextRequest, NextResponse } from 'next/server';
 
 const REPO_URL = 'https://github.com/aimentor606/aether';
-const REPO_SCRIPT_URL = `${REPO_URL}/blob/main/scripts/get-acme.sh`;
-const RAW_SCRIPT_URL = 'https://raw.githubusercontent.com/aimentor606/aether/main/scripts/get-acme.sh';
+const REPO_SCRIPT_URL = `${REPO_URL}/blob/main/scripts/get-aether.sh`;
+const RAW_SCRIPT_URL =
+  'https://raw.githubusercontent.com/aimentor606/aether/main/scripts/get-aether.sh';
 const LOCAL_SCRIPT_CANDIDATES = [
-  path.join(process.cwd(), '../../scripts/get-acme.sh'),
-  path.join(process.cwd(), '../scripts/get-acme.sh'),
-  path.join(process.cwd(), 'scripts/get-acme.sh'),
+  path.join(process.cwd(), '../../scripts/get-aether.sh'),
+  path.join(process.cwd(), '../scripts/get-aether.sh'),
+  path.join(process.cwd(), 'scripts/get-aether.sh'),
 ];
 
 function prefersHtml(request: NextRequest): boolean {
@@ -19,9 +20,12 @@ function prefersHtml(request: NextRequest): boolean {
 function scriptHeaders(upstreamHeaders: Headers): Headers {
   const headers = new Headers(upstreamHeaders);
   headers.set('Content-Type', 'text/x-shellscript; charset=utf-8');
-  headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+  headers.set(
+    'Cache-Control',
+    'public, s-maxage=60, stale-while-revalidate=120',
+  );
   headers.set('Access-Control-Allow-Origin', '*');
-  headers.set('X-Acme-Install-Source', RAW_SCRIPT_URL);
+  headers.set('X-Aether-Install-Source', RAW_SCRIPT_URL);
   return headers;
 }
 
@@ -52,7 +56,7 @@ export async function GET(request: NextRequest) {
 
   const upstream = await fetch(RAW_SCRIPT_URL, {
     headers: {
-      'User-Agent': 'acme-install-route',
+      'User-Agent': 'aether-install-route',
     },
     next: {
       revalidate: 300,
@@ -60,7 +64,10 @@ export async function GET(request: NextRequest) {
   });
 
   if (!upstream.ok) {
-    return new NextResponse(`Failed to fetch installer from ${RAW_SCRIPT_URL}`, { status: 502 });
+    return new NextResponse(
+      `Failed to fetch installer from ${RAW_SCRIPT_URL}`,
+      { status: 502 },
+    );
   }
 
   return new NextResponse(upstream.body, {

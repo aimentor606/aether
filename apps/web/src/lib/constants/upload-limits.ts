@@ -1,6 +1,6 @@
 /**
  * Re-export from shared package for backward compatibility
- * @deprecated Import from '@acme/shared' instead
+ * @deprecated Import from '@aether/shared' instead
  */
 export {
   UPLOAD_LIMITS,
@@ -10,4 +10,4 @@ export {
   formatFileSize,
   isAllowedFile,
   isExtractableArchive,
-} from '@acme/shared';
+} from '@aether/shared';

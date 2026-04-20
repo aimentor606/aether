@@ -1,0 +1,59 @@
+#!/bin/bash
+# Core supervisor wrapper for OpenCode API server (port 4096)
+# Called by master core supervisor — NOT by s6 directly.
+
+export HOME=/workspace
+export XDG_DATA_HOME=/workspace/.local/share
+export OPENCODE_CONFIG_DIR=/ephemeral/kortix-master/opencode
+export OPENCODE_FILE_ROOT=/
+export BUN_PTY_LIB=/opt/bun-pty-musl/librust_pty.so
+export PATH="/opt/bun/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
+# Drop empty *_BASE_URL vars — empty string causes @ai-sdk to fetch("") → ERR_INVALID_URL
+[ -z "$ANTHROPIC_BASE_URL" ] && unset ANTHROPIC_BASE_URL
+[ -z "$OPENAI_BASE_URL" ] && unset OPENAI_BASE_URL
+
+# Pick up vars written byapi after container start.
+# In cloud mode, tokens are either already in S6 env dir (Docker env from
+# Daytona/JustAVPS/pool) or injected within seconds via the /env API.
+# Wait up to 10s — combined with DB lock wait (~10s), total must stay under
+# ServiceManager's START_WAIT_MS (30s) so OpenCode can bind port 4096.
+TOKEN_FILE="/run/s6/container_environment/AETHER_TOKEN"
+API_URL_FILE="/run/s6/container_environment/AETHER_API_URL"
+
+if [ ! -s "$TOKEN_FILE" ] || [ ! -s "$API_URL_FILE" ]; then
+  echo "[opencode-serve] Waiting for AETHER_TOKEN and AETHER_API_URL to be provisioned..."
+  for i in $(seq 1 5); do
+    [ -s "$TOKEN_FILE" ] && [ -s "$API_URL_FILE" ] && break
+    sleep 2
+  done
+fi
+
+[ -s "$TOKEN_FILE" ] && \
+  export AETHER_TOKEN="$(cat "$TOKEN_FILE")"
+[ -s "$API_URL_FILE" ] && \
+  export AETHER_API_URL="$(cat "$API_URL_FILE")"
+
+# Safety check: if AETHER_API_URL is still unset or points to localhost, warn loudly.
+# This catches pool sandboxes where env injection failed or was delayed.
+if [ -z "$AETHER_API_URL" ] || echo "$AETHER_API_URL" | grep -q "localhost"; then
+  echo "[opencode-serve] WARNING: AETHER_API_URL is '${AETHER_API_URL:-unset}' — LLM calls will fail in cloud mode!"
+fi
+
+cd /workspace
+
+# Wait for any previous opencode instance to fully release the SQLite database.
+# Rapid restarts leave the DB locked ("unable to open database file") until the
+# old process exits and the kernel releases its file descriptors.
+DB_PATH="/workspace/.local/share/opencode/opencode.db"
+for i in $(seq 1 10); do
+  # Only check WAL/SHM — these only exist (and stay locked) during or after a crash.
+  # The main .db file is held by the running instance which is fine to ignore here.
+  if ! fuser "${DB_PATH}-wal" "${DB_PATH}-shm" >/dev/null 2>&1; then
+    break
+  fi
+  echo "[opencode-serve] DB still locked by previous process, waiting (${i}/10)..."
+  sleep 1
+done
+
+exec /usr/local/bin/opencode serve --port 4096 --hostname 0.0.0.0

@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { buildInstancePath } from '@/lib/instance-routes';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 
 /**
  * Legacy onboarding route — redirects to the dashboard.
@@ -20,7 +20,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-background">
-      <AcmeLoader size="medium" />
+      <AetherLoader size="medium" />
     </div>
   );
 }

@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'API Keys | Acme',
-  description: 'Manage your API keys for programmatic access to Acme',
+  title: 'API Keys | Aether',
+  description: 'Manage your API keys for programmatic access to Aether',
   openGraph: {
-    title: 'API Keys | Acme',
-    description: 'Manage your API keys for programmatic access to Acme',
+    title: 'API Keys | Aether',
+    description: 'Manage your API keys for programmatic access to Aether',
     type: 'website',
   },
 };

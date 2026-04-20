@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Injection Attacks on Public Endpoints
  *
- * LIVE scan against https://computer-preview-api.acme.dev
+ * LIVE scan against https://computer-preview-api.aether.dev
  * Tests SQL injection, XSS, and other payloads on the PUBLIC endpoints
  * that accept user input (check-email, request-access, oauth).
  *
@@ -24,7 +24,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.acme.dev';
+const CLOUD = 'https://computer-preview-api.aether.dev';
 
 async function post(path: string, body: any, contentType = 'application/json'): Promise<{
   status: number;

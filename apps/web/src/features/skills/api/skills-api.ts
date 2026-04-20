@@ -2,8 +2,8 @@
  * Skills API — CRUD operations for SKILL.md files.
  *
  * - List: uses `client.app.skills()` (GET /skill)
- * - Create/Update: writes SKILL.md via acme-master /file/upload
- * - Delete: removes the skill directory via acme-master DELETE /file
+ * - Create/Update: writes SKILL.md via aether-master /file/upload
+ * - Delete: removes the skill directory via aether-master DELETE /file
  *
  * Skills are created in .opencode/skills/<name>/SKILL.md (project-relative).
  * After any mutation, `instance.dispose()` is called to force the OpenCode
@@ -13,11 +13,7 @@
 import { getClient } from '@/lib/opencode-sdk';
 import { getActiveOpenCodeUrl } from '@/stores/server-store';
 import { authenticatedFetch } from '@/lib/auth-token';
-import type {
-  Skill,
-  CreateSkillInput,
-  UpdateSkillInput,
-} from '../types';
+import type { Skill, CreateSkillInput, UpdateSkillInput } from '../types';
 import { buildSkillFileContent } from '../types';
 
 // ---------------------------------------------------------------------------
@@ -76,12 +72,9 @@ export async function listSkills(): Promise<Skill[]> {
  * Upload content to a specific file path (project-relative).
  *
  * Uses the FormData field-name-as-path convention (same as the files feature).
- * Posts directly to acme-master's /file/upload endpoint.
+ * Posts directly to aether-master's /file/upload endpoint.
  */
-async function uploadToPath(
-  filePath: string,
-  content: string,
-): Promise<void> {
+async function uploadToPath(filePath: string, content: string): Promise<void> {
   const baseUrl = getActiveOpenCodeUrl();
   if (!baseUrl) {
     throw new Error('No OpenCode server URL configured');
@@ -99,7 +92,9 @@ async function uploadToPath(
 
   if (!res.ok) {
     const text = await res.text().catch(() => '');
-    throw new Error(`Failed to write skill file (${res.status}): ${text || res.statusText}`);
+    throw new Error(
+      `Failed to write skill file (${res.status}): ${text || res.statusText}`,
+    );
   }
 }
 
@@ -145,12 +140,18 @@ export async function createSkill(input: CreateSkillInput): Promise<void> {
   });
   if (!mkdirRes.ok) {
     const text = await mkdirRes.text().catch(() => '');
-    throw new Error(`Failed to create skill directory (${mkdirRes.status}): ${text || mkdirRes.statusText}`);
+    throw new Error(
+      `Failed to create skill directory (${mkdirRes.status}): ${text || mkdirRes.statusText}`,
+    );
   }
 
   // Write the SKILL.md file
   const filePath = `${skillDir}/SKILL.md`;
-  const content = buildSkillFileContent(input.name, input.description, input.body);
+  const content = buildSkillFileContent(
+    input.name,
+    input.description,
+    input.body,
+  );
   await uploadToPath(filePath, content);
 
   // Force the server to rescan skills so the new one appears in the list
@@ -200,7 +201,9 @@ export async function deleteSkill(location: string): Promise<void> {
   });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
-    throw new Error(`Failed to delete skill (${res.status}): ${text || res.statusText}`);
+    throw new Error(
+      `Failed to delete skill (${res.status}): ${text || res.statusText}`,
+    );
   }
 
   // Force rescan so the deleted skill is removed from the list

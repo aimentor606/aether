@@ -1,5 +1,5 @@
 {
-  "name": "acme",
+  "name": "aether",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -11,7 +11,7 @@
     "android:build": "eas build:dev --platform android",
     "android:prebuild": "npx expo prebuild --platform android --clean",
     "android:setup": "./scripts/setup-android.sh",
-    "android:emulator": "emulator -avd Acme_Dev",
+    "android:emulator": "emulator -avd Aether_Dev",
     "ios": "expo start -c --ios",
     "web": "expo start -c --web",
     "clean": "rm -rf .expo node_modules"

@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React, { useState } from 'react';
 import { Terminal, KeyRound, Plug, Globe, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useAcmeConnectors, type AcmeConnector } from '@/hooks/acme/use-acme-connectors';
+import { useAetherConnectors, type AetherConnector } from '@/hooks/aether/use-aether-connectors';
 import type { IntegrationConnection } from '@/hooks/integrations';
 
 const SOURCE_CONFIG: Record<string, { icon: typeof Plug; label: string; color: string }> = {
@@ -15,7 +15,7 @@ const SOURCE_CONFIG: Record<string, { icon: typeof Plug; label: string; color: s
   custom:    { icon: FileText,  label: 'Custom',    color: 'text-muted-foreground' },
 };
 
-function ConnectorCard({ connector, pipedreamConnections }: { connector: AcmeConnector; pipedreamConnections: IntegrationConnection[] }) {
+function ConnectorCard({ connector, pipedreamConnections }: { connector: AetherConnector; pipedreamConnections: IntegrationConnection[] }) {
   const [expanded, setExpanded] = useState(false);
   const source = connector.source || 'custom';
   const cfg = SOURCE_CONFIG[source] || SOURCE_CONFIG.custom!;
@@ -59,7 +59,7 @@ function ConnectorCard({ connector, pipedreamConnections }: { connector: AcmeCon
 }
 
 export function ConnectorRegistrySection({ pipedreamConnections }: { pipedreamConnections: IntegrationConnection[] }) {
-  const { data: connectors, isLoading } = useAcmeConnectors();
+  const { data: connectors, isLoading } = useAetherConnectors();
   if (isLoading || !connectors || connectors.length === 0) return null;
 
   const sorted = [...connectors].sort((a, b) => {

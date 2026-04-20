@@ -3,7 +3,7 @@
  *
  * validateSandboxToken() has been removed — all token validation now goes
  * through validateSecretKey() in repositories/api-keys.ts using the unified
- * acme.api_keys table. Both acme_ (user) and acme_sb_ (sandbox) keys
+ * aether.api_keys table. Both aether_ (user) and aether_sb_ (sandbox) keys
  * validate through the same path.
  */
 

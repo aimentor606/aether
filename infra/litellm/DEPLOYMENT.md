@@ -13,7 +13,7 @@ This directory contains production-ready infrastructure for the LiteLLM self-hos
 - Docker and Docker Compose (v2.0+)
 - Linux/macOS/Windows with Docker support
 - Network access to external LLM provider APIs (OpenAI, Azure, Anthropic, AWS, Deepseek, Minimax, Zhi-Pu, Moonshot)
-- Shared PostgreSQL database (Acme instance via `DATABASE_URL`)
+- Shared PostgreSQL database (Aether instance via `DATABASE_URL`)
 
 ## Setup
 
@@ -29,7 +29,7 @@ nano .env  # or your preferred editor
 
 Required environment variables:
 - `LITELLM_MASTER_KEY` — Master API key for proxy authentication
-- `DATABASE_URL` — PostgreSQL connection string (shared Acme DB)
+- `DATABASE_URL` — PostgreSQL connection string (shared Aether DB)
 - `REDIS_PASSWORD` — Redis authentication password
 - Provider API keys (8 total):
   - `OPENAI_API_KEY` — OpenAI API key

@@ -1,10 +1,16 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  ScrollArea,
+  Skeleton,
+} from '@aether/ui/primitives';
 import { useAdminCriticalFeedback } from '@/hooks/admin/use-admin-feedback';
 import { Star, ExternalLink, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -17,19 +23,34 @@ export function CriticalFeedbackList() {
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
-    
+
     return (
       <div className="flex items-center gap-0.5">
         {[...Array(5)].map((_, i) => {
           if (i < fullStars) {
-            return <Star key={i} className="h-3 w-3 fill-yellow-500 text-yellow-500" />;
+            return (
+              <Star
+                key={i}
+                className="h-3 w-3 fill-yellow-500 text-yellow-500"
+              />
+            );
           } else if (i === fullStars && hasHalfStar) {
-            return <Star key={i} className="h-3 w-3 fill-yellow-500 text-yellow-500" style={{ clipPath: 'inset(0 50% 0 0)' }} />;
+            return (
+              <Star
+                key={i}
+                className="h-3 w-3 fill-yellow-500 text-yellow-500"
+                style={{ clipPath: 'inset(0 50% 0 0)' }}
+              />
+            );
           } else {
-            return <Star key={i} className="h-3 w-3 text-muted-foreground/30" />;
+            return (
+              <Star key={i} className="h-3 w-3 text-muted-foreground/30" />
+            );
           }
         })}
-        <span className="ml-1 text-xs font-medium text-red-600 dark:text-red-400">{rating.toFixed(1)}</span>
+        <span className="ml-1 text-xs font-medium text-red-600 dark:text-red-400">
+          {rating.toFixed(1)}
+        </span>
       </div>
     );
   };
@@ -39,9 +60,13 @@ export function CriticalFeedbackList() {
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-red-500" />
-          <CardTitle className="text-base font-medium">Critical Feedback</CardTitle>
+          <CardTitle className="text-base font-medium">
+            Critical Feedback
+          </CardTitle>
         </div>
-        <CardDescription>Recent low ratings that need attention</CardDescription>
+        <CardDescription>
+          Recent low ratings that need attention
+        </CardDescription>
       </CardHeader>
       <CardContent className="p-0">
         {isLoading ? (
@@ -59,8 +84,8 @@ export function CriticalFeedbackList() {
           <ScrollArea className="h-[350px]">
             <div className="divide-y">
               {criticalFeedback.map((feedback) => (
-                <div 
-                  key={feedback.feedback_id} 
+                <div
+                  key={feedback.feedback_id}
                   className="p-4 hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -68,7 +93,9 @@ export function CriticalFeedbackList() {
                       <div className="flex items-center gap-2 mb-1">
                         {renderStars(feedback.rating)}
                         <span className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(parseISO(feedback.created_at), { addSuffix: true })}
+                          {formatDistanceToNow(parseISO(feedback.created_at), {
+                            addSuffix: true,
+                          })}
                         </span>
                       </div>
                       <p className="text-sm text-foreground line-clamp-2 mb-2">
@@ -83,7 +110,9 @@ export function CriticalFeedbackList() {
                             variant="ghost"
                             size="sm"
                             className="h-6 px-2 text-xs"
-                            onClick={() => router.push(`/share/${feedback.thread_id}`)}
+                            onClick={() =>
+                              router.push(`/share/${feedback.thread_id}`)
+                            }
                           >
                             <ExternalLink className="h-3 w-3 mr-1" />
                             View Chat

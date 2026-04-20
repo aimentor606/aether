@@ -3,7 +3,7 @@
  * cloud sandboxes to local machine resources.
  *
  * Uses the agent-tunnel library for transport (relay, heartbeat, WS handlers).
- * This file wires in Acme-specific business logic: DB persistence,
+ * This file wires in Aether-specific business logic: DB persistence,
  * permission sync, event notifications, and cleanup.
  *
  * Routes:
@@ -45,11 +45,11 @@ const wsHandlers = createWsHandlers(tunnelRelay, {
   maxMessageSize: config.TUNNEL_MAX_WS_MESSAGE_SIZE,
   async onAuthenticate(tunnelId: string, token: string): Promise<AuthResult | null> {
     const { isTunnelToken, hashSecretKey, deriveSigningKey } = await import('../shared/crypto');
-    const { isAcmeToken } = await import('../shared/crypto');
+    const { isAetherToken } = await import('../shared/crypto');
     const { validateSecretKey } = await import('../repositories/api-keys');
     const { getSupabase } = await import('../shared/supabase');
     const { eq: eqOp, and: andOp } = await import('drizzle-orm');
-    const { tunnelConnections } = await import('@acme/db');
+    const { tunnelConnections } = await import('@aether/db');
     const { db } = await import('../shared/db');
 
     let accountId: string | null = null;
@@ -68,7 +68,7 @@ const wsHandlers = createWsHandlers(tunnelRelay, {
         accountId = row.accountId;
         tunnel = row;
       }
-    } else if (isAcmeToken(token)) {
+    } else if (isAetherToken(token)) {
       const result = await validateSecretKey(token);
       if (result.isValid) accountId = result.accountId!;
     } else {
@@ -127,7 +127,7 @@ function startTunnelService(): void {
 
     try {
       const { eq } = await import('drizzle-orm');
-      const { tunnelConnections, tunnelPermissions } = await import('@acme/db');
+      const { tunnelConnections, tunnelPermissions } = await import('@aether/db');
       const { db } = await import('../shared/db');
 
       db.update(tunnelConnections)
@@ -175,7 +175,7 @@ function startTunnelService(): void {
 
     try {
       const { eq } = await import('drizzle-orm');
-      const { tunnelConnections } = await import('@acme/db');
+      const { tunnelConnections } = await import('@aether/db');
       const { db } = await import('../shared/db');
 
       db.update(tunnelConnections)
@@ -196,7 +196,7 @@ function startTunnelService(): void {
   tunnelRelay.on('message:pong', async ({ tunnelId, params }) => {
     try {
       const { eq } = await import('drizzle-orm');
-      const { tunnelConnections } = await import('@acme/db');
+      const { tunnelConnections } = await import('@aether/db');
       const { db } = await import('../shared/db');
 
       db.update(tunnelConnections)
@@ -218,7 +218,7 @@ function startTunnelService(): void {
     console.warn(`[tunnel] Agent ${tunnelId} timed out — marking offline`);
     try {
       const { eq } = await import('drizzle-orm');
-      const { tunnelConnections } = await import('@acme/db');
+      const { tunnelConnections } = await import('@aether/db');
       const { db } = await import('../shared/db');
 
       await db
@@ -235,7 +235,7 @@ function startTunnelService(): void {
   permissionCleanupInterval = setInterval(async () => {
     try {
       const { eq, and, lt } = await import('drizzle-orm');
-      const { tunnelPermissions } = await import('@acme/db');
+      const { tunnelPermissions } = await import('@aether/db');
       const { db } = await import('../shared/db');
 
       await db
@@ -249,7 +249,7 @@ function startTunnelService(): void {
         );
 
       // Expire pending device auth requests
-      const { tunnelDeviceAuthRequests } = await import('@acme/db');
+      const { tunnelDeviceAuthRequests } = await import('@aether/db');
       await db
         .update(tunnelDeviceAuthRequests)
         .set({ status: 'expired', updatedAt: new Date() })

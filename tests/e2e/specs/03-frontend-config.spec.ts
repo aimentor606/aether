@@ -20,7 +20,7 @@ test.describe('03 — Frontend runtime configuration', () => {
 
     // The entrypoint should have rewritten 8008 -> 13738
     // Check runtime config specifically
-    const configMatch = html.match(/__ACME_RUNTIME_CONFIG=({[^;]+})/);
+    const configMatch = html.match(/__AETHER_RUNTIME_CONFIG=({[^;]+})/);
     expect(configMatch).toBeTruthy();
 
     const config = JSON.parse(configMatch![1]);
@@ -34,7 +34,7 @@ test.describe('03 — Frontend runtime configuration', () => {
 
     expect(html).not.toContain('local-build-placeholder-anon-key');
 
-    const configMatch = html.match(/__ACME_RUNTIME_CONFIG=({[^;]+})/);
+    const configMatch = html.match(/__AETHER_RUNTIME_CONFIG=({[^;]+})/);
     const config = JSON.parse(configMatch![1]);
     expect(config.SUPABASE_ANON_KEY).toMatch(/^eyJ/); // JWT format
   });

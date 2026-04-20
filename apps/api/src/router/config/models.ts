@@ -51,7 +51,7 @@ export const MODELS: Record<string, ModelConfig> = {
 };
 
 /**
- * Default model for Acme-managed contexts (cron, memory, etc.)
+ * Default model for Aether-managed contexts (cron, memory, etc.)
  * that need a sensible default without user input.
  */
 export const DEFAULT_MODEL_ID = 'minimax/minimax-m2.7';
@@ -101,7 +101,7 @@ export function getAllModels() {
   return Object.entries(MODELS).map(([id, cfg]) => ({
     id,
     object: 'model' as const,
-    owned_by: 'acme',
+    owned_by: 'aether',
     context_window: cfg.contextWindow,
     pricing: {
       input: cfg.inputPer1M,

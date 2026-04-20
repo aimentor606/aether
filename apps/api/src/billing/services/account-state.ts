@@ -65,7 +65,7 @@ export async function buildMinimalAccountState(accountId: string): Promise<Accou
   let instances: any[] = [];
   try {
     const { db } = await import('../../shared/db');
-    const { sandboxes } = await import('@acme/db');
+    const { sandboxes } = await import('@aether/db');
 
     const sandboxRows = await db
       .select()

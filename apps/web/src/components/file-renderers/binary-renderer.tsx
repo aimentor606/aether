@@ -4,7 +4,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Download, File } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { useDownloadRestriction } from '@/hooks/billing';
 
 interface BinaryRendererProps {
@@ -75,7 +75,7 @@ export function BinaryRenderer({
           disabled={isDownloading}
         >
           {isDownloading ? (
-            <AcmeLoader size="small" />
+            <AetherLoader size="small" />
           ) : (
             <Download className="h-4 w-4" />
           )}

@@ -19,7 +19,7 @@ export interface KeyboardShortcutPreferences {
 
 export interface UserPreferences {
   keyboard: KeyboardShortcutPreferences;
-  /** Selected Acme theme ID (e.g. 'default', 'ember', 'aurora') */
+  /** Selected Aether theme ID (e.g. 'default', 'ember', 'aurora') */
   themeId: string;
   /** Selected desktop wallpaper ID */
   wallpaperId: string;
@@ -29,7 +29,9 @@ export interface UserPreferences {
 // Helpers
 // ============================================================================
 
-const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+const isMac =
+  typeof navigator !== 'undefined' &&
+  /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 
 function getDefaultKeyboardPreferences(): KeyboardShortcutPreferences {
   return {
@@ -48,7 +50,7 @@ interface UserPreferencesState {
   /** Update keyboard shortcut preferences (partial merge) */
   setKeyboardPreferences: (prefs: Partial<KeyboardShortcutPreferences>) => void;
 
-  /** Set the active Acme theme by ID */
+  /** Set the active Aether theme by ID */
   setThemeId: (themeId: string) => void;
 
   /** Set the active desktop wallpaper by ID */
@@ -116,10 +118,10 @@ export const useUserPreferencesStore = create<UserPreferencesState>()(
       },
     }),
     {
-      name: 'acme-user-preferences',
+      name: 'aether-user-preferences',
       partialize: (state) => ({
         preferences: state.preferences,
       }),
-    }
-  )
+    },
+  ),
 );

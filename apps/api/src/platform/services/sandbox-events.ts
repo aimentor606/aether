@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { eq, sql, and } from 'drizzle-orm';
-import { sandboxes } from '@acme/db';
+import { sandboxes } from '@aether/db';
 import { db } from '../../shared/db';
 import * as pool from '../../pool';
 
@@ -139,7 +139,7 @@ class SandboxEventBus {
         );
     }
 
-    // Provider-confirmed "ready" means the VM is up — but OpenCode / Acme
+    // Provider-confirmed "ready" means the VM is up — but OpenCode / Aether
     // services may still be starting inside the container. DON'T flip to active
     // here. Just update the stage to 'services_ready' and let the provision
     // poller's readiness probe verify port 8000 is actually responding before

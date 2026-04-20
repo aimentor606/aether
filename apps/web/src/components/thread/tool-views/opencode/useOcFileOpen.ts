@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAcmeComputerStore } from '@/stores/acme-computer-store';
+import { useAetherComputerStore } from '@/stores/aether-computer-store';
 import { getClient } from '@/lib/opencode-sdk';
 import { opencodeKeys } from '@/hooks/opencode/use-opencode-sessions';
 
@@ -142,7 +142,7 @@ async function discoverPrefixViaFileApi(absPath: string): Promise<string | null>
  * then tries each when converting absolute paths → project-relative paths.
  */
 export function useOcFileOpen() {
-  const openFileInComputer = useAcmeComputerStore((s) => s.openFileInComputer);
+  const openFileInComputer = useAetherComputerStore((s) => s.openFileInComputer);
   const queryClient = useQueryClient();
   const [prefixes, setPrefixes] = useState<string[]>(cachedPrefixes || []);
 

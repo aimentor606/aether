@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Configuration | Acme',
+  title: 'Configuration | Aether',
   description: 'OpenCode configuration settings',
 };
 

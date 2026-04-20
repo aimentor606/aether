@@ -16,26 +16,26 @@
 # For pure code changes (TypeScript, agents, skills, tools):
 #   Edit the file → it's already live in the container
 #   Restart the service if needed:
-#     docker exec acme-sandbox s6-svc -r /run/service/svc-acme-master
+#     docker exec aether-sandbox s6-svc -r /run/service/svc-aether-master
 #
 # Note: volume host paths are relative to this compose file's directory (core/docker/)
 
 services:
   desktop:
     environment:
-      - ACME_DEV_MODE=1
+      - aether_DEV_MODE=1
     volumes:
       # Bind-mount local source over the prebaked /opt dirs
-      # All packages now live inside core/acme-master/
-      - ../acme-master/src:/ephemeral/acme-master/src:ro
-      - ../acme-master/opencode/plugin:/ephemeral/acme-master/opencode/plugin:ro
-      - ../acme-master/opencode/agents:/ephemeral/acme-master/opencode/agents:ro
-      - ../acme-master/opencode/commands:/ephemeral/acme-master/opencode/commands:ro
-      - ../acme-master/opencode/skills:/ephemeral/acme-master/opencode/skills:ro
-      - ../acme-master/opencode/tools:/ephemeral/acme-master/opencode/tools:ro
-      - ../acme-master/opencode/patches:/ephemeral/acme-master/opencode/patches:ro
-      - ../acme-master/opencode/opencode.jsonc:/ephemeral/acme-master/opencode/opencode.jsonc:ro
-      - ../acme-master/channels/src:/ephemeral/acme-master/channels/src:ro
-      - ../acme-master/triggers/src:/ephemeral/acme-master/triggers/src:ro
+      # All packages now live inside core/aether-master/
+      - ../aether-master/src:/ephemeral/aether-master/src:ro
+      - ../aether-master/opencode/plugin:/ephemeral/aether-master/opencode/plugin:ro
+      - ../aether-master/opencode/agents:/ephemeral/aether-master/opencode/agents:ro
+      - ../aether-master/opencode/commands:/ephemeral/aether-master/opencode/commands:ro
+      - ../aether-master/opencode/skills:/ephemeral/aether-master/opencode/skills:ro
+      - ../aether-master/opencode/tools:/ephemeral/aether-master/opencode/tools:ro
+      - ../aether-master/opencode/patches:/ephemeral/aether-master/opencode/patches:ro
+      - ../aether-master/opencode/opencode.jsonc:/ephemeral/aether-master/opencode/opencode.jsonc:ro
+      - ../aether-master/channels/src:/ephemeral/aether-master/channels/src:ro
+      - ../aether-master/triggers/src:/ephemeral/aether-master/triggers/src:ro
       # Service scripts (baked-in JS for static-web, agent-browser-viewer)
       - ../services:/ephemeral/services:ro

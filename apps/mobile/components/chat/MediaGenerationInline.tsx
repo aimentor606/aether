@@ -21,7 +21,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { getToolIcon } from '@/lib/icons/tool-icons';
 import { getUserFriendlyToolName } from '@agentpress/shared';
 import { useSandboxImageBlob } from '@/lib/files/hooks';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 
 type MediaType = 'image' | 'video' | null;
 
@@ -271,7 +271,7 @@ export function MediaGenerationInline({
           {displayName}
         </Text>
         {!isComplete ? (
-          <AcmeLoader size="small" />
+          <AetherLoader size="small" />
         ) : (
           <Icon as={CheckCircle2} size={12} className="text-emerald-500 ml-2" />
         )}

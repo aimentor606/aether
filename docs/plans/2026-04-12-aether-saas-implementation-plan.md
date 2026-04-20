@@ -11,7 +11,7 @@
 This plan breaks Approach 1 (Single Codebase Multi-Tenant) into 7 executable phases with concrete file edits, git strategy, and rollout sequence. Each phase includes acceptance criteria, risk mitigations, and team assignments.
 
 **Assumptions**:
-- Upstream kortix-ai/suna synced weekly via Merging Rebase
+- Upstream aimentor606/aether synced weekly via Merging Rebase
 - Verticals: finance, healthcare, retail (MVP)
 - Database: Shared Supabase instance with RLS policies
 - Deployment: Single SaaS instance (multi-tenant via middleware + config)
@@ -55,7 +55,7 @@ jobs:
         with:
           fetch-depth: 0
       - run: |
-          git remote add upstream https://github.com/kortix-ai/suna.git
+          git remote add upstream https://github.com/aimentor606/aether.git
           git fetch upstream main
           git rebase -i upstream/main --autosquash
           git push origin main --force-with-lease

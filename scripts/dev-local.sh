@@ -49,9 +49,9 @@ sys.exit(1)
 PY
 
 echo "[dev] Starting frontend..."
-pnpm --filter Acme-Computer-Frontend dev &
+pnpm --filter aether-Computer-Frontend dev &
 FRONTEND_PID=$!
 
 echo "[dev] Starting API..."
 cd "$ROOT_DIR"
-ACME_SKIP_ENSURE_SCHEMA=1 pnpm --filter acme-api dev
+AETHER_SKIP_ENSURE_SCHEMA=1 pnpm --filter aether-api dev

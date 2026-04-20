@@ -16,7 +16,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'bun:test'
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { sql, eq, and } from 'drizzle-orm';
-import { integrationCredentials } from '@acme/db';
+import { integrationCredentials } from '@aether/db';
 import {
   getTestDb,
   TEST_USER_ID,
@@ -49,18 +49,18 @@ async function ensureTestAccount(userId: string): Promise<string> {
 
   // Check if account exists
   const [existing] = await db.execute(
-    sql`SELECT am.account_id FROM acme.account_members am WHERE am.user_id = ${userId} LIMIT 1`
+    sql`SELECT am.account_id FROM aether.account_members am WHERE am.user_id = ${userId} LIMIT 1`
   );
 
   if (existing) return (existing as any).account_id;
 
   // Create account + membership
   const [acc] = await db.execute(
-    sql`INSERT INTO acme.accounts (name, personal_account) VALUES ('Test Account', true) RETURNING account_id`
+    sql`INSERT INTO aether.accounts (name, personal_account) VALUES ('Test Account', true) RETURNING account_id`
   );
   const accountId = (acc as any).account_id;
   await db.execute(
-    sql`INSERT INTO acme.account_members (user_id, account_id, account_role) VALUES (${userId}, ${accountId}, 'owner')`
+    sql`INSERT INTO aether.account_members (user_id, account_id, account_role) VALUES (${userId}, ${accountId}, 'owner')`
   );
   return accountId;
 }
@@ -95,7 +95,7 @@ function createPipedreamTestApp(opts: { userId?: string; accountId?: string } = 
 
 async function cleanupCredentials() {
   const db = getTestDb();
-  await db.execute(sql`DELETE FROM acme.integration_credentials`);
+  await db.execute(sql`DELETE FROM aether.integration_credentials`);
 }
 
 // =============================================================================
@@ -499,7 +499,7 @@ describe.skipIf(!HAS_DB)('Full flow: sandbox push → DB → frontend resolve (e
   });
 
   it('creds saved via PUT are retrievable and flagged as account source', async () => {
-    // Step 1: sandbox pushes creds to API (simulates acme-master boot push)
+    // Step 1: sandbox pushes creds to API (simulates aether-master boot push)
     const putRes = await jsonPut(app, '/v1/pipedream/credentials', {
       client_id: 'sandbox-pushed-cid',
       client_secret: 'sandbox-pushed-secret',

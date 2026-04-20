@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
+import { useState, useMemo } from 'react';
 import {
   Loader2,
   CheckCircle,
@@ -20,19 +20,21 @@ import {
   Square,
   CheckSquare,
   RefreshCw,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+} from 'lucide-react';
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Button,
+  Badge,
+  Input,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -40,16 +42,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
-} from "@/components/ui/dropdown-menu";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
-import { toast } from "@/lib/toast";
-import type { StuckRun } from "@/hooks/admin/use-stateless";
+} from '@aether/ui/primitives';
+import { cn } from '@/lib/utils';
+import { toast } from '@/lib/toast';
+import type { StuckRun } from '@/hooks/admin/use-stateless';
 
 interface StuckRunsTableProps {
   runs: StuckRun[];
@@ -62,26 +62,29 @@ interface StuckRunsTableProps {
   isResuming: boolean;
 }
 
-const reasonConfig: Record<string, { label: string; color: string; description: string }> = {
+const reasonConfig: Record<
+  string,
+  { label: string; color: string; description: string }
+> = {
   stale_heartbeat: {
-    label: "Stale Heartbeat",
-    color: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+    label: 'Stale Heartbeat',
+    color: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
     description: "Worker hasn't sent a heartbeat recently",
   },
   no_heartbeat: {
-    label: "No Heartbeat",
-    color: "bg-red-500/10 text-red-400 border-red-500/30",
-    description: "No heartbeat recorded for this run",
+    label: 'No Heartbeat',
+    color: 'bg-red-500/10 text-red-400 border-red-500/30',
+    description: 'No heartbeat recorded for this run',
   },
   long_running: {
-    label: "Long Running",
-    color: "bg-orange-500/10 text-orange-400 border-orange-500/30",
-    description: "Run has been active for an unusually long time",
+    label: 'Long Running',
+    color: 'bg-orange-500/10 text-orange-400 border-orange-500/30',
+    description: 'Run has been active for an unusually long time',
   },
   orphaned: {
-    label: "Orphaned",
-    color: "bg-purple-500/10 text-purple-400 border-purple-500/30",
-    description: "Run has no active owner",
+    label: 'Orphaned',
+    color: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+    description: 'Run has no active owner',
   },
 };
 
@@ -95,12 +98,16 @@ export function StuckRunsTable({
   isFailing,
   isResuming,
 }: StuckRunsTableProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedReasons, setSelectedReasons] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedReasons, setSelectedReasons] = useState<Set<string>>(
+    new Set(),
+  );
   const [selectedRuns, setSelectedRuns] = useState<Set<string>>(new Set());
   const [detailRun, setDetailRun] = useState<StuckRun | null>(null);
-  const [sortBy, setSortBy] = useState<"duration" | "heartbeat_age">("duration");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [sortBy, setSortBy] = useState<'duration' | 'heartbeat_age'>(
+    'duration',
+  );
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // Get unique reasons
   const availableReasons = useMemo(() => {
@@ -117,7 +124,7 @@ export function StuckRunsTable({
       result = result.filter(
         (r) =>
           r.run_id.toLowerCase().includes(query) ||
-          r.owner?.toLowerCase().includes(query)
+          r.owner?.toLowerCase().includes(query),
       );
     }
 
@@ -126,9 +133,11 @@ export function StuckRunsTable({
     }
 
     result = [...result].sort((a, b) => {
-      const aVal = sortBy === "duration" ? (a.duration || 0) : (a.heartbeat_age || 0);
-      const bVal = sortBy === "duration" ? (b.duration || 0) : (b.heartbeat_age || 0);
-      return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
+      const aVal =
+        sortBy === 'duration' ? a.duration || 0 : a.heartbeat_age || 0;
+      const bVal =
+        sortBy === 'duration' ? b.duration || 0 : b.heartbeat_age || 0;
+      return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
     });
 
     return result;
@@ -145,12 +154,14 @@ export function StuckRunsTable({
     return {
       total: runs.length,
       byReason: Array.from(byReason.entries()),
-      avgDuration: runs.reduce((acc, r) => acc + (r.duration || 0), 0) / (runs.length || 1),
+      avgDuration:
+        runs.reduce((acc, r) => acc + (r.duration || 0), 0) /
+        (runs.length || 1),
     };
   }, [runs]);
 
   const formatDuration = (seconds: number | null) => {
-    if (!seconds) return "-";
+    if (!seconds) return '-';
     if (seconds < 60) return `${seconds.toFixed(0)}s`;
     if (seconds < 3600) return `${(seconds / 60).toFixed(1)}m`;
     if (seconds < 86400) return `${(seconds / 3600).toFixed(1)}h`;
@@ -160,9 +171,9 @@ export function StuckRunsTable({
   const getReasonBadge = (reason: string | null) => {
     if (!reason) return <Badge variant="outline">Unknown</Badge>;
     const config = reasonConfig[reason] || {
-      label: reason.replace(/_/g, " "),
-      color: "bg-muted",
-      description: "",
+      label: reason.replace(/_/g, ' '),
+      color: 'bg-muted',
+      description: '',
     };
     return (
       <TooltipProvider>
@@ -180,7 +191,7 @@ export function StuckRunsTable({
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard");
+    toast.success('Copied to clipboard');
   };
 
   const toggleSelectAll = () => {
@@ -202,10 +213,10 @@ export function StuckRunsTable({
   };
 
   const getDurationSeverity = (seconds: number | null) => {
-    if (!seconds) return "text-muted-foreground";
-    if (seconds < 300) return "text-muted-foreground";
-    if (seconds < 1800) return "text-amber-500";
-    return "text-red-500";
+    if (!seconds) return 'text-muted-foreground';
+    if (seconds < 300) return 'text-muted-foreground';
+    if (seconds < 1800) return 'text-amber-500';
+    return 'text-red-500';
   };
 
   return (
@@ -252,15 +263,17 @@ export function StuckRunsTable({
           <div className="flex items-center gap-3 mt-4">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input type="text"
-                placeholder="Search by run ID or owner..." autoComplete="off"
+              <Input
+                type="text"
+                placeholder="Search by run ID or owner..."
+                autoComplete="off"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 h-9"
               />
               {searchQuery && (
                 <button
-                  onClick={() => setSearchQuery("")}
+                  onClick={() => setSearchQuery('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-4 h-4" />
@@ -304,7 +317,9 @@ export function StuckRunsTable({
                 {selectedReasons.size > 0 && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setSelectedReasons(new Set())}>
+                    <DropdownMenuItem
+                      onClick={() => setSelectedReasons(new Set())}
+                    >
                       Clear filters
                     </DropdownMenuItem>
                   </>
@@ -320,13 +335,28 @@ export function StuckRunsTable({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={() => { setSortBy("duration"); setSortOrder("desc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy('duration');
+                    setSortOrder('desc');
+                  }}
+                >
                   Longest duration
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("heartbeat_age"); setSortOrder("desc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy('heartbeat_age');
+                    setSortOrder('desc');
+                  }}
+                >
                   Oldest heartbeat
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("duration"); setSortOrder("asc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy('duration');
+                    setSortOrder('asc');
+                  }}
+                >
                   Shortest duration
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -378,7 +408,9 @@ export function StuckRunsTable({
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <CheckCircle className="w-12 h-12 text-emerald-500/50 mb-3" />
               <p className="text-muted-foreground font-medium">
-                {runs.length === 0 ? "No stuck runs detected" : "No runs match filters"}
+                {runs.length === 0
+                  ? 'No stuck runs detected'
+                  : 'No runs match filters'}
               </p>
               {runs.length === 0 && (
                 <p className="text-sm text-muted-foreground/70 mt-1">
@@ -392,7 +424,10 @@ export function StuckRunsTable({
                 <thead>
                   <tr className="border-y bg-muted/50">
                     <th className="h-11 px-4 text-left">
-                      <button onClick={toggleSelectAll} className="flex items-center justify-center">
+                      <button
+                        onClick={toggleSelectAll}
+                        className="flex items-center justify-center"
+                      >
                         {selectedRuns.size === filteredRuns.length ? (
                           <CheckSquare className="w-4 h-4 text-primary" />
                         ) : (
@@ -428,12 +463,15 @@ export function StuckRunsTable({
                     <tr
                       key={run.run_id}
                       className={cn(
-                        "border-b transition-colors hover:bg-muted/30",
-                        selectedRuns.has(run.run_id) && "bg-primary/5"
+                        'border-b transition-colors hover:bg-muted/30',
+                        selectedRuns.has(run.run_id) && 'bg-primary/5',
                       )}
                     >
                       <td className="h-14 px-4">
-                        <button onClick={() => toggleSelectRun(run.run_id)} className="flex items-center justify-center">
+                        <button
+                          onClick={() => toggleSelectRun(run.run_id)}
+                          className="flex items-center justify-center"
+                        >
                           {selectedRuns.has(run.run_id) ? (
                             <CheckSquare className="w-4 h-4 text-primary" />
                           ) : (
@@ -454,7 +492,9 @@ export function StuckRunsTable({
                             </TooltipTrigger>
                             <TooltipContent>
                               <p className="font-mono text-xs">{run.run_id}</p>
-                              <p className="text-xs text-muted-foreground mt-1">Click to copy</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Click to copy
+                              </p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -462,15 +502,24 @@ export function StuckRunsTable({
                       <td className="h-14 px-4">
                         <span className="text-sm text-muted-foreground flex items-center gap-1.5">
                           <User className="w-3.5 h-3.5" />
-                          {run.owner ? run.owner.slice(0, 8) : "-"}
+                          {run.owner ? run.owner.slice(0, 8) : '-'}
                         </span>
                       </td>
                       <td className="h-14 px-4">
-                        <Badge variant="outline">{run.status || "unknown"}</Badge>
+                        <Badge variant="outline">
+                          {run.status || 'unknown'}
+                        </Badge>
                       </td>
-                      <td className="h-14 px-4">{getReasonBadge(run.reason)}</td>
+                      <td className="h-14 px-4">
+                        {getReasonBadge(run.reason)}
+                      </td>
                       <td className="h-14 px-4 text-right">
-                        <span className={cn("font-mono text-sm flex items-center justify-end gap-1.5", getDurationSeverity(run.duration))}>
+                        <span
+                          className={cn(
+                            'font-mono text-sm flex items-center justify-end gap-1.5',
+                            getDurationSeverity(run.duration),
+                          )}
+                        >
                           <Timer className="w-3.5 h-3.5" />
                           {formatDuration(run.duration)}
                         </span>
@@ -506,7 +555,9 @@ export function StuckRunsTable({
                                   variant="ghost"
                                   className="h-8 w-8 text-blue-500 hover:text-blue-600"
                                   onClick={() => onResume(run.run_id)}
-                                  disabled={isCompleting || isFailing || isResuming}
+                                  disabled={
+                                    isCompleting || isFailing || isResuming
+                                  }
                                 >
                                   {isResuming ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -526,7 +577,9 @@ export function StuckRunsTable({
                                   variant="ghost"
                                   className="h-8 w-8 text-emerald-500 hover:text-emerald-600"
                                   onClick={() => onComplete(run.run_id)}
-                                  disabled={isCompleting || isFailing || isResuming}
+                                  disabled={
+                                    isCompleting || isFailing || isResuming
+                                  }
                                 >
                                   {isCompleting ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -546,7 +599,9 @@ export function StuckRunsTable({
                                   variant="ghost"
                                   className="h-8 w-8 text-red-500 hover:text-red-600"
                                   onClick={() => onFail(run.run_id)}
-                                  disabled={isCompleting || isFailing || isResuming}
+                                  disabled={
+                                    isCompleting || isFailing || isResuming
+                                  }
                                 >
                                   {isFailing ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -608,13 +663,17 @@ export function StuckRunsTable({
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Owner
                   </label>
-                  <p className="text-sm font-mono">{detailRun.owner || "None"}</p>
+                  <p className="text-sm font-mono">
+                    {detailRun.owner || 'None'}
+                  </p>
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Status
                   </label>
-                  <Badge variant="outline">{detailRun.status || "unknown"}</Badge>
+                  <Badge variant="outline">
+                    {detailRun.status || 'unknown'}
+                  </Badge>
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -626,7 +685,12 @@ export function StuckRunsTable({
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Duration
                   </label>
-                  <p className={cn("text-sm font-mono", getDurationSeverity(detailRun.duration))}>
+                  <p
+                    className={cn(
+                      'text-sm font-mono',
+                      getDurationSeverity(detailRun.duration),
+                    )}
+                  >
                     {formatDuration(detailRun.duration)}
                   </p>
                 </div>
@@ -637,7 +701,9 @@ export function StuckRunsTable({
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Heartbeat Age
                   </label>
-                  <p className="text-sm font-mono">{formatDuration(detailRun.heartbeat_age)}</p>
+                  <p className="text-sm font-mono">
+                    {formatDuration(detailRun.heartbeat_age)}
+                  </p>
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -646,7 +712,7 @@ export function StuckRunsTable({
                   <p className="text-sm">
                     {detailRun.heartbeat
                       ? new Date(detailRun.heartbeat * 1000).toLocaleString()
-                      : "Never"}
+                      : 'Never'}
                   </p>
                 </div>
               </div>

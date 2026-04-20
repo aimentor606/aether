@@ -15,18 +15,18 @@ interface AgentAvatarProps extends ViewProps {
  * Automatically handles:
  * - Agent icon from backend (icon_name)
  * - Agent colors (icon_color, icon_background)
- * - SUNA/ACME SUPER WORKER special case (Acme symbol)
+ * - SUNA/aether SUPER WORKER special case (Aether symbol)
  * - Fallback to agent name initial
  * 
  * @example
  * <AgentAvatar agent={agent} size={48} />
  */
 export function AgentAvatar({ agent, size = 48, style, ...props }: AgentAvatarProps) {
-  // Check if this is the SUNA/ACME SUPER WORKER
+  // Check if this is the SUNA/aether SUPER WORKER
   const isSunaAgent = agent?.metadata?.is_suna_default || 
                       agent?.name?.toLowerCase() === 'suna' ||
                       agent?.name?.toLowerCase() === 'superworker' ||
-                      agent?.name?.toLowerCase() === 'acme super worker';
+                      agent?.name?.toLowerCase() === 'aether super worker';
 
   return (
     <Avatar
@@ -35,7 +35,7 @@ export function AgentAvatar({ agent, size = 48, style, ...props }: AgentAvatarPr
       icon={agent?.icon_name || undefined}
       iconColor={isSunaAgent ? undefined : agent?.icon_color}
       backgroundColor={isSunaAgent ? undefined : agent?.icon_background}
-      useAcmeSymbol={isSunaAgent}
+      useAetherSymbol={isSunaAgent}
       fallbackText={agent?.name}
       style={style}
       {...props}

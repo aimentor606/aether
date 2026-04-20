@@ -139,7 +139,7 @@ export function ReasoningSection({
       className="w-full"
       style={{ marginBottom: isExpanded ? 4 : 0 }}
     >
-      {/* Header row: Acme logo + Toggle button */}
+      {/* Header row: Aether logo + Toggle button */}
       <View className="flex-row items-center gap-1">
         <Pressable
           onPress={handleToggle}

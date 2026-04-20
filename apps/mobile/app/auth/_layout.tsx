@@ -2,7 +2,7 @@ import { Stack, useRouter, Redirect } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useAuthContext } from '@/contexts';
 import { View } from 'react-native';
-import { AcmeLoader } from '@/components/ui';
+import { AetherLoader } from '@/components/ui';
 import { log } from '@/lib/logger';
 
 /**
@@ -27,7 +27,7 @@ export default function AuthLayout() {
           justifyContent: 'center',
         }}
       >
-        <AcmeLoader size="xlarge" />
+        <AetherLoader size="xlarge" />
       </View>
     );
   }

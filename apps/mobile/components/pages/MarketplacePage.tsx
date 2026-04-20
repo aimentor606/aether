@@ -75,7 +75,7 @@ interface MarketplacePageProps {
   onOpenRightDrawer?: () => void;
 }
 
-const REGISTRY_URL = 'https://acme-registry-6om.pages.dev';
+const REGISTRY_URL = 'https://aether-registry-6om.pages.dev';
 
 const FILTERS: Array<{ key: FilterKey; label: string }> = [
   { key: 'all', label: 'All' },
@@ -262,7 +262,7 @@ async function runPtyCommand(sandboxUrl: string, command: string): Promise<strin
 async function installComponentWithOcx(sandboxUrl: string, componentName: string): Promise<void> {
   const output = await runPtyCommand(
     sandboxUrl,
-    `cd /workspace && ocx init -q 2>/dev/null && ocx registry add https://acme-registry-6om.pages.dev --name acme -q 2>/dev/null; ocx add acme/${componentName} 2>&1`,
+    `cd /workspace && ocx init -q 2>/dev/null && ocx registry add https://aether-registry-6om.pages.dev --name aether -q 2>/dev/null; ocx add aether/${componentName} 2>&1`,
   );
   const normalized = output.toLowerCase();
   const looksInstalled = normalized.includes('installed') || normalized.includes('done');

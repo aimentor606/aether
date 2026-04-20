@@ -1,7 +1,7 @@
 /**
- * @acme/shared
+ * @aether/shared
  *
- * Shared TypeScript code for Acme frontend applications.
+ * Shared TypeScript code for Aether frontend applications.
  * Contains utilities, error classes, and tool metadata.
  */
 

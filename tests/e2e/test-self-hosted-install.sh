@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Acme E2E Test — Self-Hosted Docker Install                               ║
+# ║  aether E2E Test — Self-Hosted Docker Install                               ║
 # ║                                                                            ║
-# ║  Tests the complete get-acme.sh flow from clean install to working        ║
+# ║  Tests the complete get-aether.sh flow from clean install to working        ║
 # ║  dashboard. Run with: bash tests/e2e/test-self-hosted-install.sh           ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -19,9 +19,9 @@ fail()    { echo "  ${RED}[FAIL]${NC} $*" >&2; }
 section() { echo ""; echo "${BOLD}${CYAN}$1${NC}"; echo ""; }
 
 # Config
-TEST_DIR="$HOME/.acme-e2e-test"
-INSTALL_DIR="$HOME/.acme"
-OWNER_EMAIL="test@acme.ai"
+TEST_DIR="$HOME/.aether-e2e-test"
+INSTALL_DIR="$HOME/.aether"
+OWNER_EMAIL="test@aether.ai"
 OWNER_PASSWORD="testpass123"
 FRONTEND_URL="http://localhost:13737"
 API_URL="http://localhost:13738"
@@ -51,13 +51,13 @@ run_test() {
 section "STEP 1: Pre-Flight Cleanup"
 # ═══════════════════════════════════════════════════════════════════════════════
 
-info "Stopping any existing Acme containers..."
-docker ps -a --format '{{.Names}}' | grep -E '^(acme-|supabase_)' | xargs -r docker rm -f 2>/dev/null || true
+info "Stopping any existing aether containers..."
+docker ps -a --format '{{.Names}}' | grep -E '^(aether-|supabase_)' | xargs -r docker rm -f 2>/dev/null || true
 
-info "Removing existing Acme installation..."
+info "Removing existing aether installation..."
 rm -rf "$INSTALL_DIR"
 
-info "Freeing Acme ports..."
+info "Freeing aether ports..."
 for port in 13737 13738 13740 13741; do
     lsof -t -i:$port 2>/dev/null | xargs -r kill -9 2>/dev/null || true
 done
@@ -65,7 +65,7 @@ done
 pass "Cleanup complete"
 
 # ═══════════════════════════════════════════════════════════════════════════════
-section "STEP 2: Run get-acme.sh Installer"
+section "STEP 2: Run get-aether.sh Installer"
 # ═══════════════════════════════════════════════════════════════════════════════
 
 info "Running installer with automated inputs..."
@@ -73,11 +73,11 @@ cd /Users/markokraemer/Projects/heyagi/computer
 
 # Run installer with all inputs provided via stdin
 # 1 = local mode, 1 = Docker database, email, password, password, n = skip integrations
-export ACME_OWNER_EMAIL="$OWNER_EMAIL"
-export ACME_OWNER_PASSWORD="$OWNER_PASSWORD"
+export AETHER_OWNER_EMAIL="$OWNER_EMAIL"
+export AETHER_OWNER_PASSWORD="$OWNER_PASSWORD"
 
-printf "1\n1\nn\n" | bash scripts/get-acme.sh --local 2>&1 | tee /tmp/acme-install.log | while read line; do
-    if [[ "$line" == *"Acme is running"* ]]; then
+printf "1\n1\nn\n" | bash scripts/get-aether.sh --local 2>&1 | tee /tmp/aether-install.log | while read line; do
+    if [[ "$line" == *"aether is running"* ]]; then
         pass "Installer completed successfully"
         break
     fi
@@ -98,19 +98,19 @@ section "STEP 3: Verify Containers"
 sleep 5
 
 run_test "Frontend container running" \
-    "docker ps | grep -q 'acme-frontend-1'"
+    "docker ps | grep -q 'aether-frontend-1'"
 
 run_test "API container running" \
-    "docker ps | grep -q 'acme-acme-api-1'"
+    "docker ps | grep -q 'aether-aether-api-1'"
 
 run_test "Sandbox container running" \
-    "docker ps | grep -q 'acme-sandbox'"
+    "docker ps | grep -q 'aether-sandbox'"
 
 run_test "Supabase Kong running" \
-    "docker ps | grep -q 'acme-supabase-kong-1'"
+    "docker ps | grep -q 'aether-supabase-kong-1'"
 
 run_test "Supabase Auth running" \
-    "docker ps | grep -q 'acme-supabase-auth-1'"
+    "docker ps | grep -q 'aether-supabase-auth-1'"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 section "STEP 4: Verify Services Health"
@@ -129,7 +129,7 @@ run_test "Supabase Kong responds on port 13740" \
     "curl -sf $SUPABASE_URL/auth/v1/health -o /dev/null"
 
 run_test "Sandbox responds on port 14000" \
-    "curl -sf http://localhost:14000/acme/health -o /dev/null"
+    "curl -sf http://localhost:14000/aether/health -o /dev/null"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 section "STEP 5: Test Authentication Flow"
@@ -169,13 +169,13 @@ print(urllib.parse.quote(json.dumps(session, separators=(',', ':')), safe=''))
 ")
 
 run_test "/dashboard accessible with auth" \
-    "curl -sf '$FRONTEND_URL/dashboard' -H 'Cookie: sb-acme-auth-token.0=$COOKIE_VALUE' -o /dev/null"
+    "curl -sf '$FRONTEND_URL/dashboard' -H 'Cookie: sb-aether-auth-token.0=$COOKIE_VALUE' -o /dev/null"
 
 run_test "/onboarding accessible with auth" \
-    "curl -sf '$FRONTEND_URL/onboarding' -H 'Cookie: sb-acme-auth-token.0=$COOKIE_VALUE' -o /dev/null"
+    "curl -sf '$FRONTEND_URL/onboarding' -H 'Cookie: sb-aether-auth-token.0=$COOKIE_VALUE' -o /dev/null"
 
 run_test "/dashboard returns dashboard content" \
-    "curl -sf '$FRONTEND_URL/dashboard' -H 'Cookie: sb-acme-auth-token.0=$COOKIE_VALUE' | grep -q 'Acme'"
+    "curl -sf '$FRONTEND_URL/dashboard' -H 'Cookie: sb-aether-auth-token.0=$COOKIE_VALUE' | grep -q 'aether'"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 section "STEP 7: Test Onboarding Flow"
@@ -202,12 +202,12 @@ section "STEP 8: Verify Frontend Configuration"
 info "Checking frontend bundle configuration..."
 
 # Check that frontend has correct Supabase URL
-docker exec acme-frontend-1 sh -c 'grep -q "localhost:13740" /app/apps/web/.next/static/chunks/*.js' && \
+docker exec aether-frontend-1 sh -c 'grep -q "localhost:13740" /app/apps/web/.next/static/chunks/*.js' && \
     pass "Frontend has correct Supabase URL" || \
     fail "Frontend missing correct Supabase URL"
 
 # Check that frontend doesn't have dev URLs
-docker exec acme-frontend-1 sh -c 'grep -q "127.0.0.1:54321" /app/apps/web/.next/static/chunks/*.js 2>/dev/null' && \
+docker exec aether-frontend-1 sh -c 'grep -q "127.0.0.1:54321" /app/apps/web/.next/static/chunks/*.js 2>/dev/null' && \
     fail "Frontend still has dev Supabase URL" || \
     pass "Frontend doesn't have dev URLs"
 
@@ -224,7 +224,7 @@ echo ""
 if [ $TESTS_FAILED -eq 0 ]; then
     echo "${GREEN}${BOLD}✅ All tests passed!${NC}"
     echo ""
-    echo "Acme is fully operational at: ${CYAN}$FRONTEND_URL${NC}"
+    echo "aether is fully operational at: ${CYAN}$FRONTEND_URL${NC}"
     echo "Login with: ${CYAN}$OWNER_EMAIL${NC} / ${CYAN}$OWNER_PASSWORD${NC}"
     exit 0
 else

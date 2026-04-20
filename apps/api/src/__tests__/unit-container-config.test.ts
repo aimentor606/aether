@@ -8,13 +8,13 @@ describe('sandbox container port config', () => {
   });
 
   test('buildContainerConfig inherits non-conflicting default ports', () => {
-    const config = buildContainerConfig({ image: 'acme/computer:0.8.20' });
+    const config = buildContainerConfig({ image: 'aether/computer:0.8.20' });
     expect(config.ports).toEqual(DEFAULT_PORTS);
     expect(config.ports).not.toContain('3456:3456');
   });
 
   test('buildDockerRunCommand does not emit 3456 binding by default', () => {
-    const config = buildContainerConfig({ image: 'acme/computer:0.8.20' });
+    const config = buildContainerConfig({ image: 'aether/computer:0.8.20' });
     const command = buildDockerRunCommand(config);
     expect(command).not.toContain('-p 3456:3456');
     expect(command).toContain('-p 8000:8000');
@@ -29,7 +29,7 @@ describe('sandbox container port config', () => {
 
   test('buildContainerConfig sanitizes custom ports too', () => {
     const config = buildContainerConfig({
-      image: 'acme/computer:0.8.20',
+      image: 'aether/computer:0.8.20',
       ports: ['3456:3456', '8000:8000'],
     });
     expect(config.ports).toEqual(['8000:8000']);

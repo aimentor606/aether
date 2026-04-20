@@ -14,12 +14,16 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@acme/vertical-finance": ["packages/vertical/finance/src"],
-      "@acme/vertical-finance/*": ["packages/vertical/finance/src/*"],
-      "@acme/vertical-healthcare": ["packages/vertical/healthcare/src"],
-      "@acme/vertical-healthcare/*": ["packages/vertical/healthcare/src/*"],
-      "@acme/vertical-retail": ["packages/vertical/retail/src"],
-      "@acme/vertical-retail/*": ["packages/vertical/retail/src/*"]
+      "@aether/vertical-finance": ["packages/finance/src"],
+      "@aether/vertical-finance/*": ["packages/finance/src/*"],
+      "@aether/vertical-healthcare": ["packages/healthcare/src"],
+      "@aether/vertical-healthcare/*": ["packages/healthcare/src/*"],
+      "@aether/vertical-retail": ["packages/retail/src"],
+      "@aether/vertical-retail/*": ["packages/retail/src/*"],
+      "@aether/ui": ["packages/ui/src"],
+      "@aether/ui/*": ["packages/ui/src/*"],
+      "@aether/sdk": ["packages/sdk/src"],
+      "@aether/sdk/*": ["packages/sdk/src/*"]
     }
   }
 }

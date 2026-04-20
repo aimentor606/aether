@@ -1,4 +1,4 @@
-# Acme E2E Test — Full Install to Verify
+# Aether E2E Test — Full Install to Verify
 
 Complete test from clean slate to every feature working.
 
@@ -7,7 +7,7 @@ Complete test from clean slate to every feature working.
 ## Prerequisites
 
 - Docker Desktop running
-- No existing `~/.acme/` directory (or willing to reinstall)
+- No existing `~/.aether/` directory (or willing to reinstall)
 - Pipedream Connect credentials (optional — needed for Step 14+)
 
 ---
@@ -16,12 +16,12 @@ Complete test from clean slate to every feature working.
 
 ### Step 1 — Nuke any previous install
 ```bash
-cd ~/.acme && docker compose down -v 2>/dev/null; docker rm -f acme-sandbox 2>/dev/null; rm -rf ~/.acme
+cd ~/.aether && docker compose down -v 2>/dev/null; docker rm -f aether-sandbox 2>/dev/null; rm -rf ~/.aether
 ```
 
 ### Step 2 — Run the installer
 ```bash
-bash scripts/get-acme.sh
+bash scripts/get-aether.sh
 ```
 
 ### Step 3 — Choose Local mode
@@ -31,14 +31,14 @@ bash scripts/get-acme.sh
 - Press `N` to skip (or `Y` + enter Pipedream creds)
 
 ### Step 5 — Wait for image pull + startup
-- Installer pulls 4 images: postgres, frontend, acme-api, computer
-- Ends with "Acme is running!" + opens browser to `/setup`
+- Installer pulls 4 images: postgres, frontend, aether-api, computer
+- Ends with "Aether is running!" + opens browser to `/setup`
 
 **VERIFY:**
 ```bash
-docker ps --format "table {{.Names}}\t{{.Status}}" | grep acme
+docker ps --format "table {{.Names}}\t{{.Status}}" | grep aether
 ```
-- [ ] 4 containers running: `acme-postgres-1`, `acme-frontend-1`, `acme-acme-api-1`, `acme-sandbox`
+- [ ] 4 containers running: `aether-postgres-1`, `aether-frontend-1`, `aether-aether-api-1`, `aether-sandbox`
 
 ---
 
@@ -48,7 +48,7 @@ docker ps --format "table {{.Names}}\t{{.Status}}" | grep acme
 ```bash
 curl -s http://localhost:13738/health | jq .
 ```
-- [ ] Returns `{"status":"ok","service":"acme-api",...}`
+- [ ] Returns `{"status":"ok","service":"aether-api",...}`
 
 ### Step 7 — API health (v1 prefix)
 ```bash
@@ -64,13 +64,13 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:13737
 
 ### Step 9 — Database schema created
 ```bash
-docker exec acme-postgres-1 psql -U postgres -c "\dt acme.*"
+docker exec aether-postgres-1 psql -U postgres -c "\dt aether.*"
 ```
 - [ ] 12 tables listed (api_keys, channel_configs, channel_identity_map, channel_messages, channel_sessions, deployments, executions, integrations, sandbox_integrations, sandboxes, server_entries, triggers)
 
 ### Step 10 — Sandbox healthy
 ```bash
-curl -s http://localhost:13740/acme/health
+curl -s http://localhost:13740/aether/health
 ```
 - [ ] Returns health response (200)
 
@@ -190,7 +190,7 @@ curl -s http://localhost:13738/v1/providers/health | jq .
 
 ### Step 32 — Sandbox preview proxy
 ```bash
-curl -s http://localhost:13738/v1/preview/acme-sandbox/8000/acme/health
+curl -s http://localhost:13738/v1/preview/aether-sandbox/8000/aether/health
 ```
 - [ ] Returns sandbox health through the API proxy
 
@@ -202,7 +202,7 @@ curl -s http://localhost:13738/v1/preview/acme-sandbox/8000/acme/health
 
 ### Step 34 — Verify sandbox workspace
 ```bash
-docker exec acme-sandbox ls /workspace
+docker exec aether-sandbox ls /workspace
 ```
 - [ ] Returns workspace contents
 
@@ -214,7 +214,7 @@ docker exec acme-sandbox ls /workspace
 
 ### Step 35 — Verify Pipedream env vars
 ```bash
-docker exec acme-acme-api-1 printenv | grep PIPEDREAM
+docker exec aether-aether-api-1 printenv | grep PIPEDREAM
 ```
 - [ ] `PIPEDREAM_CLIENT_ID`, `PIPEDREAM_CLIENT_SECRET`, `PIPEDREAM_PROJECT_ID` are set
 
@@ -242,26 +242,26 @@ curl -s http://localhost:13738/v1/integrations/connections | jq .
 
 ### Step 39 — CLI help
 ```bash
-~/.acme/acme help
+~/.aether/aether help
 ```
 - [ ] Shows command list (start, stop, restart, logs, status, setup, update, open, etc.)
 
 ### Step 40 — CLI status
 ```bash
-~/.acme/acme status
+~/.aether/aether status
 ```
 - [ ] Shows all 4 services running
 
 ### Step 41 — CLI stop + start
 ```bash
-~/.acme/acme stop && ~/.acme/acme start
+~/.aether/aether stop && ~/.aether/aether start
 ```
 - [ ] Services stop cleanly then restart
 - [ ] All 4 containers back to running
 
 ### Step 42 — CLI logs
 ```bash
-~/.acme/acme logs acme-api-1 --tail 10
+~/.aether/aether logs aether-api-1 --tail 10
 ```
 - [ ] Shows recent API logs
 
@@ -271,8 +271,8 @@ curl -s http://localhost:13738/v1/integrations/connections | jq .
 
 ### Step 43 — Restart survives
 ```bash
-docker compose -f ~/.acme/docker-compose.yml --project-name acme down
-docker compose -f ~/.acme/docker-compose.yml --project-name acme up -d
+docker compose -f ~/.aether/docker-compose.yml --project-name aether down
+docker compose -f ~/.aether/docker-compose.yml --project-name aether up -d
 ```
 - Wait for healthy, then:
 ```bash
@@ -282,7 +282,7 @@ curl -s http://localhost:13738/v1/integrations/connections | jq .
 
 ### Step 44 — Schema re-push is idempotent
 ```bash
-docker logs acme-acme-api-1 2>&1 | grep "\[schema\]"
+docker logs aether-aether-api-1 2>&1 | grep "\[schema\]"
 ```
 - [ ] Shows "Schema pushed successfully" (no errors, no duplicate table errors)
 
@@ -292,7 +292,7 @@ docker logs acme-acme-api-1 2>&1 | grep "\[schema\]"
 
 ### Step 45 — API survives DB restart
 ```bash
-docker restart acme-postgres-1
+docker restart aether-postgres-1
 ```
 - Wait 10s, then:
 ```bash

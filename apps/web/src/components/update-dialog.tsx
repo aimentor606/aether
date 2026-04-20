@@ -1,7 +1,20 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Check, XCircle, ArrowDownToLine, RotateCw, Sparkles, Bug, Zap, AlertTriangle, Shield, RefreshCw, Terminal, Copy } from 'lucide-react';
+import {
+  Check,
+  XCircle,
+  ArrowDownToLine,
+  RotateCw,
+  Sparkles,
+  Bug,
+  Zap,
+  AlertTriangle,
+  Shield,
+  RefreshCw,
+  Terminal,
+  Copy,
+} from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import {
   AlertDialog,
@@ -25,13 +38,16 @@ type DialogStep = 'confirm' | 'updating' | 'done' | 'failed';
 
 // ── Changelog items ──────────────────────────────────────────────────────────
 
-const changeTypeConfig: Record<string, { icon: typeof Sparkles; color: string }> = {
-  feature:     { icon: Sparkles,      color: 'text-emerald-500' },
-  fix:         { icon: Bug,           color: 'text-red-400' },
-  improvement: { icon: Zap,           color: 'text-blue-400' },
-  breaking:    { icon: AlertTriangle, color: 'text-amber-500' },
-  upstream:    { icon: RefreshCw,     color: 'text-violet-400' },
-  security:    { icon: Shield,        color: 'text-rose-400' },
+const changeTypeConfig: Record<
+  string,
+  { icon: typeof Sparkles; color: string }
+> = {
+  feature: { icon: Sparkles, color: 'text-emerald-500' },
+  fix: { icon: Bug, color: 'text-red-400' },
+  improvement: { icon: Zap, color: 'text-blue-400' },
+  breaking: { icon: AlertTriangle, color: 'text-amber-500' },
+  upstream: { icon: RefreshCw, color: 'text-violet-400' },
+  security: { icon: Shield, color: 'text-rose-400' },
   deprecation: { icon: AlertTriangle, color: 'text-orange-400' },
 };
 
@@ -123,11 +139,16 @@ export function UpdateDialog({
     const active = state.servers.find((s) => s.id === state.activeServerId);
     if (!active?.sandboxId) return false;
 
-    const backendUrl = (getEnv().BACKEND_URL || 'http://localhost:8008/v1').replace(/\/+$/, '');
+    const backendUrl = (
+      getEnv().BACKEND_URL || 'http://localhost:8008/v1'
+    ).replace(/\/+$/, '');
     const url = `${backendUrl}/p/${active.sandboxId}/8000/global/health`;
 
     try {
-      const res = await authenticatedFetch(url, { method: 'GET', signal: AbortSignal.timeout(5000) });
+      const res = await authenticatedFetch(url, {
+        method: 'GET',
+        signal: AbortSignal.timeout(5000),
+      });
       return res.ok;
     } catch {
       return false;
@@ -159,7 +180,9 @@ export function UpdateDialog({
     };
 
     healthPollRef.current = setTimeout(poll, 3000);
-    return () => { if (healthPollRef.current) clearTimeout(healthPollRef.current); };
+    return () => {
+      if (healthPollRef.current) clearTimeout(healthPollRef.current);
+    };
   }, [isComplete, isFailed, step, pollHealth]);
 
   useEffect(() => {
@@ -186,7 +209,7 @@ export function UpdateDialog({
 
   const copyCliCommand = async () => {
     try {
-      await navigator.clipboard.writeText('acme update');
+      await navigator.clipboard.writeText('aether update');
     } catch {
       // no-op
     }
@@ -196,15 +219,25 @@ export function UpdateDialog({
   const visibleChanges = expanded ? changes : changes.slice(0, 4);
   const hasMore = changes.length > 4 && !expanded;
 
-  const circularProgress = isReconnected ? 100 : isReconnecting ? 95 : phaseProgress;
+  const circularProgress = isReconnected
+    ? 100
+    : isReconnecting
+      ? 95
+      : phaseProgress;
   const activeLabel = isReconnected
     ? PHASE_LABEL.reconnected
     : isReconnecting
       ? PHASE_LABEL.reconnecting
-      : PHASE_LABEL[phase] ?? 'Updating...';
+      : (PHASE_LABEL[phase] ?? 'Updating...');
 
   return (
-    <AlertDialog open={open} onOpenChange={(o) => { if (!o && (step === 'confirm' || step === 'done' || step === 'failed')) onClose(); }}>
+    <AlertDialog
+      open={open}
+      onOpenChange={(o) => {
+        if (!o && (step === 'confirm' || step === 'done' || step === 'failed'))
+          onClose();
+      }}
+    >
       <AlertDialogContent className="sm:max-w-lg">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
@@ -212,50 +245,69 @@ export function UpdateDialog({
             Update to {formatVersion(latestVersion)}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            {currentVersion
-              ? <>Your sandbox is running <span className="font-mono font-medium text-foreground">{formatVersion(currentVersion)}</span>.</>
-              : 'A new version is available.'}
-            {' '}This will restart your sandbox.
+            {currentVersion ? (
+              <>
+                Your sandbox is running{' '}
+                <span className="font-mono font-medium text-foreground">
+                  {formatVersion(currentVersion)}
+                </span>
+                .
+              </>
+            ) : (
+              'A new version is available.'
+            )}{' '}
+            This will restart your sandbox.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AnimatePresence mode="wait">
           {step === 'confirm' && (
-            <motion.div key="confirm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <motion.div
+              key="confirm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
               {isLocalSelfHosted ? (
                 <Alert variant="warning" className="mt-4">
                   <Terminal className="h-4 w-4" />
                   <AlertTitle>Self-hosted updates run from the host</AlertTitle>
                   <AlertDescription>
                     <p>
-                      If you installed Acme via the CLI, updates should be run from your terminal so the full stack updates together.
+                      If you installed Aether via the CLI, updates should be run
+                      from your terminal so the full stack updates together.
                     </p>
                     <div className="mt-2 rounded-xl bg-muted/40 px-3 py-2 font-mono text-xs text-foreground/80">
-                      acme update
+                      aether update
                     </div>
                   </AlertDescription>
                 </Alert>
-              ) : changes.length > 0 && (
-                <div className="rounded-lg border border-border/50 bg-muted/30 mt-4">
-                  <div className="max-h-72 overflow-y-auto px-3 py-2.5 space-y-0.5">
-                    {visibleChanges.map((change, i) => (
-                      <ChangeItem key={i} change={change} />
-                    ))}
+              ) : (
+                changes.length > 0 && (
+                  <div className="rounded-lg border border-border/50 bg-muted/30 mt-4">
+                    <div className="max-h-72 overflow-y-auto px-3 py-2.5 space-y-0.5">
+                      {visibleChanges.map((change, i) => (
+                        <ChangeItem key={i} change={change} />
+                      ))}
+                    </div>
+                    {hasMore && (
+                      <Button
+                        onClick={() => setExpanded(true)}
+                        variant="link"
+                        size="sm"
+                        className="w-full border-t border-border/30 rounded-none h-auto py-2"
+                      >
+                        Show {changes.length - 4} more changes
+                      </Button>
+                    )}
                   </div>
-                  {hasMore && (
-                    <Button
-                      onClick={() => setExpanded(true)}
-                      variant="link"
-                      size="sm"
-                      className="w-full border-t border-border/30 rounded-none h-auto py-2"
-                    >
-                      Show {changes.length - 4} more changes
-                    </Button>
-                  )}
-                </div>
+                )
               )}
 
               <AlertDialogFooter className="mt-4">
-                <Button variant="outline" onClick={onClose}>Cancel</Button>
+                <Button variant="outline" onClick={onClose}>
+                  Cancel
+                </Button>
                 {isLocalSelfHosted ? (
                   <Button onClick={copyCliCommand} className="gap-2">
                     <Copy className="h-4 w-4" />
@@ -329,7 +381,12 @@ export function UpdateDialog({
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 300,
+                      damping: 20,
+                      delay: 0.1,
+                    }}
                   >
                     <Check className="h-7 w-7 text-white" />
                   </motion.div>
@@ -342,9 +399,12 @@ export function UpdateDialog({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <p className="text-base font-semibold text-foreground">Update Complete</p>
+                <p className="text-base font-semibold text-foreground">
+                  Update Complete
+                </p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Now running {formatVersion(updateResult?.currentVersion ?? latestVersion)}
+                  Now running{' '}
+                  {formatVersion(updateResult?.currentVersion ?? latestVersion)}
                 </p>
               </motion.div>
             </motion.div>
@@ -352,17 +412,27 @@ export function UpdateDialog({
 
           {/* ── Failed Step ── */}
           {step === 'failed' && (
-            <motion.div key="failed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <motion.div
+              key="failed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
               <div className="flex flex-col items-center py-6">
                 <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 border-2 border-red-500/30">
                   <XCircle className="h-7 w-7 text-red-500" />
                 </div>
-                <p className="text-base font-semibold text-foreground mt-4">Update Failed</p>
+                <p className="text-base font-semibold text-foreground mt-4">
+                  Update Failed
+                </p>
               </div>
 
               <Alert variant="destructive" className="mt-1">
                 <XCircle className="h-4 w-4" />
-                <AlertTitle>{phaseMessage || 'Something went wrong during the update.'}</AlertTitle>
+                <AlertTitle>
+                  {phaseMessage || 'Something went wrong during the update.'}
+                </AlertTitle>
                 {errorMessage && (
                   <AlertDescription>
                     <div className="max-h-48 overflow-y-auto whitespace-pre-wrap rounded-xl bg-muted/40 px-3 py-2 font-mono text-xs text-foreground/80">
@@ -373,8 +443,16 @@ export function UpdateDialog({
               </Alert>
 
               <AlertDialogFooter>
-                <Button variant="outline" onClick={onClose}>Close</Button>
-                <Button onClick={() => { setStep('updating'); onRetry(); }} className="gap-2">
+                <Button variant="outline" onClick={onClose}>
+                  Close
+                </Button>
+                <Button
+                  onClick={() => {
+                    setStep('updating');
+                    onRetry();
+                  }}
+                  className="gap-2"
+                >
                   <RotateCw className="h-4 w-4" />
                   Retry
                 </Button>

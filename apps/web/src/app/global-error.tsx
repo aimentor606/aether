@@ -14,7 +14,7 @@ export default function GlobalError({
   const [timestamp, setTimestamp] = useState('');
 
   useEffect(() => {
-    console.error('[Acme Global Error]', error);
+    console.error('[Aether Global Error]', error);
     // Report to Better Stack via Sentry SDK
     Sentry.captureException(error, {
       tags: {
@@ -104,7 +104,7 @@ export default function GlobalError({
             textAlign: 'center',
           }}
         >
-          {/* Acme symbol — inline SVG */}
+          {/* Aether symbol — inline SVG */}
           <svg
             width="40"
             height="33"
@@ -201,14 +201,14 @@ export default function GlobalError({
           >
             If this persists, contact{' '}
             <a
-              href="mailto:support@acme.ai"
+              href="mailto:support@aether.ai"
               style={{
                 color: 'rgba(255,255,255,0.5)',
                 textDecoration: 'underline',
                 textDecorationColor: 'rgba(255,255,255,0.2)',
               }}
             >
-              support@acme.ai
+              support@aether.ai
             </a>
           </div>
 

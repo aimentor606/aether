@@ -32,7 +32,7 @@ import {
   type LspDiagnostic,
   type DiagnosticSeverity,
 } from '@/stores/diagnostics-store';
-import { useAcmeComputerStore } from '@/stores/acme-computer-store';
+import { useAetherComputerStore } from '@/stores/aether-computer-store';
 
 // ============================================================================
 // Constants & Helpers
@@ -231,7 +231,7 @@ export function DiagnosticsBadge() {
   const byFile = useDiagnosticsStore((s) => s.byFile);
   const [open, setOpen] = useState(false);
 
-  const openFileInComputer = useAcmeComputerStore((s) => s.openFileInComputer);
+  const openFileInComputer = useAetherComputerStore((s) => s.openFileInComputer);
 
   const allDiagnostics = useMemo(() => {
     const all: LspDiagnostic[] = [];
@@ -352,7 +352,7 @@ interface DiagnosticsDialogProps {
 
 export function DiagnosticsDialog({ open, onOpenChange }: DiagnosticsDialogProps) {
   const byFile = useDiagnosticsStore((s) => s.byFile);
-  const openFileInComputer = useAcmeComputerStore((s) => s.openFileInComputer);
+  const openFileInComputer = useAetherComputerStore((s) => s.openFileInComputer);
 
   const allDiagnostics = useMemo(() => {
     const all: LspDiagnostic[] = [];

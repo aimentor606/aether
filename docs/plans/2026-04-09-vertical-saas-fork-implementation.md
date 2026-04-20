@@ -55,7 +55,7 @@
 - [ ] 创建 `packages/db/src/schema/vertical.ts`（行业表定义）
 - [ ] 在 `packages/db/src/index.ts` 中导出新 schema
 - [ ] 创建 Supabase migration 脚本
-- [ ] 不修改 `packages/db/src/schema/acme.ts`
+- [ ] 不修改 `packages/db/src/schema/aether.ts`
 
 **预计耗时**：2-3 小时
 
@@ -64,7 +64,7 @@
 ## 阶段 4：品牌主题覆盖
 
 ### 步骤 4.1：替换品牌资源
-- [ ] 替换 `apps/web/public/acme-brandmark-bg.svg` → 你的 logo
+- [ ] 替换 `apps/web/public/aether-brandmark-bg.svg` → 你的 logo
 - [ ] 替换 favicon
 - [ ] 更新 `apps/web/src/app/globals.css` 品牌色变量
 
@@ -96,8 +96,8 @@
 ## 阶段 6：垂直行业功能（后续迭代）
 
 ### 步骤 6.1：行业 Agent/Tool
-- [ ] 在 `core/acme-master/opencode/tools/` 添加行业专用工具
-- [ ] 在 `core/acme-master/opencode/plugin/` 添加行业插件
+- [ ] 在 `core/aether-master/opencode/tools/` 添加行业专用工具
+- [ ] 在 `core/aether-master/opencode/plugin/` 添加行业插件
 - [ ] 在 `apps/web` 注册工具的 UI 渲染器（ToolRegistry）
 
 ### 步骤 6.2：行业 API 路由

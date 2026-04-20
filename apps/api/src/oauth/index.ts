@@ -14,7 +14,7 @@ import {
   oauthRefreshTokens,
   accountMembers,
   sandboxes,
-} from '@acme/db';
+} from '@aether/db';
 
 // ─── Token Hashing ──────────────────────────────────────────────────────────
 
@@ -107,11 +107,11 @@ function computeCodeChallenge(codeVerifier: string): string {
 // ─── Token Generation ───────────────────────────────────────────────────────
 
 function generateAccessToken(): string {
-  return `acme_oat_${randomAlphanumeric(48)}`;
+  return `aether_oat_${randomAlphanumeric(48)}`;
 }
 
 function generateRefreshToken(): string {
-  return `acme_ort_${randomAlphanumeric(48)}`;
+  return `aether_ort_${randomAlphanumeric(48)}`;
 }
 
 function generateAuthCode(): string {
@@ -203,7 +203,7 @@ oauthApp.get('/authorize', async (c) => {
     return c.json({ error: 'invalid_request', error_description: 'redirect_uri not in allowed list' }, 400);
   }
 
-  const frontendUrl = config.FRONTEND_URL || 'https://acme.dev';
+  const frontendUrl = config.FRONTEND_URL || 'https://aether.dev';
   const consentUrl = new URL(`${frontendUrl}/oauth/authorize`);
   consentUrl.searchParams.set('client_name', client.name);
   consentUrl.searchParams.set('client_id', clientId);

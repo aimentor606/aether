@@ -125,7 +125,7 @@ export default function NotificationsScreen() {
               <ToggleRow
                 icon={HelpCircle}
                 title="Questions"
-                description="When Acme needs your input to continue"
+                description="When Aether needs your input to continue"
                 value={preferences.onQuestion}
                 onValueChange={(v) => handleToggle('onQuestion', v)}
                 trackOff={trackOff}
@@ -134,7 +134,7 @@ export default function NotificationsScreen() {
               <ToggleRow
                 icon={ShieldCheck}
                 title="Permission Requests"
-                description="When Acme needs permission to use a tool"
+                description="When Aether needs permission to use a tool"
                 value={preferences.onPermission}
                 onValueChange={(v) => handleToggle('onPermission', v)}
                 trackOff={trackOff}

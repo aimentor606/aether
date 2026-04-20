@@ -1,15 +1,15 @@
 import {
   uuid,
   varchar,
-  text,
   timestamp,
   jsonb,
   index,
   boolean,
 } from 'drizzle-orm/pg-core';
-import { acmeSchema } from './kortix';
+import { relations } from 'drizzle-orm';
+import { aetherSchema, accounts } from './aether';
 
-export const verticalTables = acmeSchema.table('vertical_entities', {
+export const verticalTables = aetherSchema.table('vertical_entities', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   type: varchar('type', { length: 100 }).notNull(),
@@ -21,7 +21,7 @@ export const verticalTables = acmeSchema.table('vertical_entities', {
   index('idx_vertical_entities_name').on(table.name),
 ]);
 
-export const featureFlags = acmeSchema.table('feature_flags', {
+export const featureFlags = aetherSchema.table('feature_flags', {
   id: uuid('id').primaryKey().defaultRandom(),
   accountId: uuid('account_id').notNull(),
   verticalId: varchar('vertical_id', { length: 100 }).notNull(),
@@ -36,7 +36,14 @@ export const featureFlags = acmeSchema.table('feature_flags', {
   index('idx_feature_flags_name').on(table.featureName),
 ]);
 
-export const verticalConfigs = acmeSchema.table('vertical_configs', {
+export const featureFlagsRelations = relations(featureFlags, ({ one }) => ({
+  account: one(accounts, {
+    fields: [featureFlags.accountId],
+    references: [accounts.accountId],
+  }),
+}));
+
+export const verticalConfigs = aetherSchema.table('vertical_configs', {
   id: uuid('id').primaryKey().defaultRandom(),
   accountId: uuid('account_id').notNull(),
   verticalId: varchar('vertical_id', { length: 100 }).notNull(),
@@ -48,7 +55,14 @@ export const verticalConfigs = acmeSchema.table('vertical_configs', {
   index('idx_vertical_configs_vertical').on(table.verticalId),
 ]);
 
-export const accountIntegrations = acmeSchema.table('account_integrations', {
+export const verticalConfigsRelations = relations(verticalConfigs, ({ one }) => ({
+  account: one(accounts, {
+    fields: [verticalConfigs.accountId],
+    references: [accounts.accountId],
+  }),
+}));
+
+export const accountIntegrations = aetherSchema.table('account_integrations', {
   id: uuid('id').primaryKey().defaultRandom(),
   accountId: uuid('account_id').notNull(),
   integrationType: varchar('integration_type', { length: 100 }).notNull(),
@@ -60,3 +74,10 @@ export const accountIntegrations = acmeSchema.table('account_integrations', {
   index('idx_account_integrations_account').on(table.accountId),
   index('idx_account_integrations_type').on(table.integrationType),
 ]);
+
+export const accountIntegrationsRelations = relations(accountIntegrations, ({ one }) => ({
+  account: one(accounts, {
+    fields: [accountIntegrations.accountId],
+    references: [accounts.accountId],
+  }),
+}));

@@ -1,10 +1,19 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Button,
+  Skeleton,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@aether/ui/primitives';
 import { toast } from '@/lib/toast';
 import {
   Users,
@@ -15,16 +24,24 @@ import {
   ChevronRight,
   CreditCard,
   ArrowRight,
+  Loader2,
   Activity,
   DollarSign,
   BarChart3,
   UserCheck,
   Zap,
 } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { Popover, PopoverContent, PopoverTrigger } from '@aether/ui/primitives';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format, addDays, subDays, startOfWeek, startOfMonth, startOfQuarter, startOfYear } from 'date-fns';
+import {
+  format,
+  addDays,
+  subDays,
+  startOfWeek,
+  startOfMonth,
+  startOfQuarter,
+  startOfYear,
+} from 'date-fns';
 import type { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
 import {
@@ -40,29 +57,39 @@ import {
 } from '@/hooks/admin/use-admin-analytics';
 import { AdminUserTable } from '@/components/admin/admin-user-table';
 import { AdminUserDetailsDialog } from '@/components/admin/admin-user-details-dialog';
-import { useAdminUserList, useRefreshUserData, type UserSummary } from '@/hooks/admin/use-admin-users';
+import {
+  useAdminUserList,
+  useRefreshUserData,
+  type UserSummary,
+} from '@/hooks/admin/use-admin-users';
 
-import { UserEmailLink, MetricCard, ThreadBrowser, RetentionTab, ARRSimulator } from './components';
+import {
+  UserEmailLink,
+  MetricCard,
+  ThreadBrowser,
+  RetentionTab,
+  ARRSimulator,
+} from './components';
 
-// Get current date in Berlin timezone
-function getBerlinToday(): Date {
+// Get current date in user's local timezone
+function getLocalToday(): Date {
   const now = new Date();
-  const berlinDate = now.toLocaleDateString('en-CA', { timeZone: 'Europe/Berlin' });
-  const [year, month, day] = berlinDate.split('-').map(Number);
-  return new Date(year, month - 1, day);
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
 export default function AdminAnalyticsPage() {
   const [dateRange, setDateRange] = useState<DateRange>({
-    from: getBerlinToday(),
-    to: getBerlinToday(),
+    from: getLocalToday(),
+    to: getLocalToday(),
   });
   const clickedDateRef = useRef<Date | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [tierFilter, setTierFilter] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('overview');
-  const [tierViewMode, setTierViewMode] = useState<'revenue' | 'cost' | 'profit'>('revenue');
+  const [tierViewMode, setTierViewMode] = useState<
+    'revenue' | 'cost' | 'profit'
+  >('revenue');
   const [includeStuckTasks, setIncludeStuckTasks] = useState(false);
 
   const handleCategoryFilter = (category: string | null) => {
@@ -80,7 +107,11 @@ export default function AdminAnalyticsPage() {
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
   const [pendingUserEmail, setPendingUserEmail] = useState<string | null>(null);
 
-  const { data: userSearchResult, isLoading: isSearchingUser, isFetching: isUserFetching } = useAdminUserList({
+  const {
+    data: userSearchResult,
+    isLoading: isSearchingUser,
+    isFetching: isUserFetching,
+  } = useAdminUserList({
     page: 1,
     page_size: 1,
     search_email: pendingUserEmail || undefined,
@@ -115,30 +146,65 @@ export default function AdminAnalyticsPage() {
     refreshUserStats();
   };
 
-  const berlinToday = getBerlinToday();
-  const dateFromString = dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : undefined;
-  const dateToString = dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : dateFromString;
+  const localToday = getLocalToday();
+  const dateFromString = dateRange.from
+    ? format(dateRange.from, 'yyyy-MM-dd')
+    : undefined;
+  const dateToString = dateRange.to
+    ? format(dateRange.to, 'yyyy-MM-dd')
+    : dateFromString;
 
   const { data: summary, isLoading: summaryLoading } = useAnalyticsSummary();
   const isThreadsTab = activeTab === 'threads';
-  const isOverviewOrThreads = activeTab === 'overview' || activeTab === 'threads';
-  const { data: distribution, isFetching: distributionFetching } = useMessageDistribution(dateFromString, dateToString, isThreadsTab);
-  const { data: categoryDistribution, isFetching: categoryFetching } = useCategoryDistribution(dateFromString, dateToString, tierFilter, isOverviewOrThreads);
-  const { data: tierDistribution } = useTierDistribution(dateFromString, dateToString, isThreadsTab);
-  const { data: conversionFunnel, isLoading: funnelLoading } = useConversionFunnel(dateFromString, dateToString, 'vercel');
-  const { data: engagementSummary, isLoading: engagementLoading, isFetching: engagementFetching } = useEngagementSummary(dateFromString, dateToString);
-  const { data: taskPerformance, isLoading: taskLoading, isFetching: taskFetching } = useTaskPerformance(dateFromString, dateToString);
-  const { data: profitability, isLoading: profitabilityLoading, isFetching: profitabilityFetching } = useProfitability(dateFromString, dateToString);
+  const isOverviewOrThreads =
+    activeTab === 'overview' || activeTab === 'threads';
+  const { data: distribution, isFetching: distributionFetching } =
+    useMessageDistribution(dateFromString, dateToString, isThreadsTab);
+  const { data: categoryDistribution, isFetching: categoryFetching } =
+    useCategoryDistribution(
+      dateFromString,
+      dateToString,
+      tierFilter,
+      isOverviewOrThreads,
+    );
+  const { data: tierDistribution } = useTierDistribution(
+    dateFromString,
+    dateToString,
+    isThreadsTab,
+  );
+  const { data: conversionFunnel, isLoading: funnelLoading } =
+    useConversionFunnel(dateFromString, dateToString, 'vercel');
+  const {
+    data: engagementSummary,
+    isLoading: engagementLoading,
+    isFetching: engagementFetching,
+  } = useEngagementSummary(dateFromString, dateToString);
+  const {
+    data: taskPerformance,
+    isLoading: taskLoading,
+    isFetching: taskFetching,
+  } = useTaskPerformance(dateFromString, dateToString);
+  const {
+    data: profitability,
+    isLoading: profitabilityLoading,
+    isFetching: profitabilityFetching,
+  } = useProfitability(dateFromString, dateToString);
 
-  const { data: churnData, isLoading: churnLoading } = useChurnByDate(dateFromString ?? '', dateToString ?? '');
+  const { data: churnData, isLoading: churnLoading } = useChurnByDate(
+    dateFromString ?? '',
+    dateToString ?? '',
+  );
 
-  const isOverviewFetching = engagementFetching || taskFetching || profitabilityFetching;
+  const isOverviewFetching =
+    engagementFetching || taskFetching || profitabilityFetching;
 
   // Navigation helpers
   const navigateDateRange = (direction: 'prev' | 'next') => {
     if (!dateRange.from) return;
     const toDate = dateRange.to || dateRange.from;
-    const daysDiff = Math.round((toDate.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
+    const daysDiff = Math.round(
+      (toDate.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24),
+    );
 
     if (direction === 'prev') {
       setDateRange({
@@ -147,23 +213,28 @@ export default function AdminAnalyticsPage() {
       });
     } else {
       const newTo = addDays(toDate, daysDiff + 1);
-      const cappedTo = newTo > berlinToday ? berlinToday : newTo;
+      const cappedTo = newTo > localToday ? localToday : newTo;
       const newFrom = addDays(dateRange.from, daysDiff + 1);
-      const cappedFrom = newFrom > berlinToday ? berlinToday : newFrom;
+      const cappedFrom = newFrom > localToday ? localToday : newFrom;
       setDateRange({ from: cappedFrom, to: cappedTo });
     }
   };
 
-  const isAtToday = (dateRange.to || dateRange.from) &&
-    format(dateRange.to || dateRange.from!, 'yyyy-MM-dd') === format(berlinToday, 'yyyy-MM-dd');
+  const isAtToday =
+    (dateRange.to || dateRange.from) &&
+    format(dateRange.to || dateRange.from!, 'yyyy-MM-dd') ===
+      format(localToday, 'yyyy-MM-dd');
 
-  const dateLabel = dateRange.from && dateRange.to && dateRange.from.getTime() === dateRange.to.getTime()
-    ? format(dateRange.from, 'MMM d, yyyy')
-    : dateRange.from && dateRange.to
-      ? `${format(dateRange.from, 'MMM d')} - ${format(dateRange.to, 'MMM d, yyyy')}`
-      : dateRange.from
-        ? format(dateRange.from, 'MMM d, yyyy')
-        : 'Select date';
+  const dateLabel =
+    dateRange.from &&
+    dateRange.to &&
+    dateRange.from.getTime() === dateRange.to.getTime()
+      ? format(dateRange.from, 'MMM d, yyyy')
+      : dateRange.from && dateRange.to
+        ? `${format(dateRange.from, 'MMM d')} - ${format(dateRange.to, 'MMM d, yyyy')}`
+        : dateRange.from
+          ? format(dateRange.from, 'MMM d, yyyy')
+          : 'Select date';
 
   return (
     <div className="min-h-screen bg-background">
@@ -172,7 +243,9 @@ export default function AdminAnalyticsPage() {
         <header className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Analytics</h1>
+              <h1 className="text-2xl font-semibold tracking-tight">
+                Analytics
+              </h1>
               <p className="text-sm text-muted-foreground mt-0.5">
                 Platform health and business metrics
               </p>
@@ -183,24 +256,50 @@ export default function AdminAnalyticsPage() {
               {/* Date Presets */}
               <div className="flex items-center gap-1 mr-2">
                 {[
-                  { label: 'Today', from: berlinToday, to: berlinToday },
-                  { label: '7D', from: subDays(berlinToday, 6), to: berlinToday },
-                  { label: '30D', from: subDays(berlinToday, 29), to: berlinToday },
-                  { label: 'WTD', from: startOfWeek(berlinToday, { weekStartsOn: 1 }), to: berlinToday },
-                  { label: 'MTD', from: startOfMonth(berlinToday), to: berlinToday },
-                  { label: 'QTD', from: startOfQuarter(berlinToday), to: berlinToday },
-                  { label: 'YTD', from: startOfYear(berlinToday), to: berlinToday },
+                  { label: 'Today', from: localToday, to: localToday },
+                  { label: '7D', from: subDays(localToday, 6), to: localToday },
+                  {
+                    label: '30D',
+                    from: subDays(localToday, 29),
+                    to: localToday,
+                  },
+                  {
+                    label: 'WTD',
+                    from: startOfWeek(localToday, { weekStartsOn: 1 }),
+                    to: localToday,
+                  },
+                  {
+                    label: 'MTD',
+                    from: startOfMonth(localToday),
+                    to: localToday,
+                  },
+                  {
+                    label: 'QTD',
+                    from: startOfQuarter(localToday),
+                    to: localToday,
+                  },
+                  {
+                    label: 'YTD',
+                    from: startOfYear(localToday),
+                    to: localToday,
+                  },
                 ].map((preset) => {
-                  const isActive = dateRange.from && dateRange.to &&
-                    format(dateRange.from, 'yyyy-MM-dd') === format(preset.from, 'yyyy-MM-dd') &&
-                    format(dateRange.to, 'yyyy-MM-dd') === format(preset.to, 'yyyy-MM-dd');
+                  const isActive =
+                    dateRange.from &&
+                    dateRange.to &&
+                    format(dateRange.from, 'yyyy-MM-dd') ===
+                      format(preset.from, 'yyyy-MM-dd') &&
+                    format(dateRange.to, 'yyyy-MM-dd') ===
+                      format(preset.to, 'yyyy-MM-dd');
                   return (
                     <Button
                       key={preset.label}
                       variant={isActive ? 'default' : 'ghost'}
                       size="sm"
                       className="h-7 px-2 text-xs"
-                      onClick={() => setDateRange({ from: preset.from, to: preset.to })}
+                      onClick={() =>
+                        setDateRange({ from: preset.from, to: preset.to })
+                      }
                     >
                       {preset.label}
                     </Button>
@@ -222,7 +321,10 @@ export default function AdminAnalyticsPage() {
 
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="h-8 px-3 font-normal text-xs">
+                  <Button
+                    variant="outline"
+                    className="h-8 px-3 font-normal text-xs"
+                  >
                     <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                     {dateLabel}
                   </Button>
@@ -231,17 +333,26 @@ export default function AdminAnalyticsPage() {
                   <Calendar
                     mode="range"
                     selected={dateRange}
-                    onDayClick={(day) => { clickedDateRef.current = day; }}
+                    onDayClick={(day) => {
+                      clickedDateRef.current = day;
+                    }}
                     onSelect={(newRange) => {
-                      if (dateRange.from && dateRange.to && clickedDateRef.current) {
-                        setDateRange({ from: clickedDateRef.current, to: undefined });
+                      if (
+                        dateRange.from &&
+                        dateRange.to &&
+                        clickedDateRef.current
+                      ) {
+                        setDateRange({
+                          from: clickedDateRef.current,
+                          to: undefined,
+                        });
                         clickedDateRef.current = null;
                         return;
                       }
                       if (newRange?.from) setDateRange(newRange);
                       clickedDateRef.current = null;
                     }}
-                    disabled={(date) => date > berlinToday}
+                    disabled={(date) => date > localToday}
                     numberOfMonths={1}
                     initialFocus
                   />
@@ -300,10 +411,12 @@ export default function AdminAnalyticsPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Overview Tab */}
           <TabsContent value="overview" className="mt-0">
-            <div className={cn(
-              'space-y-6 transition-opacity duration-200',
-              isOverviewFetching && 'opacity-60'
-            )}>
+            <div
+              className={cn(
+                'space-y-6 transition-opacity duration-200',
+                isOverviewFetching && 'opacity-60',
+              )}
+            >
               {/* SECTION 1: Tasks & Users Analysis */}
               <section className="rounded-xl border bg-card">
                 <div className="p-5 pb-4 border-b">
@@ -314,10 +427,15 @@ export default function AdminAnalyticsPage() {
                 </div>
 
                 <div className="p-5">
-                  {(summaryLoading || engagementLoading || taskLoading || funnelLoading) ? (
+                  {summaryLoading ||
+                  engagementLoading ||
+                  taskLoading ||
+                  funnelLoading ? (
                     <div className="space-y-4">
                       <div className="grid grid-cols-5 gap-4">
-                        {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-20" />)}
+                        {[...Array(5)].map((_, i) => (
+                          <Skeleton key={i} className="h-20" />
+                        ))}
                       </div>
                       <Skeleton className="h-24" />
                     </div>
@@ -326,38 +444,71 @@ export default function AdminAnalyticsPage() {
                       {/* Row 1: Core metrics */}
                       <div className="grid grid-cols-7 gap-3">
                         <div className="text-center p-3 rounded-lg bg-muted/30">
-                          <p className="text-2xl font-bold">{conversionFunnel?.visitors?.toLocaleString() || 0}</p>
-                          <p className="text-xs text-muted-foreground">Visitors</p>
+                          <p className="text-2xl font-bold">
+                            {conversionFunnel?.visitors?.toLocaleString() || 0}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Visitors
+                          </p>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-muted/30">
-                          <p className="text-2xl font-bold">{conversionFunnel?.signups?.toLocaleString() || 0}</p>
-                          <p className="text-xs text-muted-foreground">New Signups</p>
+                          <p className="text-2xl font-bold">
+                            {conversionFunnel?.signups?.toLocaleString() || 0}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            New Signups
+                          </p>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-emerald-500/10">
-                          <p className="text-2xl font-bold text-emerald-600">{conversionFunnel?.subscriptions || 0}</p>
-                          <p className="text-xs text-muted-foreground">New Paid</p>
+                          <p className="text-2xl font-bold text-emerald-600">
+                            {conversionFunnel?.subscriptions || 0}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            New Paid
+                          </p>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-muted/30">
-                          <p className="text-2xl font-bold">{taskPerformance?.total_runs?.toLocaleString() || 0}</p>
-                          <p className="text-xs text-muted-foreground">Total Tasks</p>
+                          <p className="text-2xl font-bold">
+                            {taskPerformance?.total_runs?.toLocaleString() || 0}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Total Tasks
+                          </p>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-muted/30">
-                          <p className="text-2xl font-bold">{engagementSummary?.dau || 0}</p>
-                          <p className="text-xs text-muted-foreground">Active Users</p>
+                          <p className="text-2xl font-bold">
+                            {engagementSummary?.dau || 0}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Active Users
+                          </p>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-muted/30">
-                          <p className="text-2xl font-bold">{engagementSummary?.avg_threads_per_active_user?.toFixed(1) || '0'}</p>
-                          <p className="text-xs text-muted-foreground">Tasks/User</p>
+                          <p className="text-2xl font-bold">
+                            {engagementSummary?.avg_threads_per_active_user?.toFixed(
+                              1,
+                            ) || '0'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Tasks/User
+                          </p>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-muted/30">
-                          <p className={cn(
-                            "text-2xl font-bold",
-                            (taskPerformance?.success_rate || 0) >= 80 ? "text-emerald-600" :
-                            (taskPerformance?.success_rate || 0) >= 60 ? "text-amber-600" : "text-red-500"
-                          )}>
+                          <p
+                            className={cn(
+                              'text-2xl font-bold',
+                              (taskPerformance?.success_rate || 0) >= 80
+                                ? 'text-emerald-600'
+                                : (taskPerformance?.success_rate || 0) >= 60
+                                  ? 'text-amber-600'
+                                  : 'text-red-500',
+                            )}
+                          >
                             {taskPerformance?.success_rate || 0}%
                           </p>
-                          <p className="text-xs text-muted-foreground">Success Rate</p>
+                          <p className="text-xs text-muted-foreground">
+                            Success Rate
+                          </p>
                         </div>
                       </div>
 
@@ -366,29 +517,53 @@ export default function AdminAnalyticsPage() {
                         {/* Task Distribution - expanded */}
                         <div className="col-span-5 p-4 rounded-lg bg-muted/30">
                           <div className="flex items-center justify-between mb-3">
-                            <p className="text-xs font-medium text-muted-foreground">Task Distribution by Category</p>
+                            <p className="text-xs font-medium text-muted-foreground">
+                              Task Distribution by Category
+                            </p>
                             {categoryDistribution && (
                               <p className="text-xs text-muted-foreground">
-                                {Object.values(categoryDistribution.distribution).reduce((a, b) => a + b, 0)} total
+                                {Object.values(
+                                  categoryDistribution.distribution,
+                                ).reduce((a, b) => a + b, 0)}{' '}
+                                total
                               </p>
                             )}
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {categoryDistribution && Object.entries(categoryDistribution.distribution)
-                              .sort(([, a], [, b]) => b - a)
-                              .map(([cat, count]) => {
-                                const total = Object.values(categoryDistribution.distribution).reduce((a, b) => a + b, 0);
-                                const percent = total > 0 ? ((count / total) * 100).toFixed(0) : 0;
-                                return (
-                                  <div key={cat} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background border">
-                                    <span className="text-sm font-medium">{cat}</span>
-                                    <span className="text-xs text-muted-foreground">{count}</span>
-                                    <span className="text-[10px] text-muted-foreground/70">({percent}%)</span>
-                                  </div>
-                                );
-                              })}
-                            {(!categoryDistribution || Object.keys(categoryDistribution.distribution).length === 0) && (
-                              <p className="text-sm text-muted-foreground">No task data</p>
+                            {categoryDistribution &&
+                              Object.entries(categoryDistribution.distribution)
+                                .sort(([, a], [, b]) => b - a)
+                                .map(([cat, count]) => {
+                                  const total = Object.values(
+                                    categoryDistribution.distribution,
+                                  ).reduce((a, b) => a + b, 0);
+                                  const percent =
+                                    total > 0
+                                      ? ((count / total) * 100).toFixed(0)
+                                      : 0;
+                                  return (
+                                    <div
+                                      key={cat}
+                                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background border"
+                                    >
+                                      <span className="text-sm font-medium">
+                                        {cat}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground">
+                                        {count}
+                                      </span>
+                                      <span className="text-[10px] text-muted-foreground/70">
+                                        ({percent}%)
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                            {(!categoryDistribution ||
+                              Object.keys(categoryDistribution.distribution)
+                                .length === 0) && (
+                              <p className="text-sm text-muted-foreground">
+                                No task data
+                              </p>
                             )}
                           </div>
                         </div>
@@ -406,19 +581,28 @@ export default function AdminAnalyticsPage() {
                                 : `${(duration / 60).toFixed(1)}m`;
                             })()}
                           </p>
-                          <p className="text-xs text-muted-foreground mt-1">Avg Task Duration</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Avg Task Duration
+                          </p>
                           {(taskPerformance?.stuck_task_count ?? 0) > 0 && (
                             <button
-                              onClick={() => setIncludeStuckTasks(!includeStuckTasks)}
+                              onClick={() =>
+                                setIncludeStuckTasks(!includeStuckTasks)
+                              }
                               className={cn(
-                                "text-[0.5625rem] mt-1 px-1.5 py-0.5 rounded cursor-pointer transition-colors",
+                                'text-[0.5625rem] mt-1 px-1.5 py-0.5 rounded cursor-pointer transition-colors',
                                 includeStuckTasks
-                                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
                               )}
-                              title={includeStuckTasks ? "Click to exclude stuck tasks" : "Click to include stuck tasks"}
+                              title={
+                                includeStuckTasks
+                                  ? 'Click to exclude stuck tasks'
+                                  : 'Click to include stuck tasks'
+                              }
                             >
-                              {taskPerformance?.stuck_task_count} stuck {includeStuckTasks ? '(included)' : '(excluded)'}
+                              {taskPerformance?.stuck_task_count} stuck{' '}
+                              {includeStuckTasks ? '(included)' : '(excluded)'}
                             </button>
                           )}
                         </div>
@@ -440,29 +624,55 @@ export default function AdminAnalyticsPage() {
                 <div className="p-5">
                   {engagementLoading ? (
                     <div className="grid grid-cols-4 gap-4">
-                      {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-20" />)}
+                      {[...Array(4)].map((_, i) => (
+                        <Skeleton key={i} className="h-20" />
+                      ))}
                     </div>
                   ) : (
                     <div className="grid grid-cols-4 gap-4">
                       <div className="text-center p-4 rounded-lg bg-muted/30">
-                        <p className="text-3xl font-bold">{engagementSummary?.dau || 0}</p>
-                        <p className="text-xs text-muted-foreground mt-1">DAU</p>
-                        <p className="text-[10px] text-muted-foreground">Daily Active Users</p>
+                        <p className="text-3xl font-bold">
+                          {engagementSummary?.dau || 0}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          DAU
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          Daily Active Users
+                        </p>
                       </div>
                       <div className="text-center p-4 rounded-lg bg-muted/30">
-                        <p className="text-3xl font-bold">{engagementSummary?.wau || 0}</p>
-                        <p className="text-xs text-muted-foreground mt-1">WAU</p>
-                        <p className="text-[10px] text-muted-foreground">Weekly Active Users</p>
+                        <p className="text-3xl font-bold">
+                          {engagementSummary?.wau || 0}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          WAU
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          Weekly Active Users
+                        </p>
                       </div>
                       <div className="text-center p-4 rounded-lg bg-muted/30">
-                        <p className="text-3xl font-bold">{engagementSummary?.mau || 0}</p>
-                        <p className="text-xs text-muted-foreground mt-1">MAU</p>
-                        <p className="text-[10px] text-muted-foreground">Monthly Active Users</p>
+                        <p className="text-3xl font-bold">
+                          {engagementSummary?.mau || 0}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          MAU
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          Monthly Active Users
+                        </p>
                       </div>
                       <div className="text-center p-4 rounded-lg bg-blue-500/10">
-                        <p className="text-3xl font-bold text-blue-600">{engagementSummary?.dau_mau_ratio || 0}%</p>
-                        <p className="text-xs text-muted-foreground mt-1">DAU/MAU</p>
-                        <p className="text-[10px] text-muted-foreground">Stickiness Ratio</p>
+                        <p className="text-3xl font-bold text-blue-600">
+                          {engagementSummary?.dau_mau_ratio || 0}%
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          DAU/MAU
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          Stickiness Ratio
+                        </p>
                       </div>
                     </div>
                   )}
@@ -496,7 +706,9 @@ export default function AdminAnalyticsPage() {
                       <div className="flex items-center justify-center px-2 bg-muted/30">
                         <div className="text-center">
                           <ArrowRight className="h-4 w-4 text-muted-foreground mx-auto" />
-                          <span className="text-xs font-medium text-muted-foreground">{conversionFunnel.visitor_to_signup_rate}%</span>
+                          <span className="text-xs font-medium text-muted-foreground">
+                            {conversionFunnel.visitor_to_signup_rate}%
+                          </span>
                         </div>
                       </div>
 
@@ -506,14 +718,18 @@ export default function AdminAnalyticsPage() {
                           {conversionFunnel.signups.toLocaleString()}
                         </p>
                         <p className="text-sm font-medium mt-1">Signups</p>
-                        <p className="text-xs text-muted-foreground">{conversionFunnel.visitor_to_signup_rate}% of visitors</p>
+                        <p className="text-xs text-muted-foreground">
+                          {conversionFunnel.visitor_to_signup_rate}% of visitors
+                        </p>
                       </div>
 
                       {/* Arrow */}
                       <div className="flex items-center justify-center px-2 bg-muted/30">
                         <div className="text-center">
                           <ArrowRight className="h-4 w-4 text-muted-foreground mx-auto" />
-                          <span className="text-xs font-medium text-muted-foreground">{conversionFunnel.signup_to_subscription_rate}%</span>
+                          <span className="text-xs font-medium text-muted-foreground">
+                            {conversionFunnel.signup_to_subscription_rate}%
+                          </span>
                         </div>
                       </div>
 
@@ -525,29 +741,46 @@ export default function AdminAnalyticsPage() {
                         <p className="text-sm font-medium mt-1">Paid</p>
                         <p className="text-xs text-muted-foreground">
                           {conversionFunnel.visitors > 0
-                            ? ((conversionFunnel.subscriptions / conversionFunnel.visitors) * 100).toFixed(2)
-                            : 0}% of visitors
+                            ? (
+                                (conversionFunnel.subscriptions /
+                                  conversionFunnel.visitors) *
+                                100
+                              ).toFixed(2)
+                            : 0}
+                          % of visitors
                         </p>
                         {/* Web/App breakdown */}
                         <div className="flex justify-center gap-3 mt-2 text-xs">
                           <Popover>
                             <PopoverTrigger asChild>
                               <button className="text-blue-600 hover:underline cursor-pointer">
-                                Web: {conversionFunnel.web_subscriber_emails?.length || 0}
+                                Web:{' '}
+                                {conversionFunnel.web_subscriber_emails
+                                  ?.length || 0}
                               </button>
                             </PopoverTrigger>
                             <PopoverContent className="w-72 max-h-60 overflow-y-auto">
-                              <h4 className="font-medium text-sm mb-2">Web Subscribers</h4>
-                              {conversionFunnel.web_subscriber_emails?.length > 0 ? (
+                              <h4 className="font-medium text-sm mb-2">
+                                Web Subscribers
+                              </h4>
+                              {conversionFunnel.web_subscriber_emails?.length >
+                              0 ? (
                                 <ul className="space-y-1">
-                                  {conversionFunnel.web_subscriber_emails.map((email, idx) => (
-                                    <li key={idx} className="text-sm">
-                                      <UserEmailLink email={email} onUserClick={handleUserEmailClick} />
-                                    </li>
-                                  ))}
+                                  {conversionFunnel.web_subscriber_emails.map(
+                                    (email, idx) => (
+                                      <li key={idx} className="text-sm">
+                                        <UserEmailLink
+                                          email={email}
+                                          onUserClick={handleUserEmailClick}
+                                        />
+                                      </li>
+                                    ),
+                                  )}
                                 </ul>
                               ) : (
-                                <p className="text-sm text-muted-foreground">No web subscribers</p>
+                                <p className="text-sm text-muted-foreground">
+                                  No web subscribers
+                                </p>
                               )}
                             </PopoverContent>
                           </Popover>
@@ -555,21 +788,33 @@ export default function AdminAnalyticsPage() {
                           <Popover>
                             <PopoverTrigger asChild>
                               <button className="text-purple-600 hover:underline cursor-pointer">
-                                App: {conversionFunnel.app_subscriber_emails?.length || 0}
+                                App:{' '}
+                                {conversionFunnel.app_subscriber_emails
+                                  ?.length || 0}
                               </button>
                             </PopoverTrigger>
                             <PopoverContent className="w-72 max-h-60 overflow-y-auto">
-                              <h4 className="font-medium text-sm mb-2">App Subscribers</h4>
-                              {conversionFunnel.app_subscriber_emails?.length > 0 ? (
+                              <h4 className="font-medium text-sm mb-2">
+                                App Subscribers
+                              </h4>
+                              {conversionFunnel.app_subscriber_emails?.length >
+                              0 ? (
                                 <ul className="space-y-1">
-                                  {conversionFunnel.app_subscriber_emails.map((email, idx) => (
-                                    <li key={idx} className="text-sm">
-                                      <UserEmailLink email={email} onUserClick={handleUserEmailClick} />
-                                    </li>
-                                  ))}
+                                  {conversionFunnel.app_subscriber_emails.map(
+                                    (email, idx) => (
+                                      <li key={idx} className="text-sm">
+                                        <UserEmailLink
+                                          email={email}
+                                          onUserClick={handleUserEmailClick}
+                                        />
+                                      </li>
+                                    ),
+                                  )}
                                 </ul>
                               ) : (
-                                <p className="text-sm text-muted-foreground">No app subscribers</p>
+                                <p className="text-sm text-muted-foreground">
+                                  No app subscribers
+                                </p>
                               )}
                             </PopoverContent>
                           </Popover>
@@ -591,32 +836,43 @@ export default function AdminAnalyticsPage() {
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                     Financials
                   </h2>
-                  {profitability && profitability.paying_user_emails?.length > 0 && (
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button className="text-xs text-primary hover:underline">
-                          View {profitability.unique_paying_users} paying users
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-72 max-h-60 overflow-y-auto">
-                        <h4 className="font-medium text-sm mb-2">Paying Users</h4>
-                        <ul className="space-y-1">
-                          {profitability.paying_user_emails.map((email, idx) => (
-                            <li key={idx} className="text-sm">
-                              <UserEmailLink email={email} onUserClick={handleUserEmailClick} />
-                            </li>
-                          ))}
-                        </ul>
-                      </PopoverContent>
-                    </Popover>
-                  )}
+                  {profitability &&
+                    profitability.paying_user_emails?.length > 0 && (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button className="text-xs text-primary hover:underline">
+                            View {profitability.unique_paying_users} paying
+                            users
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-72 max-h-60 overflow-y-auto">
+                          <h4 className="font-medium text-sm mb-2">
+                            Paying Users
+                          </h4>
+                          <ul className="space-y-1">
+                            {profitability.paying_user_emails.map(
+                              (email, idx) => (
+                                <li key={idx} className="text-sm">
+                                  <UserEmailLink
+                                    email={email}
+                                    onUserClick={handleUserEmailClick}
+                                  />
+                                </li>
+                              ),
+                            )}
+                          </ul>
+                        </PopoverContent>
+                      </Popover>
+                    )}
                 </div>
 
                 <div className="p-5">
                   {profitabilityLoading ? (
                     <div className="space-y-4">
                       <div className="grid grid-cols-6 gap-4">
-                        {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-20" />)}
+                        {[...Array(6)].map((_, i) => (
+                          <Skeleton key={i} className="h-20" />
+                        ))}
                       </div>
                       <Skeleton className="h-32" />
                     </div>
@@ -625,10 +881,20 @@ export default function AdminAnalyticsPage() {
                       {/* Row 1: Key financial metrics */}
                       <div className="grid grid-cols-6 gap-4">
                         <div className="text-center p-3 rounded-lg bg-muted/30">
-                          <p className="text-xl font-bold">{profitability.total_active_subscriptions?.toLocaleString() ?? '—'}</p>
-                          <p className="text-xs text-muted-foreground">Total Active Subs</p>
+                          <p className="text-xl font-bold">
+                            {profitability.total_active_subscriptions?.toLocaleString() ??
+                              '—'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Total Active Subs
+                          </p>
                           <p className="text-[10px] text-muted-foreground mt-1">
-                            Web: {profitability.stripe_active_subscriptions?.toLocaleString() ?? '—'} | App: {profitability.revenuecat_active_subscriptions?.toLocaleString() ?? '—'}
+                            Web:{' '}
+                            {profitability.stripe_active_subscriptions?.toLocaleString() ??
+                              '—'}{' '}
+                            | App:{' '}
+                            {profitability.revenuecat_active_subscriptions?.toLocaleString() ??
+                              '—'}
                           </p>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-muted/30">
@@ -636,20 +902,32 @@ export default function AdminAnalyticsPage() {
                           <p className="text-xs text-muted-foreground">MRR</p>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-muted/30">
-                          <p className="text-xl font-bold">${profitability.avg_revenue_per_paid_user.toFixed(0)}</p>
+                          <p className="text-xl font-bold">
+                            $
+                            {profitability.avg_revenue_per_paid_user.toFixed(0)}
+                          </p>
                           <p className="text-xs text-muted-foreground">ARPU</p>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-muted/30">
-                          <p className="text-xl font-bold">{churnLoading ? '...' : (churnData?.total ?? '—')}</p>
-                          <p className="text-xs text-muted-foreground">Churns</p>
+                          <p className="text-xl font-bold">
+                            {churnLoading ? '...' : (churnData?.total ?? '—')}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Churns
+                          </p>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-muted/30">
                           <p className="text-xl font-bold">
-                            {churnLoading ? '...' : (churnData && profitability?.total_active_subscriptions
-                              ? `${((churnData.total / profitability.total_active_subscriptions) * 100).toFixed(2)}%`
-                              : '—')}
+                            {churnLoading
+                              ? '...'
+                              : churnData &&
+                                  profitability?.total_active_subscriptions
+                                ? `${((churnData.total / profitability.total_active_subscriptions) * 100).toFixed(2)}%`
+                                : '—'}
                           </p>
-                          <p className="text-xs text-muted-foreground">Churn Rate</p>
+                          <p className="text-xs text-muted-foreground">
+                            Churn Rate
+                          </p>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-muted/30">
                           <p className="text-xl font-bold">—</p>
@@ -663,46 +941,97 @@ export default function AdminAnalyticsPage() {
                         <div className="space-y-4">
                           <div className="flex items-center justify-between p-4 rounded-lg bg-emerald-500/10">
                             <div>
-                              <p className="text-xs text-muted-foreground">Revenue</p>
-                              <p className="text-2xl font-bold text-emerald-600">${profitability.total_revenue.toLocaleString()}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xs text-muted-foreground">Cost</p>
-                              <p className="text-lg font-semibold">${profitability.total_actual_cost.toLocaleString()}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xs text-muted-foreground">Profit</p>
-                              <p className={cn(
-                                "text-lg font-bold",
-                                profitability.gross_profit >= 0 ? "text-emerald-600" : "text-red-500"
-                              )}>
-                                {profitability.gross_profit < 0 ? '-' : ''}${Math.abs(profitability.gross_profit).toLocaleString()}
+                              <p className="text-xs text-muted-foreground">
+                                Revenue
+                              </p>
+                              <p className="text-2xl font-bold text-emerald-600">
+                                ${profitability.total_revenue.toLocaleString()}
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className="text-xs text-muted-foreground">Margin</p>
-                              <p className="text-lg font-semibold">{profitability.gross_margin_percent}%</p>
+                              <p className="text-xs text-muted-foreground">
+                                Cost
+                              </p>
+                              <p className="text-lg font-semibold">
+                                $
+                                {profitability.total_actual_cost.toLocaleString()}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-muted-foreground">
+                                Profit
+                              </p>
+                              <p
+                                className={cn(
+                                  'text-lg font-bold',
+                                  profitability.gross_profit >= 0
+                                    ? 'text-emerald-600'
+                                    : 'text-red-500',
+                                )}
+                              >
+                                {profitability.gross_profit < 0 ? '-' : ''}$
+                                {Math.abs(
+                                  profitability.gross_profit,
+                                ).toLocaleString()}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-muted-foreground">
+                                Margin
+                              </p>
+                              <p className="text-lg font-semibold">
+                                {profitability.gross_margin_percent}%
+                              </p>
                             </div>
                           </div>
 
                           {/* Per User Metrics */}
                           <div className="relative flex items-center justify-between p-3 pt-4 rounded-lg border mt-2">
-                            <span className="absolute top-1 left-2 text-[0.5625rem] text-muted-foreground">Per Paying User ({profitability.unique_paying_users})</span>
+                            <span className="absolute top-1 left-2 text-[0.5625rem] text-muted-foreground">
+                              Per Paying User (
+                              {profitability.unique_paying_users})
+                            </span>
                             <div>
-                              <p className="text-[10px] text-muted-foreground">Revenue/User</p>
-                              <p className="text-sm font-semibold">${profitability.avg_revenue_per_paid_user.toFixed(2)}</p>
+                              <p className="text-[10px] text-muted-foreground">
+                                Revenue/User
+                              </p>
+                              <p className="text-sm font-semibold">
+                                $
+                                {profitability.avg_revenue_per_paid_user.toFixed(
+                                  2,
+                                )}
+                              </p>
                             </div>
                             <div className="text-right">
-                              <p className="text-[10px] text-muted-foreground">Cost/User</p>
-                              <p className="text-sm font-semibold">${profitability.avg_cost_per_active_user.toFixed(2)}</p>
+                              <p className="text-[10px] text-muted-foreground">
+                                Cost/User
+                              </p>
+                              <p className="text-sm font-semibold">
+                                $
+                                {profitability.avg_cost_per_active_user.toFixed(
+                                  2,
+                                )}
+                              </p>
                             </div>
                             <div className="text-right">
-                              <p className="text-[10px] text-muted-foreground">Profit/User</p>
-                              <p className={cn(
-                                "text-sm font-semibold",
-                                (profitability.avg_revenue_per_paid_user - profitability.avg_cost_per_active_user) >= 0 ? "text-emerald-600" : "text-red-500"
-                              )}>
-                                ${(profitability.avg_revenue_per_paid_user - profitability.avg_cost_per_active_user).toFixed(2)}
+                              <p className="text-[10px] text-muted-foreground">
+                                Profit/User
+                              </p>
+                              <p
+                                className={cn(
+                                  'text-sm font-semibold',
+                                  profitability.avg_revenue_per_paid_user -
+                                    profitability.avg_cost_per_active_user >=
+                                    0
+                                    ? 'text-emerald-600'
+                                    : 'text-red-500',
+                                )}
+                              >
+                                $
+                                {(
+                                  profitability.avg_revenue_per_paid_user -
+                                  profitability.avg_cost_per_active_user
+                                ).toFixed(2)}
                               </p>
                             </div>
                           </div>
@@ -710,14 +1039,26 @@ export default function AdminAnalyticsPage() {
                           {/* Platform Split */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="p-3 rounded-lg border">
-                              <p className="text-xs text-muted-foreground mb-1">Web (Stripe)</p>
-                              <p className="text-lg font-bold">${profitability.web_revenue.toLocaleString()}</p>
-                              <p className="text-xs text-muted-foreground">Cost: ${profitability.web_cost.toFixed(2)}</p>
+                              <p className="text-xs text-muted-foreground mb-1">
+                                Web (Stripe)
+                              </p>
+                              <p className="text-lg font-bold">
+                                ${profitability.web_revenue.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Cost: ${profitability.web_cost.toFixed(2)}
+                              </p>
                             </div>
                             <div className="p-3 rounded-lg border">
-                              <p className="text-xs text-muted-foreground mb-1">App (RevenueCat)</p>
-                              <p className="text-lg font-bold">${profitability.app_revenue.toLocaleString()}</p>
-                              <p className="text-xs text-muted-foreground">Cost: ${profitability.app_cost.toFixed(2)}</p>
+                              <p className="text-xs text-muted-foreground mb-1">
+                                App (RevenueCat)
+                              </p>
+                              <p className="text-lg font-bold">
+                                ${profitability.app_revenue.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Cost: ${profitability.app_cost.toFixed(2)}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -725,13 +1066,17 @@ export default function AdminAnalyticsPage() {
                         {/* Users & Revenue per Tier */}
                         <div>
                           <div className="flex items-center justify-between mb-3">
-                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">By Tier</p>
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                              By Tier
+                            </p>
                             <div className="flex items-center gap-1 bg-muted rounded-full p-0.5">
                               <button
                                 onClick={() => setTierViewMode('revenue')}
                                 className={cn(
                                   'text-[10px] px-2 py-0.5 rounded-full transition-colors',
-                                  tierViewMode === 'revenue' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                                  tierViewMode === 'revenue'
+                                    ? 'bg-background shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground',
                                 )}
                               >
                                 Revenue
@@ -740,7 +1085,9 @@ export default function AdminAnalyticsPage() {
                                 onClick={() => setTierViewMode('cost')}
                                 className={cn(
                                   'text-[10px] px-2 py-0.5 rounded-full transition-colors',
-                                  tierViewMode === 'cost' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                                  tierViewMode === 'cost'
+                                    ? 'bg-background shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground',
                                 )}
                               >
                                 Usage
@@ -749,71 +1096,155 @@ export default function AdminAnalyticsPage() {
                                 onClick={() => setTierViewMode('profit')}
                                 className={cn(
                                   'text-[10px] px-2 py-0.5 rounded-full transition-colors',
-                                  tierViewMode === 'profit' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                                  tierViewMode === 'profit'
+                                    ? 'bg-background shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground',
                                 )}
                               >
                                 Profit
                               </button>
                             </div>
                           </div>
-                          {profitability.by_tier && profitability.by_tier.length > 0 ? (() => {
-                            const filteredTiers = profitability.by_tier.filter(t =>
-                              tierViewMode === 'revenue' ? t.total_revenue > 0 :
-                              tierViewMode === 'cost' ? t.total_actual_cost > 0 :
-                              t.total_revenue > 0 || t.total_actual_cost > 0
-                            );
-                            // Use usage_users for cost view, unique_users for revenue/profit
-                            const getUserCount = (t: typeof filteredTiers[0]) => tierViewMode === 'cost' ? (t.usage_users ?? t.unique_users) : t.unique_users;
-                            const totalUsers = filteredTiers.reduce((sum, t) => sum + getUserCount(t), 0);
-                            const totalValue = tierViewMode === 'revenue'
-                              ? filteredTiers.reduce((sum, t) => sum + t.total_revenue, 0)
-                              : tierViewMode === 'cost'
-                              ? filteredTiers.reduce((sum, t) => sum + t.total_actual_cost, 0)
-                              : filteredTiers.reduce((sum, t) => sum + t.gross_profit, 0);
-                            return filteredTiers.length > 0 ? (
-                              <div className="space-y-1.5">
-                                {/* Header */}
-                                <div className="grid grid-cols-3 gap-2 text-[10px] text-muted-foreground px-2 pb-1">
-                                  <div>Tier</div>
-                                  <div className="text-right">Users</div>
-                                  <div className="text-right">{tierViewMode === 'revenue' ? 'Revenue' : tierViewMode === 'cost' ? 'Cost' : 'Profit'}</div>
-                                </div>
-                                {/* Rows */}
-                                {filteredTiers.map((tier, idx) => {
-                                  const userCount = getUserCount(tier);
-                                  const userPercent = totalUsers > 0 ? ((userCount / totalUsers) * 100).toFixed(0) : '0';
-                                  const value = tierViewMode === 'revenue' ? tier.total_revenue : tierViewMode === 'cost' ? tier.total_actual_cost : tier.gross_profit;
-                                  const valuePercent = totalValue > 0 ? ((value / totalValue) * 100).toFixed(0) : '0';
-                                  return (
-                                    <div
-                                      key={idx}
-                                      className="grid grid-cols-3 gap-2 text-xs py-1.5 px-2 rounded hover:bg-muted/50 transition-colors"
-                                    >
-                                      <div className="font-medium truncate flex items-center gap-1">
-                                        {tier.display_name}
-                                        <span className="text-[10px] text-muted-foreground">
-                                          ({tier.provider === 'stripe' ? 'Web' : 'App'})
-                                        </span>
-                                      </div>
-                                      <div className="text-right">
-                                        {userCount}
-                                        <span className="text-[10px] text-muted-foreground ml-1">({userPercent}%)</span>
-                                      </div>
-                                      <div className={cn("text-right", tierViewMode === 'profit' && (value >= 0 ? 'text-green-600' : 'text-red-600'))}>
-                                        {tierViewMode === 'profit' && value < 0 ? '-' : ''}${Math.abs(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        <span className="text-[10px] text-muted-foreground ml-1">({valuePercent}%)</span>
-                                      </div>
+                          {profitability.by_tier &&
+                          profitability.by_tier.length > 0 ? (
+                            (() => {
+                              const filteredTiers =
+                                profitability.by_tier.filter((t) =>
+                                  tierViewMode === 'revenue'
+                                    ? t.total_revenue > 0
+                                    : tierViewMode === 'cost'
+                                      ? t.total_actual_cost > 0
+                                      : t.total_revenue > 0 ||
+                                        t.total_actual_cost > 0,
+                                );
+                              // Use usage_users for cost view, unique_users for revenue/profit
+                              const getUserCount = (
+                                t: (typeof filteredTiers)[0],
+                              ) =>
+                                tierViewMode === 'cost'
+                                  ? (t.usage_users ?? t.unique_users)
+                                  : t.unique_users;
+                              const totalUsers = filteredTiers.reduce(
+                                (sum, t) => sum + getUserCount(t),
+                                0,
+                              );
+                              const totalValue =
+                                tierViewMode === 'revenue'
+                                  ? filteredTiers.reduce(
+                                      (sum, t) => sum + t.total_revenue,
+                                      0,
+                                    )
+                                  : tierViewMode === 'cost'
+                                    ? filteredTiers.reduce(
+                                        (sum, t) => sum + t.total_actual_cost,
+                                        0,
+                                      )
+                                    : filteredTiers.reduce(
+                                        (sum, t) => sum + t.gross_profit,
+                                        0,
+                                      );
+                              return filteredTiers.length > 0 ? (
+                                <div className="space-y-1.5">
+                                  {/* Header */}
+                                  <div className="grid grid-cols-3 gap-2 text-[10px] text-muted-foreground px-2 pb-1">
+                                    <div>Tier</div>
+                                    <div className="text-right">Users</div>
+                                    <div className="text-right">
+                                      {tierViewMode === 'revenue'
+                                        ? 'Revenue'
+                                        : tierViewMode === 'cost'
+                                          ? 'Cost'
+                                          : 'Profit'}
                                     </div>
-                                  );
-                                })}
-                              </div>
-                            ) : (
-                              <p className="text-sm text-muted-foreground text-center py-4">
-                                No {tierViewMode === 'revenue' ? 'paying' : tierViewMode === 'cost' ? 'usage' : 'profit'} data
-                              </p>
-                            );
-                          })() : (
-                            <p className="text-sm text-muted-foreground text-center py-4">No tier data</p>
+                                  </div>
+                                  {/* Rows */}
+                                  {filteredTiers.map((tier, idx) => {
+                                    const userCount = getUserCount(tier);
+                                    const userPercent =
+                                      totalUsers > 0
+                                        ? (
+                                            (userCount / totalUsers) *
+                                            100
+                                          ).toFixed(0)
+                                        : '0';
+                                    const value =
+                                      tierViewMode === 'revenue'
+                                        ? tier.total_revenue
+                                        : tierViewMode === 'cost'
+                                          ? tier.total_actual_cost
+                                          : tier.gross_profit;
+                                    const valuePercent =
+                                      totalValue > 0
+                                        ? ((value / totalValue) * 100).toFixed(
+                                            0,
+                                          )
+                                        : '0';
+                                    return (
+                                      <div
+                                        key={idx}
+                                        className="grid grid-cols-3 gap-2 text-xs py-1.5 px-2 rounded hover:bg-muted/50 transition-colors"
+                                      >
+                                        <div className="font-medium truncate flex items-center gap-1">
+                                          {tier.display_name}
+                                          <span className="text-[10px] text-muted-foreground">
+                                            (
+                                            {tier.provider === 'stripe'
+                                              ? 'Web'
+                                              : 'App'}
+                                            )
+                                          </span>
+                                        </div>
+                                        <div className="text-right">
+                                          {userCount}
+                                          <span className="text-[10px] text-muted-foreground ml-1">
+                                            ({userPercent}%)
+                                          </span>
+                                        </div>
+                                        <div
+                                          className={cn(
+                                            'text-right',
+                                            tierViewMode === 'profit' &&
+                                              (value >= 0
+                                                ? 'text-green-600'
+                                                : 'text-red-600'),
+                                          )}
+                                        >
+                                          {tierViewMode === 'profit' &&
+                                          value < 0
+                                            ? '-'
+                                            : ''}
+                                          $
+                                          {Math.abs(value).toLocaleString(
+                                            undefined,
+                                            {
+                                              minimumFractionDigits: 2,
+                                              maximumFractionDigits: 2,
+                                            },
+                                          )}
+                                          <span className="text-[10px] text-muted-foreground ml-1">
+                                            ({valuePercent}%)
+                                          </span>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              ) : (
+                                <p className="text-sm text-muted-foreground text-center py-4">
+                                  No{' '}
+                                  {tierViewMode === 'revenue'
+                                    ? 'paying'
+                                    : tierViewMode === 'cost'
+                                      ? 'usage'
+                                      : 'profit'}{' '}
+                                  data
+                                </p>
+                              );
+                            })()
+                          ) : (
+                            <p className="text-sm text-muted-foreground text-center py-4">
+                              No tier data
+                            </p>
                           )}
                         </div>
                       </div>
@@ -835,7 +1266,9 @@ export default function AdminAnalyticsPage() {
               <div className="flex items-center gap-8 py-4">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">Total:</span>
-                  <span className="text-sm font-medium">{distribution.total_threads} threads</span>
+                  <span className="text-sm font-medium">
+                    {distribution.total_threads} threads
+                  </span>
                 </div>
                 <div className="h-4 w-px bg-border" />
                 <div className="flex items-center gap-4">
@@ -843,74 +1276,104 @@ export default function AdminAnalyticsPage() {
                     onClick={() => handleCategoryFilter(null)}
                     className={cn(
                       'text-xs px-2.5 py-1 rounded-full transition-colors',
-                      !categoryFilter ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'
+                      !categoryFilter
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted hover:bg-muted/80',
                     )}
                   >
                     All
                   </button>
                   <span className="text-xs text-muted-foreground">
-                    1 msg: {distribution.distribution['1_message']} ·
-                    2-3: {distribution.distribution['2_3_messages']} ·
-                    5+: {distribution.distribution['5_plus_messages']}
+                    1 msg: {distribution.distribution['1_message']} · 2-3:{' '}
+                    {distribution.distribution['2_3_messages']} · 5+:{' '}
+                    {distribution.distribution['5_plus_messages']}
                   </span>
                 </div>
 
                 {/* Tier Filter */}
-                {tierDistribution && Object.keys(tierDistribution.distribution).length > 0 && (
-                  <>
-                    <div className="h-4 w-px bg-border" />
-                    <Select
-                      value={tierFilter || 'all'}
-                      onValueChange={(value) => setTierFilter(value === 'all' ? null : value)}
-                    >
-                      <SelectTrigger className="w-36 h-8 text-xs">
-                        <CreditCard className="h-3 w-3 mr-1.5 text-muted-foreground" />
-                        <SelectValue placeholder="All Tiers" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Tiers</SelectItem>
-                        {Object.entries(tierDistribution.distribution).map(([tier, count]) => {
-                          const displayName = tier === 'none' ? 'No Sub' :
-                            tier === 'free' ? 'Free' :
-                            tier === 'tier_2_20' ? 'Plus' :
-                            tier === 'tier_6_50' ? 'Pro' :
-                            tier === 'tier_12_100' ? 'Business' :
-                            tier === 'tier_25_200' ? 'Ultra' : tier;
-                          return (
-                            <SelectItem key={tier} value={tier}>
-                              {displayName} ({count})
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                  </>
-                )}
+                {tierDistribution &&
+                  Object.keys(tierDistribution.distribution).length > 0 && (
+                    <>
+                      <div className="h-4 w-px bg-border" />
+                      <Select
+                        value={tierFilter || 'all'}
+                        onValueChange={(value) =>
+                          setTierFilter(value === 'all' ? null : value)
+                        }
+                      >
+                        <SelectTrigger className="w-36 h-8 text-xs">
+                          <CreditCard className="h-3 w-3 mr-1.5 text-muted-foreground" />
+                          <SelectValue placeholder="All Tiers" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Tiers</SelectItem>
+                          {Object.entries(tierDistribution.distribution).map(
+                            ([tier, count]) => {
+                              const displayName =
+                                tier === 'none'
+                                  ? 'No Sub'
+                                  : tier === 'free'
+                                    ? 'Free'
+                                    : tier === 'tier_2_20'
+                                      ? 'Plus'
+                                      : tier === 'tier_6_50'
+                                        ? 'Pro'
+                                        : tier === 'tier_12_100'
+                                          ? 'Business'
+                                          : tier === 'tier_25_200'
+                                            ? 'Ultra'
+                                            : tier;
+                              return (
+                                <SelectItem key={tier} value={tier}>
+                                  {displayName} ({count})
+                                </SelectItem>
+                              );
+                            },
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </>
+                  )}
               </div>
             )}
 
             {/* Category Pills */}
-            {categoryDistribution && Object.keys(categoryDistribution.distribution).length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(categoryDistribution.distribution).map(([category, count]) => (
-                  <button
-                    key={category}
-                    onClick={() => setCategoryFilter(categoryFilter === category ? null : category)}
-                    className={cn(
-                      'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors border',
-                      categoryFilter === category
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'bg-background hover:bg-muted border-border'
-                    )}
-                  >
-                    <span className="font-medium truncate max-w-[100px]">{category}</span>
-                    <span className={categoryFilter === category ? 'text-primary-foreground/70' : 'text-muted-foreground'}>
-                      {count}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
+            {categoryDistribution &&
+              Object.keys(categoryDistribution.distribution).length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(categoryDistribution.distribution).map(
+                    ([category, count]) => (
+                      <button
+                        key={category}
+                        onClick={() =>
+                          setCategoryFilter(
+                            categoryFilter === category ? null : category,
+                          )
+                        }
+                        className={cn(
+                          'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors border',
+                          categoryFilter === category
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background hover:bg-muted border-border',
+                        )}
+                      >
+                        <span className="font-medium truncate max-w-[100px]">
+                          {category}
+                        </span>
+                        <span
+                          className={
+                            categoryFilter === category
+                              ? 'text-primary-foreground/70'
+                              : 'text-muted-foreground'
+                          }
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    ),
+                  )}
+                </div>
+              )}
 
             {/* Thread Browser */}
             <ThreadBrowser
@@ -961,7 +1424,7 @@ export default function AdminAnalyticsPage() {
         {/* Loading indicator */}
         {isSearchingUser && pendingUserEmail && (
           <div className="fixed bottom-4 right-4 bg-card border rounded-lg shadow-lg p-3 flex items-center gap-2">
-            <AcmeLoader size="small" />
+            <Loader2 className="w-4 h-4 animate-spin" />
             <span className="text-sm">Loading user...</span>
           </div>
         )}

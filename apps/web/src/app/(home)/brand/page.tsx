@@ -334,7 +334,7 @@ function Hex({ value }: { value: string }) {
 function LogoCard({ asset, fmt }: { asset: LogoAsset; fmt: LogoFormat }) {
   const isWordmark = asset.label === 'Wordmark';
   const downloadHref = fmt === 'png' ? asset.pngSrc : asset.svgSrc;
-  const downloadName = `acme-${asset.label.toLowerCase()}-${asset.variant.toLowerCase()}.${fmt}`;
+  const downloadName = `aether-${asset.label.toLowerCase()}-${asset.variant.toLowerCase()}.${fmt}`;
 
   return (
     <div className="group relative">
@@ -350,7 +350,7 @@ function LogoCard({ asset, fmt }: { asset: LogoAsset; fmt: LogoFormat }) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={asset.svgSrc}
-          alt={`Acme ${asset.label} ${asset.variant}`}
+          alt={`Aether ${asset.label} ${asset.variant}`}
           className={cn(
             'object-contain',
             isWordmark
@@ -650,7 +650,7 @@ export default function BrandPage() {
                 </h1>
                 <p className="text-base text-muted-foreground/60 leading-relaxed max-w-xl">
                   Logo assets, color palette, typography, motion tokens,
-                  component library, and usage rules for building Acme.
+                  component library, and usage rules for building Aether.
                   The complete reference for designers and engineers.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-6">
@@ -813,7 +813,7 @@ export default function BrandPage() {
                           s.cls
                         )}
                       >
-                        Acme Computer
+                        Aether Computer
                       </p>
                     </div>
                   ))}
@@ -825,7 +825,7 @@ export default function BrandPage() {
                     Roobert Mono
                   </span>
                   <p className="font-mono text-lg md:text-2xl tracking-tight">
-                    const agent = new Acme();
+                    const agent = new Aether();
                   </p>
                   <p className="font-mono text-[11px] text-neutral-600 mt-4">
                     ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz
@@ -989,9 +989,9 @@ export default function BrandPage() {
                           <Button variant="link">Link</Button>
                         </div>
                       </div>
-                      {/* Acme Variants */}
+                      {/* Aether Variants */}
                       <div>
-                        <p className="text-[10px] text-muted-foreground/30 mb-3 uppercase tracking-wider">Acme Variants</p>
+                        <p className="text-[10px] text-muted-foreground/30 mb-3 uppercase tracking-wider">Aether Variants</p>
                         <div className="flex flex-wrap gap-2">
                           <Button variant="subtle">Subtle</Button>
                           <Button variant="muted">Muted</Button>
@@ -1625,10 +1625,10 @@ export default function BrandPage() {
                     <Accordion type="single" collapsible className="w-full">
                       <AccordionItem value="item-1">
                         <AccordionTrigger>
-                          What is Acme?
+                          What is Aether?
                         </AccordionTrigger>
                         <AccordionContent>
-                          Acme is an AI-powered platform for building and
+                          Aether is an AI-powered platform for building and
                           deploying intelligent agents. It provides the
                           infrastructure, tools, and interfaces needed to create
                           production-grade AI workflows.
@@ -1639,7 +1639,7 @@ export default function BrandPage() {
                           What design system does it use?
                         </AccordionTrigger>
                         <AccordionContent>
-                          Acme uses a monochromatic design system with
+                          Aether uses a monochromatic design system with
                           strategic accent colors, built on OKLCH color tokens,
                           the Roobert type family, and Radix UI primitives.
                         </AccordionContent>
@@ -1685,14 +1685,14 @@ export default function BrandPage() {
                         </CollapsibleTrigger>
                       </div>
                       <div className="rounded-md border border-border/50 px-4 py-2 mt-2 text-sm">
-                        @acme/design-system
+                        @aether/design-system
                       </div>
                       <CollapsibleContent className="mt-2 space-y-2">
                         <div className="rounded-md border border-border/50 px-4 py-2 text-sm">
-                          @acme/components
+                          @aether/components
                         </div>
                         <div className="rounded-md border border-border/50 px-4 py-2 text-sm">
-                          @acme/tokens
+                          @aether/tokens
                         </div>
                       </CollapsibleContent>
                     </Collapsible>

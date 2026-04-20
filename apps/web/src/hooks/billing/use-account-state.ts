@@ -15,7 +15,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 
-import { CREDITS_PER_DOLLAR, dollarsToCredits } from '@acme/shared';
+import { CREDITS_PER_DOLLAR, dollarsToCredits } from '@aether/shared';
 import {
   billingApi,
   AccountState,

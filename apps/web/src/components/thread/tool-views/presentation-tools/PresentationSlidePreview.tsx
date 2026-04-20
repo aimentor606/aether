@@ -4,7 +4,7 @@ import { PresentationSlideCard } from './PresentationSlideCard';
 import { constructHtmlPreviewUrl } from '@/lib/utils/url';
 import { Project } from '@/types/project';
 import { RefreshCw, Presentation } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { usePresentationViewerStore } from '@/stores/presentation-viewer-store';
 import { Button } from '@/components/ui/button';
 import { useSandboxProxy } from '@/hooks/use-sandbox-proxy';
@@ -121,7 +121,7 @@ export function PresentationSlidePreview({
   if (isLoading) {
     return (
       <div className={cn('flex flex-col items-center justify-center p-8 bg-muted/30 rounded-lg border', className)}>
-        <AcmeLoader customSize={24} className="mb-2" />
+        <AetherLoader customSize={24} className="mb-2" />
         <span className="text-sm text-muted-foreground">Loading presentation...</span>
         {retryCount > 0 && (
           <span className="text-xs text-muted-foreground/70 mt-1">

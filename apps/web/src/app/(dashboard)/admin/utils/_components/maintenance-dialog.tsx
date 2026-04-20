@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import {
+  Button,
+  Label,
+  Switch,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Wrench, Loader2 } from "lucide-react";
-import { DateTimePicker } from "./date-time-picker";
+} from '@aether/ui/primitives';
+import { Wrench, Loader2 } from 'lucide-react';
+import { DateTimePicker } from './date-time-picker';
 
 interface MaintenanceDialogProps {
   open: boolean;
@@ -54,7 +54,9 @@ export function MaintenanceDialog({
 
         <div className="space-y-4 py-4">
           <div className="flex items-center justify-between">
-            <Label htmlFor="maintenance-enabled">Enable maintenance notice</Label>
+            <Label htmlFor="maintenance-enabled">
+              Enable maintenance notice
+            </Label>
             <Switch
               id="maintenance-enabled"
               checked={enabled}
@@ -82,7 +84,7 @@ export function MaintenanceDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={onSave}
             disabled={isPending || (enabled && (!startDate || !endDate))}
           >

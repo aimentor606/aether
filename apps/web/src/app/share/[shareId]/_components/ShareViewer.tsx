@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { getEnv } from '@/lib/env-config';
 import { UnifiedMarkdown } from '@/components/markdown/unified-markdown';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import {
   AlertTriangle,
   Copy,
@@ -66,7 +66,7 @@ interface ShareData {
 
 import { getActiveOpenCodeUrl } from '@/stores/server-store';
 
-const FALLBACK_BASE_URL = `${getEnv().BACKEND_URL.replace(/\/+$/, '')}/p/acme-sandbox/8000`;
+const FALLBACK_BASE_URL = `${getEnv().BACKEND_URL.replace(/\/+$/, '')}/p/aether-sandbox/8000`;
 
 function getOpenCodeBaseUrl(): string {
   // Use the active server URL if available (resolves correct sandboxId).
@@ -78,22 +78,24 @@ function getOpenCodeBaseUrl(): string {
 async function fetchShareData(shareId: string): Promise<ShareData> {
   const baseUrl = getOpenCodeBaseUrl();
   const sessionsRes = await fetch(`${baseUrl}/session`, {
-    headers: { 'Accept': 'application/json' },
+    headers: { Accept: 'application/json' },
   });
   if (!sessionsRes.ok) throw new Error('Failed to load sessions');
   const contentType = sessionsRes.headers.get('content-type') || '';
-  if (!contentType.includes('application/json')) throw new Error('Unexpected response from server');
+  if (!contentType.includes('application/json'))
+    throw new Error('Unexpected response from server');
 
   const sessions: SessionInfo[] = await sessionsRes.json();
   const session = sessions.find((s) => s.id.endsWith(shareId) && s.share?.url);
   if (!session) throw new Error('Share not found');
 
   const messagesRes = await fetch(`${baseUrl}/session/${session.id}/message`, {
-    headers: { 'Accept': 'application/json' },
+    headers: { Accept: 'application/json' },
   });
   if (!messagesRes.ok) throw new Error('Failed to load messages');
   const msgContentType = messagesRes.headers.get('content-type') || '';
-  if (!msgContentType.includes('application/json')) throw new Error('Unexpected response from server');
+  if (!msgContentType.includes('application/json'))
+    throw new Error('Unexpected response from server');
 
   const messages: MessageWithParts[] = await messagesRes.json();
   return { session, messages };
@@ -114,11 +116,19 @@ export function ShareViewer({ shareId }: { shareId: string }) {
     setError(null);
 
     fetchShareData(shareId)
-      .then((result) => { if (!cancelled) setData(result); })
-      .catch((err) => { if (!cancelled) setError(err.message || 'Failed to load share'); })
-      .finally(() => { if (!cancelled) setLoading(false); });
+      .then((result) => {
+        if (!cancelled) setData(result);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message || 'Failed to load share');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [shareId]);
 
   const parsed = useMemo(() => {
@@ -142,8 +152,10 @@ export function ShareViewer({ shareId }: { shareId: string }) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
-          <AcmeLoader size="medium" />
-          <p className="text-sm text-muted-foreground">Loading shared session...</p>
+          <AetherLoader size="medium" />
+          <p className="text-sm text-muted-foreground">
+            Loading shared session...
+          </p>
         </div>
       </div>
     );
@@ -158,7 +170,9 @@ export function ShareViewer({ shareId }: { shareId: string }) {
             <AlertTriangle className="h-5 w-5 text-muted-foreground" />
           </div>
           <h2 className="text-base font-medium">
-            {error === 'Share not found' ? 'Share Not Found' : 'Error Loading Share'}
+            {error === 'Share not found'
+              ? 'Share Not Found'
+              : 'Error Loading Share'}
           </h2>
           <p className="text-sm text-muted-foreground">
             {error === 'Share not found'
@@ -225,7 +239,9 @@ function ShareHeader({ sessionTitle }: { sessionTitle: string }) {
         {/* Left side — title + "Shared" badge */}
         <div className="flex items-center gap-1 min-w-0 flex-1">
           <div className="text-sm font-medium text-muted-foreground flex items-center gap-2 min-w-0">
-            <span className="truncate max-w-[140px] sm:max-w-none">{sessionTitle}</span>
+            <span className="truncate max-w-[140px] sm:max-w-none">
+              {sessionTitle}
+            </span>
             <span className="text-[11px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-md shrink-0 font-medium">
               Shared
             </span>
@@ -243,8 +259,14 @@ function ShareHeader({ sessionTitle }: { sessionTitle: string }) {
                   size="sm"
                   className="px-2.5 cursor-pointer gap-1.5"
                 >
-                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  <span className="hidden sm:inline text-sm">{copied ? 'Copied!' : 'Copy Link'}</span>
+                  {copied ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                  <span className="hidden sm:inline text-sm">
+                    {copied ? 'Copied!' : 'Copy Link'}
+                  </span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom" sideOffset={4}>
@@ -269,7 +291,10 @@ function ShareMessageView({
   role: 'user' | 'assistant';
   parts: MessagePart[];
 }) {
-  const text = parts.map((p) => p.text || p.content?.text || '').join('\n').trim();
+  const text = parts
+    .map((p) => p.text || p.content?.text || '')
+    .join('\n')
+    .trim();
   if (!text) return null;
 
   if (role === 'user') {
@@ -304,12 +329,12 @@ function AssistantBlock({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      {/* Agent header — Acme logomark (matches Suna AgentHeader for name="Acme") */}
+      {/* Agent header — Aether logomark (matches Suna AgentHeader for name="Aether") */}
       <div className="flex items-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/acme-logomark-white.svg"
-          alt="Acme"
+          src="/aether-logomark-white.svg"
+          alt="Aether"
           className="dark:invert-0 invert flex-shrink-0"
           style={{ height: '12px', width: 'auto' }}
         />
@@ -340,7 +365,13 @@ function AssistantBlock({
 // MessageActions — matches Suna MessageActions component
 // ============================================================================
 
-function MessageActions({ text, className }: { text: string; className?: string }) {
+function MessageActions({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) {
   const [copied, setCopied] = useState(false);
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);

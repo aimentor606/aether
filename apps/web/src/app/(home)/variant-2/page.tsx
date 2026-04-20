@@ -5,7 +5,17 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { BackgroundAALChecker } from '@/components/auth/background-aal-checker';
-import { ArrowRight, Check, Copy, Globe, Smartphone, Bot, Sparkles, Terminal, Zap } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  Copy,
+  Globe,
+  Smartphone,
+  Bot,
+  Sparkles,
+  Terminal,
+  Zap,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackCtaSignup } from '@/lib/analytics/gtm';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
@@ -14,12 +24,18 @@ import { GithubButton } from '@/components/home/github-button';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 
-const AcmeBoxScene = dynamic(() => import('@/components/landing/AcmeBoxScene'), {
-  ssr: false,
-  loading: () => <div className="animate-pulse bg-foreground/5 w-full h-full rounded-full blur-3xl opacity-20" />
-});
+// 3D scene removed (three.js dependency deleted). CSS fallback used instead.
+const AetherBoxScene = dynamic(
+  () =>
+    Promise.resolve(function FallbackScene() {
+      return (
+        <div className="w-full h-full rounded-full bg-gradient-to-br from-foreground/5 to-transparent blur-3xl" />
+      );
+    } as any),
+  { ssr: false },
+);
 
-const INSTALL_CMD = 'curl -fsSL https://acme.dev/install | bash';
+const INSTALL_CMD = 'curl -fsSL https://aether.dev/install | bash';
 
 // ─── Reusable Components ────────────────────────────────
 
@@ -36,7 +52,10 @@ export default function Variant2Home() {
     offset: ['start start', 'end start'],
   });
 
-  const smoothProgress = useSpring(heroProgress, { damping: 20, stiffness: 100 });
+  const smoothProgress = useSpring(heroProgress, {
+    damping: 20,
+    stiffness: 100,
+  });
 
   useEffect(() => {
     const unsub = smoothProgress.on('change', (v) => {
@@ -73,13 +92,12 @@ export default function Variant2Home() {
   return (
     <BackgroundAALChecker>
       <div className="relative bg-background text-foreground selection:bg-foreground/20">
-
         {/* 3D Scene — fixed, fades via CSS opacity */}
         <motion.div
           className="fixed inset-0 z-10 pointer-events-none"
           style={{ opacity: sceneOpacity }}
         >
-          <AcmeBoxScene
+          <AetherBoxScene
             scrollProgressRef={sceneProgressRef}
             isOn={isMachineOn}
             setIsOn={setIsMachineOn}
@@ -108,7 +126,11 @@ export default function Variant2Home() {
             <motion.div
               initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                duration: 1.2,
+                delay: 0.2,
+                ease: [0.16, 1, 0.3, 1],
+              }}
               className="text-center w-full max-w-md mx-auto relative z-30 flex flex-col items-center gap-6 mb-12"
             >
               <Button
@@ -116,7 +138,8 @@ export default function Variant2Home() {
                 className="h-14 px-10 text-base rounded-full transition-colors"
                 onClick={handleLaunch}
               >
-                Launch Acme<ArrowRight className="ml-2 size-4" />
+                Launch Aether
+                <ArrowRight className="ml-2 size-4" />
               </Button>
 
               <div className="flex flex-col items-center gap-3 w-full">
@@ -128,13 +151,19 @@ export default function Variant2Home() {
                   className="group flex items-center justify-between w-full max-w-sm h-10 px-4 rounded-lg bg-foreground/[0.03] border border-foreground/[0.08] hover:bg-foreground/[0.06] hover:border-foreground/[0.12] transition-colors cursor-pointer backdrop-blur-md"
                 >
                   <div className="flex items-center gap-3 overflow-hidden">
-                    <span className="font-mono text-xs text-muted-foreground/40 select-none">$</span>
-                    <code className="text-xs font-mono text-foreground/70 tracking-tight group-hover:text-foreground transition-colors truncate">{INSTALL_CMD}</code>
+                    <span className="font-mono text-xs text-muted-foreground/40 select-none">
+                      $
+                    </span>
+                    <code className="text-xs font-mono text-foreground/70 tracking-tight group-hover:text-foreground transition-colors truncate">
+                      {INSTALL_CMD}
+                    </code>
                   </div>
                   <div className="pl-3 border-l border-foreground/[0.08] shrink-0">
-                    {copied
-                      ? <Check className="size-3.5 text-emerald-500" />
-                      : <Copy className="size-3.5 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />}
+                    {copied ? (
+                      <Check className="size-3.5 text-emerald-500" />
+                    ) : (
+                      <Copy className="size-3.5 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />
+                    )}
                   </div>
                 </button>
               </div>
@@ -146,7 +175,9 @@ export default function Variant2Home() {
               animate={{ opacity: 1 }}
               transition={{ delay: 1, duration: 1 }}
             >
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground/30">Scroll to explore</span>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground/30">
+                Scroll to explore
+              </span>
               <div className="w-px h-8 bg-gradient-to-b from-muted-foreground/30 to-transparent" />
             </motion.div>
           </motion.section>
@@ -154,7 +185,6 @@ export default function Variant2Home() {
 
         {/* ═══════════════ CONTENT — below the hero ═══════════════ */}
         <div className="relative z-20 bg-background">
-
           {/* ── Intro ── */}
           <div className="max-w-3xl mx-auto px-6 pt-24 sm:pt-32 pb-10 sm:pb-14">
             <Reveal>
@@ -164,7 +194,11 @@ export default function Variant2Home() {
             </Reveal>
             <Reveal delay={0.1}>
               <p className="mt-4 text-base sm:text-lg text-muted-foreground/60 leading-relaxed max-w-2xl">
-                A Acme is a cloud computer where AI agents do the actual work of running a company. You connect your tools, define your agents, set their schedules and triggers — and the machine operates whether you&apos;re there or not. Persistent memory that compounds. A workforce that never stops.
+                A Aether is a cloud computer where AI agents do the actual work
+                of running a company. You connect your tools, define your
+                agents, set their schedules and triggers — and the machine
+                operates whether you&apos;re there or not. Persistent memory
+                that compounds. A workforce that never stops.
               </p>
             </Reveal>
           </div>
@@ -174,21 +208,52 @@ export default function Variant2Home() {
             <div className="max-w-3xl mx-auto px-6 mb-8">
               <Reveal>
                 <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground">
-                  Real outputs. <span className="text-muted-foreground/50">Not suggestions.</span>
+                  Real outputs.{' '}
+                  <span className="text-muted-foreground/50">
+                    Not suggestions.
+                  </span>
                 </h2>
               </Reveal>
               <Reveal delay={0.1}>
                 <p className="mt-2 text-base text-muted-foreground/60 leading-relaxed max-w-xl">
-                  Give an agent a goal. It plans, executes, self-verifies, and delivers a finished result. That&apos;s autowork.
+                  Give an agent a goal. It plans, executes, self-verifies, and
+                  delivers a finished result. That&apos;s autowork.
                 </p>
               </Reveal>
             </div>
-            <div className="flex gap-5 px-6 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
+            <div
+              className="flex gap-5 px-6 overflow-x-auto pb-4"
+              style={{ scrollbarWidth: 'none' }}
+            >
               {[
-                { src: '/showcase/data/dashboard.png', width: 1386, height: 836, label: 'Company Performance Dashboard', prompt: '"Analyse all sales data and build me a dashboard"' },
-                { src: '/showcase/presentation/slide1.png', width: 1512, height: 756, label: 'Research Presentation', prompt: '"Create a deck on neural networks for the team"' },
-                { src: '/showcase/presentation/slide2.png', width: 1512, height: 756, label: 'Slide with Diagrams', prompt: '"Add a technical deep-dive slide"' },
-                { src: '/showcase/image/mockup-board.png', width: 874, height: 1312, label: 'Brand Identity Mockup', prompt: '"Design a logo and brand kit for Luxy"' },
+                {
+                  src: '/showcase/data/dashboard.png',
+                  width: 1386,
+                  height: 836,
+                  label: 'Company Performance Dashboard',
+                  prompt: '"Analyse all sales data and build me a dashboard"',
+                },
+                {
+                  src: '/showcase/presentation/slide1.png',
+                  width: 1512,
+                  height: 756,
+                  label: 'Research Presentation',
+                  prompt: '"Create a deck on neural networks for the team"',
+                },
+                {
+                  src: '/showcase/presentation/slide2.png',
+                  width: 1512,
+                  height: 756,
+                  label: 'Slide with Diagrams',
+                  prompt: '"Add a technical deep-dive slide"',
+                },
+                {
+                  src: '/showcase/image/mockup-board.png',
+                  width: 874,
+                  height: 1312,
+                  label: 'Brand Identity Mockup',
+                  prompt: '"Design a logo and brand kit for Luxy"',
+                },
               ].map(({ src, width, height, label, prompt }) => (
                 <Reveal key={src} className="flex-none w-[320px] sm:w-[380px]">
                   <div className="rounded-xl overflow-hidden border border-border/40 bg-card/20">
@@ -198,15 +263,30 @@ export default function Variant2Home() {
                         <div className="size-1.5 rounded-full bg-muted-foreground/15" />
                         <div className="size-1.5 rounded-full bg-muted-foreground/15" />
                       </div>
-                      <span className="text-[0.5625rem] font-mono text-muted-foreground/30 ml-1">output</span>
+                      <span className="text-[0.5625rem] font-mono text-muted-foreground/30 ml-1">
+                        output
+                      </span>
                     </div>
-                    <div className="relative overflow-hidden" style={{ aspectRatio: `${width}/${height}` }}>
-                      <Image src={src} alt={label} width={width} height={height} className="w-full h-full object-cover" />
+                    <div
+                      className="relative overflow-hidden"
+                      style={{ aspectRatio: `${width}/${height}` }}
+                    >
+                      <Image
+                        src={src}
+                        alt={label}
+                        width={width}
+                        height={height}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </div>
                   <div className="mt-2.5 px-0.5">
-                    <div className="text-sm font-medium text-foreground/70 tracking-tight">{label}</div>
-                    <div className="mt-1 text-[10px] text-muted-foreground/40 font-mono">{prompt}</div>
+                    <div className="text-sm font-medium text-foreground/70 tracking-tight">
+                      {label}
+                    </div>
+                    <div className="mt-1 text-[10px] text-muted-foreground/40 font-mono">
+                      {prompt}
+                    </div>
                   </div>
                 </Reveal>
               ))}
@@ -225,23 +305,54 @@ export default function Variant2Home() {
                 </Reveal>
                 <Reveal delay={0.1}>
                   <p className="text-base text-muted-foreground/60 leading-relaxed mb-8">
-                    Acme runs on <a href="https://opencode.ai" target="_blank" rel="noopener noreferrer" className="hover:text-foreground/80 transition-colors">OpenCode</a>, an open foundation for building knowledge work agents, with the Acme cognitive architecture layered on top. Everything is just files.
+                    Aether runs on{' '}
+                    <a
+                      href="https://opencode.ai"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-foreground/80 transition-colors"
+                    >
+                      OpenCode
+                    </a>
+                    , an open foundation for building knowledge work agents,
+                    with the Aether cognitive architecture layered on top.
+                    Everything is just files.
                   </p>
                 </Reveal>
                 <Reveal delay={0.2}>
                   <div className="flex flex-col gap-4">
                     {[
-                      ['Agents', 'Markdown files with identity, permissions, tools, and triggers. Each one a specialist.'],
-                      ['Skills', '60+ knowledge packs — coding, browser automation, deep research, legal writing, spreadsheets.'],
-                      ['Autowork', 'Autonomous execution loop. Works until done, self-verifies, only stops when correct.'],
-                      ['Triggers', 'Cron schedules and webhooks in agent frontmatter. The machine works while you sleep.'],
-                      ['Memory', 'Persistent, filesystem-based, semantic-searchable. The longer it runs, the smarter it gets.'],
+                      [
+                        'Agents',
+                        'Markdown files with identity, permissions, tools, and triggers. Each one a specialist.',
+                      ],
+                      [
+                        'Skills',
+                        '60+ knowledge packs — coding, browser automation, deep research, legal writing, spreadsheets.',
+                      ],
+                      [
+                        'Autowork',
+                        'Autonomous execution loop. Works until done, self-verifies, only stops when correct.',
+                      ],
+                      [
+                        'Triggers',
+                        'Cron schedules and webhooks in agent frontmatter. The machine works while you sleep.',
+                      ],
+                      [
+                        'Memory',
+                        'Persistent, filesystem-based, semantic-searchable. The longer it runs, the smarter it gets.',
+                      ],
                     ].map(([title, desc]) => (
                       <div key={title} className="flex items-start gap-3">
                         <div className="mt-[7px] size-1 rounded-full bg-foreground/25 shrink-0" />
                         <div>
-                          <span className="text-sm font-medium text-foreground/70">{title}</span>
-                          <span className="text-sm text-muted-foreground/60"> — {desc}</span>
+                          <span className="text-sm font-medium text-foreground/70">
+                            {title}
+                          </span>
+                          <span className="text-sm text-muted-foreground/60">
+                            {' '}
+                            — {desc}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -257,34 +368,67 @@ export default function Variant2Home() {
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground/40 ml-1">acme — session</span>
+                    <span className="text-[10px] font-mono text-muted-foreground/40 ml-1">
+                      aether — session
+                    </span>
                   </div>
                   <div className="p-5 space-y-5">
                     <div className="space-y-1">
-                      <div className="text-muted-foreground/35 text-[0.5625rem] uppercase tracking-widest">You</div>
+                      <div className="text-muted-foreground/35 text-[0.5625rem] uppercase tracking-widest">
+                        You
+                      </div>
                       <div className="text-foreground/65 leading-relaxed">
-                        Research our top 3 competitors, summarise their pricing, and send a Slack report to #strategy.
+                        Research our top 3 competitors, summarise their pricing,
+                        and send a Slack report to #strategy.
                       </div>
                     </div>
                     <div className="space-y-2 pl-3 border-l border-border/25">
-                      <div className="text-muted-foreground/35 text-[0.5625rem] uppercase tracking-widest mb-3">Acme</div>
+                      <div className="text-muted-foreground/35 text-[0.5625rem] uppercase tracking-widest mb-3">
+                        Aether
+                      </div>
                       {[
-                        { done: true, text: 'Browsing competitor sites via Chromium...' },
-                        { done: true, text: 'Extracting pricing pages (3 sites)...' },
-                        { done: true, text: 'Writing analysis to /workspace/research/competitors.md' },
+                        {
+                          done: true,
+                          text: 'Browsing competitor sites via Chromium...',
+                        },
+                        {
+                          done: true,
+                          text: 'Extracting pricing pages (3 sites)...',
+                        },
+                        {
+                          done: true,
+                          text: 'Writing analysis to /workspace/research/competitors.md',
+                        },
                         { done: true, text: 'Formatting Slack message...' },
-                        { done: false, text: 'Sending to #strategy via Slack OAuth...' },
+                        {
+                          done: false,
+                          text: 'Sending to #strategy via Slack OAuth...',
+                        },
                       ].map(({ done, text }, i) => (
                         <div key={i} className="flex items-start gap-2.5">
-                          <div className={cn('mt-[3px] size-1.5 rounded-full shrink-0', done ? 'bg-foreground/20' : 'bg-foreground/50 animate-pulse')} />
-                          <span className={done ? 'text-muted-foreground/40 line-through decoration-muted-foreground/25' : 'text-foreground/70'}>
+                          <div
+                            className={cn(
+                              'mt-[3px] size-1.5 rounded-full shrink-0',
+                              done
+                                ? 'bg-foreground/20'
+                                : 'bg-foreground/50 animate-pulse',
+                            )}
+                          />
+                          <span
+                            className={
+                              done
+                                ? 'text-muted-foreground/40 line-through decoration-muted-foreground/25'
+                                : 'text-foreground/70'
+                            }
+                          >
                             {text}
                           </span>
                         </div>
                       ))}
                     </div>
                     <div className="pt-1 border-t border-border/20 text-foreground/60 leading-relaxed">
-                      Done. Report delivered. Saved to workspace for future reference.
+                      Done. Report delivered. Saved to workspace for future
+                      reference.
                     </div>
                     <div className="flex items-center gap-1.5">
                       <span className="text-foreground/30">$</span>
@@ -307,7 +451,9 @@ export default function Variant2Home() {
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-widest">root@acme ~ acme status</span>
+                    <span className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-widest">
+                      root@aether ~ aether status
+                    </span>
                     <div className="size-2.5 opacity-0" />
                   </div>
                   <div className="p-5 space-y-1 text-[11px]">
@@ -317,19 +463,66 @@ export default function Variant2Home() {
                       <div className="col-span-4">Last action</div>
                     </div>
                     {[
-                      { name: 'support-agent', uptime: '14d 02:11', last: 'Replied to 3 tickets', running: true },
-                      { name: 'bookkeeping', uptime: '14d 02:10', last: 'Reconciled March invoices', running: true },
-                      { name: 'recruiter', uptime: '6d 14:45', last: 'Screened 12 applicants', running: true },
-                      { name: 'data-pipeline', uptime: '3d 08:20', last: 'Refreshed dashboard data', running: true },
-                      { name: 'cron-weekly', uptime: '—', last: 'Next run: Monday 08:00', running: false },
+                      {
+                        name: 'support-agent',
+                        uptime: '14d 02:11',
+                        last: 'Replied to 3 tickets',
+                        running: true,
+                      },
+                      {
+                        name: 'bookkeeping',
+                        uptime: '14d 02:10',
+                        last: 'Reconciled March invoices',
+                        running: true,
+                      },
+                      {
+                        name: 'recruiter',
+                        uptime: '6d 14:45',
+                        last: 'Screened 12 applicants',
+                        running: true,
+                      },
+                      {
+                        name: 'data-pipeline',
+                        uptime: '3d 08:20',
+                        last: 'Refreshed dashboard data',
+                        running: true,
+                      },
+                      {
+                        name: 'cron-weekly',
+                        uptime: '—',
+                        last: 'Next run: Monday 08:00',
+                        running: false,
+                      },
                     ].map(({ name, uptime, last, running }) => (
-                      <div key={name} className="grid grid-cols-12 gap-2 py-1.5 items-center">
+                      <div
+                        key={name}
+                        className="grid grid-cols-12 gap-2 py-1.5 items-center"
+                      >
                         <div className="col-span-5 flex items-center gap-2">
-                          <div className={cn('size-1.5 rounded-full shrink-0', running ? 'bg-foreground/40 animate-pulse' : 'bg-muted-foreground/20')} />
-                          <span className={running ? 'text-foreground/65' : 'text-muted-foreground/35'}>{name}</span>
+                          <div
+                            className={cn(
+                              'size-1.5 rounded-full shrink-0',
+                              running
+                                ? 'bg-foreground/40 animate-pulse'
+                                : 'bg-muted-foreground/20',
+                            )}
+                          />
+                          <span
+                            className={
+                              running
+                                ? 'text-foreground/65'
+                                : 'text-muted-foreground/35'
+                            }
+                          >
+                            {name}
+                          </span>
                         </div>
-                        <div className="col-span-3 text-muted-foreground/35">{uptime}</div>
-                        <div className="col-span-4 text-muted-foreground/40 truncate">{last}</div>
+                        <div className="col-span-3 text-muted-foreground/35">
+                          {uptime}
+                        </div>
+                        <div className="col-span-4 text-muted-foreground/40 truncate">
+                          {last}
+                        </div>
                       </div>
                     ))}
                     <div className="flex items-center gap-1.5 pt-3 border-t border-border/20 mt-2">
@@ -348,22 +541,41 @@ export default function Variant2Home() {
                 </Reveal>
                 <Reveal delay={0.1}>
                   <p className="text-base text-muted-foreground/60 leading-relaxed mb-8">
-                    Your agents run 24/7. Triggers fire them on schedule. Autowork keeps them going until the job is verified done. You check in from anywhere — whenever you want.
+                    Your agents run 24/7. Triggers fire them on schedule.
+                    Autowork keeps them going until the job is verified done.
+                    You check in from anywhere — whenever you want.
                   </p>
                 </Reveal>
                 <Reveal delay={0.2}>
                   <div className="flex flex-col gap-4">
                     {[
-                      ['Cron triggers', 'Schedule any agent at any interval — hourly, daily, weekly'],
-                      ['Event webhooks', 'React to external events the moment they happen'],
-                      ['Orchestration', 'One agent delegates to many. Parallel sub-agents, background sessions.'],
-                      ['Channels', 'Talk to agents from Slack, Telegram, Discord, web, or mobile'],
+                      [
+                        'Cron triggers',
+                        'Schedule any agent at any interval — hourly, daily, weekly',
+                      ],
+                      [
+                        'Event webhooks',
+                        'React to external events the moment they happen',
+                      ],
+                      [
+                        'Orchestration',
+                        'One agent delegates to many. Parallel sub-agents, background sessions.',
+                      ],
+                      [
+                        'Channels',
+                        'Talk to agents from Slack, Telegram, Discord, web, or mobile',
+                      ],
                     ].map(([title, desc]) => (
                       <div key={title} className="flex items-start gap-3">
                         <div className="mt-[7px] size-1 rounded-full bg-foreground/25 shrink-0" />
                         <div>
-                          <span className="text-sm font-medium text-foreground/70">{title}</span>
-                          <span className="text-sm text-muted-foreground/60"> — {desc}</span>
+                          <span className="text-sm font-medium text-foreground/70">
+                            {title}
+                          </span>
+                          <span className="text-sm text-muted-foreground/60">
+                            {' '}
+                            — {desc}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -383,7 +595,9 @@ export default function Variant2Home() {
               </Reveal>
               <Reveal delay={0.1}>
                 <p className="text-base text-muted-foreground/60 leading-relaxed mb-10 max-w-2xl">
-                  Agents, skills, memory, credentials, browser profiles — all on the filesystem you own. Human-readable, git-trackable, SSH-accessible.
+                  Agents, skills, memory, credentials, browser profiles — all on
+                  the filesystem you own. Human-readable, git-trackable,
+                  SSH-accessible.
                 </p>
               </Reveal>
 
@@ -391,7 +605,9 @@ export default function Variant2Home() {
                 <Reveal delay={0.15}>
                   <div className="rounded-2xl border border-border/40 bg-card/20 overflow-hidden">
                     <div className="px-5 py-4 border-b border-border/25">
-                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground/35 font-medium">Connected</div>
+                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground/35 font-medium">
+                        Connected
+                      </div>
                     </div>
                     <div className="p-4 flex flex-col gap-2">
                       {[
@@ -402,9 +618,16 @@ export default function Variant2Home() {
                         { name: 'Stripe', tag: 'API' },
                         { name: 'Linear', tag: 'MCP' },
                       ].map(({ name, tag }) => (
-                        <div key={name} className="flex items-center justify-between py-1.5">
-                          <span className="text-sm text-foreground/70 font-medium">{name}</span>
-                          <span className="text-[0.5625rem] font-mono uppercase tracking-widest text-muted-foreground/35 bg-muted/20 px-2 py-0.5 rounded-md">{tag}</span>
+                        <div
+                          key={name}
+                          className="flex items-center justify-between py-1.5"
+                        >
+                          <span className="text-sm text-foreground/70 font-medium">
+                            {name}
+                          </span>
+                          <span className="text-[0.5625rem] font-mono uppercase tracking-widest text-muted-foreground/35 bg-muted/20 px-2 py-0.5 rounded-md">
+                            {tag}
+                          </span>
                         </div>
                       ))}
                       <div className="pt-2 text-[10px] text-muted-foreground/30 text-center border-t border-border/20">
@@ -417,7 +640,9 @@ export default function Variant2Home() {
                 <Reveal delay={0.25}>
                   <div className="rounded-2xl border border-border/40 bg-card/20 overflow-hidden font-mono text-[11px]">
                     <div className="px-5 py-4 border-b border-border/25">
-                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground/35 font-medium">~/workspace</div>
+                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground/35 font-medium">
+                        ~/workspace
+                      </div>
                     </div>
                     <div className="p-4 flex flex-col gap-0.5">
                       {[
@@ -434,7 +659,9 @@ export default function Variant2Home() {
                           className="flex items-center gap-2 py-1 px-1 rounded hover:bg-muted/15 transition-colors"
                           style={{ paddingLeft: `${d * 1.25 + 0.25}rem` }}
                         >
-                          <span className="text-muted-foreground/25 text-[10px]">{f ? '·' : '▸'}</span>
+                          <span className="text-muted-foreground/25 text-[10px]">
+                            {f ? '·' : '▸'}
+                          </span>
                           <span className="text-foreground/55">{n}</span>
                         </div>
                       ))}
@@ -457,7 +684,8 @@ export default function Variant2Home() {
                   className="h-11 px-7 text-sm rounded-full"
                   onClick={handleLaunch}
                 >
-                  Get Started<ArrowRight className="ml-1.5 size-3.5" />
+                  Get Started
+                  <ArrowRight className="ml-1.5 size-3.5" />
                 </Button>
                 <GithubButton size="lg" className="h-11" />
               </div>
@@ -465,18 +693,22 @@ export default function Variant2Home() {
                 onClick={handleCopy}
                 className="group inline-flex items-center gap-2.5 h-9 px-4 rounded-lg bg-foreground/[0.03] border border-foreground/[0.08] hover:bg-foreground/[0.06] hover:border-foreground/[0.12] transition-colors cursor-pointer"
               >
-                <span className="font-mono text-[11px] text-muted-foreground/35 select-none">$</span>
-                <code className="text-[11px] font-mono text-foreground/70 tracking-tight">{INSTALL_CMD}</code>
+                <span className="font-mono text-[11px] text-muted-foreground/35 select-none">
+                  $
+                </span>
+                <code className="text-[11px] font-mono text-foreground/70 tracking-tight">
+                  {INSTALL_CMD}
+                </code>
                 <div className="pl-2.5 border-l border-foreground/[0.08]">
-                  {copied
-                    ? <Check className="size-3 text-emerald-500" />
-                    : <Copy className="size-3 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />
-                  }
+                  {copied ? (
+                    <Check className="size-3 text-emerald-500" />
+                  ) : (
+                    <Copy className="size-3 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />
+                  )}
                 </div>
               </button>
             </section>
           </Reveal>
-
         </div>
       </div>
     </BackgroundAALChecker>

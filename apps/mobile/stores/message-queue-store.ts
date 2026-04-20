@@ -8,7 +8,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const QUEUE_STORAGE_KEY = 'acme_message_queue_v1';
+const QUEUE_STORAGE_KEY = 'aether_message_queue_v1';
 
 // ---------------------------------------------------------------------------
 // Types

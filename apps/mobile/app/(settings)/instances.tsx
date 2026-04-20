@@ -547,7 +547,7 @@ const AddInstanceSheet = React.forwardRef<
                   <Icon as={Globe} size={18} className="text-foreground/80" strokeWidth={2.2} />
                   <View className="ml-4 flex-1">
                     <Text className="font-roobert-medium text-[15px] text-foreground">Custom URL</Text>
-                    <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">Connect to any Acme instance by address</Text>
+                    <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">Connect to any Aether instance by address</Text>
                   </View>
                 </View>
               </Pressable>
@@ -559,7 +559,7 @@ const AddInstanceSheet = React.forwardRef<
               Custom URL
             </Text>
             <Text className="mb-4 font-roobert text-xs text-muted-foreground">
-              Enter the address of your Acme instance.
+              Enter the address of your Aether instance.
             </Text>
 
             <BottomSheetTextInput

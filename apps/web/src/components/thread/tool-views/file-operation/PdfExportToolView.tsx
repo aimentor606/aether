@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { FileText, Download, CheckCircle2, AlertCircle } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { ToolViewProps } from '../types';
 import { formatTimestamp } from '../utils';
 import { toast } from '@/lib/toast';
@@ -156,8 +156,8 @@ export function PdfExportToolView({
             >
               {isDownloading ? (
                 <>
-                  <AcmeLoader customSize={16} variant="white" className="mr-2 dark:hidden" />
-                  <AcmeLoader customSize={16} variant="black" className="mr-2 hidden dark:flex" />
+                  <AetherLoader customSize={16} variant="white" className="mr-2 dark:hidden" />
+                  <AetherLoader customSize={16} variant="black" className="mr-2 hidden dark:flex" />
                   <span>Downloading...</span>
                 </>
               ) : (

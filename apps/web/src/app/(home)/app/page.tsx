@@ -9,12 +9,12 @@ import { AppDownloadQR, APP_DOWNLOAD_URL } from '@/components/common/app-downloa
 // This page only renders for desktop users
 
 const STORE_LINKS = {
-  ios: 'https://apps.apple.com/ie/app/acme/id6754448524',
-  android: 'https://play.google.com/store/apps/details?id=com.acme.app',
+  ios: 'https://apps.apple.com/ie/app/aether/id6754448524',
+  android: 'https://play.google.com/store/apps/details?id=com.aether.app',
 };
 
-// Acme symbol SVG (inline to avoid loading issues)
-function AcmeSymbol({ size = 24, className }: { size?: number; className?: string }) {
+// Aether symbol SVG (inline to avoid loading issues)
+function AetherSymbol({ size = 24, className }: { size?: number; className?: string }) {
   return (
     <svg 
       width={size} 
@@ -78,16 +78,16 @@ export default function AppDownloadPage() {
             {/* App icon */}
             <div className="relative mb-6 z-10">
               <div className="relative w-20 h-20 bg-foreground rounded-[20px] flex items-center justify-center">
-                <AcmeSymbol size={40} className="text-background" />
+                <AetherSymbol size={40} className="text-background" />
               </div>
             </div>
             
             <h1 className="text-2xl md:text-3xl font-semibold text-foreground text-center tracking-tight mb-3">
-              Acme for Mobile
+              Aether for Mobile
             </h1>
             <p className="text-base text-muted-foreground text-center max-w-xl leading-relaxed">
               Your AI Worker, in your pocket.<br />
-              Download the app and take Acme with you everywhere.
+              Download the app and take Aether with you everywhere.
             </p>
           </motion.div>
 

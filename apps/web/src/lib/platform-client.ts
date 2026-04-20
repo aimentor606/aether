@@ -1,7 +1,7 @@
 /**
  * Platform API client.
  *
- * Routes through acme-api (the unified backend) for sandbox lifecycle:
+ * Routes through aether-api (the unified backend) for sandbox lifecycle:
  *   GET  /platform/providers          — available sandbox providers
  *   POST /platform/init               — ensure user has a sandbox, provision if needed
  *   GET  /platform/sandbox            — get user's active sandbox
@@ -9,7 +9,7 @@
  *   POST /platform/sandbox/stop       — stop the active sandbox
  *   POST /platform/sandbox/restart    — restart the active sandbox
  *
- * In production: https://api.acme.dev/v1/platform/*  (base URL includes /v1)
+ * In production: https://api.aether.dev/v1/platform/*  (base URL includes /v1)
  * In local:      http://localhost:8008/v1/platform/*  (base URL includes /v1)
  */
 
@@ -28,7 +28,7 @@ export const SANDBOX_PORTS = {
   DESKTOP_HTTPS: '6081',
   PRESENTATION_VIEWER: '3210',
   STATIC_FILE_SERVER: '3211',
-  ACME_MASTER: '8000',
+  AETHER_MASTER: '8000',
   BROWSER_STREAM: '9223',
   BROWSER_VIEWER: '9224',
   SSH: '22',
@@ -142,7 +142,7 @@ async function platformFetch<T>(
  * Provider-agnostic: {BACKEND_URL}/p/{externalId}/8000
  *
  * The external_id is the sandbox identifier used for routing:
- *   - Local Docker: container name (e.g. 'acme-sandbox') — resolves via Docker DNS
+ *   - Local Docker: container name (e.g. 'aether-sandbox') — resolves via Docker DNS
  *   - Daytona (cloud): Daytona sandbox ID
  *
  * Guards against missing external_id to prevent broken URLs.
@@ -155,7 +155,7 @@ export function getSandboxUrl(sandbox: SandboxInfo): string {
     );
   }
 
-  return `${getPlatformUrl()}/p/${sandbox.external_id}/${SANDBOX_PORTS.ACME_MASTER}`;
+  return `${getPlatformUrl()}/p/${sandbox.external_id}/${SANDBOX_PORTS.AETHER_MASTER}`;
 }
 
 /**
@@ -620,7 +620,7 @@ export interface SandboxUpdateStatus {
 }
 
 /**
- * Get the current update status from acme-api.
+ * Get the current update status from aether-api.
  * The API tracks the Docker pull + recreate progress.
  */
 export async function getSandboxUpdateStatus(
@@ -679,7 +679,7 @@ export async function getAllVersions(): Promise<AllVersionsResponse> {
 }
 
 /**
- * Trigger a Docker image-based sandbox update via acme-api.
+ * Trigger a Docker image-based sandbox update via aether-api.
  *
  * The API pulls the new image, stops the container, removes it (preserving
  * the /workspace volume), and recreates with the new image. The frontend
@@ -709,7 +709,7 @@ export async function triggerSandboxUpdate(
 }
 
 /**
- * Reset the update status on acme-api (e.g. after a failed update to allow retry).
+ * Reset the update status on aether-api (e.g. after a failed update to allow retry).
  */
 export async function resetSandboxUpdateStatus(sandbox?: SandboxInfo): Promise<void> {
   const url = sandbox?.sandbox_id

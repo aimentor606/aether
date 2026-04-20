@@ -1,4 +1,4 @@
-# 基于Acme构建垂直行业SaaS产品 — Fork策略设计
+# 基于Aether构建垂直行业SaaS产品 — Fork策略设计
 
 ## 文档信息
 
@@ -10,7 +10,7 @@
 
 ## 1. 需求总结
 
-**目标**：基于开源项目 Acme (aimentor606/aether) fork 构建垂直行业 SaaS 产品。
+**目标**：基于开源项目 Aether (aimentor606/aether) fork 构建垂直行业 SaaS 产品。
 
 **约束**：
 1. 尽量与上游保持同步，上游更新时下游更新成本最小
@@ -84,7 +84,7 @@ aether/ (fork of aimentor606/aether)
 | `apps/web/src/components/custom/` | 新建目录 | 无 | 独有组件 |
 | `apps/api/src/routes/` | 新增路由文件 | 低 | 不碰已有路由 |
 | `apps/api/src/middleware/` | 不动已有，可加新的 | 低 | 认证是冲突重灾区 |
-| `packages/db/src/schema/` | 新建 vertical.ts | 低 | 不改 acme.ts |
+| `packages/db/src/schema/` | 新建 vertical.ts | 低 | 不改 aether.ts |
 | `packages/vertical/` | 全新包 | 无 | 上游不存在 |
 | `packages/theme/` | 全新包 | 无 | 上游不存在 |
 | `core/` | 用 plugin 扩展 | 无 | 不动即不冲突 |
@@ -186,7 +186,7 @@ git checkout main && git merge sync-upstream-$(date +%Y%m%d)
 ## 6. 核心纪律（减少冲突的关键）
 
 1. **新功能放新文件/新包** — 永远不冲突
-2. **不改 `packages/db/src/schema/acme.ts`** — 冲突重灾区，用关联表代替
+2. **不改 `packages/db/src/schema/aether.ts`** — 冲突重灾区，用关联表代替
 3. **不改 `apps/api/src/middleware/auth.ts`** — 核心认证逻辑
 4. **不改 `core/` 核心运行时** — 用 plugin/tool/skill 机制扩展
 5. **数据库扩展用新表** — `packages/db/src/schema/vertical.ts`
@@ -196,15 +196,15 @@ git checkout main && git merge sync-upstream-$(date +%Y%m%d)
 
 ## 7. 扩展机制利用
 
-Acme 已有以下扩展机制，可以在不改核心代码的情况下添加能力：
+Aether 已有以下扩展机制，可以在不改核心代码的情况下添加能力：
 
 | 机制 | 文件位置 | 用途 |
 |---|---|---|
-| OpenCode Plugin | `core/acme-master/opencode/plugin/` | 添加系统级行为 |
-| Tool Registry | `core/acme-master/opencode/tools/` | 添加 Agent 可调用的工具 |
+| OpenCode Plugin | `core/aether-master/opencode/plugin/` | 添加系统级行为 |
+| Tool Registry | `core/aether-master/opencode/tools/` | 添加 Agent 可调用的工具 |
 | Frontend ToolRegistry | `apps/web/src/components/session/tool-renderers.tsx` | 注册工具的 UI 渲染器 |
 | ToolViewRegistry | `apps/web/src/components/thread/tool-views/wrapper/ToolViewRegistry.tsx` | 注册工具视图 |
-| Service Manager | `core/acme-master/src/services/service-manager.ts` | 注册运行时服务 |
+| Service Manager | `core/aether-master/src/services/service-manager.ts` | 注册运行时服务 |
 | Provider Registry | `apps/api/src/providers/registry.ts` | 添加 LLM 提供商 |
 | Feature Flags | `apps/web/src/lib/feature-flags.ts` | 通过环境变量控制功能 |
 | CSS Variables | `apps/web/src/app/globals.css` | 品牌主题定制 |
@@ -216,27 +216,27 @@ Acme 已有以下扩展机制，可以在不改核心代码的情况下添加能
 
 ### 8.1 核心思路
 
-**保留目录名不动，替换其他所有 "Acme" 关键字。** 用 codemod 脚本自动化，每次 merge 上游后运行一次。
+**保留目录名不动，替换其他所有 "Aether" 关键字。** 用 codemod 脚本自动化，每次 merge 上游后运行一次。
 
 ### 8.2 替换范围
 
 **不动（保留原样）**：
-- 目录名：`core/acme-master/`、`packages/acme-ocx-registry/`
+- 目录名：`core/aether-master/`、`packages/aether-ocx-registry/`
 - Git submodule 引用
 
 **替换（通过 codemod 脚本）**：
 
 | 替换项 | 上游值 | 替换为 | 影响范围 |
 |---|---|---|---|
-| workspace 包名 | `@acme/db`、`@acme/shared` | `@yourbrand/db`、`@yourbrand/shared` | ~80+ 文件的 import |
-| 包名 | `acme-api` | `yourbrand-api` | package.json、pnpm 引用 |
-| 环境变量前缀 | `ACME_PUBLIC_*`、`ACME_TOKEN` 等 | `YOURBRAND_PUBLIC_*`、`YOURBRAND_TOKEN` | ~40+ 文件 |
-| Auth Cookie | `ACME_SUPABASE_AUTH_COOKIE` | `YOURBRAND_SUPABASE_AUTH_COOKIE` | ~5 文件 |
-| 用户可见文字 | "Acme" | 你的品牌名 | ~100+ 文件（前端/i18n） |
-| API Key 前缀 | `acme_` | `yourbrand_` | ~3 文件 |
-| Docker 镜像名 | `acme/suna:*` | `yourbrand/app:*` | ~5 文件 |
-| CLI 命令名 | `acme start` 等 | `yourbrand start` | ~20 文件 |
-| DB schema 名 | `acme` | `yourbrand` | ~10 文件 |
+| workspace 包名 | `@aether/db`、`@aether/shared` | `@yourbrand/db`、`@yourbrand/shared` | ~80+ 文件的 import |
+| 包名 | `aether-api` | `yourbrand-api` | package.json、pnpm 引用 |
+| 环境变量前缀 | `aether_PUBLIC_*`、`aether_TOKEN` 等 | `YOURBRAND_PUBLIC_*`、`YOURBRAND_TOKEN` | ~40+ 文件 |
+| Auth Cookie | `aether_SUPABASE_AUTH_COOKIE` | `YOURBRAND_SUPABASE_AUTH_COOKIE` | ~5 文件 |
+| 用户可见文字 | "Aether" | 你的品牌名 | ~100+ 文件（前端/i18n） |
+| API Key 前缀 | `aether_` | `yourbrand_` | ~3 文件 |
+| Docker 镜像名 | `aether/suna:*` | `yourbrand/app:*` | ~5 文件 |
+| CLI 命令名 | `aether start` 等 | `yourbrand start` | ~20 文件 |
+| DB schema 名 | `aether` | `yourbrand` | ~10 文件 |
 
 ### 8.3 Rebrand Codemod 脚本
 
@@ -248,23 +248,23 @@ Acme 已有以下扩展机制，可以在不改核心代码的情况下添加能
 
 set -euo pipefail
 
-BRAND="${BRAND:?请设置 BRAND 环境变量，例如 BRAND=acme}"
+BRAND="${BRAND:?请设置 BRAND 环境变量，例如 BRAND=aether}"
 BRAND_CAP="$(echo "$BRAND" | sed 's/^./\U&/')"
 BRAND_UPPER="$(echo "$BRAND" | tr '[:lower:]' '[:upper:]')"
 
-echo "🔄 Rebranding: acme → $BRAND"
+echo "🔄 Rebranding: aether → $BRAND"
 
 # --- 第1步：包名替换（package.json + import 语句）---
 
-# package.json 中的 @acme/* 引用
+# package.json 中的 @aether/* 引用
 find . -name 'package.json' -not -path '*/node_modules/*' -not -path '*/.next/*' | \
   xargs sed -i '' \
-    -e "s/@acme\//@$BRAND\//g" \
-    -e "s/\"acme-api\"/\"$BRAND-api\"/g" \
-    -e "s/\"acme\"/\"$BRAND\"/g"
+    -e "s/@aether\//@$BRAND\//g" \
+    -e "s/\"aether-api\"/\"$BRAND-api\"/g" \
+    -e "s/\"aether\"/\"$BRAND\"/g"
 
 # pnpm-workspace.yaml
-sed -i '' -e "s/@acme\//@$BRAND\//g" pnpm-workspace.yaml 2>/dev/null || true
+sed -i '' -e "s/@aether\//@$BRAND\//g" pnpm-workspace.yaml 2>/dev/null || true
 
 # TypeScript/TSX 文件中的 import
 find . \( -name '*.ts' -o -name '*.tsx' \) \
@@ -272,27 +272,27 @@ find . \( -name '*.ts' -o -name '*.tsx' \) \
   -not -path '*/.next/*' \
   -not -path '*/dist/*' | \
   xargs sed -i '' \
-    -e "s/@acme\//@$BRAND\//g" \
-    -e "s/from ['\"]acme-api/from ['\"]$BRAND-api/g"
+    -e "s/@aether\//@$BRAND\//g" \
+    -e "s/from ['\"]aether-api/from ['\"]$BRAND-api/g"
 
 # --- 第2步：环境变量替换 ---
 find . \( -name '*.ts' -o -name '*.tsx' -o -name '*.env*' \) \
   -not -path '*/node_modules/*' \
   -not -path '*/.next/*' | \
   xargs sed -i '' \
-    -e "s/ACME_/$BRAND_UPPER\_/g" \
-    -e "s/NEXT_PUBLIC_ACME_/NEXT_PUBLIC_$BRAND_UPPER\_/g"
+    -e "s/aether_/$BRAND_UPPER\_/g" \
+    -e "s/NEXT_PUBLIC_aether_/NEXT_PUBLIC_$BRAND_UPPER\_/g"
 
 # --- 第3步：用户可见文字替换（前端）---
 find ./apps/web \( -name '*.tsx' -o -name '*.ts' \) \
   -not -path '*/node_modules/*' \
   -not -path '*/.next/*' | \
   xargs sed -i '' \
-    -e "s/Acme/$BRAND_CAP/g"
+    -e "s/Aether/$BRAND_CAP/g"
 
 # i18n 翻译文件
 find ./apps/web/translations -name '*.json' | \
-  xargs sed -i '' "s/Acme/$BRAND_CAP/g"
+  xargs sed -i '' "s/Aether/$BRAND_CAP/g"
 
 # --- 第4步：其他固定替换 ---
 
@@ -300,27 +300,27 @@ find ./apps/web/translations -name '*.json' | \
 find . \( -name '*.ts' -o -name '*.tsx' \) \
   -not -path '*/node_modules/*' | \
   xargs sed -i '' \
-    -e "s/ACME_SUPABASE_AUTH_COOKIE/$BRAND_UPPER\_SUPABASE_AUTH_COOKIE/g"
+    -e "s/aether_SUPABASE_AUTH_COOKIE/$BRAND_UPPER\_SUPABASE_AUTH_COOKIE/g"
 
 # API key 前缀
 find . -name '*.ts' -not -path '*/node_modules/*' | \
-  xargs sed -i '' "s/acme_/$BRAND\_/g"
+  xargs sed -i '' "s/aether_/$BRAND\_/g"
 
 # DB schema 名（SQL 和 Drizzle）
 find . \( -name '*.ts' -o -name '*.sql' \) \
   -not -path '*/node_modules/*' | \
-  xargs sed -i '' "s/'acme'/'$BRAND'/g"
+  xargs sed -i '' "s/'aether'/'$BRAND'/g"
 
 # CLI 命令名
 find . -name '*.sh' -o -name '*.ts' | \
-  xargs sed -i '' "s/acme start/$BRAND start/g; s/acme stop/$BRAND stop/g"
+  xargs sed -i '' "s/aether start/$BRAND start/g; s/aether stop/$BRAND stop/g"
 
 # --- 第5步：品牌资源 ---
 # 替换 logo 和 favicon（需手动准备文件）
-# cp assets/yourbrand-logo.svg apps/web/public/acme-brandmark-bg.svg
+# cp assets/yourbrand-logo.svg apps/web/public/aether-brandmark-bg.svg
 # cp assets/yourbrand-favicon.ico apps/web/public/favicon.ico
 
-echo "✅ Rebrand 完成: acme → $BRAND"
+echo "✅ Rebrand 完成: aether → $BRAND"
 echo "⚠️  请运行 pnpm install && pnpm build 验证"
 ```
 
@@ -361,7 +361,7 @@ git commit -m "chore: sync upstream + rebrand"
 2. **需排除的文件** — lock 文件（pnpm-lock.yaml）、node_modules、.git 目录
 3. **brand 品牌资源**需手动准备（logo、favicon 等），不在脚本范围内
 4. **测试**：rebrand 后必须 `pnpm build` 验证，确保没有遗漏的引用
-5. **注释中的 "acme"** 可以不替换（不影响功能，减少 diff 噪音）
+5. **注释中的 "aether"** 可以不替换（不影响功能，减少 diff 噪音）
 
 ---
 
@@ -370,7 +370,7 @@ git commit -m "chore: sync upstream + rebrand"
 进入实施计划阶段：
 
 1. 编写并测试 rebrand codemod 脚本
-2. 运行初始 rebrand（acme → 你的品牌名）
+2. 运行初始 rebrand（aether → 你的品牌名）
 3. 创建 `packages/vertical/` 和 `packages/theme/` 包
 4. 设置品牌主题覆盖（CSS 变量、logo）
 5. 配置 GitHub Actions 上游同步自动化

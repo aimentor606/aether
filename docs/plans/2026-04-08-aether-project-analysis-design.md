@@ -1,4 +1,4 @@
-# Acme (Aether) 项目技术架构分析报告
+# Aether (Aether) 项目技术架构分析报告
 
 ## 文档信息
 
@@ -13,7 +13,7 @@
 
 ### 1.1 产品定位
 
-**Acme** 是一个 **AI 自主公司操作系统 (Autonomous Company Operating System) — 一个云电脑，其上运行着 AI Agent 24/7 处理各种业务任务。
+**Aether** 是一个 **AI 自主公司操作系统 (Autonomous Company Operating System) — 一个云电脑，其上运行着 AI Agent 24/7 处理各种业务任务。
 
 ### 1.2 核心理念
 - **Everything Is files**: 以 Markdown 为基础，代码可读、可跟踪
@@ -116,7 +116,7 @@ apps/web/
 
 ### 5.3 共享包 (packages/)
 
-#### 5.3.1 数据层 (@acme/db)
+#### 5.3.1 数据层 (@aether/db)
 **技术栈**:
 - **ORM**: Drizzle ORM 0.44.x
 - **数据库**: PostgreSQL (via Supabase)
@@ -126,7 +126,7 @@ apps/web/
 - Schema 还移管理
 - 数据库连接池
 
-#### 5.3.2 共享工具 (@acme/shared)
+#### 5.3.2 共享工具 (@aether/shared)
 **内容**:
 - 共享工具函数
 - 娡型 Pricing 配置
@@ -228,7 +228,7 @@ apps/api/src/
 - `encrypted_password` - 加密密码
 - `created_at` - 创建时间
 
-#### 4.2.2 Acme Schema (`acme`)
+#### 4.2.2 Aether Schema (`aether`)
 **Tables**:
 - `accounts` - 账户(组织)
 - `account_members` - 账户成员
@@ -282,7 +282,7 @@ apps/api/src/
 ### 5.2 Agent 系统
 
 #### 5.2.1 主 Agent (柯塔克斯)
-**名称**: Acme
+**名称**: Aether
 **模式**: primary
 **职责**:
 - 任务理解与执行
@@ -341,7 +341,7 @@ apps/api/src/
 **内存类型**:
 
 #### 5.4.1 Core Memory (核心内存)
-**位置**: `/workspace/.acme/memory/core/`
+**位置**: `/workspace/.aether/memory/core/`
 **加载**: 每次会话自动加载
 **内容**:
 - Agent 身份和使命
@@ -350,7 +350,7 @@ apps/api/src/
 - 重要决策记录
 
 #### 5.4.2 Long-term Memory (长期记忆)
-**位置**: `/workspace/.acme/memory/long-term/`
+**位置**: `/workspace/.aether/memory/long-term/`
 **访问**: 按需检索
 **内容**:
 - 用户信息
@@ -359,7 +359,7 @@ apps/api/src/
 - 持久化偏好
 
 #### 5.4.3 Episodic Memory (情景记忆)
-**位置**: `/workspace/.acme/memory/episodic/`
+**位置**: `/workspace/.aether/memory/episodic/`
 **格式**: 会话日志
 **内容**:
 - 会话历史
@@ -367,7 +367,7 @@ apps/api/src/
 - 工具调用日志
 
 #### 5.4.4 Knowledge Base (知识库)
-**位置**: `/workspace/.acme/knowledge/`
+**位置**: `/workspace/.aether/knowledge/`
 **用途**: 参考资料
 **内容**:
 - 研究报告
@@ -625,7 +625,7 @@ pnpm test             # 运行测试
 ### 11.2 鸃署架构
 
 **部署方式**:
-- **Cloud**: Acme Cloud (acme.com)
+- **Cloud**: Aether Cloud (aether.com)
 - **Self-hosted**: Docker Compose
 - **VPS**: JustAVPS 镜像
 
@@ -658,11 +658,11 @@ DATABASE_URL=          # PostgreSQL 连接字符串
 
 | 匽令 | 用途 |
 |------|------|
-| `acme start` | 启动所有服务 |
-| `acme stop` | 停止所有服务 |
-| `acme logs` | 查看日志 |
-| `acme status` | 查看状态 |
-| `acme update` | 更新系统 |
+| `aether start` | 启动所有服务 |
+| `aether stop` | 停止所有服务 |
+| `aether logs` | 查看日志 |
+| `aether status` | 查看状态 |
+| `aether update` | 更新系统 |
 
 ---
 
@@ -680,7 +680,7 @@ DATABASE_URL=          # PostgreSQL 连接字符串
 
 ### 12.2 改进建议
 #### 12.2.1 短期 (1-2 周)
-1. 数据库 Schema 统一 - 将所有表迁移到 `acme` schema
+1. 数据库 Schema 统一 - 将所有表迁移到 `aether` schema
 2. API 错误处理标准化 - 统一错误响应格式
 3. 前端组件解耦 - 提取可复用的共享组件
 
@@ -755,7 +755,7 @@ export function selectProvider(modelId: string) {
 ### 13.3 沙箱状态管理
 
 ```typescript
-// packages/db/src/schema/acme.ts
+// packages/db/src/schema/aether.ts
 export const sandboxStatusEnum = pgEnum('sandbox_status', [
   'provisioning',  // 正在创建
   'active',         // 运行中

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { AcmeLogo } from '@/components/sidebar/acme-logo';
+import { AetherLogo } from '@/components/sidebar/aether-logo';
 import { DynamicIcon } from 'lucide-react/dynamic';
 import { Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -60,8 +60,8 @@ export const AgentAvatar: React.FC<AgentAvatarProps> = ({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/acme-symbol.svg"
-          alt="Acme"
+          src="/aether-symbol.svg"
+          alt="Aether"
           className="flex-shrink-0 invert dark:invert-0"
           style={{ width: `${size * 0.5}px`, height: `${size * 0.5}px` }}
         />
@@ -127,7 +127,7 @@ interface AgentNameProps {
 
 export const AgentName: React.FC<AgentNameProps> = ({
   name,
-  fallback = "Acme"
+  fallback = "Aether"
 }) => {
   return <span>{name || fallback}</span>;
 };

@@ -122,7 +122,7 @@ export function useSandboxServices(options?: { enabled?: boolean; includeAll?: b
     queryFn: async () => {
       if (!serverUrl) return [];
       const query = includeAll ? '?all=true' : '';
-      const data = await requestJson<{ services?: SandboxService[] }>(`${serverUrl}/acme/services${query}`);
+      const data = await requestJson<{ services?: SandboxService[] }>(`${serverUrl}/aether/services${query}`);
       return data.services ?? [];
     },
     enabled: (options?.enabled ?? true) && !isAuthLoading && !!user && !!serverUrl,
@@ -141,7 +141,7 @@ export function useSandboxServiceTemplates(options?: { enabled?: boolean }) {
     queryKey: [...serviceKeys.templates(serverUrl), user?.id ?? 'anonymous'],
     queryFn: async () => {
       if (!serverUrl) return [];
-      const data = await requestJson<{ templates?: SandboxServiceTemplate[] }>(`${serverUrl}/acme/services/templates`);
+      const data = await requestJson<{ templates?: SandboxServiceTemplate[] }>(`${serverUrl}/aether/services/templates`);
       return data.templates ?? [];
     },
     enabled: (options?.enabled ?? true) && !isAuthLoading && !!user && !!serverUrl,
@@ -160,7 +160,7 @@ export function useSandboxServiceLogs(serviceId: string | null, options?: { enab
       : ['sandbox-services', serverUrl, 'logs', 'none', user?.id ?? 'anonymous'],
     queryFn: async () => {
       if (!serverUrl || !serviceId) return [];
-      const data = await requestJson<{ logs?: string[] }>(`${serverUrl}/acme/services/${encodeURIComponent(serviceId)}/logs`);
+      const data = await requestJson<{ logs?: string[] }>(`${serverUrl}/aether/services/${encodeURIComponent(serviceId)}/logs`);
       return data.logs ?? [];
     },
     enabled: (options?.enabled ?? true) && !isAuthLoading && !!user && !!serverUrl && !!serviceId,
@@ -181,8 +181,8 @@ export function useSandboxServiceAction() {
       const isDelete = action === 'delete';
       const method = isDelete ? 'DELETE' : 'POST';
       const path = isDelete
-        ? `${serverUrl}/acme/services/${encodeURIComponent(serviceId)}`
-        : `${serverUrl}/acme/services/${encodeURIComponent(serviceId)}/${action}`;
+        ? `${serverUrl}/aether/services/${encodeURIComponent(serviceId)}`
+        : `${serverUrl}/aether/services/${encodeURIComponent(serviceId)}/${action}`;
 
       return requestJson(path, { method });
     },
@@ -203,7 +203,7 @@ export function useSandboxServiceReconcile() {
     mutationFn: async ({ reload }: { reload?: boolean } = {}) => {
       const serverUrl = getActiveServerUrl();
       if (!serverUrl) throw new Error('No active instance selected');
-      const url = `${serverUrl}/acme/services/reconcile${reload ? '?reload=true' : ''}`;
+      const url = `${serverUrl}/aether/services/reconcile${reload ? '?reload=true' : ''}`;
       return requestJson(url, { method: 'POST' });
     },
     onSuccess: () => {
@@ -220,7 +220,7 @@ export function useRegisterSandboxService() {
       const serverUrl = getActiveServerUrl();
       if (!serverUrl) throw new Error('No active instance selected');
       return requestJson<{ success: boolean; output?: string; service?: SandboxService }>(
-        `${serverUrl}/acme/services/register`,
+        `${serverUrl}/aether/services/register`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -240,7 +240,7 @@ export function useSandboxRuntimeReload() {
       const serverUrl = getActiveServerUrl();
       if (!serverUrl) throw new Error('No active instance selected');
       return requestJson<{ success: boolean; mode: RuntimeReloadMode; steps: string[]; errors: string[] }>(
-        `${serverUrl}/acme/services/system/reload`,
+        `${serverUrl}/aether/services/system/reload`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -15,23 +15,56 @@ import { featureFlags } from '@/lib/feature-flags';
 import { connection } from 'next/server';
 
 // Lazy load non-critical analytics and global components
-const Analytics = lazy(() => import('@vercel/analytics/react').then(mod => ({ default: mod.Analytics })));
-const SpeedInsights = lazy(() => import('@vercel/speed-insights/next').then(mod => ({ default: mod.SpeedInsights })));
-const GoogleTagManager = lazy(() => import('@next/third-parties/google').then(mod => ({ default: mod.GoogleTagManager })));
-const PostHogIdentify = lazy(() => import('@/components/posthog-identify').then(mod => ({ default: mod.PostHogIdentify })));
-const AnnouncementDialog = lazy(() => import('@/components/announcements/announcement-dialog').then(mod => ({ default: mod.AnnouncementDialog })));
-const RouteChangeTracker = lazy(() => import('@/components/analytics/route-change-tracker').then(mod => ({ default: mod.RouteChangeTracker })));
-const AuthEventTracker = lazy(() => import('@/components/analytics/auth-event-tracker').then(mod => ({ default: mod.AuthEventTracker })));
-const CookieVisibility = lazy(() => import('@/components/cookie-visibility').then(mod => ({ default: mod.CookieVisibility })));
-const LocalhostLinkInterceptor = lazy(() => import('@/components/localhost-link-interceptor').then(mod => ({ default: mod.LocalhostLinkInterceptor })));
+const Analytics = lazy(() =>
+  import('@vercel/analytics/react').then((mod) => ({ default: mod.Analytics })),
+);
+const SpeedInsights = lazy(() =>
+  import('@vercel/speed-insights/next').then((mod) => ({
+    default: mod.SpeedInsights,
+  })),
+);
+const GoogleTagManager = lazy(() =>
+  import('@next/third-parties/google').then((mod) => ({
+    default: mod.GoogleTagManager,
+  })),
+);
+const PostHogIdentify = lazy(() =>
+  import('@/components/posthog-identify').then((mod) => ({
+    default: mod.PostHogIdentify,
+  })),
+);
+const AnnouncementDialog = lazy(() =>
+  import('@/components/announcements/announcement-dialog').then((mod) => ({
+    default: mod.AnnouncementDialog,
+  })),
+);
+const RouteChangeTracker = lazy(() =>
+  import('@/components/analytics/route-change-tracker').then((mod) => ({
+    default: mod.RouteChangeTracker,
+  })),
+);
+const AuthEventTracker = lazy(() =>
+  import('@/components/analytics/auth-event-tracker').then((mod) => ({
+    default: mod.AuthEventTracker,
+  })),
+);
+const CookieVisibility = lazy(() =>
+  import('@/components/cookie-visibility').then((mod) => ({
+    default: mod.CookieVisibility,
+  })),
+);
+const LocalhostLinkInterceptor = lazy(() =>
+  import('@/components/localhost-link-interceptor').then((mod) => ({
+    default: mod.LocalhostLinkInterceptor,
+  })),
+);
 // Not lazy — wraps {children} so it must be available for SSR to avoid hydration mismatch
 import { IntegrationConnectProvider } from '@/components/integrations/integration-connect-provider';
-
 
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' }
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -48,9 +81,9 @@ export const metadata: Metadata = {
   },
   description: siteMetadata.description,
   keywords: siteMetadata.keywords,
-  authors: [{ name: 'Acme Team', url: 'https://www.acme.dev' }],
-  creator: 'Acme Team',
-  publisher: 'Acme Team',
+  authors: [{ name: 'Aether Team', url: 'https://www.aether.dev' }],
+  creator: 'Aether Team',
+  publisher: 'Aether Team',
   applicationName: siteMetadata.name,
   robots: {
     index: true,
@@ -83,14 +116,18 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: siteMetadata.title,
     description: siteMetadata.description,
-    creator: '@acme',
-    site: '@acme',
+    creator: '@aether',
+    site: '@aether',
     images: ['/banner.png'],
   },
   icons: {
     icon: [
       { url: '/favicon.png', sizes: '32x32' },
-      { url: '/favicon-light.png', sizes: '32x32', media: '(prefers-color-scheme: dark)' },
+      {
+        url: '/favicon-light.png',
+        sizes: '32x32',
+        media: '(prefers-color-scheme: dark)',
+      },
     ],
     shortcut: '/favicon.png',
     apple: [{ url: '/logo_black.png', sizes: '180x180' }],
@@ -110,13 +147,17 @@ export default async function RootLayout({
   const runtimeEnv = getServerPublicEnv();
 
   return (
-    <html lang="en" suppressHydrationWarning className={`${roobert.variable} ${roobertMono.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${roobert.variable} ${roobertMono.variable}`}
+    >
       <head>
         {/* Runtime config — evaluated at request time via connection() above.
             Docker images get correct env vars regardless of build-time defaults. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.__ACME_RUNTIME_CONFIG=${JSON.stringify(runtimeEnv)};window.__RUNTIME_ENV=window.__ACME_RUNTIME_CONFIG;`,
+            __html: `window.__AETHER_RUNTIME_CONFIG=${JSON.stringify(runtimeEnv)};window.__RUNTIME_ENV=window.__AETHER_RUNTIME_CONFIG;`,
           }}
         />
 
@@ -183,28 +224,47 @@ export default async function RootLayout({
         />
 
         {/* Static SEO meta tags - rendered in initial HTML */}
-        <title>Acme – The Autonomous Company Operating System</title>
-        <meta name="description" content="A cloud computer where AI agents run your company. Connect 3,000+ tools, configure autonomous agents, set triggers — and the machine operates 24/7 with persistent memory." />
-        <meta name="keywords" content="Acme, autonomous company operating system, AI agents, self-driving company, cloud computer, AI automation, agent orchestration, autowork, AI triggers, persistent memory, autonomous workforce, AI operations" />
-        <meta property="og:title" content="Acme – The Autonomous Company Operating System" />
-        <meta property="og:description" content="A cloud computer where AI agents run your company. Connect 3,000+ tools, configure autonomous agents, set triggers — and the machine operates 24/7 with persistent memory." />
-        <meta property="og:image" content="https://acme.dev/banner.png" />
-        <meta property="og:url" content="https://acme.dev" />
+        <title>Aether – The Autonomous Company Operating System</title>
+        <meta
+          name="description"
+          content="A cloud computer where AI agents run your company. Connect 3,000+ tools, configure autonomous agents, set triggers — and the machine operates 24/7 with persistent memory."
+        />
+        <meta
+          name="keywords"
+          content="Aether, autonomous company operating system, AI agents, self-driving company, cloud computer, AI automation, agent orchestration, autowork, AI triggers, persistent memory, autonomous workforce, AI operations"
+        />
+        <meta
+          property="og:title"
+          content="Aether – The Autonomous Company Operating System"
+        />
+        <meta
+          property="og:description"
+          content="A cloud computer where AI agents run your company. Connect 3,000+ tools, configure autonomous agents, set triggers — and the machine operates 24/7 with persistent memory."
+        />
+        <meta property="og:image" content="https://aether.dev/banner.png" />
+        <meta property="og:url" content="https://aether.dev" />
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Acme" />
+        <meta property="og:site_name" content="Aether" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Acme – The Autonomous Company Operating System" />
-        <meta name="twitter:description" content="A cloud computer where AI agents run your company. Connect 3,000+ tools, configure autonomous agents, set triggers — and the machine operates 24/7 with persistent memory." />
-        <meta name="twitter:image" content="https://acme.dev/banner.png" />
-        <meta name="twitter:site" content="@acme" />
-        <link rel="canonical" href="https://acme.dev" />
+        <meta
+          name="twitter:title"
+          content="Aether – The Autonomous Company Operating System"
+        />
+        <meta
+          name="twitter:description"
+          content="A cloud computer where AI agents run your company. Connect 3,000+ tools, configure autonomous agents, set triggers — and the machine operates 24/7 with persistent memory."
+        />
+        <meta name="twitter:image" content="https://aether.dev/banner.png" />
+        <meta name="twitter:site" content="@aether" />
+        <link rel="canonical" href="https://aether.dev" />
 
         {/* iOS Smart App Banner - shows native install banner in Safari */}
         {!featureFlags.disableMobileAdvertising ? (
-          <meta name="apple-itunes-app" content="app-id=6754448524, app-argument=acme://" />
+          <meta
+            name="apple-itunes-app"
+            content="app-id=6754448524, app-argument=aether://"
+          />
         ) : null}
-
-
 
         <script
           type="application/ld+json"
@@ -213,15 +273,19 @@ export default async function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: siteMetadata.name,
-              alternateName: ['Acme', 'Acme AI', 'Acme – The Autonomous Company Operating System'],
+              alternateName: [
+                'Aether',
+                'Aether AI',
+                'Aether – The Autonomous Company Operating System',
+              ],
               url: siteMetadata.url,
               logo: `${siteMetadata.url}/favicon.png`,
               description: siteMetadata.description,
               foundingDate: '2024',
               sameAs: [
                 'https://github.com/aimentor606/aether',
-                'https://x.com/acme',
-                'https://linkedin.com/company/acme',
+                'https://x.com/aether',
+                'https://linkedin.com/company/aether',
               ],
               contactPoint: {
                 '@type': 'ContactPoint',
@@ -239,7 +303,7 @@ export default async function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'SoftwareApplication',
               name: siteMetadata.title,
-              alternateName: [siteMetadata.name, 'Acme'],
+              alternateName: [siteMetadata.name, 'Aether'],
               applicationCategory: 'BusinessApplication',
               operatingSystem: 'Web, macOS, Windows, Linux',
               description: siteMetadata.description,

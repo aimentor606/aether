@@ -1,9 +1,9 @@
--- Ensure billing customers table exists in acme schema.
+-- Ensure billing customers table exists in aether schema.
 -- Needed by billing setup/checkout flows in cloud billing mode.
 
-create schema if not exists acme;
+create schema if not exists aether;
 
-create table if not exists acme.billing_customers (
+create table if not exists aether.billing_customers (
   account_id uuid not null,
   id text primary key,
   email text,
@@ -11,5 +11,5 @@ create table if not exists acme.billing_customers (
   provider text
 );
 
-create index if not exists idx_acme_billing_customers_account_id
-  on acme.billing_customers(account_id);
+create index if not exists idx_aether_billing_customers_account_id
+  on aether.billing_customers(account_id);

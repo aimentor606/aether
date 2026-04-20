@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
               textAlign: 'center',
             }}
           >
-            {template.is_acme_team && (
+            {template.is_aether_team && (
               <div
                 style={{
                   display: 'flex',
@@ -169,7 +169,7 @@ export async function GET(request: NextRequest) {
                 bottom: '40px',
               }}
             >
-              <span style={{ color: '#64748b', fontSize: '20px' }}>Acme</span>
+              <span style={{ color: '#64748b', fontSize: '20px' }}>Aether</span>
               <span style={{ color: '#334155', fontSize: '20px' }}>•</span>
               <span style={{ color: '#64748b', fontSize: '20px' }}>AI Agent Marketplace</span>
             </div>
@@ -230,7 +230,7 @@ export async function GET(request: NextRequest) {
                 color: '#94a3b8',
               }}
             >
-              Discover powerful AI agents on Acme
+              Discover powerful AI agents on Aether
             </p>
           </div>
         </div>

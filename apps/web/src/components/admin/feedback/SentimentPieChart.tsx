@@ -1,7 +1,13 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+} from '@aether/ui/primitives';
 import { useAdminSentimentSummary } from '@/hooks/admin/use-admin-feedback';
 import {
   ChartContainer,
@@ -31,18 +37,26 @@ const COLORS = ['hsl(220 80% 50%)', 'hsl(220 20% 60%)', 'hsl(0 70% 50%)'];
 export function SentimentPieChart() {
   const { data: sentiment, isLoading } = useAdminSentimentSummary();
 
-  const chartData = sentiment ? [
-    { name: 'Positive (4-5★)', value: sentiment.positive, fill: COLORS[0] },
-    { name: 'Neutral (3-3.5★)', value: sentiment.neutral, fill: COLORS[1] },
-    { name: 'Negative (1-2.5★)', value: sentiment.negative, fill: COLORS[2] },
-  ].filter(d => d.value > 0) : [];
+  const chartData = sentiment
+    ? [
+        { name: 'Positive (4-5★)', value: sentiment.positive, fill: COLORS[0] },
+        { name: 'Neutral (3-3.5★)', value: sentiment.neutral, fill: COLORS[1] },
+        {
+          name: 'Negative (1-2.5★)',
+          value: sentiment.negative,
+          fill: COLORS[2],
+        },
+      ].filter((d) => d.value > 0)
+    : [];
 
   const total = chartData.reduce((sum, d) => sum + d.value, 0);
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-medium">Sentiment Breakdown</CardTitle>
+        <CardTitle className="text-base font-medium">
+          Sentiment Breakdown
+        </CardTitle>
         <CardDescription>Overall feedback sentiment</CardDescription>
       </CardHeader>
       <CardContent>
@@ -70,11 +84,11 @@ export function SentimentPieChart() {
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Pie>
-                <ChartTooltip 
+                <ChartTooltip
                   content={<ChartTooltipContent />}
                   formatter={(value, name) => [
                     `${value} (${total > 0 ? ((Number(value) / total) * 100).toFixed(1) : 0}%)`,
-                    name
+                    name,
                   ]}
                 />
               </PieChart>
@@ -82,8 +96,8 @@ export function SentimentPieChart() {
             <div className="flex flex-wrap justify-center gap-4 mt-2">
               {chartData.map((entry, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <div 
-                    className="w-3 h-3 rounded-full" 
+                  <div
+                    className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: entry.fill }}
                   />
                   <span className="text-xs text-muted-foreground">

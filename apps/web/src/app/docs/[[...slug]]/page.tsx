@@ -43,7 +43,7 @@ export function generateMetadata(props: {
   if (!page) return {};
 
   return {
-    title: `${page.data.title} | Acme Docs`,
-    description: page.data.description ?? 'Acme developer documentation.',
+    title: `${page.data.title} | Aether Docs`,
+    description: page.data.description ?? 'Aether developer documentation.',
   };
 }

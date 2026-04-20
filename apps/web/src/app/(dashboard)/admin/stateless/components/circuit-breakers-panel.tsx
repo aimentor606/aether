@@ -1,10 +1,16 @@
-"use client";
+'use client';
 
-import { Shield, RotateCcw, Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import type { CircuitBreaker } from "@/hooks/admin/use-stateless";
+import { Shield, RotateCcw, Loader2 } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Button,
+  Badge,
+} from '@aether/ui/primitives';
+import type { CircuitBreaker } from '@/hooks/admin/use-stateless';
 
 interface CircuitBreakersPanelProps {
   breakers: Record<string, CircuitBreaker>;
@@ -19,13 +25,13 @@ export function CircuitBreakersPanel({
 }: CircuitBreakersPanelProps) {
   const getStateBadge = (state: string) => {
     const colors: Record<string, string> = {
-      closed: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
-      open: "bg-red-500/10 text-red-400 border-red-500/30",
-      half_open: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+      closed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+      open: 'bg-red-500/10 text-red-400 border-red-500/30',
+      half_open: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
     };
     return (
-      <Badge className={colors[state] || "bg-muted"}>
-        {state.replace(/_/g, " ")}
+      <Badge className={colors[state] || 'bg-muted'}>
+        {state.replace(/_/g, ' ')}
       </Badge>
     );
   };
@@ -94,7 +100,7 @@ export function CircuitBreakersPanel({
                     </p>
                   </div>
                 </div>
-                {breaker.state === "open" && breaker.retry_after !== null && (
+                {breaker.state === 'open' && breaker.retry_after !== null && (
                   <div className="mt-3 pt-3 border-t">
                     <p className="text-sm text-amber-400">
                       Retry in {breaker.retry_after.toFixed(1)}s

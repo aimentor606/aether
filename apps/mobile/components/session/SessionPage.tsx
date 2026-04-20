@@ -53,8 +53,8 @@ import { QuestionPrompt } from './QuestionPrompt';
 import { useSessions } from '@/lib/platform/hooks';
 import { FileViewer } from '@/components/files/FileViewer';
 import type { SandboxFile } from '@/api/types';
-import AcmeSymbolBlack from '@/assets/brand/acme-symbol-scale-effect-black.svg';
-import AcmeSymbolWhite from '@/assets/brand/acme-symbol-scale-effect-white.svg';
+import AetherSymbolBlack from '@/assets/brand/aether-symbol-scale-effect-black.svg';
+import AetherSymbolWhite from '@/assets/brand/aether-symbol-scale-effect-white.svg';
 
 interface SessionPageProps {
   sessionId: string;
@@ -768,9 +768,9 @@ export function SessionPage({ sessionId, onBack, onOpenDrawer, onOpenRightDrawer
                   {/* Compacting indicator */}
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                     {isDark ? (
-                      <AcmeSymbolWhite width={14} height={14} />
+                      <AetherSymbolWhite width={14} height={14} />
                     ) : (
-                      <AcmeSymbolBlack width={14} height={14} />
+                      <AetherSymbolBlack width={14} height={14} />
                     )}
                     <RNText style={{ fontSize: 14, fontFamily: 'Roobert', color: isDark ? '#888' : '#666' }}>
                       Compacting session...
@@ -903,7 +903,7 @@ function FreshSessionHero({
   visible: boolean;
   windowWidth: number;
 }) {
-  const Symbol = isDark ? AcmeSymbolWhite : AcmeSymbolBlack;
+  const Symbol = isDark ? AetherSymbolWhite : AetherSymbolBlack;
   const greeting = useMemo(() => getGreetingLabel(), []);
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;

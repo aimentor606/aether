@@ -3,7 +3,7 @@ import { ToolViewProps } from '../types';
 import { formatTimestamp, getToolTitle } from '../utils';
 import { getToolIcon } from '../../utils';
 import { CheckCircle, AlertCircle } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { cn } from '@/lib/utils';
 
 export interface ToolViewWrapperProps extends ToolViewProps {
@@ -95,7 +95,7 @@ export function ToolViewWrapper({
 
             {isStreaming && showStatus && (
               <div className="flex items-center gap-2">
-                <AcmeLoader customSize={14} />
+                <AetherLoader customSize={14} />
                 <span>{customStatus?.streaming || "Processing..."}</span>
               </div>
             )}

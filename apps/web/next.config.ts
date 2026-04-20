@@ -1,40 +1,25 @@
 import type { NextConfig } from 'next';
 import path from 'path';
 import { createMDX } from 'fumadocs-mdx/next';
-import { withSentryConfig } from '@sentry/nextjs';
-import { withBetterStack } from '@logtail/next';
 
 const nextConfig = (): NextConfig => ({
   output: 'standalone',
-  // Pin tracing root to monorepo root so standalone preserves
-  // the correct `apps/web/server.js` path structure.
   outputFileTracingRoot: path.join(__dirname, '../../'),
-
-  // Skip type checking during build (done in CI via `pnpm typecheck`)
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-
-  // Webpack configuration to make Konva work with Next.js
+  typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: true },
   webpack: (config) => {
-    config.externals = [...config.externals, { canvas: 'canvas' }]; // required to make Konva & react-konva work
+    config.externals = [...config.externals, { canvas: 'canvas' }];
     return config;
   },
-
-  // Turbopack configuration
-  turbopack: {
-    // Handle Node.js modules that shouldn't be bundled for browser builds
-    // Canvas is a Node.js native module that needs to be externalized (required for Konva & react-konva)
-    resolveAlias: {
-      canvas: {
-        browser: './src/lib/empty-module.ts', // Exclude canvas from browser builds
-      },
-    },
+  compress: true,
+  skipTrailingSlashRedirect: true,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    qualities: [75, 100],
   },
-
-  // Performance optimizations
   experimental: {
-    // Optimize package imports for faster builds and smaller bundles
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
@@ -45,25 +30,9 @@ const nextConfig = (): NextConfig => ({
       'react-icons',
     ],
   },
-
-  // Enable compression
-  compress: true,
-
-  // Optimize images
-  images: {
-    formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256],
-    qualities: [75, 100],
-  },
-
   async rewrites() {
     return [
-      // Proxy API calls to backend to avoid CORS in local dev
-      {
-        source: '/v1/:path*',
-        destination: 'http://localhost:8008/v1/:path*',
-      },
+      { source: '/v1/:path*', destination: 'http://localhost:8008/v1/:path*' },
       {
         source: '/ingest/static/:path*',
         destination: 'https://eu-assets.i.posthog.com/static/:path*',
@@ -78,8 +47,6 @@ const nextConfig = (): NextConfig => ({
       },
     ];
   },
-
-  // HTTP headers for caching and performance
   async headers() {
     return [
       {
@@ -102,31 +69,31 @@ const nextConfig = (): NextConfig => ({
       },
     ];
   },
-
-  skipTrailingSlashRedirect: true,
 });
 
 const withMDX = createMDX();
 
-// Compose config wrappers: MDX → Better Stack (structured logs) → Sentry (error tracking)
-export default withSentryConfig(withBetterStack(withMDX(nextConfig())), {
-  // Suppresses source map uploading logs during build
-  silent: true,
+// Sentry + Better Stack wrappers: only apply when env vars are configured.
+// Without SENTRY_DSN / LOGTAIL_TOKEN, these wrappers cause build errors.
+const hasSentry = !!process.env.NEXT_PUBLIC_SENTRY_DSN;
+const hasBetterStack = !!process.env.LOGTAIL_SOURCE_TOKEN;
 
-  // Don't upload source maps during build (we can enable this later)
-  sourcemaps: {
-    disable: true,
-  },
+let config = withMDX(nextConfig());
 
-  // Disable Sentry CLI telemetry
-  telemetry: false,
+if (hasBetterStack) {
+  const { withBetterStack } = require('@logtail/next');
+  config = withBetterStack(config);
+}
 
-  // Tree-shake Sentry debug logger statements to reduce bundle size
-  bundleSizeOptimizations: {
-    excludeDebugStatements: true,
-  },
+if (hasSentry) {
+  const { withSentryConfig } = require('@sentry/nextjs');
+  config = withSentryConfig(config, {
+    silent: true,
+    sourcemaps: { disable: true },
+    telemetry: false,
+    bundleSizeOptimizations: { excludeDebugStatements: true },
+    tunnelRoute: '/monitoring',
+  });
+}
 
-  // Route Sentry envelopes through our server to bypass ad-blockers.
-  // Creates an auto-generated route at /monitoring that forwards to the DSN host.
-  tunnelRoute: '/monitoring',
-});
+export default config;

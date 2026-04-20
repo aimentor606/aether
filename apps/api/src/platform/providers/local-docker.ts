@@ -48,23 +48,23 @@ const PORT_BINDINGS: Record<string, { HostPort: string; HostIp: string }[]> = Ob
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
- * Compute the URL the sandbox container should use to reach acme-api.
+ * Compute the URL the sandbox container should use to reach aether-api.
  *
- * This is the INTERNAL url — how the sandbox talks to acme-api from inside Docker.
+ * This is the INTERNAL url — how the sandbox talks to aether-api from inside Docker.
  * NOT the external/browser-facing URL.
  *
- * - Shared Docker network (SANDBOX_NETWORK set):  http://acme-api:{PORT}  (Docker DNS)
+ * - Shared Docker network (SANDBOX_NETWORK set):  http://aether-api:{PORT}  (Docker DNS)
  * - Default bridge (sandbox on host ports):        http://host.docker.internal:{PORT}
  *
- * If ACME_URL is set to something other than localhost (e.g. a real domain),
+ * If AETHER_URL is set to something other than localhost (e.g. a real domain),
  * we use it as-is since the sandbox can reach it directly.
  */
 function getSandboxInternalApiUrl(): string {
   if (config.SANDBOX_NETWORK) {
-    return `http://acme-api:${config.PORT}`;
+    return `http://aether-api:${config.PORT}`;
   }
 
-  const externalUrl = config.ACME_URL?.replace(/\/v1\/router\/?$/, '');
+  const externalUrl = config.AETHER_URL?.replace(/\/v1\/router\/?$/, '');
   if (externalUrl) {
     try {
       const parsed = new URL(externalUrl);
@@ -181,7 +181,7 @@ function setUpdateStatus(partial: Partial<SandboxUpdateStatus>): void {
 /**
  * Derive the target image name from a version string.
  * Uses the current SANDBOX_IMAGE config as the base (strips existing tag).
- * e.g. "acme/computer:0.7.5" + version "0.8.0" → "acme/computer:0.8.0"
+ * e.g. "aether/computer:0.7.5" + version "0.8.0" → "aether/computer:0.8.0"
  */
 function getImageForVersion(version: string): string {
   const current = config.SANDBOX_IMAGE;
@@ -268,7 +268,7 @@ export class LocalDockerProvider implements SandboxProvider {
     if (existing) {
       if (existing.status === 'running') {
         await this.syncCoreEnvVars();
-        const callerToken = this._lastCreateOpts?.envVars?.ACME_TOKEN;
+        const callerToken = this._lastCreateOpts?.envVars?.AETHER_TOKEN;
         if (callerToken) {
           await this.syncTokenToContainer(callerToken);
         }
@@ -530,26 +530,26 @@ export class LocalDockerProvider implements SandboxProvider {
 
   /**
    * Ensure the running container has the correct values for all 3 core env vars:
-   *   - ACME_API_URL        (how sandbox reaches acme-api)
-   *   - ACME_TOKEN           (sandbox → acme-api auth)
-   *   - INTERNAL_SERVICE_KEY   (acme-api → sandbox auth)
+   *   - AETHER_API_URL        (how sandbox reaches aether-api)
+   *   - AETHER_TOKEN           (sandbox → aether-api auth)
+   *   - INTERNAL_SERVICE_KEY   (aether-api → sandbox auth)
    *
-   * If any differ from what acme-api has, inject via s6 env dir and restart
-   * acme-master so the sandbox picks them up without a full container recreate.
+   * If any differ from what aether-api has, inject via s6 env dir and restart
+   * aether-master so the sandbox picks them up without a full container recreate.
    */
   /**
    * Sync the 3 core env vars to the sandbox via the secrets manager API.
    *
-   * Uses acme-master's /env endpoint which does triple-write:
+   * Uses aether-master's /env endpoint which does triple-write:
    *   1. SecretStore (.secrets.json — encrypted at rest)
    *   2. s6 env dir  (/run/s6/container_environment/ — tools read this on every call)
-   *   3. process.env (acme-master's own process)
+   *   3. process.env (aether-master's own process)
    *
    * Since getEnv() reads s6 first (always fresh from disk), updated values
    * take effect immediately — no service restart needed.
    * Only POSTs when values actually differ from what's currently set.
    *
-   * NOTE: ACME_TOKEN and TUNNEL_TOKEN are NOT synced here. They are managed
+   * NOTE: AETHER_TOKEN and TUNNEL_TOKEN are NOT synced here. They are managed
    * by injectSandboxToken (at API startup) and syncTokenToContainer (at runtime
    * when ensure() is called with a caller-provided token). This prevents
    * clobbering the authoritative DB token with stale Docker creation-time values.
@@ -566,11 +566,11 @@ export class LocalDockerProvider implements SandboxProvider {
     const sandboxApiBase = getSandboxInternalApiUrl();
     const routerBase = `${sandboxApiBase}/v1/router`;
     const desired: Record<string, string> = {
-      ACME_API_URL: sandboxApiBase,
+      AETHER_API_URL: sandboxApiBase,
       INTERNAL_SERVICE_KEY: config.INTERNAL_SERVICE_KEY,
       TUNNEL_API_URL: sandboxApiBase,
-      // Tool proxy URLs — route through acme-api router so sandbox tools
-      // auth with ACME_TOKEN and the router injects real upstream API keys.
+      // Tool proxy URLs — route through aether-api router so sandbox tools
+      // auth with AETHER_TOKEN and the router injects real upstream API keys.
       TAVILY_API_URL: `${routerBase}/tavily`,
       REPLICATE_API_URL: `${routerBase}/replicate`,
       SERPER_API_URL: `${routerBase}/serper`,
@@ -621,7 +621,7 @@ export class LocalDockerProvider implements SandboxProvider {
   }
 
   /**
-   * GET /env from acme-master — returns all current env vars.
+   * GET /env from aether-master — returns all current env vars.
    */
   private async fetchMasterEnv(): Promise<Record<string, string>> {
     const url = `http://localhost:${config.SANDBOX_PORT_BASE || 14000}/env`;
@@ -636,7 +636,7 @@ export class LocalDockerProvider implements SandboxProvider {
   }
 
   /**
-   * POST /env to acme-master — sets env vars via the secrets manager.
+   * POST /env to aether-master — sets env vars via the secrets manager.
    * No restart needed: getEnv() reads s6 env dir directly on every call.
    */
   private async postMasterEnv(keys: Record<string, string>): Promise<void> {
@@ -655,7 +655,7 @@ export class LocalDockerProvider implements SandboxProvider {
 
   /**
    * Fallback: write directly to s6 env dir via docker exec.
-   * Used only when the /env API is unreachable (e.g. acme-master not ready yet).
+   * Used only when the /env API is unreachable (e.g. aether-master not ready yet).
    */
   private syncCoreEnvVarsFallback(stale: Record<string, string>): void {
     const env = { ...process.env };
@@ -677,7 +677,7 @@ export class LocalDockerProvider implements SandboxProvider {
   }
 
   /**
-   * Push a ACME_TOKEN into a running container so it matches the DB.
+   * Push a AETHER_TOKEN into a running container so it matches the DB.
    *
    * Called by ensure() when the caller (e.g. POST /init/local) registered a
    * new token in the DB but the container is already running with a stale one.
@@ -685,18 +685,18 @@ export class LocalDockerProvider implements SandboxProvider {
    */
   private async syncTokenToContainer(token: string): Promise<void> {
     const containerEnv = await this.getContainerEnv();
-    if (containerEnv['ACME_TOKEN'] === token) return; // already in sync
+    if (containerEnv['AETHER_TOKEN'] === token) return; // already in sync
 
-    console.log('[LOCAL-DOCKER] Syncing DB-registered ACME_TOKEN into running container...');
+    console.log('[LOCAL-DOCKER] Syncing DB-registered AETHER_TOKEN into running container...');
     try {
-      await this.postMasterEnv({ ACME_TOKEN: token });
-      console.log('[LOCAL-DOCKER] ACME_TOKEN synced to container via /env API');
+      await this.postMasterEnv({ AETHER_TOKEN: token });
+      console.log('[LOCAL-DOCKER] AETHER_TOKEN synced to container via /env API');
     } catch {
       try {
-        this.syncCoreEnvVarsFallback({ ACME_TOKEN: token });
-        console.log('[LOCAL-DOCKER] ACME_TOKEN synced to container via docker exec fallback');
+        this.syncCoreEnvVarsFallback({ AETHER_TOKEN: token });
+        console.log('[LOCAL-DOCKER] AETHER_TOKEN synced to container via docker exec fallback');
       } catch (err: any) {
-        console.error('[LOCAL-DOCKER] Failed to sync ACME_TOKEN into container:', err.message || err);
+        console.error('[LOCAL-DOCKER] Failed to sync AETHER_TOKEN into container:', err.message || err);
       }
     }
   }
@@ -766,7 +766,7 @@ export class LocalDockerProvider implements SandboxProvider {
   }
 
   /**
-   * Pull a specific image by full name (e.g. "acme/computer:0.8.0").
+   * Pull a specific image by full name (e.g. "aether/computer:0.8.0").
    * Updates both _pullStatus and _updateStatus with progress.
    */
   private async pullImageByName(imageName: string): Promise<void> {
@@ -825,7 +825,7 @@ export class LocalDockerProvider implements SandboxProvider {
       await this.pullImage();
     }
 
-    let authToken = this._lastCreateOpts?.envVars?.ACME_TOKEN || '';
+    let authToken = this._lastCreateOpts?.envVars?.AETHER_TOKEN || '';
     if (!authToken) {
       authToken = generateSandboxKeyPair().secretKey;
     }
@@ -838,8 +838,8 @@ export class LocalDockerProvider implements SandboxProvider {
     const serviceKey = config.INTERNAL_SERVICE_KEY;
 
     const MANAGED_VARS = new Set([
-      'ACME_TOKEN',
-      'ACME_API_URL',
+      'AETHER_TOKEN',
+      'AETHER_API_URL',
       'SANDBOX_ID',
       'INTERNAL_SERVICE_KEY',
       'PROJECT_ID',
@@ -864,12 +864,12 @@ export class LocalDockerProvider implements SandboxProvider {
       'PGID=911',
       'TZ=Etc/UTC',
       'SUBFOLDER=/',
-      'TITLE=Acme Sandbox',
-      'OPENCODE_CONFIG_DIR=/ephemeral/acme-master/opencode',
+      'TITLE=Aether Sandbox',
+      'OPENCODE_CONFIG_DIR=/ephemeral/aether-master/opencode',
       'OPENCODE_PERMISSION={"*":"allow"}',
       'DISPLAY=:1',
       'LSS_DIR=/workspace/.lss',
-      'ACME_WORKSPACE=/workspace',
+      'AETHER_WORKSPACE=/workspace',
       'PYTHONUSERBASE=/workspace/.local',
       'PIP_USER=1',
       'NPM_CONFIG_PREFIX=/workspace/.npm-global',
@@ -877,8 +877,8 @@ export class LocalDockerProvider implements SandboxProvider {
       'SECRET_FILE_PATH=/workspace/.secrets/.secrets.json',
       'SALT_FILE_PATH=/workspace/.secrets/.salt',
       // ENCRYPTION_KEY_PATH auto-derived from SECRET_FILE_PATH dir
-      `ACME_API_URL=${sandboxApiBase}`,
-      `ACME_TOKEN=${authToken}`,
+      `AETHER_API_URL=${sandboxApiBase}`,
+      `AETHER_TOKEN=${authToken}`,
       `INTERNAL_SERVICE_KEY=${serviceKey}`,
       `TUNNEL_API_URL=${sandboxApiBase}`,
       `TUNNEL_TOKEN=${authToken}`,
@@ -887,16 +887,16 @@ export class LocalDockerProvider implements SandboxProvider {
       // All components share one version (set by deploy-zero-downtime.sh from image tag).
       `SANDBOX_VERSION=${SANDBOX_VERSION}`,
       'PROJECT_ID=local',
-      // ── Tool proxy URLs — route through acme-api router ─────────────
-      // Sandbox tools use ACME_TOKEN to auth; the router injects the real
+      // ── Tool proxy URLs — route through aether-api router ─────────────
+      // Sandbox tools use AETHER_TOKEN to auth; the router injects the real
       // upstream API key. Matches cloud provider env injection (justavps/daytona/pool).
       `TAVILY_API_URL=${routerBase}/tavily`,
       `REPLICATE_API_URL=${routerBase}/replicate`,
       `SERPER_API_URL=${routerBase}/serper`,
       `FIRECRAWL_API_URL=${routerBase}/firecrawl`,
-      ...(config.ACME_LOCAL_IMAGES ? ['ACME_LOCAL_SOURCE=1'] : []),
-      `ENV_MODE=${config.ACME_BILLING_INTERNAL_ENABLED ? 'cloud' : 'local'}`,
-      `CORS_ALLOWED_ORIGINS=${[config.FRONTEND_URL, config.ACME_URL].filter(Boolean).join(',')}`,
+      ...(config.AETHER_LOCAL_IMAGES ? ['AETHER_LOCAL_SOURCE=1'] : []),
+      `ENV_MODE=${config.AETHER_BILLING_INTERNAL_ENABLED ? 'cloud' : 'local'}`,
+      `CORS_ALLOWED_ORIGINS=${[config.FRONTEND_URL, config.AETHER_URL].filter(Boolean).join(',')}`,
       ...filteredSandboxEnv,
     ];
 
@@ -917,9 +917,9 @@ export class LocalDockerProvider implements SandboxProvider {
         ...(config.SANDBOX_NETWORK ? { NetworkMode: config.SANDBOX_NETWORK } : {}),
       },
       Labels: {
-        'acme.sandbox': 'true',
-        'acme.account': 'local',
-        'acme.user': 'local',
+        'aether.sandbox': 'true',
+        'aether.account': 'local',
+        'aether.user': 'local',
       },
     });
 
@@ -970,11 +970,11 @@ export class LocalDockerProvider implements SandboxProvider {
 
   /**
    * Wait for the sandbox to pass health checks.
-   * Polls GET /acme/health until it returns 200 with status "ok".
+   * Polls GET /aether/health until it returns 200 with status "ok".
    */
   private async waitForHealth(timeoutMs: number): Promise<void> {
     const start = Date.now();
-    const healthUrl = `http://localhost:${PORT_MAP['8000']}/acme/health`;
+    const healthUrl = `http://localhost:${PORT_MAP['8000']}/aether/health`;
 
     while (Date.now() - start < timeoutMs) {
       try {

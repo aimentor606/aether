@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, ScrollView, Pressable, Linking, Dimensions } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import {
   Globe,
   MonitorPlay,
@@ -475,7 +475,7 @@ export function BrowserToolView({
                   }}
                 >
                   <View className="flex-row items-center gap-2">
-                    <AcmeLoader size="small" customSize={14} />
+                    <AetherLoader size="small" customSize={14} />
                     <Text className="text-xs text-muted-foreground">
                       Browser action in progress...
                     </Text>

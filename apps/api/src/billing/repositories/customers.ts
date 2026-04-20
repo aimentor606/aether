@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { billingCustomers } from '@acme/db';
+import { billingCustomers } from '@aether/db';
 import { db } from '../../shared/db';
 
 export async function getCustomerByAccountId(accountId: string) {

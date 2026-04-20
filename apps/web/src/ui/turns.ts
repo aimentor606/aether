@@ -703,7 +703,7 @@ export function getToolInfo(tool: string, input: Record<string, any> = {}): Tool
     case 'session-start-background':
       return {
         icon: 'square-kanban',
-        title: `Worker (${input.agent || 'AcmeWorker'})`,
+        title: `Worker (${input.agent || 'AetherWorker'})`,
         subtitle: input.description || input.prompt?.slice(0, 60),
       };
     case 'bash':
@@ -882,7 +882,7 @@ export function getQuestionForTool(
  * The billing system deducts cost × COST_MARKUP from the user's credits.
  * We apply the same multiplier here so the UI matches what's actually billed.
  *
- * Must stay in sync with ACME_MARKUP in apps/api/src/config.ts.
+ * Must stay in sync with AETHER_MARKUP in apps/api/src/config.ts.
  */
 export const COST_MARKUP = 1.2;
 

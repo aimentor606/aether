@@ -13,7 +13,7 @@ export const POPULAR_PROVIDER_IDS = [
 ];
 
 export const MODEL_SELECTOR_PROVIDER_IDS = [
-  'acme',
+  'aether',
   'anthropic',
   'openai',
   'github-copilot',
@@ -30,7 +30,7 @@ export const PROVIDER_LABELS: Record<string, string> = {
   moonshotai: 'Moonshot',
   'moonshotai-cn': 'Moonshot',
   opencode: 'OpenCode Zen',
-  acme: 'Acme',
+  aether: 'Aether',
   firmware: 'Firmware',
   bedrock: 'AWS Bedrock',
   openrouter: 'OpenRouter',
@@ -119,7 +119,7 @@ const PROVIDER_ICON_MAP: Record<string, { src?: string; fallback: string }> = {
   anthropic: { src: '/provider-icons/anthropic.svg', fallback: 'AN' },
   openai: { src: '/provider-icons/openai.svg', fallback: 'OA' },
   opencode: { src: '/provider-icons/opencode.svg', fallback: 'OC' },
-  acme: { src: '/acme-symbol.svg', fallback: 'KX' },
+  aether: { src: '/aether-symbol.svg', fallback: 'KX' },
   'github-copilot': { src: '/provider-icons/github-copilot.svg', fallback: 'GH' },
   google: { src: '/provider-icons/google.svg', fallback: 'GO' },
   openrouter: { src: '/provider-icons/openrouter.svg', fallback: 'OR' },

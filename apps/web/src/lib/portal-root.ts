@@ -13,15 +13,15 @@ export function getPortalRoot(): HTMLElement | null {
   if (typeof document === 'undefined') return null;
   if (portalRoot && document.body.contains(portalRoot)) return portalRoot;
 
-  const existing = document.getElementById('acme-portal-root');
+  const existing = document.getElementById('aether-portal-root');
   if (existing) {
     portalRoot = existing;
     return portalRoot;
   }
 
   const el = document.createElement('div');
-  el.id = 'acme-portal-root';
-  el.setAttribute('data-acme-portal-root', 'true');
+  el.id = 'aether-portal-root';
+  el.setAttribute('data-aether-portal-root', 'true');
   document.body.appendChild(el);
   portalRoot = el;
   return portalRoot;

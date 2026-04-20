@@ -81,7 +81,7 @@
     "guest": {
       "label": "Gast",
       "title": "Browse Without\nan Account",
-      "description": "Try Acme with limited features. No signup required!",
+      "description": "Try Aether with limited features. No signup required!",
       "continue": "Continue as Guest",
       "signUp": "Sign Up Instead",
       "agreement": "By continuing, you agree to our",
@@ -99,7 +99,7 @@
     "resetFailed": "Konnte E-Mail nicht senden. Versuch's nochmal.",
     "passwordsDontMatch": "Passwörter stimmen nicht überein",
     "passwordTooShort": "Passwort muss mindestens 8 Zeichen haben",
-    "welcomeTitle": "Hire Acme für",
+    "welcomeTitle": "Hire Aether für",
     "rotatingPhrases": {
       "presentations": "Präsentationen",
       "writing": "Schreiben",
@@ -123,12 +123,12 @@
     }
   },
   "onboarding": {
-    "welcome": "Sehen Sie, was Acme kann",
+    "welcome": "Sehen Sie, was Aether kann",
     "welcomeSubtitle": "Ihr KI-Assistent, der handelt",
     "skip": "Überspringen",
     "next": "Weiter",
     "getStarted": "Los geht's",
-    "acmeComputer": "Acme Computer",
+    "aetherComputer": "Aether Computer",
     "ready": "Bereit",
     "examples": {
       "presentations": {
@@ -237,8 +237,8 @@
   },
   "chat": {
     "newChat": "Neuer Chat",
-    "placeholder": "Gib Acme eine Aufgabe...",
-    "inputPlaceholder": "Frag Acme alles...",
+    "placeholder": "Gib Aether eine Aufgabe...",
+    "inputPlaceholder": "Frag Aether alles...",
     "recording": "Nimmt auf...",
     "cancelRecording": "Aufnahme abbrechen",
     "stopRecording": "Aufnahme stoppen",
@@ -251,7 +251,7 @@
     "rateThisResult": "Dieses Ergebnis bewerten",
     "feedbackHelpsImprove": "Dein Feedback hilft uns, uns zu verbessern",
     "additionalFeedbackOptional": "Zusätzliches Feedback (optional)",
-    "helpAcmeImprove": "Hilf Acme mit meinem Feedback, sich zu verbessern",
+    "helpAetherImprove": "Hilf Aether mit meinem Feedback, sich zu verbessern",
     "submit": "Absenden",
     "submitting": "Wird gesendet...",
     "suggestedFollowUps": "Vorgeschlagene Nachfragen",
@@ -266,7 +266,7 @@
     "newWorker": "Neuer Worker",
     "myWorkers": "Meine Workers",
     "searchAgents": "Worker suchen",
-    "defaultAgent": "Acme",
+    "defaultAgent": "Aether",
     "defaultDescription": "Allzweck-KI für alle Aufgaben",
     "superWorker": "Super Worker",
     "coder": "Coder",
@@ -470,8 +470,8 @@
   "billing": {
     "loadingPaywall": "Pläne werden geladen...",
     "checkoutUnavailable": "Mobile-Checkout nicht verfügbar",
-    "checkoutUnavailableMessage": "Um einen Plan zu abonnieren, besuche bitte acme.com im Web.",
-    "goToWeb": "Zu acme.com gehen",
+    "checkoutUnavailableMessage": "Um einen Plan zu abonnieren, besuche bitte aether.com im Web.",
+    "goToWeb": "Zu aether.com gehen",
     "billingStatus": "Abrechnungsstatus",
     "loading": "Lade Abrechnungsinformationen...",
     "error": "Fehler beim Laden der Abrechnungsinformationen",
@@ -520,12 +520,12 @@
   "beta": {
     "title": "Beta-Funktionen",
     "webSupportTitle": "Vollständig Unterstützt im Web",
-    "webSupportDescription": "Verfügbar auf Acme.com. Kommt bald auf Mobilgeräten—hier noch in Arbeit.",
-    "visitAcme": "Acme.com besuchen",
+    "webSupportDescription": "Verfügbar auf Aether.com. Kommt bald auf Mobilgeräten—hier noch in Arbeit.",
+    "visitAether": "Aether.com besuchen",
     "advancedFeatures": "Erweiterte Funktionen",
     "mobileBeta": "Mobile Beta",
     "pleaseNote": "Bitte Beachten",
-    "mobileWarning": "Auf Mobilgeräten noch in Arbeit und kann Probleme haben. Für die beste Erfahrung nutze Acme.com."
+    "mobileWarning": "Auf Mobilgeräten noch in Arbeit und kann Probleme haben. Für die beste Erfahrung nutze Aether.com."
   },
   "accountDeletion": {
     "title": "Konto Löschen",
@@ -561,7 +561,7 @@
     "chooseModelFor": "Wähle ein Modell für Worker {{agent}}"
   },
   "placeholders": {
-    "default": "Gib Acme eine Aufgabe...",
+    "default": "Gib Aether eine Aufgabe...",
     "search": "Suchen...",
     "searchConversations": "Chats durchsuchen",
     "searchAgents": "Workers suchen",

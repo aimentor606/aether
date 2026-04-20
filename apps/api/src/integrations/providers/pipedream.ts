@@ -137,9 +137,9 @@ export class PipedreamProvider implements AuthProvider {
     // The webhook handler recomputes the HMAC from the body's account_id and verifies it.
     // Stateless, per-user, can't be replayed for a different account.
     const { config: appConfig } = await import('../../config');
-    const acmeUrl = appConfig.ACME_URL;
-    if (acmeUrl) {
-      const webhookBase = `${acmeUrl.replace(/\/+$/, '')}/v1/pipedream/webhook`;
+    const aetherUrl = appConfig.AETHER_URL;
+    if (aetherUrl) {
+      const webhookBase = `${aetherUrl.replace(/\/+$/, '')}/v1/pipedream/webhook`;
       const webhookSecret = appConfig.PIPEDREAM_WEBHOOK_SECRET;
       if (webhookSecret) {
         const { createHmac } = await import('crypto');

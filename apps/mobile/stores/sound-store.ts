@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type SoundEvent = 'completion' | 'error' | 'notification' | 'send';
-export type SoundPack = 'off' | 'opencode' | 'acme';
+export type SoundPack = 'off' | 'opencode' | 'aether';
 
 export interface SoundPreferences {
   pack: SoundPack;
@@ -22,7 +22,7 @@ interface SoundState {
 }
 
 const DEFAULT_PREFERENCES: SoundPreferences = {
-  pack: 'acme',
+  pack: 'aether',
   volume: 0.5,
   events: {},
   hapticsEnabled: true,

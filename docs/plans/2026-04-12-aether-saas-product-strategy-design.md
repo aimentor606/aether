@@ -10,7 +10,7 @@
 This document specifies the architecture for Aether as a multi-tenant B2B SaaS platform supporting multiple vertical industries (finance, healthcare, retail, etc.). Each vertical gets customized UI, workflows, and capabilities while maintaining a **single upstream fork** and **minimal sync overhead**.
 
 **Key Design Decisions**:
-- ✅ One monorepo fork from kortix-ai/suna
+- ✅ One monorepo fork from aimentor606/aether
 - ✅ All verticals coexist via config + feature flags (no code forks)
 - ✅ Multi-tenant database model (existing accountId + sandboxId)
 - ✅ Tenant-scoped configuration loader replaces direct env reads
@@ -119,7 +119,7 @@ Response (tenant-customized)
 │                 │                    │
 ┌───▼──────┐  ┌──▼────────┐  ┌───────▼──┐
 │ Web App  │  │ API       │  │ Agent    │
-│(Next.js) │  │(Hono)     │  │(Kortix)  │
+│(Next.js) │  │(Hono)     │  │(Aether)  │
 │Instance  │  │Instance   │  │Instance  │
 │(1)       │  │(1)        │  │(1)       │
 └──────────┘  └───────────┘  └──────────┘
@@ -943,7 +943,7 @@ describe('Finance: Bank Reconciliation Workflow', () => {
 ### 11.1 Sync Workflow
 
 ```bash
-# 1. Fetch latest from upstream (kortix-ai/suna)
+# 1. Fetch latest from upstream (aimentor606/aether)
 git fetch upstream main
 
 # 2. Rebase our changes onto upstream/main
@@ -952,7 +952,7 @@ git rebase upstream/main
 # 3. If conflicts (expected in config, schema, plugin files):
 #    - packages/db/drizzle/* → keep ours (vertical schema)
 #    - packages/vertical/* → keep ours (industry config)
-#    - core/kortix-master/opencode/* → merge carefully
+#    - core/aether-master/opencode/* → merge carefully
 #    - Everything else → take upstream
 
 # 4. Resolve, continue rebase
@@ -972,7 +972,7 @@ npm run build
 **High-Risk Files** (expect conflicts):
 - `packages/db/drizzle/migrations/*` — Always keep ours (vertical additions)
 - `packages/vertical/*` — Always keep ours (our industry config)
-- `core/kortix-master/opencode/*` — Careful review; may need manual merge
+- `core/aether-master/opencode/*` — Careful review; may need manual merge
 
 **Low-Risk Files** (rarely conflict):
 - `apps/web/src/pages/*` — Upstream rarely changes this

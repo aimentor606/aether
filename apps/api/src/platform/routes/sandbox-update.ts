@@ -13,7 +13,7 @@
 
 import { Hono } from 'hono';
 import { eq, and } from 'drizzle-orm';
-import { sandboxes } from '@acme/db';
+import { sandboxes } from '@aether/db';
 import { db } from '../../shared/db';
 import {
   LocalDockerProvider,

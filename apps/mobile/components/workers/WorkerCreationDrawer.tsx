@@ -20,7 +20,7 @@ import {
   ArrowLeft,
   Sparkles,
 } from 'lucide-react-native';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView, TouchableOpacity as BottomSheetTouchable } from '@gorhom/bottom-sheet';
 import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useCreateAgent, useCreateNewAgent } from '@/lib/agents/hooks';
@@ -104,7 +104,7 @@ function OptionCard({ option, isSelected, isLoading, onPress }: OptionCardProps)
               {option.label}
             </Text>
             {isLoading && (
-              <AcmeLoader size="small" customSize={14} />
+              <AetherLoader size="small" customSize={14} />
             )}
           </View>
           <Text className="mt-0.5 font-roobert text-sm text-muted-foreground">

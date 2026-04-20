@@ -14,8 +14,8 @@ const ANDROID_HIT_SLOP = Platform.OS === 'android' ? { top: 10, bottom: 10, left
 function isAdvancedModel(modelId: string | undefined): boolean {
   if (!modelId) return false;
   return (
-    modelId === 'acme/power' ||
-    modelId === 'acme-power' ||
+    modelId === 'aether/power' ||
+    modelId === 'aether-power' ||
     modelId.includes('claude-sonnet-4-5') ||
     modelId.includes('sonnet')
   );

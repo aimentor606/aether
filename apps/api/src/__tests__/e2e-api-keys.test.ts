@@ -1,5 +1,5 @@
 /**
- * E2E tests for the API key management routes (acme.api_keys).
+ * E2E tests for the API key management routes (aether.api_keys).
  *
  * Routes tested (mounted at /v1/platform/api-keys):
  *   POST   /                        → Create a new API key for a sandbox
@@ -23,7 +23,7 @@ import {
 
 const HAS_DB = !!process.env.DATABASE_URL;
 
-describe.skipIf(!HAS_DB)('Platform — API Keys (acme schema)', () => {
+describe.skipIf(!HAS_DB)('Platform — API Keys (aether schema)', () => {
   const app = createTestApp({
     dockerProvider: createMockProvider('local_docker'),
     daytonaProvider: createMockProvider('daytona'),
@@ -70,7 +70,7 @@ describe.skipIf(!HAS_DB)('Platform — API Keys (acme schema)', () => {
       expect(body.success).toBe(true);
       expect(body.data.key_id).toBeDefined();
       expect(body.data.public_key).toMatch(/^pk_[A-Za-z0-9]{32}$/);
-      expect(body.data.secret_key).toMatch(/^acme_[A-Za-z0-9]{32}$/);
+      expect(body.data.secret_key).toMatch(/^aether_[A-Za-z0-9]{32}$/);
       expect(body.data.sandbox_id).toBe(sandboxId);
       expect(body.data.title).toBe('Test Key');
       expect(body.data.description).toBe('Integration test key');
@@ -265,7 +265,7 @@ describe.skipIf(!HAS_DB)('Platform — API Keys (acme schema)', () => {
         title: 'Security Test',
       });
       const createBody = await createRes.json();
-      expect(createBody.data.secret_key).toMatch(/^acme_/);
+      expect(createBody.data.secret_key).toMatch(/^aether_/);
 
       // List — must NOT contain secret
       const listRes = await jsonGet(app, `/v1/platform/api-keys?sandbox_id=${sandboxId}`);

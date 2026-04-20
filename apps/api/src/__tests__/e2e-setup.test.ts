@@ -27,7 +27,7 @@ mock.module('../middleware/auth', () => ({
 
 const { setupApp } = await import('../setup');
 
-const TEST_DIR = `/tmp/acme-setup-test-${Date.now()}`;
+const TEST_DIR = `/tmp/aether-setup-test-${Date.now()}`;
 
 // ─── Test app factory ───────────────────────────────────────────────────────
 
@@ -187,9 +187,9 @@ describe('/v1/setup', () => {
       expect(content).toContain('ANTHROPIC_API_KEY=sk-ant-test-setup-123');
     });
 
-    it('core/docker/.env has ACME_API_URL', async () => {
+    it('core/docker/.env has AETHER_API_URL', async () => {
       const content = readFileSync(resolve(TEST_DIR, 'core/docker/.env'), 'utf-8');
-      expect(content).toContain('ACME_API_URL=http://acme-api:8008');
+      expect(content).toContain('AETHER_API_URL=http://aether-api:8008');
     });
 
     it('rejects invalid body', async () => {

@@ -28,7 +28,7 @@ interface SandboxContextValue {
   isProvisioning: boolean;
   /** The sandbox_id (UUID) to use for polling provisioning status */
   provisioningSandboxId: string | undefined;
-  /** The external_id (e.g. 'acme-sandbox') for proxy URL construction */
+  /** The external_id (e.g. 'aether-sandbox') for proxy URL construction */
   provisioningExternalId: string | undefined;
   /** The provider of the provisioning sandbox (local_docker, justavps, etc.) */
   provisioningProvider: string | undefined;

@@ -5,23 +5,23 @@ export * as schema from './schema';
 // Re-export frequently used schemas and types for convenience
 export {
   // Schema namespace
-  acmeSchema,
+  aetherSchema,
   // Enums
   sandboxStatusEnum,
   deploymentStatusEnum,
   deploymentSourceEnum,
   apiKeyStatusEnum,
   apiKeyTypeEnum,
-  // Acme tables — accounts
+  // Aether tables — accounts
   accounts,
   accountMembers,
   accountRoleEnum,
   accountsRelations,
   accountMembersRelations,
-  // Acme tables
+  // Aether tables
   sandboxes,
   deployments,
-  acmeApiKeys,
+  aetherApiKeys,
   integrationCredentials,
   integrations,
   sandboxIntegrations,
@@ -31,10 +31,10 @@ export {
   // Relations
   sandboxesRelations,
   deploymentsRelations,
-  acmeApiKeysRelations,
+  aetherApiKeysRelations,
   integrationsRelations,
   sandboxIntegrationsRelations,
-  // Billing / Credits (moved from public → acme schema)
+  // Billing / Credits (moved from public → aether schema)
   billingCustomers,
   creditAccounts,
   creditLedger,
@@ -72,7 +72,7 @@ export {
   // Pool
   poolResources,
   poolSandboxes,
-} from './schema/acme';
+} from './schema/aether';
 
 export type {
   TunnelMachineInfo,
@@ -80,7 +80,54 @@ export type {
   TunnelShellScope,
   TunnelNetworkScope,
   TunnelPermissionScope,
-} from './schema/acme';
+} from './schema/aether';
+
+export {
+  invoiceStatusEnum,
+  expenseCategoryEnum,
+  expenseStatusEnum,
+  budgetPeriodEnum,
+  budgetStatusEnum,
+  ledgerStatusEnum,
+  invoices,
+  expenses,
+  budgets,
+  ledgers,
+  invoicesRelations,
+  expensesRelations,
+  budgetsRelations,
+  ledgersRelations,
+  createInvoiceSchema,
+  updateInvoiceSchema,
+  createExpenseSchema,
+  updateExpenseSchema,
+  createBudgetSchema,
+  updateBudgetSchema,
+  createLedgerSchema,
+  updateLedgerSchema,
+} from './schema/finance';
+
+export type {
+  CreateInvoiceInput,
+  UpdateInvoiceInput,
+  CreateExpenseInput,
+  UpdateExpenseInput,
+  CreateBudgetInput,
+  UpdateBudgetInput,
+  CreateLedgerInput,
+  UpdateLedgerInput,
+} from './schema/finance';
+
+// Vertical / Multi-tenant tables
+export {
+  verticalTables,
+  featureFlags,
+  verticalConfigs,
+  accountIntegrations,
+  featureFlagsRelations,
+  verticalConfigsRelations,
+  accountIntegrationsRelations,
+} from './schema/vertical';
 
 // Public/basejump tables
 export {
@@ -100,8 +147,8 @@ export type {
   AccountUser,
   NewApiKey,
   SandboxSelect,
-  AcmeApiKey,
-  NewAcmeApiKey,
+  AetherApiKey,
+  NewAetherApiKey,
   IntegrationCredential,
   NewIntegrationCredential,
   Integration,
@@ -118,4 +165,10 @@ export type {
   NewTunnelPermissionRequest,
   TunnelAuditLog,
   NewTunnelAuditLog,
+  FeatureFlag,
+  NewFeatureFlag,
+  VerticalConfig,
+  NewVerticalConfig,
+  AccountIntegration,
+  NewAccountIntegration,
 } from './types';

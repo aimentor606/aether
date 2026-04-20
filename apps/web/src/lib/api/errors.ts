@@ -1,7 +1,7 @@
 /**
  * Billing & API Error Classes
  * 
- * Simplified from the legacy 8-class hierarchy. The backend (acme-api)
+ * Simplified from the legacy 8-class hierarchy. The backend (aether-api)
  * only returns plain HTTP 402 with { message: "..." } for billing errors.
  * All the old error codes (AGENT_RUN_LIMIT_EXCEEDED, THREAD_LIMIT_EXCEEDED, etc.)
  * are no longer emitted by any backend endpoint.

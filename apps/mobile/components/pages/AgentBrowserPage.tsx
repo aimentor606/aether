@@ -1,7 +1,7 @@
 /**
  * AgentBrowserPage — dedicated viewer for the agent's Chrome browser (port 9224).
  *
- * Auto-connects to the primary session in focused mode (?session=acme).
+ * Auto-connects to the primary session in focused mode (?session=aether).
  * Native toolbar with back/forward that call the viewer's /input API.
  * The viewer HTML handles SSE streaming, canvas rendering, and input forwarding.
  */
@@ -59,7 +59,7 @@ export function AgentBrowserPage({ page, onBack, onOpenDrawer, onOpenRightDrawer
   const viewerUrl = useMemo(() => {
     if (!sandboxId) return '';
     const base = getSandboxPortUrl(sandboxId, String(BROWSER_VIEWER_PORT));
-    return `${base}?session=acme`;
+    return `${base}?session=aether`;
   }, [sandboxId]);
 
   // Build the /input API URL for sending nav commands

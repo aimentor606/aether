@@ -384,7 +384,7 @@ function ConnectStep({
 
   const apiUrl = `${getEnv().BACKEND_URL}/tunnel`;
 
-  const connectCommand = `npx @acme/agent-tunnel connect --tunnel-id ${result.tunnelId} --token ${result.setupToken} --api-url ${apiUrl}`;
+  const connectCommand = `npx @aether/agent-tunnel connect --tunnel-id ${result.tunnelId} --token ${result.setupToken} --api-url ${apiUrl}`;
   const highlightedCommand = useMemo(
     () => renderHighlightedCommand(connectCommand),
     [connectCommand],

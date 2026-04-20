@@ -327,7 +327,7 @@
       ],
       "random": [
         "Olha quem voltou!",
-        "E aí! O que o Acme pode fazer por ti?",
+        "E aí! O que o Aether pode fazer por ti?",
         "O que queres realizar hoje?",
         "Vamos criar algo incrível",
         "Pronto quando quiseres!",
@@ -357,7 +357,7 @@
     "chatDescription": "Conversa simples de ida e volta",
     "sampleAnswers": "Respostas de exemplo",
     "samplePrompts": "Prompts de exemplo",
-    "waitingForUserResponse": "Acme continuará trabalhando de forma autônoma após tua resposta.",
+    "waitingForUserResponse": "Aether continuará trabalhando de forma autônoma após tua resposta.",
     "taskCompleted": "Tarefa concluída",
     "uploadingFiles": "Enviando {count} arquivo{plural}...",
     "uploadingFilesOne": "Enviando {count} arquivo...",
@@ -373,7 +373,7 @@
     "running": "Executando",
     "minimizeToFloatingPreview": "Minimizar para pré-visualização flutuante",
     "close": "Fechar",
-    "noActionsYet": "Acme Computer",
+    "noActionsYet": "Aether Computer",
     "workerActionsDescription": "Iniciando",
     "emptyActionsDescription": "As ações do Worker aparecerão aqui",
     "toolIsRunning": "Ferramenta está executando",
@@ -383,7 +383,7 @@
     "rateThisResult": "Avaliar este resultado",
     "feedbackHelpsImprove": "Teu feedback nos ajuda a melhorar",
     "additionalFeedbackOptional": "Feedback adicional (opcional)",
-    "helpAcmeImprove": "Ajuda Acme a melhorar com teu feedback",
+    "helpAetherImprove": "Ajuda Aether a melhorar com teu feedback",
     "submit": "Enviar",
     "submitting": "Enviando...",
     "feedbackSubmittedSuccess": "Feedback enviado com sucesso",
@@ -406,10 +406,10 @@
     "heroPlaceholder": "Descreve a tarefa que queres que teu Worker complete..."
   },
   "showcase": {
-    "title": "Acme: Teu Worker de IA Autônomo",
+    "title": "Aether: Teu Worker de IA Autônomo",
     "subtitle": "Construído para tarefas complexas, projetado para tudo. O assistente de IA definitivo que lida com tudo—de solicitações simples a projetos mega-complexos.",
     "tryItOut": "Experimentar",
-    "acmeComputer": "Acme Computer",
+    "aetherComputer": "Aether Computer",
     "running": "Em execução",
     "workers": {
       "images": {
@@ -527,10 +527,10 @@
     },
     "creditsExplainedPage": {
       "title": "Créditos Explicados",
-      "subtitle": "Tudo o que precisas saber sobre como os créditos funcionam no Acme",
+      "subtitle": "Tudo o que precisas saber sobre como os créditos funcionam no Aether",
       "understandingCredits": {
         "title": "Entendendo Créditos",
-        "description": "Os créditos servem como moeda universal do Acme para operações da plataforma. Cada ação que teus agentes de IA executam—de analisar dados a gerar código—consome créditos com base na complexidade da tarefa e nos recursos necessários."
+        "description": "Os créditos servem como moeda universal do Aether para operações da plataforma. Cada ação que teus agentes de IA executam—de analisar dados a gerar código—consome créditos com base na complexidade da tarefa e nos recursos necessários."
       },
       "howCreditsWork": {
         "title": "Como os Créditos Funcionam",
@@ -548,7 +548,7 @@
       },
       "gettingMoreCredits": {
         "title": "Obtendo Mais Créditos",
-        "description": "Existem várias formas de obter créditos no Acme:",
+        "description": "Existem várias formas de obter créditos no Aether:",
         "monthlySubscription": {
           "title": "Créditos de Assinatura Mensal",
           "description": "Incluídos no teu plano pago e renovados automaticamente a cada mês. Estes são créditos com expiração."
@@ -568,7 +568,7 @@
       },
       "typesOfCredits": {
         "title": "Tipos de Créditos",
-        "description": "O Acme usa dois tipos de créditos para te dar flexibilidade em como geres teu uso:",
+        "description": "O Aether usa dois tipos de créditos para te dar flexibilidade em como geres teu uso:",
         "expiringCredits": {
           "title": "Créditos com Expiração",
           "description": "Créditos de assinatura mensal",
@@ -581,7 +581,7 @@
         },
         "creditPriority": {
           "title": "Prioridade de Créditos:",
-          "description": "Quando usas o Acme, os créditos com expiração são consumidos primeiro. Apenas após os teus créditos com expiração se esgotarem, os créditos sem expiração serão usados."
+          "description": "Quando usas o Aether, os créditos com expiração são consumidos primeiro. Apenas após os teus créditos com expiração se esgotarem, os créditos sem expiração serão usados."
         }
       }
     },
@@ -639,16 +639,16 @@
       "continue": "Continuar",
       "keepCurrentPlan": "Manter meu plano atual",
       "feedbackTitle": "Ajude-nos a melhorar",
-      "feedbackSubtitle": "Seu feedback molda o futuro do Acme",
+      "feedbackSubtitle": "Seu feedback molda o futuro do Aether",
       "whatWouldMakeYouStay": "O que faria você ficar?",
-      "feedbackPlaceholder": "Se houvesse uma coisa que pudéssemos mudar ou adicionar para tornar o Acme valioso para você, qual seria?",
+      "feedbackPlaceholder": "Se houvesse uma coisa que pudéssemos mudar ou adicionar para tornar o Aether valioso para você, qual seria?",
       "feedbackFooter": "Nossa equipe lê cada resposta. Suas palavras influenciam diretamente o que construímos a seguir.",
       "confirmDowngrade": "Confirmar downgrade",
       "processing": "Processando...",
       "pleaseSelectReason": "Por favor, selecione um motivo",
       "reasons": {
         "tooExpensive": "É muito caro para minhas necessidades",
-        "notUsingOften": "Não estou usando o Acme o suficiente",
+        "notUsingOften": "Não estou usando o Aether o suficiente",
         "foundAlternative": "Encontrei outra solução",
         "technicalIssues": "Tive problemas técnicos",
         "resultsNotGood": "Os resultados não atenderam às minhas expectativas",
@@ -662,7 +662,7 @@
     "enterCode": "Inserir código",
     "logIntoAccount": "Entra na tua conta",
     "createAccount": "Criar conta",
-    "signInOrCreateAccount": "Entra ou cria a tua conta Acme",
+    "signInOrCreateAccount": "Entra ou cria a tua conta Aether",
     "continueWithGoogle": "Continuar com Google",
     "continueWithGitHub": "Continuar com GitHub",
     "orEmail": "ou email",
@@ -707,7 +707,7 @@
     "alreadySignedIn": "Já tens sessão iniciada. Nenhuma ação necessária.",
     "goToDashboard": "Ir para o Painel",
     "signInToContinue": "Entra para continuar",
-    "signInOrCreateAccountToTalk": "Entra ou cria uma conta para falar com o Acme",
+    "signInOrCreateAccountToTalk": "Entra ou cria uma conta para falar com o Aether",
     "orContinueWithEmail": "ou continua com email",
     "signInWithEmail": "Entrar com email",
     "createNewAccount": "Criar nova conta",
@@ -1196,7 +1196,7 @@
   "announcements": {
     "memories": {
       "title": "Apresentando Memórias",
-      "description": "Acme agora lembra suas preferências e contexto em todas as conversas",
+      "description": "Aether agora lembra suas preferências e contexto em todas as conversas",
       "features": {
         "personalized": {
           "title": "Experiência Personalizada",

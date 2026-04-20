@@ -16,7 +16,7 @@ import { config } from '../config';
 import { ALL_SANDBOX_ENV_KEYS, buildProviderKeySchema } from '../providers/registry';
 import { supabaseAuth } from '../middleware/auth';
 import { eq, sql } from 'drizzle-orm';
-import { accounts } from '@acme/db';
+import { accounts } from '@aether/db';
 import { db, hasDatabase } from '../shared/db';
 import { resolveAccountId } from '../shared/resolve-account';
 import { getSupabase } from '../shared/supabase';
@@ -75,7 +75,7 @@ function getProjectRoot(): string {
 
 function getMasterUrlCandidates(): string[] {
   const candidates: string[] = [];
-  const explicit = process.env.ACME_MASTER_URL;
+  const explicit = process.env.AETHER_MASTER_URL;
   if (explicit && explicit.trim()) candidates.push(explicit.trim());
 
   // Inside docker-compose network, the sandbox service is reachable by name.
@@ -113,7 +113,7 @@ async function fetchMasterJson<T>(path: string, init: RequestInit = {}, timeoutM
     const url = `${base}${path}`;
     try {
       const res = await fetchWithTimeout(url, init, timeoutMs);
-      // 503 from /acme/health means "starting" — still return the JSON body
+      // 503 from /aether/health means "starting" — still return the JSON body
       // so callers can inspect the status/opencode fields.
       if (!res.ok && res.status !== 503) {
         lastErr = new Error(`Master ${url} returned ${res.status}`);
@@ -150,8 +150,8 @@ async function getLocalSandboxWarmStatus() {
   const provider = new LocalDockerProvider();
   const existing = await provider.find();
   const sandboxHealthUrl = config.SANDBOX_NETWORK
-    ? `http://${config.SANDBOX_CONTAINER_NAME}:8000/acme/health`
-    : `http://localhost:${config.SANDBOX_PORT_BASE || 14000}/acme/health`;
+    ? `http://${config.SANDBOX_CONTAINER_NAME}:8000/aether/health`
+    : `http://localhost:${config.SANDBOX_PORT_BASE || 14000}/aether/health`;
 
   if (existing && existing.status === 'running') {
     try {
@@ -170,7 +170,7 @@ async function getLocalSandboxWarmStatus() {
       success: true,
       status: 'creating',
       progress: 95,
-      message: 'Sandbox container is running and finishing Acme boot...',
+      message: 'Sandbox container is running and finishing Aether boot...',
     };
   }
 
@@ -562,7 +562,7 @@ setupApp.post('/env', async (c) => {
     if (existsSync(examplePath)) {
       writeFileSync(rootEnvPath, readFileSync(examplePath, 'utf-8'));
     } else {
-      writeFileSync(rootEnvPath, '# Acme Environment Configuration\nENV_MODE=local\n');
+      writeFileSync(rootEnvPath, '# Aether Environment Configuration\nENV_MODE=local\n');
     }
   }
 
@@ -578,13 +578,13 @@ setupApp.post('/env', async (c) => {
     if (existsSync(examplePath)) {
       writeFileSync(sandboxEnvPath, readFileSync(examplePath, 'utf-8'));
     } else {
-      writeFileSync(sandboxEnvPath, '# Acme Sandbox Environment\nENV_MODE=local\n');
+      writeFileSync(sandboxEnvPath, '# Aether Sandbox Environment\nENV_MODE=local\n');
     }
   }
   sandboxData.ENV_MODE = 'local';
   sandboxData.SANDBOX_ID = config.SANDBOX_CONTAINER_NAME;
   sandboxData.PROJECT_ID = 'local';
-  sandboxData.ACME_API_URL = 'http://acme-api:8008';
+  sandboxData.AETHER_API_URL = 'http://aether-api:8008';
   writeEnvFile(sandboxEnvPath, sandboxData);
 
   // Run setup-env.sh
@@ -611,7 +611,7 @@ setupApp.get('/health', async (c) => {
   // Installed/local Docker mode: check sandbox by HTTP (no docker CLI in image)
   if (!repoRoot) {
     try {
-      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/acme/health', {}, 5000);
+      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/aether/health', {}, 5000);
       checks.sandbox = { ok: true };
       checks.docker = { ok: true };
       if (health.status === 'starting' || health.runtimeReady === false) {

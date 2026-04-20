@@ -796,7 +796,7 @@ function TelegramWizard({
 }) {
   const [botToken, setBotToken] = useState('');
   const [botInfo, setBotInfo] = useState<{ username: string; firstName: string } | null>(null);
-  const [agentName, setAgentName] = useState('acme');
+  const [agentName, setAgentName] = useState('aether');
   const [selectedModelIdx, setSelectedModelIdx] = useState(0);
 
   const verifyMutation = useTelegramVerifyToken();
@@ -1001,7 +1001,7 @@ const BOT_NAMES = [
 ];
 
 function randomBotName(): string {
-  return `Acme ${BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)]}`;
+  return `Aether ${BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)]}`;
 }
 
 function SlackWizard({
@@ -1020,7 +1020,7 @@ function SlackWizard({
 
   // Step 1: Configure
   const [botName, setBotName] = useState(() => randomBotName());
-  const [agentName, setAgentName] = useState('acme');
+  const [agentName, setAgentName] = useState('aether');
   const [selectedModelIdx, setSelectedModelIdx] = useState(0);
 
   // Step 2: Manifest
@@ -1101,7 +1101,7 @@ function SlackWizard({
           <BottomSheetTextInput
             value={botName}
             onChangeText={setBotName}
-            placeholder="Acme Agent"
+            placeholder="Aether Agent"
             placeholderTextColor={isDark ? 'rgba(248,248,248,0.25)' : 'rgba(18,18,21,0.3)'}
             style={{ ...inputStyle, marginBottom: 4 }}
           />

@@ -175,7 +175,7 @@ export async function grantCredits(
       const message = insertErr instanceof Error ? insertErr.message : String(insertErr);
       const isDuplicate =
         message.includes('duplicate key') &&
-        (message.includes('acme_unique_stripe_event') || message.includes('idx_acme_credit_ledger_idempotency'));
+        (message.includes('aether_unique_stripe_event') || message.includes('idx_aether_credit_ledger_idempotency'));
       if (isDuplicate) {
         return { success: true, duplicate_prevented: true };
       }

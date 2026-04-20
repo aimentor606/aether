@@ -11,19 +11,19 @@ export type MobileDevicePlatform = 'ios' | 'android' | null;
  */
 export function isMobileDevice(): boolean {
   if (typeof window === 'undefined') return false;
-  
+
   const userAgent = window.navigator.userAgent.toLowerCase();
-  
+
   // Check for iOS devices
   if (/iphone|ipad|ipod/.test(userAgent)) {
     return true;
   }
-  
+
   // Check for Android devices
   if (/android/.test(userAgent)) {
     return true;
   }
-  
+
   return false;
 }
 
@@ -33,19 +33,19 @@ export function isMobileDevice(): boolean {
  */
 export function getMobileDevicePlatform(): MobileDevicePlatform {
   if (typeof window === 'undefined') return null;
-  
+
   const userAgent = window.navigator.userAgent.toLowerCase();
-  
+
   // Check for iOS devices
   if (/iphone|ipad|ipod/.test(userAgent)) {
     return 'ios';
   }
-  
+
   // Check for Android devices
   if (/android/.test(userAgent)) {
     return 'android';
   }
-  
+
   return null;
 }
 
@@ -64,8 +64,10 @@ export function isIPad(): boolean {
   if (typeof window === 'undefined') return false;
   const userAgent = window.navigator.userAgent.toLowerCase();
   // Also check for Mac with touch for iPad OS 13+
-  return /ipad/.test(userAgent) || 
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  return (
+    /ipad/.test(userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
 }
 
 /**
@@ -93,12 +95,11 @@ export function isAndroidTablet(): boolean {
  * Store links for mobile app downloads
  */
 export const MOBILE_APP_STORE_LINKS = {
-  ios: 'https://apps.apple.com/ie/app/acme/id6754448524',
-  android: 'https://play.google.com/store/apps/details?id=com.acme.app',
+  ios: 'https://apps.apple.com/ie/app/aether/id6754448524',
+  android: 'https://play.google.com/store/apps/details?id=com.aether.app',
 } as const;
 
 /**
- * Deep link scheme for opening the Acme app
+ * Deep link scheme for opening the Aether app
  */
-export const ACME_DEEP_LINK = 'acme://';
-
+export const AETHER_DEEP_LINK = 'aether://';

@@ -3,7 +3,7 @@
  *
  * Matches the web frontend's onboarding page:
  *   Phase 1 (bios):    Terminal boot sequence
- *   Phase 2 (logo):    Acme logo + progress bar
+ *   Phase 2 (logo):    Aether logo + progress bar
  *   Phase 3 (session): Full-screen chat with /onboarding command
  *
  * Env vars persisted to sandbox:
@@ -26,7 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
-import { AcmeLogo } from '@/components/ui/AcmeLogo';
+import { AetherLogo } from '@/components/ui/AetherLogo';
 import { useSandboxContext } from '@/contexts/SandboxContext';
 import { useCreateSession } from '@/lib/platform/hooks';
 import { getAuthToken } from '@/api/config';
@@ -36,9 +36,9 @@ import { log } from '@/lib/logger';
 // ─── BIOS lines (matches web frontend) ──────────────────────────────────────
 
 const BIOS_LINES = [
-  { text: 'ACME BIOS v2.0.1', bold: true },
+  { text: 'aether BIOS v2.0.1', bold: true },
   { text: '' },
-  { text: 'CPU: Acme Inference Engine X1 @ 3.80 GHz' },
+  { text: 'CPU: Aether Inference Engine X1 @ 3.80 GHz' },
   { text: 'Memory test................. OK' },
   { text: 'Neural cores............... 8/8 online' },
   { text: 'Agent runtime.............. initialized' },
@@ -47,7 +47,7 @@ const BIOS_LINES = [
   { text: 'Mounting workspace......... done' },
   { text: 'Connecting to services..... done' },
   { text: '' },
-  { text: 'All systems nominal. Starting ACME OS...' },
+  { text: 'All systems nominal. Starting aether OS...' },
 ];
 
 const LINE_DELAY_MS = 160;
@@ -167,7 +167,7 @@ function LogoPhase({ onDone, onSkip }: { onDone: () => void; onSkip: () => void 
 
   return (
     <Animated.View entering={FadeIn.duration(800)} style={{ flex: 1, backgroundColor: '#09090b', alignItems: 'center', justifyContent: 'center' }}>
-      <AcmeLogo size={64} variant="symbol" color="light" />
+      <AetherLogo size={64} variant="symbol" color="light" />
       {/* Progress bar */}
       <View style={{ width: 120, height: 3, borderRadius: 1.5, backgroundColor: 'rgba(255,255,255,0.1)', marginTop: 28, overflow: 'hidden' }}>
         <Animated.View style={[{ height: 3, borderRadius: 1.5, backgroundColor: '#FFFFFF' }, barStyle]} />
@@ -233,7 +233,7 @@ export function InstanceOnboarding({ onComplete }: InstanceOnboardingProps) {
     if (!sandboxUrl || onboardingSessionId) return;
 
     try {
-      const session = await createSession.mutateAsync({ title: 'Acme Onboarding' });
+      const session = await createSession.mutateAsync({ title: 'Aether Onboarding' });
       setOnboardingSessionId(session.id);
       await writeEnv(sandboxUrl, 'ONBOARDING_SESSION_ID', session.id);
 
@@ -315,7 +315,7 @@ export function InstanceOnboarding({ onComplete }: InstanceOnboardingProps) {
     // Still creating session — show loading
     return (
       <Animated.View entering={FadeIn.duration(400)} style={{ flex: 1, backgroundColor: isDark ? '#09090b' : '#FFFFFF', alignItems: 'center', justifyContent: 'center' }}>
-        <AcmeLogo size={40} variant="symbol" color={isDark ? 'light' : 'dark'} />
+        <AetherLogo size={40} variant="symbol" color={isDark ? 'light' : 'dark'} />
         <Text style={{ marginTop: 16, fontSize: 13, fontFamily: 'Roobert', color: isDark ? 'rgba(248,248,248,0.4)' : 'rgba(18,18,21,0.4)' }}>
           Setting up your workspace…
         </Text>

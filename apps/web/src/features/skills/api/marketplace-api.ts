@@ -1,15 +1,20 @@
 /**
  * Marketplace API — fetches all components from the OCX registry.
  *
- * Registry URL: https://acme-registry-6om.pages.dev
+ * Registry URL: https://aether-registry-6om.pages.dev
  * - GET /index.json → list of ALL components (skills, agents, tools, etc.)
  * - GET /components/{name}.json → component details
  * - GET /components/{name}/{type}/{name}/SKILL.md → skill content
  */
 
-const REGISTRY_URL = 'https://acme-registry-6om.pages.dev';
+const REGISTRY_URL = 'https://aether-registry-6om.pages.dev';
 
-export type ComponentType = 'ocx:skill' | 'ocx:agent' | 'ocx:tool' | 'ocx:plugin' | string;
+export type ComponentType =
+  | 'ocx:skill'
+  | 'ocx:agent'
+  | 'ocx:tool'
+  | 'ocx:plugin'
+  | string;
 
 export interface RegistryComponent {
   name: string;
@@ -67,7 +72,7 @@ export async function fetchRegistryComponents(): Promise<RegistryComponent[]> {
   if (!response.ok) {
     throw new Error(`Failed to fetch registry: ${response.statusText}`);
   }
-  
+
   const data: RegistryIndex = await response.json();
   return data.components;
 }
@@ -77,27 +82,37 @@ export async function fetchRegistryComponents(): Promise<RegistryComponent[]> {
  */
 export async function fetchRegistrySkills(): Promise<RegistryComponent[]> {
   const components = await fetchRegistryComponents();
-  return components.filter(c => c.type === 'ocx:skill');
+  return components.filter((c) => c.type === 'ocx:skill');
 }
 
 /**
  * Get the full component details.
  */
-export async function fetchComponentDetails(componentName: string): Promise<RegistryComponent | null> {
-  const response = await fetch(`${REGISTRY_URL}/components/${componentName}.json`);
+export async function fetchComponentDetails(
+  componentName: string,
+): Promise<RegistryComponent | null> {
+  const response = await fetch(
+    `${REGISTRY_URL}/components/${componentName}.json`,
+  );
   if (!response.ok) {
     if (response.status === 404) return null;
     throw new Error(`Failed to fetch component: ${response.statusText}`);
   }
-  
+
   const data = await response.json();
   return data;
 }
 
-export async function fetchComponentBundle(componentName: string): Promise<RegistryComponentBundle> {
-  const response = await fetch(`${REGISTRY_URL}/components/${componentName}.json`);
+export async function fetchComponentBundle(
+  componentName: string,
+): Promise<RegistryComponentBundle> {
+  const response = await fetch(
+    `${REGISTRY_URL}/components/${componentName}.json`,
+  );
   if (!response.ok) {
-    throw new Error(`Failed to fetch component details: ${response.statusText}`);
+    throw new Error(
+      `Failed to fetch component details: ${response.statusText}`,
+    );
   }
 
   const manifest: RegistryComponentDetails = await response.json();
@@ -113,7 +128,9 @@ export async function fetchComponentBundle(componentName: string): Promise<Regis
 
   const files = await Promise.all(
     (version.files ?? []).map(async (path) => {
-      const fileResponse = await fetch(`${REGISTRY_URL}/components/${componentName}/${path}`);
+      const fileResponse = await fetch(
+        `${REGISTRY_URL}/components/${componentName}/${path}`,
+      );
       if (!fileResponse.ok) {
         return {
           path,

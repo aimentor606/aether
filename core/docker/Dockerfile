@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 #
-# kortix/computer — sandbox image
+#aether/computer — sandbox image
 #
 # ONE image. Everything baked at build time. No OTA, no npm, no symlinks.
 # Updates = pull new image + recreate container.
@@ -10,7 +10,7 @@
 # │                                                                        │
 # │  /workspace/   = PERSISTENT  (Docker volume, survives everything)      │
 # │  /opt/         = AVAILABLE   (user/system, container layer)            │
-# │  /ephemeral/   = SHIPPED     (Kortix runtime, REPLACED on update)     │
+# │  /ephemeral/   = SHIPPED     ( runtime, REPLACED on update)     │
 # │  /run/s6/      = TMPFS       (rebuilt from /workspace on boot)         │
 # │                                                                        │
 # │  Rule: ALL user state MUST live under /workspace/.                     │
@@ -26,7 +26,7 @@
 #     .local/bin/, .local/lib/     User pip packages
 #     .npm-global/                 User npm -g packages
 #     .opencode/                   OpenCode config (skills, agents from marketplace)
-#     .kortix/                     Kortix state, package manifests
+#     .aether/                    aether state, package manifests
 #     .lss/                        LSS search index
 #     .browser-profile/            Chromium profile
 #     .cache/opencode/             OpenCode runtime cache
@@ -34,7 +34,7 @@
 #     *                            User code, projects, files
 #
 #   EPHEMERAL (/ephemeral/ — shipped runtime, replaced on update):
-#     /ephemeral/kortix-master/    Hono server, OpenCode config, channels, triggers
+#     /ephemeral/master/    Hono server, OpenCode config, channels, triggers
 #     /ephemeral/metadata/         Version metadata, service spec, changelog
 #     /ephemeral/agent-browser-viewer/ Browser viewer HTML
 #     /ephemeral/services/         Service scripts
@@ -188,9 +188,9 @@ RUN mkdir -p /workspace/.browser-profile \
     /workspace/.npm-global/lib \
     && chmod 700 /workspace/.secrets \
     # Bake .gitignore so these dirs are always excluded from git snapshots.
-    # kortix-env-setup.sh commits this in the initial workspace commit.
+    #env-setup.sh commits this in the initial workspace commit.
     && printf '%s\n' \
-        '# kortix/opencode internal dirs — excluded from agent snapshots' \
+        '#aether/opencode internal dirs — excluded from agent snapshots' \
         '.local/share/opencode/' \
         '.cache/' \
         '.config/' \
@@ -218,7 +218,7 @@ RUN mkdir -p /workspace/.browser-profile \
     && git config --system --add safe.directory '*' \
     && echo "abc ALL=(root) NOPASSWD: /usr/bin/s6-svc, /bin/s6-svc, /usr/sbin/s6-svc, /usr/bin/s6-rc, /bin/s6-rc" >> /etc/sudoers
 WORKDIR /workspace
-ENV KORTIX_WORKSPACE=/workspace
+ENVWORKSPACE=/workspace
 
 # NOTE: Persistent package ENVs (PYTHONUSERBASE, PIP_USER, NPM_CONFIG_PREFIX)
 # are set AFTER the build step — see "Runtime persistence" section below.
@@ -227,7 +227,7 @@ ENV KORTIX_WORKSPACE=/workspace
 
 # ── Services (s6-rc.d longrun) ──────────────────────────────────────────────
 COPY core/s6-services/ /etc/s6-overlay/s6-rc.d/
-RUN for svc in svc-kortix-master svc-opencode-serve \
+RUN for svc in svc-master svc-opencode-serve \
         svc-chromium-persistent svc-agent-browser-session svc-agent-browser-viewer \
         svc-static-web svc-lss-sync svc-sshd svc-docker; do \
         touch "/etc/s6-overlay/s6-rc.d/user/contents.d/${svc}"; \
@@ -261,24 +261,24 @@ COPY core/tests/ /ephemeral/tests/
 RUN chmod +x /ephemeral/tests/*.sh 2>/dev/null || true
 
 # ── Copy source packages to build staging area ──────────────────────────────
-# All sandbox packages are now consolidated inside core/kortix-master/
-#   kortix-master/opencode/   — OpenCode config dir (agents, skills, plugins, tools)
-#   kortix-master/channels/   — Channel CLIs (ktelegram, kslack, kchannel)
-#   kortix-master/triggers/   — Cron + webhook triggers
+# All sandbox packages are now consolidated inside core/master/
+#   master/opencode/   — OpenCode config dir (agents, skills, plugins, tools)
+#   master/channels/   — Channel CLIs (ktelegram, kslack, kchannel)
+#   master/triggers/   — Cron + webhook triggers
 COPY core/kortix-master  /opt/build/kortix-master
 COPY core/s6-services/svc-agent-browser-viewer/index.html /opt/build/browser-viewer/index.html
 
 # ── Build sandbox runtime ────────────────────────────────────────────────────
 RUN set -eo pipefail && echo "[docker] Building sandbox runtime v${SANDBOX_VERSION}..." && \
     \
-    # ── 1. kortix-master (single bun install — includes triggers, channels, opencode deps) ── \
+    # ── 1.master (single bun install — includes triggers, channels, opencode deps) ── \
     mkdir -p /ephemeral/kortix-master && \
     rsync -a --exclude=node_modules --exclude=bun.lock --exclude=.git \
       /opt/build/kortix-master/ /ephemeral/kortix-master/ && \
     cd /ephemeral/kortix-master && bun install 2>&1 && \
     test -d /ephemeral/kortix-master/node_modules && \
     chmod +x /ephemeral/kortix-master/scripts/*.sh 2>/dev/null || true && \
-    echo "[docker] kortix-master: bun install OK (includes triggers, channel CLIs, opencode)" && \
+    echo "[docker]master: bun install OK (includes triggers, channel CLIs, opencode)" && \
     \
     # ── 2. skills shipped in-tree under skills/KORTIX-system/ (recursive discovery) ── \
     echo "[docker] skills: agent-tunnel, agent-browser, presentations in /ephemeral/kortix-master/opencode/skills/KORTIX-system/" && \
@@ -335,7 +335,7 @@ RUN set -eo pipefail && echo "[docker] Building sandbox runtime v${SANDBOX_VERSI
     \
     # ── 10. Fix ownership ── \
     # CRITICAL: Use abc:abc (UID 911) — NOT 1000:1000. The linuxserver base image \
-    # creates user abc with UID 911. All runtime processes (opencode, kortix-master) \
+    # creates user abc with UID 911. All runtime processes (opencode,master) \
     # run as abc via s6-setuidgid. Using 1000 causes EACCES everywhere at runtime. \
     chown -R abc:abc /ephemeral \
       2>/dev/null || true && \

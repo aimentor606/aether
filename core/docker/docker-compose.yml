@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Acme Sandbox — Docker Compose (single instance, fixed ports)
+# aether Sandbox — Docker Compose (single instance, fixed ports)
 # ─────────────────────────────────────────────────────────────────────────────
 #
 # PERSISTENCE MODEL
@@ -14,7 +14,7 @@
 #                    This is the ONLY volume. If it's in /workspace, it persists.
 #
 #   /ephemeral/  →  SHIPPED RUNTIME (image layer, REPLACED on every update)
-#                    Acme server, OpenCode config, services, metadata.
+#                    aether server, OpenCode config, services, metadata.
 #                    Rebuilt from scratch on every `docker pull` + recreate.
 #                    NEVER store user data here. NEVER modify at runtime.
 #
@@ -25,7 +25,7 @@
 #   ✅ /workspace/*          — preserved (volume)
 #   ✅ secrets, encryption   — preserved (/workspace/.secrets/)
 #   ✅ OpenCode state/DB     — preserved (/workspace/.local/share/opencode/)
-#   ✅ user-installed pkgs   — preserved (/workspace/.local/, .npm-global/, .acme/packages/)
+#   ✅ user-installed pkgs   — preserved (/workspace/.local/, .npm-global/, .aether/packages/)
 #   ✅ git repos, projects   — preserved (/workspace/)
 #   ❌ /opt/*                — replaced (new image)
 #   ❌ /run/s6/              — rebuilt from /workspace/.secrets/ on boot
@@ -41,8 +41,8 @@ services:
       dockerfile: core/docker/Dockerfile
       args:
         SANDBOX_VERSION: ${SANDBOX_VERSION:-dev}
-    image: acme/computer:${SANDBOX_VERSION:-dev}
-    container_name: acme-sandbox
+    image: aether/computer:${SANDBOX_VERSION:-dev}
+    container_name: aether-sandbox
     privileged: true
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -51,12 +51,12 @@ services:
       - PGID=911
       - TZ=Etc/UTC
       - SUBFOLDER=/
-      - TITLE=Acme Sandbox ${SANDBOX_NAME:-default}
-      - OPENCODE_CONFIG_DIR=/ephemeral/acme-master/opencode
+      - TITLE=aether Sandbox ${SANDBOX_NAME:-default}
+      - OPENCODE_CONFIG_DIR=/ephemeral/aether-master/opencode
       - OPENCODE_PERMISSION={"*":"allow"}
       - DISPLAY=:1
       - LSS_DIR=/workspace/.lss
-      - ACME_WORKSPACE=/workspace
+      - aether_WORKSPACE=/workspace
       # ── Persistent package paths (all under /workspace/) ──────────────
       - PYTHONUSERBASE=/workspace/.local
       - PIP_USER=1
@@ -65,16 +65,16 @@ services:
       - SECRET_FILE_PATH=/workspace/.secrets/.secrets.json
       - SALT_FILE_PATH=/workspace/.secrets/.salt
       # ENCRYPTION_KEY_PATH is auto-derived from SECRET_FILE_PATH dir
-      # ── Sandbox identity (injected by acme-api or set manually) ─────
-      - ACME_API_URL=${ACME_API_URL:-http://host.docker.internal:8008}
-      - ACME_TOKEN=${ACME_TOKEN:-}
+      # ── Sandbox identity (injected by aether-api or set manually) ─────
+      - aether_API_URL=${aether_API_URL:-http://host.docker.internal:8008}
+      - aether_TOKEN=${aether_TOKEN:-}
       - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-}
-      - TUNNEL_API_URL=${ACME_API_URL:-http://host.docker.internal:8008}
-      - TUNNEL_TOKEN=${ACME_TOKEN:-}
+      - TUNNEL_API_URL=${aether_API_URL:-http://host.docker.internal:8008}
+      - TUNNEL_TOKEN=${aether_TOKEN:-}
       - SANDBOX_ID=${SANDBOX_ID:-local}
       - PROJECT_ID=${PROJECT_ID:-local}
       - ENV_MODE=${ENV_MODE:-local}
-      - ACME_LOCAL_SOURCE=${ACME_LOCAL_SOURCE:-1}
+      - aether_LOCAL_SOURCE=${aether_LOCAL_SOURCE:-1}
       - START_DOCKER=true
     env_file:
       - .env
@@ -86,7 +86,7 @@ services:
       - sandbox_data:/workspace
       - sandbox_data:/config
     ports:
-      - "127.0.0.1:14000:8000"  # Acme Master (proxy entry point)
+      - "127.0.0.1:14000:8000"  # aether Master (proxy entry point)
       - "127.0.0.1:14002:6080"  # Desktop (noVNC)
       - "127.0.0.1:14003:6081"  # Desktop (HTTPS)
       - "127.0.0.1:14004:3210"  # Presentation Viewer
@@ -97,7 +97,7 @@ services:
     shm_size: "2gb"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/acme/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/aether/health"]
       interval: 10s
       timeout: 5s
       retries: 3

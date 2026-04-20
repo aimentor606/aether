@@ -19,7 +19,7 @@ import { Text } from '@/components/ui/text';
 import { useAuthContext } from '@/contexts';
 import { log } from '@/lib/logger';
 import { supabase } from '@/api/supabase';
-import { AcmeLogo } from '@/components/ui/AcmeLogo';
+import { AetherLogo } from '@/components/ui/AetherLogo';
 import { AuthButton } from '@/components/auth/AuthButton';
 import { AuthInput } from '@/components/auth/AuthInput';
 
@@ -106,13 +106,13 @@ export default function AuthScreen() {
         >
           {/* Logo + headline */}
           <View className="items-start mb-10">
-            <AcmeLogo
+            <AetherLogo
               variant="symbol"
               size={36}
               color={isDark ? 'dark' : 'light'}
             />
             <Text className="text-[28px] font-roobert-semibold text-foreground mt-5 leading-tight">
-              Sign in to{'\n'}Acme
+              Sign in to{'\n'}Aether
             </Text>
             <Text className="text-[15px] text-muted-foreground mt-2 font-roobert">
               Your AI Computer

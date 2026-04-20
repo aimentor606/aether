@@ -62,7 +62,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 
-import { AcmeLogo } from '@/components/ui/AcmeLogo';
+import { AetherLogo } from '@/components/ui/AetherLogo';
 import AnthropicIcon from '@/assets/images/models/Anthropic.svg';
 import OAIIcon from '@/assets/images/models/OAI.svg';
 import GeminiIcon from '@/assets/images/models/Gemini.svg';
@@ -523,7 +523,7 @@ function ProviderStep({ onContinue, isDark, themeColors }: StepProps & { onConti
           <Text style={{ fontSize: 13, fontFamily: 'Roobert', color: isDark ? 'rgba(248,248,248,0.5)' : 'rgba(18,18,21,0.5)', textAlign: 'center', lineHeight: 18, paddingHorizontal: 8, maxWidth: 300 }}>
             {hasLLMProvider
               ? `${connectedCount} provider${connectedCount > 1 ? 's' : ''} ready. You can add more anytime from settings.`
-              : 'Configure which AI models to use with your Acme agent. Connect OpenAI, Anthropic, Google, or any supported provider.'}
+              : 'Configure which AI models to use with your Aether agent. Connect OpenAI, Anthropic, Google, or any supported provider.'}
           </Text>
         </View>
 
@@ -1195,7 +1195,7 @@ function GetStartedStep({ onComplete, completing, isDark, themeColors }: StepPro
           You're all set
         </Text>
         <Text style={{ fontSize: 13, fontFamily: 'Roobert', color: colors.muted, textAlign: 'center', lineHeight: 18, maxWidth: 280 }}>
-          Your Acme agent is configured and ready. We'll walk you through the basics in a quick guided conversation.
+          Your Aether agent is configured and ready. We'll walk you through the basics in a quick guided conversation.
         </Text>
       </View>
 
@@ -1294,7 +1294,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
       <View style={{ flex: 1, paddingTop: insets.top + 24, paddingBottom: insets.bottom + 16, paddingHorizontal: 28 }}>
         {/* ── Fixed header ── */}
         <View style={{ alignItems: 'center', marginBottom: 16 }}>
-          <AcmeLogo size={28} variant="symbol" color={isDark ? 'dark' : 'light'} />
+          <AetherLogo size={28} variant="symbol" color={isDark ? 'dark' : 'light'} />
           <Text style={{ fontSize: 10, fontFamily: 'Roobert-Medium', color: isDark ? 'rgba(248,248,248,0.3)' : 'rgba(18,18,21,0.3)', letterSpacing: 2, textTransform: 'uppercase', marginTop: 12, marginBottom: 4 }}>
             Instance Setup
           </Text>

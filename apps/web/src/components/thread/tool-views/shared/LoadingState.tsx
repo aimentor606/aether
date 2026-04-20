@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 
 interface LoadingStateProps {
   title: string;
@@ -22,7 +22,7 @@ interface LoadingStateProps {
   /** @deprecated Kept for backward compat with inactive views — ignored */
   initialProgress?: number;
   /** @deprecated Kept for backward compat with inactive views — ignored */
-  useAcmeLoader?: boolean;
+  useAetherLoader?: boolean;
 }
 
 export function LoadingState({
@@ -47,7 +47,7 @@ export function LoadingState({
     <div className="flex flex-col items-center justify-center h-full min-h-[180px] py-6 px-4">
       <div className="text-center w-full max-w-xs">
         <div className="w-10 h-10 rounded-full bg-muted mx-auto mb-3 flex items-center justify-center">
-          <AcmeLoader customSize={18} />
+          <AetherLoader customSize={18} />
         </div>
         <h3 className="text-sm font-medium mb-1 text-foreground">{title}</h3>
         {subtitle && (

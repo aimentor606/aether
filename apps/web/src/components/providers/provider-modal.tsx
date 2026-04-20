@@ -77,12 +77,23 @@ const MODAL_CMDK_CLASSES = [
 
 // ─── Empty state ─────────────────────────────────────────────────────────────
 
-function EmptyState({ message, action }: { message: string; action?: { label: string; onClick: () => void } }) {
+function EmptyState({
+  message,
+  action,
+}: {
+  message: string;
+  action?: { label: string; onClick: () => void };
+}) {
   return (
     <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 text-center">
       <p className="text-xs text-muted-foreground/60">{message}</p>
       {action && (
-        <Button variant="outline" size="sm" className="h-7 px-3 text-[11px]" onClick={action.onClick}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 px-3 text-[11px]"
+          onClick={action.onClick}
+        >
           <Plus className="h-3 w-3" />
           {action.label}
         </Button>
@@ -105,14 +116,20 @@ function ConnectedTabContent({
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
-  const [confirmDisconnect, setConfirmDisconnect] = useState<string | null>(null);
+  const [confirmDisconnect, setConfirmDisconnect] = useState<string | null>(
+    null,
+  );
   const [search, setSearch] = useState('');
 
   const filteredProviders = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return connectedProviders;
     return connectedProviders.filter((provider) => {
-      const label = (PROVIDER_LABELS[provider.id] || provider.name || provider.id).toLowerCase();
+      const label = (
+        PROVIDER_LABELS[provider.id] ||
+        provider.name ||
+        provider.id
+      ).toLowerCase();
       return label.includes(q) || provider.id.toLowerCase().includes(q);
     });
   }, [connectedProviders, search]);
@@ -133,14 +150,21 @@ function ConnectedTabContent({
               err.message.includes('Not Found') ||
               err.message.includes('Method Not Allowed'));
           if (isEndpointMissing) {
-            await client.auth.set({ providerID, auth: { type: 'api', key: '' } });
+            await client.auth.set({
+              providerID,
+              auth: { type: 'api', key: '' },
+            });
           } else {
             throw err;
           }
         }
         await client.global.dispose();
-        await queryClient.refetchQueries({ queryKey: opencodeKeys.providers() });
-        toast.success(`${PROVIDER_LABELS[providerID] || providerID} disconnected`);
+        await queryClient.refetchQueries({
+          queryKey: opencodeKeys.providers(),
+        });
+        toast.success(
+          `${PROVIDER_LABELS[providerID] || providerID} disconnected`,
+        );
         onDisconnected?.();
       } catch {
         toast.error('Failed to disconnect provider');
@@ -175,7 +199,11 @@ function ConnectedTabContent({
         <CommandList className="flex-1 max-h-none px-1.5 py-1.5">
           {filteredProviders.length === 0 ? (
             <EmptyState
-              message={connectedProviders.length === 0 ? 'No providers connected yet' : 'No match'}
+              message={
+                connectedProviders.length === 0
+                  ? 'No providers connected yet'
+                  : 'No match'
+              }
               action={{ label: 'Connect provider', onClick: onAddProvider }}
             />
           ) : (
@@ -190,14 +218,22 @@ function ConnectedTabContent({
                   <div key={provider.id}>
                     <CommandItem
                       value={`provider-${provider.id}`}
-                      onSelect={() => setExpanded(isExpanded ? null : provider.id)}
+                      onSelect={() =>
+                        setExpanded(isExpanded ? null : provider.id)
+                      }
                       className="py-3"
                     >
-                      <ProviderLogo providerID={provider.id} name={provider.name} size="default" />
+                      <ProviderLogo
+                        providerID={provider.id}
+                        name={provider.name}
+                        size="default"
+                      />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-foreground">
-                            {PROVIDER_LABELS[provider.id] || provider.name || provider.id}
+                            {PROVIDER_LABELS[provider.id] ||
+                              provider.name ||
+                              provider.id}
                           </span>
                           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-px text-[0.5625rem] font-medium text-emerald-600 dark:text-emerald-400">
                             <span className="h-1 w-1 rounded-full bg-emerald-500" />
@@ -209,13 +245,17 @@ function ConnectedTabContent({
                           {source ? ` · ${source}` : ''}
                         </div>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
-                        {modelCount > 0 && (
-                          isExpanded
-                            ? <ChevronDown className="h-3 w-3 text-muted-foreground/40" />
-                            : <ChevronRight className="h-3 w-3 text-muted-foreground/40" />
-                        )}
-                         <Button
+                      <div
+                        className="flex items-center gap-1.5 shrink-0"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {modelCount > 0 &&
+                          (isExpanded ? (
+                            <ChevronDown className="h-3 w-3 text-muted-foreground/40" />
+                          ) : (
+                            <ChevronRight className="h-3 w-3 text-muted-foreground/40" />
+                          ))}
+                        <Button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -227,18 +267,27 @@ function ConnectedTabContent({
                           className="text-muted-foreground/40 hover:bg-destructive/10 hover:text-destructive"
                           title="Disconnect"
                         >
-                          {isDisconnecting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Unplug className="h-3.5 w-3.5" />}
+                          {isDisconnecting ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Unplug className="h-3.5 w-3.5" />
+                          )}
                         </Button>
                       </div>
                     </CommandItem>
 
                     {isExpanded && modelCount > 0 && (
                       <div className="ml-8 mr-3 mb-2 rounded-lg border border-border/20 bg-background/40 overflow-hidden">
-                        {Object.values(provider.models ?? {}).map((model: any) => (
-                          <div key={model.id} className="px-3 py-1.5 text-xs text-muted-foreground/60 hover:bg-muted/20">
-                            {model.name || model.id}
-                          </div>
-                        ))}
+                        {Object.values(provider.models ?? {}).map(
+                          (model: any) => (
+                            <div
+                              key={model.id}
+                              className="px-3 py-1.5 text-xs text-muted-foreground/60 hover:bg-muted/20"
+                            >
+                              {model.name || model.id}
+                            </div>
+                          ),
+                        )}
                       </div>
                     )}
                   </div>
@@ -265,22 +314,33 @@ function ConnectedTabContent({
         </CommandFooter>
       </Command>
 
-      <AlertDialog open={!!confirmDisconnect} onOpenChange={(open) => !open && setConfirmDisconnect(null)}>
+      <AlertDialog
+        open={!!confirmDisconnect}
+        onOpenChange={(open) => !open && setConfirmDisconnect(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Disconnect provider?</AlertDialogTitle>
             <AlertDialogDescription className="text-xs">
               {confirmDisconnect && (
                 <>
-                  Remove <span className="font-medium text-foreground">{PROVIDER_LABELS[confirmDisconnect] || confirmDisconnect}</span>?
-                  {' '}You&apos;ll need to reconnect it to use it again.
+                  Remove{' '}
+                  <span className="font-medium text-foreground">
+                    {PROVIDER_LABELS[confirmDisconnect] || confirmDisconnect}
+                  </span>
+                  ? You&apos;ll need to reconnect it to use it again.
                 </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => confirmDisconnect && doDisconnect(confirmDisconnect)} className="bg-destructive text-white hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={() =>
+                confirmDisconnect && doDisconnect(confirmDisconnect)
+              }
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
               Disconnect
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -365,8 +425,16 @@ function ModelsTabContent({
                 key={providerID}
                 heading={
                   <div className="flex items-center gap-2">
-                    <ProviderLogo providerID={providerID} name={providerModels[0]?.providerName || providerID} size="small" />
-                    <span>{PROVIDER_LABELS[providerID] || providerModels[0]?.providerName || providerID}</span>
+                    <ProviderLogo
+                      providerID={providerID}
+                      name={providerModels[0]?.providerName || providerID}
+                      size="small"
+                    />
+                    <span>
+                      {PROVIDER_LABELS[providerID] ||
+                        providerModels[0]?.providerName ||
+                        providerID}
+                    </span>
                     <span className="ml-auto text-[10px] text-muted-foreground/30 normal-case tracking-normal">
                       {providerModels.length}
                     </span>
@@ -375,7 +443,10 @@ function ModelsTabContent({
                 forceMount
               >
                 {providerModels.map((model) => {
-                  const key = { providerID: model.providerID, modelID: model.modelID };
+                  const key = {
+                    providerID: model.providerID,
+                    modelID: model.modelID,
+                  };
                   const visible = modelStore.isVisible(key);
                   return (
                     <CommandItem
@@ -384,11 +455,20 @@ function ModelsTabContent({
                       onSelect={() => modelStore.setVisibility(key, !visible)}
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm text-foreground">{model.modelName}</div>
-                        <div className="truncate text-[10px] text-muted-foreground/40 mt-0.5">{model.modelID}</div>
+                        <div className="truncate text-sm text-foreground">
+                          {model.modelName}
+                        </div>
+                        <div className="truncate text-[10px] text-muted-foreground/40 mt-0.5">
+                          {model.modelID}
+                        </div>
                       </div>
                       <div onClick={(e) => e.stopPropagation()}>
-                        <Switch checked={visible} onCheckedChange={(checked) => modelStore.setVisibility(key, checked)} />
+                        <Switch
+                          checked={visible}
+                          onCheckedChange={(checked) =>
+                            modelStore.setVisibility(key, checked)
+                          }
+                        />
                       </div>
                     </CommandItem>
                   );
@@ -448,18 +528,24 @@ export function ProviderModal({
   const connectedProviders = useMemo(() => {
     if (!providers) return [];
     const connectedIds = new Set(providers.connected ?? []);
-    return (providers.all ?? []).filter((provider) => connectedIds.has(provider.id));
+    return (providers.all ?? []).filter((provider) =>
+      connectedIds.has(provider.id),
+    );
   }, [providers]);
 
   const modelStore = useModelStore(models ?? []);
   const hasModelsTab = !!models?.length;
-  const visibleTabs = hasModelsTab ? TAB_CONFIG : TAB_CONFIG.filter((tabItem) => tabItem.id !== 'models');
+  const visibleTabs = hasModelsTab
+    ? TAB_CONFIG
+    : TAB_CONFIG.filter((tabItem) => tabItem.id !== 'models');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="!grid h-[min(80vh,680px)] w-[calc(100vw-2rem)] max-w-[520px] grid-rows-[auto_auto_minmax(0,1fr)] overflow-hidden p-0 gap-0">
         <DialogHeader className="px-5 pb-2 pt-5">
-          <DialogTitle className="text-sm font-semibold">LLM Providers</DialogTitle>
+          <DialogTitle className="text-sm font-semibold">
+            LLM Providers
+          </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground/60">
             Connect providers and manage which models appear in chat.
           </DialogDescription>
@@ -477,9 +563,12 @@ export function ProviderModal({
                 className="flex-1"
               >
                 {tabItem.label}
-                {tabItem.id === 'connected' && connectedProviders.length > 0 && (
-                  <span className="ml-1 text-[10px] text-muted-foreground/40">{connectedProviders.length}</span>
-                )}
+                {tabItem.id === 'connected' &&
+                  connectedProviders.length > 0 && (
+                    <span className="ml-1 text-[10px] text-muted-foreground/40">
+                      {connectedProviders.length}
+                    </span>
+                  )}
               </FilterBarItem>
             ))}
           </FilterBar>
@@ -527,14 +616,22 @@ export function GlobalProviderModal() {
   const models = useMemo(() => {
     if (!providers) return [];
     const connectedIds = new Set(providers.connected ?? []);
-    // If acme provider is connected, it serves all models — hide redundant
-    // built-in providers so users see a clean Acme-only model list.
-    const ACME_SUPERSEDED = ['anthropic', 'openai', 'google', 'xai', 'moonshotai', 'minimax', 'zhipuai'];
-    const acmeConnected = connectedIds.has('acme');
+    // If aether provider is connected, it serves all models — hide redundant
+    // built-in providers so users see a clean Aether-only model list.
+    const AETHER_SUPERSEDED = [
+      'anthropic',
+      'openai',
+      'google',
+      'xai',
+      'moonshotai',
+      'minimax',
+      'zhipuai',
+    ];
+    const aetherConnected = connectedIds.has('aether');
     const result: FlatModel[] = [];
     for (const provider of providers.all ?? []) {
       if (!connectedIds.has(provider.id)) continue;
-      if (acmeConnected && ACME_SUPERSEDED.includes(provider.id)) continue;
+      if (aetherConnected && AETHER_SUPERSEDED.includes(provider.id)) continue;
       for (const [modelID, model] of Object.entries(provider.models ?? {})) {
         const caps = (model as any).capabilities;
         const modalities = (model as any).modalities;
@@ -542,7 +639,9 @@ export function GlobalProviderModal() {
           providerID: provider.id,
           providerName: provider.name,
           modelID,
-          modelName: ((model as any).name || modelID).replace('(latest)', '').trim(),
+          modelName: ((model as any).name || modelID)
+            .replace('(latest)', '')
+            .trim(),
           variants: (model as any).variants,
           capabilities: caps
             ? {

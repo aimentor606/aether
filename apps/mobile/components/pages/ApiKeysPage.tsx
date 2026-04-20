@@ -139,7 +139,7 @@ function ApiKeysContent() {
     enabled: !!sandboxUrl,
     queryFn: async (): Promise<PublicShareEntry[]> => {
       const token = await getAuthToken();
-      const res = await fetch(`${sandboxUrl}/acme/share`, {
+      const res = await fetch(`${sandboxUrl}/aether/share`, {
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -155,7 +155,7 @@ function ApiKeysContent() {
     mutationFn: async (shareToken: string) => {
       if (!sandboxUrl) throw new Error('No sandbox URL');
       const token = await getAuthToken();
-      const res = await fetch(`${sandboxUrl}/acme/share/${shareToken}`, {
+      const res = await fetch(`${sandboxUrl}/aether/share/${shareToken}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -397,7 +397,7 @@ function ApiKeysContent() {
                     </Text>
                     <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4, alignSelf: 'flex-start' }}>
                       <Text style={{ fontSize: 11, fontFamily: 'Roobert-Medium', color: fg }}>
-                        Authorization: Bearer acme_...
+                        Authorization: Bearer aether_...
                       </Text>
                     </View>
                     <Text style={{ fontSize: 11, fontFamily: 'Roobert', color: muted, lineHeight: 16, marginTop: 2 }}>

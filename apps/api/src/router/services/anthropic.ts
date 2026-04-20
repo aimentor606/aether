@@ -1,5 +1,5 @@
 import { litellmConfig } from '../config/litellm-config';
-import { ACME_MARKUP } from '../../config';
+import { AETHER_MARKUP } from '../../config';
 import type { ModelConfig } from '../config/models';
 import { resolveVirtualKey } from './litellm-keys';
 
@@ -47,7 +47,7 @@ export function extractAnthropicUsage(responseBody: any): AnthropicUsage | null 
 export function calculateAnthropicCost(
   modelConfig: ModelConfig,
   usage: AnthropicUsage,
-  markup: number = ACME_MARKUP,
+  markup: number = AETHER_MARKUP,
 ): number {
   const { inputTokens, outputTokens, cacheCreationInputTokens, cacheReadInputTokens } = usage;
 

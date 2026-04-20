@@ -12,7 +12,7 @@ export const lssSearchKeys = {
 
 /**
  * Semantic search over workspace files using LSS (BM25 + embeddings).
- * Uses the /lss/search endpoint on Acme Master.
+ * Uses the /lss/search endpoint on Aether Master.
  *
  * Enable only when the user has typed a query (debounce upstream).
  */

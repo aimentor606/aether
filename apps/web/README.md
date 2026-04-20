@@ -1,4 +1,4 @@
-# Acme Frontend
+# Aether Frontend
 
 ## Quick Setup
 

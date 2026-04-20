@@ -1,5 +1,5 @@
 import { Cloud, CloudOff, Check, AlertCircle, RefreshCw } from 'lucide-react';
-import { AcmeLoader } from '@/components/ui/acme-loader';
+import { AetherLoader } from '@/components/ui/aether-loader';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -48,7 +48,7 @@ export function SyncStatusIndicator({
     switch (status) {
       case 'syncing':
         return {
-          icon: <AcmeLoader customSize={14} />,
+          icon: <AetherLoader customSize={14} />,
           label: 'Saving...',
           ...grayStyle,
         };

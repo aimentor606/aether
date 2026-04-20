@@ -189,8 +189,8 @@ export interface Agent {
   current_version?: AgentVersion | null;
   metadata?: {
     template_name?: string;
-    acme_template_id?: string;
-    is_acme_team?: boolean;
+    aether_template_id?: string;
+    is_aether_team?: boolean;
     is_suna_default?: boolean;
     centrally_managed?: boolean;
     management_version?: string;

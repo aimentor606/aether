@@ -16,9 +16,9 @@ export interface WebNotificationPreferences {
   onCompletion: boolean;
   /** Notify when a session error occurs */
   onError: boolean;
-  /** Notify when Acme asks a question that needs user input */
+  /** Notify when Aether asks a question that needs user input */
   onQuestion: boolean;
-  /** Notify when Acme requests a permission */
+  /** Notify when Aether requests a permission */
   onPermission: boolean;
   /** Only send browser notifications when the tab is not visible */
   onlyWhenHidden: boolean;
@@ -66,15 +66,18 @@ const DEFAULT_PREFERENCES: WebNotificationPreferences = {
 export const useWebNotificationStore = create<WebNotificationState>()(
   persist(
     (set, get) => ({
-      permission: (typeof Notification !== 'undefined'
-        ? (Notification.permission as WebNotificationPermission)
-        : 'default'),
+      permission:
+        typeof Notification !== 'undefined'
+          ? (Notification.permission as WebNotificationPermission)
+          : 'default',
       preferences: DEFAULT_PREFERENCES,
       promptDismissed: false,
 
       syncPermission: () => {
         if (typeof Notification === 'undefined') return;
-        set({ permission: Notification.permission as WebNotificationPermission });
+        set({
+          permission: Notification.permission as WebNotificationPermission,
+        });
       },
 
       requestPermission: async () => {
@@ -121,7 +124,7 @@ export const useWebNotificationStore = create<WebNotificationState>()(
       },
     }),
     {
-      name: 'acme-web-notifications',
+      name: 'aether-web-notifications',
       partialize: (state) => ({
         preferences: state.preferences,
         promptDismissed: state.promptDismissed,

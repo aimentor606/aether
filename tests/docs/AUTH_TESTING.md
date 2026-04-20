@@ -1,11 +1,11 @@
 # Auth E2E Test Suite
 
-End-to-end tests for the Acme sandbox authentication system.
+End-to-end tests for the Aether sandbox authentication system.
 
 ## Quick Start
 
 ```bash
-# Run all tests (requires sandbox + acme-api running)
+# Run all tests (requires sandbox + aether-api running)
 ./computer/scripts/tests/test-auth-e2e.sh
 
 # Run a specific section
@@ -21,11 +21,11 @@ End-to-end tests for the Acme sandbox authentication system.
 
 | Requirement | How to start |
 |-------------|-------------|
-| Docker container `acme-sandbox` on `127.0.0.1:14000` | `docker compose -f core/docker/docker-compose.yml up -d` in `computer/` |
-| acme-api on `127.0.0.1:8008` | `pnpm run dev` in `computer/apps/api/` |
+| Docker container `aether-sandbox` on `127.0.0.1:14000` | `docker compose -f core/docker/docker-compose.yml up -d` in `computer/` |
+| aether-api on `127.0.0.1:8008` | `pnpm run dev` in `computer/apps/api/` |
 | `jq` | `brew install jq` |
-| `/tmp/sandbox_token.txt` | Contains `acme_sb_*` token (optional — skips section 4 if missing) |
-| `/tmp/api_key.txt` | Contains `acme_*` user API key (optional — skips sections 5/11 if missing) |
+| `/tmp/sandbox_token.txt` | Contains `aether_sb_*` token (optional — skips section 4 if missing) |
+| `/tmp/api_key.txt` | Contains `aether_*` user API key (optional — skips sections 5/11 if missing) |
 
 ## Environment Variables
 
@@ -73,36 +73,36 @@ Verifies that health and docs endpoints are accessible without authentication.
 
 | # | Route | Expected |
 |---|-------|----------|
-| 2.1 | `/acme/health` | 200 (no auth) |
+| 2.1 | `/aether/health` | 200 (no auth) |
 | 2.2 | `/docs` | 200 (Scalar UI) |
 | 2.3 | `/docs/openapi.json` | 200 (merged spec, >50 paths) |
 
 ### Section 2b: Protected Routes Reject Without Auth
 Verifies every major route category returns 401 without credentials.
 
-Routes tested: `/env/list`, `/lss/search`, `/file/content`, `/acme/ports`, `/session`, `/memory/search`
+Routes tested: `/env/list`, `/lss/search`, `/file/content`, `/aether/ports`, `/session`, `/memory/search`
 
 ### Section 3: Authed Route Categories
 Verifies all route categories respond correctly with valid auth.
 
-Routes tested: `/env/list`, `/acme/ports`, `/session`, `/agent`, `/file/content`, `/lss/search`, `/memory/search`, `/acme/update/status`
+Routes tested: `/env/list`, `/aether/ports`, `/session`, `/agent`, `/file/content`, `/lss/search`, `/memory/search`, `/aether/update/status`
 
-### Section 4: ACME_TOKEN (Sandbox → API)
-Tests the sandbox-to-API authentication token (`acme_sb_*` prefix).
+### Section 4: aether_TOKEN (Sandbox → API)
+Tests the sandbox-to-API authentication token (`aether_sb_*` prefix).
 
 | # | Test | Expected |
 |---|------|----------|
-| 4.1 | Token has `acme_sb_` prefix | Pass |
+| 4.1 | Token has `aether_sb_` prefix | Pass |
 | 4.2 | Token length >= 40 chars | Pass |
 | 4.3 | API accepts token | Non-401 |
 | 4.4 | Old `sbt_` prefix rejected | 401/403/404 |
 
 ### Section 5: User API Key Auth
-Tests user API keys (`acme_*` prefix) against acme-api.
+Tests user API keys (`aether_*` prefix) against aether-api.
 
 | # | Test | Expected |
 |---|------|----------|
-| 5.1 | Key has `acme_` prefix | Pass |
+| 5.1 | Key has `aether_` prefix | Pass |
 | 5.2 | API accepts key | Non-401 |
 | 5.3 | Wrong key rejected | 401/403 |
 
@@ -133,7 +133,7 @@ Static checks verifying the self-healing auth infrastructure exists.
 
 | # | Test | File |
 |---|------|------|
-| 8.1 | `sandbox-health.ts` exists | acme-api |
+| 8.1 | `sandbox-health.ts` exists | aether-api |
 | 8.2 | Periodic health interval | sandbox-health.ts |
 | 8.3 | Retry with backoff | sandbox-health.ts |
 | 8.4 | Key sync function | sandbox-health.ts |
@@ -152,11 +152,11 @@ Validates token format patterns.
 | Token | Expected Format |
 |-------|----------------|
 | INTERNAL_SERVICE_KEY | 64-char lowercase hex (`[0-9a-f]{64}`) |
-| SANDBOX_TOKEN | `acme_sb_` + 32 alphanumeric |
-| User API Key | `acme_` + 32 alphanumeric |
+| SANDBOX_TOKEN | `aether_sb_` + 32 alphanumeric |
+| User API Key | `aether_` + 32 alphanumeric |
 
-### Section 11: Proxy Chain (acme-api → sandbox)
-Tests the full proxy chain from acme-api through to the sandbox.
+### Section 11: Proxy Chain (aether-api → sandbox)
+Tests the full proxy chain from aether-api through to the sandbox.
 
 > **Note:** These tests require the API proxy routes to be configured. They skip gracefully if routes return 404.
 
@@ -172,9 +172,9 @@ Static source code checks for WebSocket authentication.
 ## Auth Architecture
 
 ```
-Frontend ──[Supabase JWT]──→ acme-api ──[INTERNAL_SERVICE_KEY]──→ sandbox
-CLI/API  ──[acme_ key]───→ acme-api ──[INTERNAL_SERVICE_KEY]──→ sandbox
-Sandbox  ──[ACME_TOKEN]──→ acme-api ──→ LLM providers / integrations
+Frontend ──[Supabase JWT]──→ aether-api ──[INTERNAL_SERVICE_KEY]──→ sandbox
+CLI/API  ──[aether_ key]───→ aether-api ──[INTERNAL_SERVICE_KEY]──→ sandbox
+Sandbox  ──[aether_TOKEN]──→ aether-api ──→ LLM providers / integrations
 ```
 
 ### Token Types
@@ -182,17 +182,17 @@ Sandbox  ──[ACME_TOKEN]──→ acme-api ──→ LLM providers / integrat
 | Token | Format | Direction | Purpose |
 |-------|--------|-----------|---------|
 | Supabase JWT | `eyJhbGci...` | Browser → API | Dashboard auth |
-| User API Key | `acme_` + 32 | CLI → API | Programmatic access |
-| Sandbox Token | `acme_sb_` + 32 | Sandbox → API | Identity + billing |
+| User API Key | `aether_` + 32 | CLI → API | Programmatic access |
+| Sandbox Token | `aether_sb_` + 32 | Sandbox → API | Identity + billing |
 | INTERNAL_SERVICE_KEY | 64-char hex | API → Sandbox | Platform-to-sandbox auth |
 
 ### Self-Healing Flow
 
-1. acme-api sends request to sandbox with `INTERNAL_SERVICE_KEY`
+1. aether-api sends request to sandbox with `INTERNAL_SERVICE_KEY`
 2. If sandbox returns 401 → key mismatch detected
 3. `sandbox-health.ts` triggers `attemptKeySync()`:
    - Writes key to `/run/s6/container_environment/INTERNAL_SERVICE_KEY` via `docker exec`
-   - Restarts `acme-master` via `s6-svc -r`
+   - Restarts `aether-master` via `s6-svc -r`
 4. Progressive backoff: 3 retries at 2s, 5s, 10s intervals
 5. Periodic health monitor runs every 60s to catch drift
 
@@ -201,21 +201,21 @@ Sandbox  ──[ACME_TOKEN]──→ acme-api ──→ LLM providers / integrat
 ### Sandbox returns 401 for everything
 ```bash
 # Check what key the sandbox has
-docker exec acme-sandbox cat /run/s6/container_environment/INTERNAL_SERVICE_KEY
+docker exec aether-sandbox cat /run/s6/container_environment/INTERNAL_SERVICE_KEY
 
 # Check what key the API has
 grep INTERNAL_SERVICE_KEY computer/apps/api/.env
 
 # If they differ, sync manually:
-docker exec acme-sandbox bash -c "echo '<api-key>' > /run/s6/container_environment/INTERNAL_SERVICE_KEY"
-docker exec acme-sandbox sudo s6-svc -r /run/service/svc-acme-master
+docker exec aether-sandbox bash -c "echo '<api-key>' > /run/s6/container_environment/INTERNAL_SERVICE_KEY"
+docker exec aether-sandbox sudo s6-svc -r /run/service/svc-aether-master
 ```
 
 ### CORS returns `*` instead of allowlist
 The updated sandbox code hasn't been deployed. Run:
 ```bash
-docker cp computer/core/acme-master/src/index.ts acme-sandbox:/ephemeral/acme-master/src/index.ts
-docker exec acme-sandbox sudo s6-svc -r /run/service/svc-acme-master
+docker cp computer/core/aether-master/src/index.ts aether-sandbox:/ephemeral/aether-master/src/index.ts
+docker exec aether-sandbox sudo s6-svc -r /run/service/svc-aether-master
 ```
 
 ### Ports bound to 0.0.0.0
@@ -228,5 +228,5 @@ cd computer && docker compose -f core/docker/docker-compose.yml down && docker c
 OpenCode ignores SIGTERM so it can't be restarted. The tools read the key from the filesystem:
 ```bash
 # Verify the key file exists inside the container
-docker exec acme-sandbox cat /run/s6/container_environment/INTERNAL_SERVICE_KEY
+docker exec aether-sandbox cat /run/s6/container_environment/INTERNAL_SERVICE_KEY
 ```

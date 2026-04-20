@@ -1,7 +1,7 @@
 'use server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { ACME_SUPABASE_AUTH_COOKIE } from './constants'
+import { AETHER_SUPABASE_AUTH_COOKIE } from './constants'
 
 export async function createClient() {
   const cookieStore = await cookies()
@@ -22,7 +22,7 @@ export async function createClient() {
     supabaseAnonKey,
     {
       cookieOptions: {
-        name: ACME_SUPABASE_AUTH_COOKIE,
+        name: AETHER_SUPABASE_AUTH_COOKIE,
         path: '/',
         sameSite: 'lax',
       },

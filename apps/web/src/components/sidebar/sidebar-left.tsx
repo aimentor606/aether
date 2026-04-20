@@ -32,7 +32,7 @@ import { useGlobalSandboxUpdate } from '@/hooks/platform/use-global-sandbox-upda
 import { useUpdateDialogStore } from '@/stores/update-dialog-store';
 
 import { UserMenu } from '@/components/sidebar/user-menu';
-import { AcmeLogo } from '@/components/sidebar/acme-logo';
+import { AetherLogo } from '@/components/sidebar/aether-logo';
 import { ThreadIcon } from '@/components/sidebar/thread-icon';
 
 import {
@@ -71,7 +71,7 @@ import { useDocumentModalStore } from '@/stores/use-document-modal-store';
 import { isBillingEnabled } from '@/lib/config';
 
 import { useCreateOpenCodeSession, useOpenCodeSessions } from '@/hooks/opencode/use-opencode-sessions';
-import { useAcmeProjects, type AcmeProject } from '@/hooks/acme/use-acme-projects';
+import { useAetherProjects, type AetherProject } from '@/hooks/aether/use-aether-projects';
 import { openTabAndNavigate } from '@/stores/tab-store';
 import { useServerStore } from '@/stores/server-store';
 import { useOpenCodePendingStore } from '@/stores/opencode-pending-store';
@@ -272,7 +272,7 @@ function SessionsFlyout() {
 // ============================================================================
 
 function ProjectsFlyout() {
-  const { data: projects } = useAcmeProjects();
+  const { data: projects } = useAetherProjects();
 
   const sorted = React.useMemo(() => {
     if (!projects || !Array.isArray(projects)) return [];
@@ -388,7 +388,7 @@ function SidebarUpdateIndicator({ collapsed }: { collapsed: boolean }) {
           <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
         </span>
         <span className="text-xs font-semibold text-foreground truncate min-w-0">
-          {currentChannel === 'dev' ? 'New dev build' : 'New Acme version'}
+          {currentChannel === 'dev' ? 'New dev build' : 'New Aether version'}
         </span>
         <span className="flex-1" />
         <span className="text-[10px] text-muted-foreground flex-shrink-0">v{latestVersion}</span>
@@ -469,8 +469,8 @@ function SidebarSections() {
   const pathname = normalizeAppPathname(usePathname());
   const { isMobile, setOpenMobile } = useSidebar();
 
-  // Projects data — Acme projects are the source of truth
-  const { data: projectsData } = useAcmeProjects();
+  // Projects data — Aether projects are the source of truth
+  const { data: projectsData } = useAetherProjects();
   const sortedProjects = React.useMemo(() => {
     if (!projectsData || !Array.isArray(projectsData)) return [];
     return [...projectsData].sort((a, b) =>
@@ -478,7 +478,7 @@ function SidebarSections() {
     );
   }, [projectsData]);
 
-  const handleProjectClick = React.useCallback((project: AcmeProject) => {
+  const handleProjectClick = React.useCallback((project: AetherProject) => {
     openTabAndNavigate({
       id: `project:${project.id}`,
       title: project.name,
@@ -899,7 +899,7 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
       {/* ====== HEADER: Logo + collapse/expand ====== */}
       <SidebarHeader className="pt-3 pb-0 overflow-visible">
         <div className="relative flex h-[32px] items-center px-3 justify-between">
-          {/* Collapsed: Acme symbol (always visible), chevron on hover */}
+          {/* Collapsed: Aether symbol (always visible), chevron on hover */}
           {effectiveState === 'collapsed' && (
             <div
               className="group/collapsed absolute inset-0 flex items-center justify-center cursor-pointer"
@@ -920,7 +920,7 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
                 }, router);
                 if (isMobile) setOpenMobile(false);
               }} className="flex items-center justify-center group-hover/collapsed:hidden">
-                <AcmeLogo
+                <AetherLogo
                   variant="symbol"
                   size={20}
                   className="flex-shrink-0"
@@ -943,7 +943,7 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
               }, router);
               if (isMobile) setOpenMobile(false);
             }} className="flex items-center">
-              <AcmeLogo
+              <AetherLogo
                 variant="logomark"
                 size={16}
                 className="flex-shrink-0"

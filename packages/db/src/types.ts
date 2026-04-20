@@ -1,5 +1,6 @@
-import { sandboxes, deployments, acmeApiKeys, integrationCredentials, integrations, sandboxIntegrations, serverEntries, accounts, accountMembers, creditAccounts, tunnelConnections, tunnelPermissions, tunnelPermissionRequests, tunnelAuditLogs } from './schema/acme';
+import { sandboxes, deployments, aetherApiKeys, integrationCredentials, integrations, sandboxIntegrations, serverEntries, accounts, accountMembers, creditAccounts, tunnelConnections, tunnelPermissions, tunnelPermissionRequests, tunnelAuditLogs } from './schema/aether';
 import { apiKeys, accountUser } from './schema/public';
+import { featureFlags, verticalConfigs, accountIntegrations } from './schema/vertical';
 
 // Select types (what you get back from queries)
 export type Account = typeof accounts.$inferSelect;
@@ -9,16 +10,16 @@ export type NewAccountMember = typeof accountMembers.$inferInsert;
 export type Sandbox = typeof sandboxes.$inferSelect;
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type CreditAccount = typeof creditAccounts.$inferSelect;
-/** @deprecated Use AccountMember instead — basejump.account_user is being migrated to acme.account_members */
+/** @deprecated Use AccountMember instead — basejump.account_user is being migrated to aether.account_members */
 export type AccountUser = typeof accountUser.$inferSelect;
-export type AcmeApiKey = typeof acmeApiKeys.$inferSelect;
+export type AetherApiKey = typeof aetherApiKeys.$inferSelect;
 
 // Insert types (what you pass to inserts)
 export type NewSandbox = typeof sandboxes.$inferInsert;
 export type Deployment = typeof deployments.$inferSelect;
 export type NewDeployment = typeof deployments.$inferInsert;
 export type NewApiKey = typeof apiKeys.$inferInsert;
-export type NewAcmeApiKey = typeof acmeApiKeys.$inferInsert;
+export type NewAetherApiKey = typeof aetherApiKeys.$inferInsert;
 export type IntegrationCredential = typeof integrationCredentials.$inferSelect;
 export type NewIntegrationCredential = typeof integrationCredentials.$inferInsert;
 export type Integration = typeof integrations.$inferSelect;
@@ -41,3 +42,11 @@ export type NewTunnelAuditLog = typeof tunnelAuditLogs.$inferInsert;
 // Aliases
 export type SandboxSelect = Sandbox;
 export type DeploymentSelect = Deployment;
+
+// Vertical / Multi-tenant
+export type FeatureFlag = typeof featureFlags.$inferSelect;
+export type NewFeatureFlag = typeof featureFlags.$inferInsert;
+export type VerticalConfig = typeof verticalConfigs.$inferSelect;
+export type NewVerticalConfig = typeof verticalConfigs.$inferInsert;
+export type AccountIntegration = typeof accountIntegrations.$inferSelect;
+export type NewAccountIntegration = typeof accountIntegrations.$inferInsert;

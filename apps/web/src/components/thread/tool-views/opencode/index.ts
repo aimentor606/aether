@@ -1,5 +1,5 @@
 /**
- * OpenCode ToolView components for AcmeComputer.
+ * OpenCode ToolView components for AetherComputer.
  *
  * These are registered in the ToolViewRegistry under the "oc-" prefix
  * to avoid collision with AgentPress tool names.
@@ -26,7 +26,12 @@ export { OcSkillToolView } from './OcSkillToolView';
 export { OcCodesearchToolView } from './OcCodesearchToolView';
 export { OcBatchToolView } from './OcBatchToolView';
 export { OcPlanToolView } from './OcPlanToolView';
-export { OcPtySpawnToolView, OcPtyReadToolView, OcPtyWriteToolView, OcPtyKillToolView } from './OcPtyToolViews';
+export {
+  OcPtySpawnToolView,
+  OcPtyReadToolView,
+  OcPtyWriteToolView,
+  OcPtyKillToolView,
+} from './OcPtyToolViews';
 export { OcMemSearchToolView } from './OcMemSearchToolView';
 export { OcMemSaveToolView } from './OcMemSaveToolView';
 export { OcSessionListToolView } from './OcSessionListToolView';
@@ -67,7 +72,12 @@ import { OcSkillToolView } from './OcSkillToolView';
 import { OcCodesearchToolView } from './OcCodesearchToolView';
 import { OcBatchToolView } from './OcBatchToolView';
 import { OcPlanToolView } from './OcPlanToolView';
-import { OcPtySpawnToolView, OcPtyReadToolView, OcPtyWriteToolView, OcPtyKillToolView } from './OcPtyToolViews';
+import {
+  OcPtySpawnToolView,
+  OcPtyReadToolView,
+  OcPtyWriteToolView,
+  OcPtyKillToolView,
+} from './OcPtyToolViews';
 import { OcMemSearchToolView } from './OcMemSearchToolView';
 import { OcMemSaveToolView } from './OcMemSaveToolView';
 import { OcSessionListToolView } from './OcSessionListToolView';
@@ -152,16 +162,16 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
 
   // Sub-agent delegation
   'oc-task': OcTaskToolView,
-  'task': OcTaskToolView,
+  task: OcTaskToolView,
 
-  // Acme orchestrator session spawning
+  // Aether orchestrator session spawning
   'oc-session_spawn': OcSessionSpawnToolView,
   'oc-session-spawn': OcSessionSpawnToolView,
-  'session_spawn': OcSessionSpawnToolView,
+  session_spawn: OcSessionSpawnToolView,
   'session-spawn': OcSessionSpawnToolView,
   'oc-session_start_background': OcSessionSpawnToolView,
   'oc-session-start-background': OcSessionSpawnToolView,
-  'session_start_background': OcSessionSpawnToolView,
+  session_start_background: OcSessionSpawnToolView,
   'session-start-background': OcSessionSpawnToolView,
 
   // Todo / task management
@@ -190,79 +200,79 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-plan_enter': OcPlanToolView,
   'oc-plan-enter': OcPlanToolView,
 
-  // Memory tools (acme-memory)
+  // Memory tools (aether-memory)
   'oc-mem_search': OcMemSearchToolView,
   'oc-mem-search': OcMemSearchToolView,
-  'mem_search': OcMemSearchToolView,
+  mem_search: OcMemSearchToolView,
   'mem-search': OcMemSearchToolView,
-  'memory_search': OcMemSearchToolView,
+  memory_search: OcMemSearchToolView,
   'memory-search': OcMemSearchToolView,
-  'ltm_search': OcMemSearchToolView,
+  ltm_search: OcMemSearchToolView,
   'ltm-search': OcMemSearchToolView,
   'oc-mem_save': OcMemSaveToolView,
   'oc-mem-save': OcMemSaveToolView,
 
-  // Session tools (acme-sessions + acme-orchestrator)
+  // Session tools (aether-sessions + aether-orchestrator)
   'oc-session_list': OcSessionListToolView,
   'oc-session-list': OcSessionListToolView,
-  'session_list': OcSessionListToolView,
+  session_list: OcSessionListToolView,
   'oc-session_get': OcSessionGetToolView,
   'oc-session-get': OcSessionGetToolView,
-  'session_get': OcSessionGetToolView,
+  session_get: OcSessionGetToolView,
   'oc-session_read': OcSessionReadToolView,
   'oc-session-read': OcSessionReadToolView,
-  'session_read': OcSessionReadToolView,
+  session_read: OcSessionReadToolView,
   'oc-session_search': OcSessionSearchToolView,
   'oc-session-search': OcSessionSearchToolView,
-  'session_search': OcSessionSearchToolView,
+  session_search: OcSessionSearchToolView,
   'oc-session_message': OcSessionMessageToolView,
   'oc-session-message': OcSessionMessageToolView,
-  'session_message': OcSessionMessageToolView,
+  session_message: OcSessionMessageToolView,
   'oc-session_lineage': OcSessionLineageToolView,
   'oc-session-lineage': OcSessionLineageToolView,
-  'session_lineage': OcSessionLineageToolView,
+  session_lineage: OcSessionLineageToolView,
   'oc-session_list_background': OcSessionListToolView,
   'oc-session-list-background': OcSessionListToolView,
-  'session_list_background': OcSessionListToolView,
+  session_list_background: OcSessionListToolView,
   'oc-session_list_spawned': OcSessionListToolView,
   'oc-session-list-spawned': OcSessionListToolView,
-  'session_list_spawned': OcSessionListToolView,
+  session_list_spawned: OcSessionListToolView,
 
-  // Project tools (acme-orchestrator)
+  // Project tools (aether-orchestrator)
   'oc-project_list': OcProjectListToolView,
   'oc-project-list': OcProjectListToolView,
-  'project_list': OcProjectListToolView,
+  project_list: OcProjectListToolView,
   'oc-project_get': OcProjectGetToolView,
   'oc-project-get': OcProjectGetToolView,
-  'project_get': OcProjectGetToolView,
+  project_get: OcProjectGetToolView,
   'oc-project_select': OcProjectSelectToolView,
   'oc-project-select': OcProjectSelectToolView,
-  'project_select': OcProjectSelectToolView,
+  project_select: OcProjectSelectToolView,
   'oc-project_create': OcProjectCreateToolView,
   'oc-project-create': OcProjectCreateToolView,
-  'project_create': OcProjectCreateToolView,
+  project_create: OcProjectCreateToolView,
   'oc-project_update': OcProjectGetToolView,
   'oc-project-update': OcProjectGetToolView,
-  'project_update': OcProjectGetToolView,
+  project_update: OcProjectGetToolView,
   'oc-project_delete': OcProjectGetToolView,
   'oc-project-delete': OcProjectGetToolView,
-  'project_delete': OcProjectGetToolView,
+  project_delete: OcProjectGetToolView,
 
-  // Connector tools (acme-connectors plugin)
+  // Connector tools (aether-connectors plugin)
   'oc-connector_list': OcConnectorListToolView,
   'oc-connector-list': OcConnectorListToolView,
-  'connector_list': OcConnectorListToolView,
+  connector_list: OcConnectorListToolView,
   'oc-connector_get': OcConnectorGetToolView,
   'oc-connector-get': OcConnectorGetToolView,
-  'connector_get': OcConnectorGetToolView,
+  connector_get: OcConnectorGetToolView,
   'oc-connector_setup': OcConnectorSetupToolView,
   'oc-connector-setup': OcConnectorSetupToolView,
-  'connector_setup': OcConnectorSetupToolView,
+  connector_setup: OcConnectorSetupToolView,
 
   // Legacy / compatibility memory retrieval tool
   'oc-get_mem': OcGetMemToolView,
   'oc-get-mem': OcGetMemToolView,
-  'get_mem': OcGetMemToolView,
+  get_mem: OcGetMemToolView,
   'get-mem': OcGetMemToolView,
 
   // MCP tools and other unknown tools will fall through to the

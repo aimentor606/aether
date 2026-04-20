@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Response Header Security Audit
  *
- * LIVE scan against https://computer-preview-api.acme.dev
+ * LIVE scan against https://computer-preview-api.aether.dev
  * Checks for missing security headers, information disclosure via headers,
  * and proper cache-control settings.
  *
@@ -18,7 +18,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.acme.dev';
+const CLOUD = 'https://computer-preview-api.aether.dev';
 
 async function getHeaders(path: string): Promise<Record<string, string>> {
   try {
@@ -113,21 +113,21 @@ describe('Cloud Scan: Response Header Security', () => {
   describe('CORS headers on error responses', () => {
     test('401 responses include proper CORS headers', async () => {
       const res = await fetch(`${CLOUD}/v1/accounts`, {
-        headers: { 'Origin': 'https://computer-preview.acme.dev' },
+        headers: { 'Origin': 'https://computer-preview.aether.dev' },
       });
       const h: Record<string, string> = {};
       res.headers.forEach((v, k) => { h[k] = v; });
-      expect(h['access-control-allow-origin']).toBe('https://computer-preview.acme.dev');
+      expect(h['access-control-allow-origin']).toBe('https://computer-preview.aether.dev');
       expect(h['access-control-allow-credentials']).toBe('true');
     });
 
     test('404 responses include proper CORS headers', async () => {
       const res = await fetch(`${CLOUD}/v1/nonexistent`, {
-        headers: { 'Origin': 'https://computer-preview.acme.dev' },
+        headers: { 'Origin': 'https://computer-preview.aether.dev' },
       });
       const h: Record<string, string> = {};
       res.headers.forEach((v, k) => { h[k] = v; });
-      expect(h['access-control-allow-origin']).toBe('https://computer-preview.acme.dev');
+      expect(h['access-control-allow-origin']).toBe('https://computer-preview.aether.dev');
     });
   });
 

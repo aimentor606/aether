@@ -1,101 +1,138 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Settings, Clock } from "lucide-react";
-import { AcmeLoader } from '@/components/ui/acme-loader';
-import { toast } from "@/lib/toast";
-import {
-  useSystemStatus,
-  useUpdateMaintenanceNotice,
-  useUpdateTechnicalIssue,
-} from "@/hooks/admin/use-system-status";
+import { useState, useEffect } from 'react';
+import { Settings, Clock, Loader2 } from 'lucide-react';
+import { toast } from '@/lib/toast';
+import { useApiClient, useAdminSystemStatus } from '@aether/sdk/client';
 import {
   MaintenanceCard,
   TechnicalIssueCard,
   MaintenanceDialog,
   TechnicalIssueDialog,
-} from "./_components";
+} from './_components';
 
 export default function AdminUtilsPage() {
-  const { data: status, isLoading } = useSystemStatus();
-  const updateMaintenance = useUpdateMaintenanceNotice();
-  const updateTechnicalIssue = useUpdateTechnicalIssue();
+  const client = useApiClient();
+  const admin = useAdminSystemStatus(client);
+  const { data: status } = admin.status;
 
   const [maintenanceDialogOpen, setMaintenanceDialogOpen] = useState(false);
-  const [technicalIssueDialogOpen, setTechnicalIssueDialogOpen] = useState(false);
+  const [technicalIssueDialogOpen, setTechnicalIssueDialogOpen] =
+    useState(false);
 
   const [maintenanceEnabled, setMaintenanceEnabled] = useState(false);
-  const [maintenanceStartDate, setMaintenanceStartDate] = useState<Date | undefined>(undefined);
-  const [maintenanceEndDate, setMaintenanceEndDate] = useState<Date | undefined>(undefined);
+  const [maintenanceStartDate, setMaintenanceStartDate] = useState<
+    Date | undefined
+  >(undefined);
+  const [maintenanceEndDate, setMaintenanceEndDate] = useState<
+    Date | undefined
+  >(undefined);
 
   const [technicalIssueEnabled, setTechnicalIssueEnabled] = useState(false);
   const [technicalIssueMessage, setTechnicalIssueMessage] = useState('');
-  const [technicalIssueSeverity, setTechnicalIssueSeverity] = useState<'degraded' | 'outage' | 'maintenance'>('degraded');
-  const [technicalIssueDescription, setTechnicalIssueDescription] = useState('');
+  const [technicalIssueSeverity, setTechnicalIssueSeverity] = useState<
+    'degraded' | 'outage' | 'maintenance'
+  >('degraded');
+  const [technicalIssueDescription, setTechnicalIssueDescription] =
+    useState('');
   const [technicalIssueResolution, setTechnicalIssueResolution] = useState('');
-  const [technicalIssueServices, setTechnicalIssueServices] = useState<string[]>([]);
-  const [technicalIssueStatusUrl, setTechnicalIssueStatusUrl] = useState('/status');
+  const [technicalIssueServices, setTechnicalIssueServices] = useState<
+    string[]
+  >([]);
+  const [technicalIssueStatusUrl, setTechnicalIssueStatusUrl] =
+    useState('/status');
 
   useEffect(() => {
     if (status) {
       setMaintenanceEnabled(status.maintenance_notice.enabled);
-      setMaintenanceStartDate(status.maintenance_notice.start_time ? new Date(status.maintenance_notice.start_time) : undefined);
-      setMaintenanceEndDate(status.maintenance_notice.end_time ? new Date(status.maintenance_notice.end_time) : undefined);
+      setMaintenanceStartDate(
+        status.maintenance_notice.start_time
+          ? new Date(status.maintenance_notice.start_time)
+          : undefined,
+      );
+      setMaintenanceEndDate(
+        status.maintenance_notice.end_time
+          ? new Date(status.maintenance_notice.end_time)
+          : undefined,
+      );
 
       setTechnicalIssueEnabled(status.technical_issue.enabled);
       setTechnicalIssueMessage(status.technical_issue.message || '');
       setTechnicalIssueSeverity(status.technical_issue.severity || 'degraded');
       setTechnicalIssueDescription(status.technical_issue.description || '');
-      setTechnicalIssueResolution(status.technical_issue.estimated_resolution || '');
+      setTechnicalIssueResolution(
+        status.technical_issue.estimated_resolution || '',
+      );
       setTechnicalIssueServices(status.technical_issue.affected_services || []);
-      setTechnicalIssueStatusUrl(status.technical_issue.status_url || '/status');
+      setTechnicalIssueStatusUrl(
+        status.technical_issue.status_url || '/status',
+      );
     }
   }, [status]);
 
   const handleSaveMaintenance = async () => {
     try {
-      await updateMaintenance.mutateAsync({
+      await admin.updateMaintenance.mutateAsync({
         enabled: maintenanceEnabled,
-        start_time: maintenanceEnabled && maintenanceStartDate ? maintenanceStartDate.toISOString() : null,
-        end_time: maintenanceEnabled && maintenanceEndDate ? maintenanceEndDate.toISOString() : null,
+        start_time:
+          maintenanceEnabled && maintenanceStartDate
+            ? maintenanceStartDate.toISOString()
+            : null,
+        end_time:
+          maintenanceEnabled && maintenanceEndDate
+            ? maintenanceEndDate.toISOString()
+            : null,
       });
-      toast.success(maintenanceEnabled ? "Maintenance notice enabled" : "Maintenance notice disabled");
+      toast.success(
+        maintenanceEnabled
+          ? 'Maintenance notice enabled'
+          : 'Maintenance notice disabled',
+      );
       setMaintenanceDialogOpen(false);
     } catch {
-      toast.error("Failed to update maintenance notice");
+      toast.error('Failed to update maintenance notice');
     }
   };
 
   const handleSaveTechnicalIssue = async () => {
     try {
-      await updateTechnicalIssue.mutateAsync({
+      await admin.updateTechnicalIssue.mutateAsync({
         enabled: technicalIssueEnabled,
         message: technicalIssueEnabled ? technicalIssueMessage : null,
         severity: technicalIssueEnabled ? technicalIssueSeverity : null,
         description: technicalIssueEnabled ? technicalIssueDescription : null,
-        estimated_resolution: technicalIssueEnabled ? technicalIssueResolution : null,
-        affected_services: technicalIssueEnabled && technicalIssueServices.length > 0 ? technicalIssueServices : null,
+        estimated_resolution: technicalIssueEnabled
+          ? technicalIssueResolution
+          : null,
+        affected_services:
+          technicalIssueEnabled && technicalIssueServices.length > 0
+            ? technicalIssueServices
+            : null,
         status_url: technicalIssueEnabled ? technicalIssueStatusUrl : null,
       });
-      toast.success(technicalIssueEnabled ? "Technical issue banner enabled" : "Technical issue banner disabled");
+      toast.success(
+        technicalIssueEnabled
+          ? 'Technical issue banner enabled'
+          : 'Technical issue banner disabled',
+      );
       setTechnicalIssueDialogOpen(false);
     } catch {
-      toast.error("Failed to update technical issue");
+      toast.error('Failed to update technical issue');
     }
   };
 
   const toggleService = (serviceLabel: string) => {
-    setTechnicalIssueServices(prev => 
+    setTechnicalIssueServices((prev) =>
       prev.includes(serviceLabel)
-        ? prev.filter(s => s !== serviceLabel)
-        : [...prev, serviceLabel]
+        ? prev.filter((s) => s !== serviceLabel)
+        : [...prev, serviceLabel],
     );
   };
 
-  if (isLoading) {
+  if (admin.status.isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <AcmeLoader size="large" />
+        <Loader2 className="animate-spin size-8" />
       </div>
     );
   }
@@ -109,7 +146,9 @@ export default function AdminUtilsPage() {
               <Settings className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Admin Utils</h1>
+              <h1 className="text-2xl font-semibold tracking-tight">
+                Admin Utils
+              </h1>
               <p className="text-sm text-muted-foreground">
                 System utilities and status management
               </p>
@@ -152,7 +191,7 @@ export default function AdminUtilsPage() {
         endDate={maintenanceEndDate}
         setEndDate={setMaintenanceEndDate}
         onSave={handleSaveMaintenance}
-        isPending={updateMaintenance.isPending}
+        isPending={admin.updateMaintenance.isPending}
       />
 
       <TechnicalIssueDialog
@@ -173,7 +212,7 @@ export default function AdminUtilsPage() {
         statusUrl={technicalIssueStatusUrl}
         setStatusUrl={setTechnicalIssueStatusUrl}
         onSave={handleSaveTechnicalIssue}
-        isPending={updateTechnicalIssue.isPending}
+        isPending={admin.updateTechnicalIssue.isPending}
       />
     </div>
   );

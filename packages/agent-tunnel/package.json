@@ -1,5 +1,5 @@
 {
-  "name": "@acme/agent-tunnel",
+  "name": "@aether/agent-tunnel",
   "version": "0.1.2",
   "private": false,
   "type": "module",

@@ -8,8 +8,8 @@
  *  - Missing Authorization header
  *  - Empty Bearer token
  *  - Malformed Authorization header (no "Bearer " prefix)
- *  - Non-acme token sent to apiKeyAuth
- *  - Random/forged acme_ tokens
+ *  - Non-aether token sent to apiKeyAuth
+ *  - Random/forged aether_ tokens
  *  - Expired JWT tokens
  *  - Tampered JWT tokens
  *  - OPTIONS preflight bypass in combinedAuth (intentional, must not set userId)
@@ -53,9 +53,9 @@ function extractToken(
   return null;
 }
 
-/** isAcmeToken — mirrors shared/crypto.ts */
-function isAcmeToken(token: string): boolean {
-  return token.startsWith('acme_');
+/** isAetherToken — mirrors shared/crypto.ts */
+function isAetherToken(token: string): boolean {
+  return token.startsWith('aether_');
 }
 
 // ---------------------------------------------------------------------------
@@ -82,30 +82,30 @@ describe('Security Audit: Auth Middleware', () => {
       expect(token).toBeNull();
     });
 
-    test('rejects non-acme token format', () => {
+    test('rejects non-aether token format', () => {
       const token = 'sk-abc123def456';
-      expect(isAcmeToken(token)).toBe(false);
+      expect(isAetherToken(token)).toBe(false);
     });
 
     test('rejects token with cortix_ typo prefix', () => {
-      expect(isAcmeToken('cortix_abc123')).toBe(false);
+      expect(isAetherToken('cortix_abc123')).toBe(false);
     });
 
-    test('rejects token with ACME_ uppercase prefix', () => {
+    test('rejects token with AETHER_ uppercase prefix', () => {
       // The check is case-sensitive — uppercase must not match
-      expect(isAcmeToken('ACME_abc123')).toBe(false);
+      expect(isAetherToken('AETHER_abc123')).toBe(false);
     });
 
-    test('accepts valid acme_ prefix', () => {
-      expect(isAcmeToken('acme_abc123')).toBe(true);
+    test('accepts valid aether_ prefix', () => {
+      expect(isAetherToken('aether_abc123')).toBe(true);
     });
 
-    test('accepts valid acme_sb_ prefix (sandbox key)', () => {
-      expect(isAcmeToken('acme_sb_abc123')).toBe(true);
+    test('accepts valid aether_sb_ prefix (sandbox key)', () => {
+      expect(isAetherToken('aether_sb_abc123')).toBe(true);
     });
 
-    test('accepts valid acme_tnl_ prefix (tunnel key)', () => {
-      expect(isAcmeToken('acme_tnl_abc123')).toBe(true);
+    test('accepts valid aether_tnl_ prefix (tunnel key)', () => {
+      expect(isAetherToken('aether_tnl_abc123')).toBe(true);
     });
   });
 

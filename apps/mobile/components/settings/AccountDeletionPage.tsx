@@ -12,7 +12,7 @@ import { Icon } from '@/components/ui/icon';
 import { Trash2, Calendar, XCircle, AlertTriangle, CheckCircle } from 'lucide-react-native';
 import { SettingsHeader } from './SettingsHeader';
 import * as Haptics from 'expo-haptics';
-import { AcmeLoader } from '@/components/ui';
+import { AetherLoader } from '@/components/ui';
 import { 
   useAccountDeletionStatus, 
   useRequestAccountDeletion, 
@@ -328,7 +328,7 @@ function ActionButton({ onPress, disabled, isLoading, icon: IconComponent, label
     >
       {isLoading ? (
         <>
-          <AcmeLoader 
+          <AetherLoader 
             size="small" 
             forceTheme={colorScheme === 'dark' ? 'dark' : 'light'}
           />

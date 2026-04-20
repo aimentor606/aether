@@ -1,5 +1,5 @@
 /**
- * ModeLogo - Displays the Acme Basic or Advanced SVG logo
+ * ModeLogo - Displays the Aether Basic or Advanced SVG logo
  * 
  * Uses theme-appropriate variants (dark on light, light on dark)
  */

@@ -82,13 +82,15 @@ import {
   TestTube,
   UserPlus,
   BarChart2,
+  Flag,
   MessageCircle,
   Wrench,
   Gauge,
   ShieldCheck,
 } from 'lucide-react';
 
-const DEPLOYMENTS_ENABLED = process.env.NEXT_PUBLIC_ACME_DEPLOYMENTS_ENABLED === 'true';
+const DEPLOYMENTS_ENABLED =
+  process.env.NEXT_PUBLIC_AETHER_DEPLOYMENTS_ENABLED === 'true';
 
 // ============================================================================
 // Types
@@ -144,10 +146,7 @@ export type MenuGroup =
  * Used by the right sidebar to add separators between logical sections
  * without changing the overall group structure.
  */
-export type NavSubGroup =
-  | 'tools'
-  | 'services'
-  | 'security';
+export type NavSubGroup = 'tools' | 'services' | 'security';
 
 /** Human-readable labels for sub-groups (used in expanded sidebar) */
 export const navSubGroupLabels: Record<NavSubGroup, string> = {
@@ -318,7 +317,13 @@ export const menuRegistry: MenuItemDef[] = [
     showIn: ['commandPalette', 'rightSidebar'],
     kind: 'navigate',
     href: '/workspace',
-    activePathPrefixes: ['/workspace', '/agents', '/skills', '/commands', '/tools'],
+    activePathPrefixes: [
+      '/workspace',
+      '/agents',
+      '/skills',
+      '/commands',
+      '/tools',
+    ],
     keywords: 'workspace agents skills commands tools build create',
   },
   {
@@ -442,16 +447,18 @@ export const menuRegistry: MenuItemDef[] = [
     href: '/connectors',
   },
   ...(DEPLOYMENTS_ENABLED
-    ? [{
-      id: 'deployments',
-      label: 'Deployments',
-      icon: Rocket,
-      group: 'navigation' as const,
-      subGroup: 'services' as const,
-      showIn: ['commandPalette', 'rightSidebar'] as MenuSurface[],
-      kind: 'navigate' as const,
-      href: '/deployments',
-    }]
+    ? [
+        {
+          id: 'deployments',
+          label: 'Deployments',
+          icon: Rocket,
+          group: 'navigation' as const,
+          subGroup: 'services' as const,
+          showIn: ['commandPalette', 'rightSidebar'] as MenuSurface[],
+          kind: 'navigate' as const,
+          href: '/deployments',
+        },
+      ]
     : []),
   {
     id: 'running-services',
@@ -530,7 +537,8 @@ export const menuRegistry: MenuItemDef[] = [
     href: '/service-manager',
     tabId: 'service-manager',
     tabType: 'services',
-    keywords: 'service manager services orchestration process manager sandbox active restart reload',
+    keywords:
+      'service manager services orchestration process manager sandbox active restart reload',
   },
   {
     id: 'agent-browser-cmd',
@@ -597,6 +605,26 @@ export const menuRegistry: MenuItemDef[] = [
     href: '/credits-explained',
     keywords: 'credits coins billing usage tokens cost explain',
   },
+  {
+    id: 'finance',
+    label: 'Finance',
+    icon: Receipt,
+    group: 'navigation',
+    showIn: ['commandPalette', 'rightSidebar'],
+    kind: 'navigate',
+    href: '/finance',
+    keywords: 'finance invoices expenses budgets ledger accounting',
+  },
+  {
+    id: 'litellm-admin',
+    label: 'LiteLLM Management',
+    icon: Bot,
+    group: 'admin',
+    showIn: ['commandPalette'],
+    kind: 'navigate',
+    href: '/admin/litellm',
+    keywords: 'litellm llm models providers proxy management admin',
+  },
 
   // ──────────────────────────────────────────────────────────────────────────
   // SETTINGS PAGES (navigate to route)
@@ -610,7 +638,8 @@ export const menuRegistry: MenuItemDef[] = [
     kind: 'navigate',
     href: '/settings/credentials',
     tabType: 'settings',
-    keywords: 'secrets manager credentials env environment variables integrations keys',
+    keywords:
+      'secrets manager credentials env environment variables integrations keys',
   },
   {
     id: 'api-keys',
@@ -630,7 +659,8 @@ export const menuRegistry: MenuItemDef[] = [
     showIn: ['commandPalette'],
     kind: 'action',
     actionId: 'openProviderModal',
-    keywords: 'llm providers models anthropic openai openrouter google groq xai',
+    keywords:
+      'llm providers models anthropic openai openrouter google groq xai',
   },
   {
     id: 'settings-providers',
@@ -885,6 +915,17 @@ export const menuRegistry: MenuItemDef[] = [
     keywords: 'admin stateless mode configuration',
   },
   {
+    id: 'admin-feature-flags',
+    label: 'Admin: Feature Flags',
+    icon: Flag,
+    group: 'admin',
+    showIn: ['commandPalette'],
+    kind: 'navigate',
+    href: '/admin/feature-flags',
+    requiresAdmin: true,
+    keywords: 'admin feature flags toggles vertical config',
+  },
+  {
     id: 'admin-stress-test',
     label: 'Admin: Stress Test',
     icon: TestTube,
@@ -948,11 +989,16 @@ export function getNavItemsClustered(
 /**
  * Returns whether a navigation item is currently "active" based on the pathname.
  */
-export function isItemActive(item: MenuItemDef, pathname: string | null): boolean {
+export function isItemActive(
+  item: MenuItemDef,
+  pathname: string | null,
+): boolean {
   if (!pathname || !item.href) return false;
   if (pathname === item.href) return true;
   if (item.activePathPrefixes) {
-    return item.activePathPrefixes.some((prefix) => pathname.startsWith(prefix));
+    return item.activePathPrefixes.some((prefix) =>
+      pathname.startsWith(prefix),
+    );
   }
   return false;
 }
@@ -969,7 +1015,13 @@ export interface SettingsTab {
 
 /** Preference tabs for the settings modal */
 export function getPreferenceTabs(): SettingsTab[] {
-  const preferenceIds: SettingsTabId[] = ['general', 'appearance', 'sounds', 'notifications', 'shortcuts'];
+  const preferenceIds: SettingsTabId[] = [
+    'general',
+    'appearance',
+    'sounds',
+    'notifications',
+    'shortcuts',
+  ];
   return preferenceIds.map((tabId) => {
     const item = menuRegistry.find(
       (i) => i.kind === 'settings' && i.settingsTab === tabId,
@@ -994,9 +1046,7 @@ export function getAccountTabs(billingEnabled: boolean): SettingsTab[] {
   // }
   // Enrich labels/icons from registry where possible
   return items.map((tab) => {
-    const item = menuRegistry.find(
-      (i) => i.settingsTab === tab.id,
-    );
+    const item = menuRegistry.find((i) => i.settingsTab === tab.id);
     if (item) {
       return { ...tab, label: item.label, icon: item.icon };
     }

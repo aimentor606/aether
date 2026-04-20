@@ -1,4 +1,4 @@
-import { tunnelAuditLogs } from '@acme/db';
+import { tunnelAuditLogs } from '@aether/db';
 import { db } from '../../shared/db';
 import type { TunnelCapability } from 'agent-tunnel';
 

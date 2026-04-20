@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - JWT & Token Attack Vectors
  *
- * LIVE scan against https://computer-preview-api.acme.dev
+ * LIVE scan against https://computer-preview-api.aether.dev
  * Tests various forged, malformed, and expired tokens to ensure
  * the cloud API rejects them all.
  *
@@ -10,14 +10,14 @@
  * - "none" algorithm JWT correctly rejected
  * - HS256 signed with "secret" correctly rejected
  * - Expired tokens correctly rejected
- * - Fake acme_ and acme_sb_ tokens correctly rejected
+ * - Fake aether_ and aether_sb_ tokens correctly rejected
  * - Basic auth scheme correctly rejected
  * - Error messages are consistent and do not leak token type info
  */
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.acme.dev';
+const CLOUD = 'https://computer-preview-api.aether.dev';
 
 async function probeWithAuth(path: string, authHeader: string): Promise<{
   status: number;
@@ -101,24 +101,24 @@ describe('Cloud Scan: JWT & Token Attack Vectors', () => {
     });
   });
 
-  describe('Fake Acme token attacks', () => {
-    test('random acme_ token is rejected', async () => {
-      const r = await probeWithAuth(TARGET, 'Bearer acme_faketoken12345678901234567890');
+  describe('Fake Aether token attacks', () => {
+    test('random aether_ token is rejected', async () => {
+      const r = await probeWithAuth(TARGET, 'Bearer aether_faketoken12345678901234567890');
       expect(r.status).toBe(401);
     });
 
-    test('random acme_sb_ sandbox token is rejected', async () => {
-      const r = await probeWithAuth(TARGET, 'Bearer acme_sb_faketoken1234567890123456');
+    test('random aether_sb_ sandbox token is rejected', async () => {
+      const r = await probeWithAuth(TARGET, 'Bearer aether_sb_faketoken1234567890123456');
       expect(r.status).toBe(401);
     });
 
-    test('random acme_tnl_ tunnel token is rejected', async () => {
-      const r = await probeWithAuth(TARGET, 'Bearer acme_tnl_faketoken123456789012345');
+    test('random aether_tnl_ tunnel token is rejected', async () => {
+      const r = await probeWithAuth(TARGET, 'Bearer aether_tnl_faketoken123456789012345');
       expect(r.status).toBe(401);
     });
 
-    test('FINDING: random acme_oat_ token on /v1/oauth/userinfo returns 500', async () => {
-      const r = await probeWithAuth('/v1/oauth/userinfo', 'Bearer acme_oat_faketoken123456789012345');
+    test('FINDING: random aether_oat_ token on /v1/oauth/userinfo returns 500', async () => {
+      const r = await probeWithAuth('/v1/oauth/userinfo', 'Bearer aether_oat_faketoken123456789012345');
       // BUG: oauthTokenAuth middleware crashes on fake token hash lookup
       // Should return 401 but currently returns 500
       expect([401, 500]).toContain(r.status);
@@ -174,14 +174,14 @@ describe('Cloud Scan: JWT & Token Attack Vectors', () => {
 
   describe('Cross-route token type confusion', () => {
     test('JWT token on apiKey-only route (/v1/router/models) returns 401', async () => {
-      // JWT doesn't have acme_ prefix so apiKeyAuth rejects it
+      // JWT doesn't have aether_ prefix so apiKeyAuth rejects it
       const r = await probeWithAuth('/v1/router/models', 'Bearer fake.jwt.here');
       expect(r.status).toBe(401);
     });
 
-    test('acme_ token on supabaseAuth-only route still returns 401', async () => {
-      // combinedAuth would accept acme_ but supabaseAuth won't
-      const r = await probeWithAuth('/v1/accounts', 'Bearer acme_fake123');
+    test('aether_ token on supabaseAuth-only route still returns 401', async () => {
+      // combinedAuth would accept aether_ but supabaseAuth won't
+      const r = await probeWithAuth('/v1/accounts', 'Bearer aether_fake123');
       expect(r.status).toBe(401);
     });
   });

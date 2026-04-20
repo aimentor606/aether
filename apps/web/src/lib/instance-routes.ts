@@ -1,4 +1,4 @@
-export const ACTIVE_INSTANCE_COOKIE = 'acme-active-instance';
+export const ACTIVE_INSTANCE_COOKIE = 'aether-active-instance';
 
 export const INSTANCE_SCOPED_ROUTES = [
   '/dashboard',

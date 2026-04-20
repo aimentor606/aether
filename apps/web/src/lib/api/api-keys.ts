@@ -65,37 +65,66 @@ interface ApiKeyRegenerateEnvelope {
   sandbox_updated: boolean;
 }
 
-// API Key Management API (sandbox-scoped, acme schema)
+// API Key Management API (sandbox-scoped, aether schema)
 export const apiKeysApi = {
   /**
    * Create a new user API key for a sandbox.
    * The secret_key is returned ONCE in the response — only the hash is stored.
    */
-  create: (data: APIKeyCreateRequest, options?: ApiClientOptions): Promise<ApiResponse<ApiKeyCreateEnvelope>> =>
+  create: (
+    data: APIKeyCreateRequest,
+    options?: ApiClientOptions,
+  ): Promise<ApiResponse<ApiKeyCreateEnvelope>> =>
     backendApi.post<ApiKeyCreateEnvelope>('/platform/api-keys', data, options),
 
   /**
    * List all API keys for a sandbox (no secrets returned).
    */
-  list: (sandboxId: string, options?: ApiClientOptions): Promise<ApiResponse<ApiKeysListEnvelope>> =>
-    backendApi.get<ApiKeysListEnvelope>(`/platform/api-keys?sandbox_id=${sandboxId}`, options),
+  list: (
+    sandboxId: string,
+    options?: ApiClientOptions,
+  ): Promise<ApiResponse<ApiKeysListEnvelope>> =>
+    backendApi.get<ApiKeysListEnvelope>(
+      `/platform/api-keys?sandbox_id=${sandboxId}`,
+      options,
+    ),
 
   /**
    * Revoke an API key (soft-delete).
    */
-  revoke: (keyId: string, options?: ApiClientOptions): Promise<ApiResponse<{ success: boolean; message: string }>> =>
-    backendApi.patch<{ success: boolean; message: string }>(`/platform/api-keys/${keyId}/revoke`, {}, options),
+  revoke: (
+    keyId: string,
+    options?: ApiClientOptions,
+  ): Promise<ApiResponse<{ success: boolean; message: string }>> =>
+    backendApi.patch<{ success: boolean; message: string }>(
+      `/platform/api-keys/${keyId}/revoke`,
+      {},
+      options,
+    ),
 
   /**
    * Delete an API key permanently.
    */
-  delete: (keyId: string, options?: ApiClientOptions): Promise<ApiResponse<{ success: boolean; message: string }>> =>
-    backendApi.delete<{ success: boolean; message: string }>(`/platform/api-keys/${keyId}`, options),
+  delete: (
+    keyId: string,
+    options?: ApiClientOptions,
+  ): Promise<ApiResponse<{ success: boolean; message: string }>> =>
+    backendApi.delete<{ success: boolean; message: string }>(
+      `/platform/api-keys/${keyId}`,
+      options,
+    ),
 
   /**
    * Regenerate a sandbox-managed key (revoke old + create new).
    * Returns the new secret_key ONCE.
    */
-  regenerate: (keyId: string, options?: ApiClientOptions): Promise<ApiResponse<ApiKeyRegenerateEnvelope>> =>
-    backendApi.post<ApiKeyRegenerateEnvelope>(`/platform/api-keys/${keyId}/regenerate`, {}, options),
+  regenerate: (
+    keyId: string,
+    options?: ApiClientOptions,
+  ): Promise<ApiResponse<ApiKeyRegenerateEnvelope>> =>
+    backendApi.post<ApiKeyRegenerateEnvelope>(
+      `/platform/api-keys/${keyId}/regenerate`,
+      {},
+      options,
+    ),
 };

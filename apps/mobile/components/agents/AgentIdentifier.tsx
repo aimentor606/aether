@@ -15,7 +15,7 @@ import { AgentAvatar } from './AgentAvatar';
 import { useAgent } from '@/contexts/AgentContext';
 import { useColorScheme } from 'nativewind';
 import type { Agent } from '@/api/types';
-import { AcmeLogo } from '@/components/ui/AcmeLogo';
+import { AetherLogo } from '@/components/ui/AetherLogo';
 
 interface AgentIdentifierProps extends ViewProps {
   agentId?: string | null;

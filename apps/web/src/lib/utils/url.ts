@@ -38,7 +38,7 @@ export function constructHtmlPreviewUrl(
     return rewriteLocalhostUrl(port, staticPath, '', subdomainOpts);
   }
 
-  // Legacy fallback: use the raw sandbox_url (Acme Master at port 8000).
+  // Legacy fallback: use the raw sandbox_url (Aether Master at port 8000).
   // Browser cannot reach this directly — only works when served in the same origin
   // context or when blob URLs are used.
   if (!baseUrl) return undefined;

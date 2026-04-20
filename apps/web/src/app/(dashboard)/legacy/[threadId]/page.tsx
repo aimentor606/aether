@@ -251,8 +251,8 @@ function LegacyTurn({
 					<div className="flex items-center gap-2 mt-3">
 						{/* eslint-disable-next-line @next/next/no-img-element */}
 						<img
-							src="/acme-logomark-white.svg"
-							alt="Acme"
+							src="/aether-logomark-white.svg"
+							alt="Aether"
 							className="dark:invert-0 invert flex-shrink-0"
 							style={{ height: '14px', width: 'auto' }}
 						/>

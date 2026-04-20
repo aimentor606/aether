@@ -2,7 +2,7 @@
  * Security Audit: Cloud API Security
  *
  * Tests the cloud-facing API endpoints for unauthorized access, token validation,
- * and proper CORS handling for the cloud deployment (computer-preview-api.acme.dev).
+ * and proper CORS handling for the cloud deployment (computer-preview-api.aether.dev).
  *
  * Attack vectors tested:
  *  - Unauthenticated access to protected cloud endpoints
@@ -21,7 +21,7 @@ import { describe, test, expect } from 'bun:test';
 // Cloud endpoint configuration
 // ---------------------------------------------------------------------------
 
-const CLOUD_API_BASE = 'https://computer-preview-api.acme.dev';
+const CLOUD_API_BASE = 'https://computer-preview-api.aether.dev';
 
 /** All endpoints that require authentication */
 const AUTHENTICATED_ENDPOINTS = [
@@ -126,7 +126,7 @@ describe('Security Audit: Cloud API Security', () => {
     test('health response does not leak secrets', () => {
       const response = {
         status: 'ok',
-        service: 'acme-api',
+        service: 'aether-api',
         timestamp: new Date().toISOString(),
         env: 'cloud',
       };
@@ -172,18 +172,18 @@ describe('Security Audit: Cloud API Security', () => {
   describe('Response security headers', () => {
     test('cloud API sets CORS headers', () => {
       // From the example request headers provided:
-      // access-control-allow-origin: https://computer-preview.acme.dev
+      // access-control-allow-origin: https://computer-preview.aether.dev
       // access-control-allow-credentials: true
       const expectedHeaders = {
-        'access-control-allow-origin': 'https://computer-preview.acme.dev',
+        'access-control-allow-origin': 'https://computer-preview.aether.dev',
         'access-control-allow-credentials': 'true',
       };
-      expect(expectedHeaders['access-control-allow-origin']).toBe('https://computer-preview.acme.dev');
+      expect(expectedHeaders['access-control-allow-origin']).toBe('https://computer-preview.aether.dev');
       expect(expectedHeaders['access-control-allow-credentials']).toBe('true');
     });
 
     test('CORS origin is specific, not wildcard', () => {
-      const origin = 'https://computer-preview.acme.dev';
+      const origin = 'https://computer-preview.aether.dev';
       expect(origin).not.toBe('*');
     });
 
@@ -244,18 +244,18 @@ describe('Security Audit: Cloud API Security', () => {
   });
 
   describe('Cloud-specific CORS', () => {
-    test('computer-preview.acme.dev is in allowed origins', () => {
+    test('computer-preview.aether.dev is in allowed origins', () => {
       const cloudOrigins = [
-        'https://www.acme.dev',
-        'https://acme.dev',
-        'https://computer-preview.acme.dev',
+        'https://www.aether.dev',
+        'https://aether.dev',
+        'https://computer-preview.aether.dev',
       ];
-      expect(cloudOrigins).toContain('https://computer-preview.acme.dev');
+      expect(cloudOrigins).toContain('https://computer-preview.aether.dev');
     });
 
     test('API domain is separate from frontend domain', () => {
-      const apiDomain = 'computer-preview-api.acme.dev';
-      const frontendDomain = 'computer-preview.acme.dev';
+      const apiDomain = 'computer-preview-api.aether.dev';
+      const frontendDomain = 'computer-preview.aether.dev';
       expect(apiDomain).not.toBe(frontendDomain);
     });
   });
@@ -273,7 +273,7 @@ describe('Security Audit: Cloud API Security', () => {
     test('OAuth access tokens use hash lookup (not plaintext comparison)', () => {
       // oauthTokenAuth hashes the provided token and looks up the hash
       const { createHash } = require('crypto');
-      const token = 'acme_oat_test_token';
+      const token = 'aether_oat_test_token';
       const hash = createHash('sha256').update(token).digest('hex');
       expect(hash).not.toBe(token);
       expect(hash.length).toBe(64);

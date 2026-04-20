@@ -1,13 +1,13 @@
 import { DarkTheme, DefaultTheme, type Theme } from '@react-navigation/native';
 
 /**
- * Theme values aligned with global.css Acme brand palette.
+ * Theme values aligned with global.css Aether brand palette.
  * These drive React Navigation chrome (headers, tab bars, etc.).
  */
 export const THEME = {
   light: {
-    background: 'hsl(0 0% 96%)',            // #F5F5F5 – Acme light bg
-    foreground: 'hsl(218 12% 7%)',           // #121215 – Acme Black
+    background: 'hsl(0 0% 96%)',            // #F5F5F5 – Aether light bg
+    foreground: 'hsl(218 12% 7%)',           // #121215 – Aether Black
     card: 'hsl(210 20% 98%)',                // #F9FAFB
     cardForeground: 'hsl(218 12% 7%)',       // #121215
     popover: 'hsl(0 0% 100%)',               // #FFFFFF
@@ -27,8 +27,8 @@ export const THEME = {
     radius: '0.625rem',
   },
   dark: {
-    background: 'hsl(240 8% 8%)',            // #121215 – Acme Black
-    foreground: 'hsl(240 11% 97%)',          // #F8F8F8 – Acme White
+    background: 'hsl(240 8% 8%)',            // #121215 – Aether Black
+    foreground: 'hsl(240 11% 97%)',          // #F8F8F8 – Aether White
     card: 'hsl(240 4% 9%)',                  // #161618
     cardForeground: 'hsl(240 11% 97%)',      // #F8F8F8
     popover: 'hsl(220 6% 9%)',               // #161618

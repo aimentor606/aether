@@ -1,9 +1,9 @@
-# Kortix Robots.txt
+# Robots.txt
 User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://kortix.com/sitemap.xml
+Sitemap: https://aether.com/sitemap.xml
 
 # Disallow sensitive routes
 Disallow: /api/

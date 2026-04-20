@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Setup Routes Exposed on Production
  *
- * LIVE scan against https://computer-preview-api.acme.dev
+ * LIVE scan against https://computer-preview-api.aether.dev
  *
  * The /v1/setup/* routes are designed for LOCAL/self-hosted installation
  * wizard, but they are mounted UNCONDITIONALLY in index.ts:255:
@@ -39,7 +39,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.acme.dev';
+const CLOUD = 'https://computer-preview-api.aether.dev';
 
 async function probe(method: string, path: string, body?: any, headers?: Record<string, string>): Promise<{
   status: number;

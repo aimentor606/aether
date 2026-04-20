@@ -12,17 +12,23 @@
  *   public/sounds/opencode/notification.mp3
  *   public/sounds/opencode/send.mp3
  *
- *   public/sounds/acme/completion.mp3
- *   public/sounds/acme/error.mp3
- *   public/sounds/acme/notification.mp3
- *   public/sounds/acme/send.mp3
+ *   public/sounds/aether/completion.mp3
+ *   public/sounds/aether/error.mp3
+ *   public/sounds/aether/notification.mp3
+ *   public/sounds/aether/send.mp3
+ *
+ * Note: The sound pack directory is still named "aether" (matches filesystem).
  *
  * Drop replacement mp3 files in these directories.  The filenames must
  * match the SoundEvent names exactly (completion, error, notification, send).
  * -----------------------------------------------------------------------
  */
 
-import { useSoundStore, type SoundEvent, type SoundPack } from '@/stores/sound-store';
+import {
+  useSoundStore,
+  type SoundEvent,
+  type SoundPack,
+} from '@/stores/sound-store';
 
 // ============================================================================
 // Audio cache — reuse HTMLAudioElement instances to avoid re-fetching files
@@ -48,7 +54,10 @@ function getOrCreateAudio(path: string): HTMLAudioElement {
 // Fallback: synthesised tones (used when mp3 files are missing)
 // ============================================================================
 
-const SYNTH_CONFIG: Record<SoundEvent, { freq: number; duration: number; type: OscillatorType }> = {
+const SYNTH_CONFIG: Record<
+  SoundEvent,
+  { freq: number; duration: number; type: OscillatorType }
+> = {
   completion: { freq: 880, duration: 0.3, type: 'sine' },
   error: { freq: 330, duration: 0.4, type: 'square' },
   notification: { freq: 660, duration: 0.25, type: 'sine' },
@@ -57,9 +66,10 @@ const SYNTH_CONFIG: Record<SoundEvent, { freq: number; duration: number; type: O
 
 function playSynthFallback(event: SoundEvent, volume: number) {
   try {
-    const AudioCtx = (typeof AudioContext !== 'undefined')
-      ? AudioContext
-      : (window as any).webkitAudioContext;
+    const AudioCtx =
+      typeof AudioContext !== 'undefined'
+        ? AudioContext
+        : (window as any).webkitAudioContext;
     if (!AudioCtx) return;
 
     const ctx = new AudioCtx();
@@ -73,7 +83,10 @@ function playSynthFallback(event: SoundEvent, volume: number) {
     osc.type = cfg.type;
     osc.frequency.setValueAtTime(cfg.freq, ctx.currentTime);
     gain.gain.setValueAtTime(volume * 0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + cfg.duration);
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      ctx.currentTime + cfg.duration,
+    );
 
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + cfg.duration);

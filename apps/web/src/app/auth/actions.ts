@@ -5,7 +5,6 @@ import { createClient } from '@/lib/supabase/server';
 import { getServerPublicEnv } from '@/lib/public-env-server';
 import { redirect } from 'next/navigation';
 
-
 export async function signIn(prevState: any, formData: FormData) {
   const email = formData.get('email') as string;
   const returnUrl = formData.get('returnUrl') as string | undefined;
@@ -21,17 +20,17 @@ export async function signIn(prevState: any, formData: FormData) {
   const normalizedEmail = email.trim().toLowerCase();
 
   // Use magic link (passwordless) authentication
-  // For desktop app, use custom protocol (acme://auth/callback) - same as mobile
-  // For web, use standard origin (https://acme.dev/auth/callback)
+  // For desktop app, use custom protocol (aether://auth/callback) - same as mobile
+  // For web, use standard origin (https://aether.dev/auth/callback)
   // Include email in redirect URL so it's available if the link expires
   let emailRedirectTo: string;
-  if (isDesktopApp && origin.startsWith('acme://')) {
+  if (isDesktopApp && origin.startsWith('aether://')) {
     // Match mobile implementation - simple protocol URL with optional terms_accepted
     const params = new URLSearchParams();
     if (acceptedTerms) {
       params.set('terms_accepted', 'true');
     }
-    emailRedirectTo = `acme://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
+    emailRedirectTo = `aether://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
   } else {
     emailRedirectTo = `${origin}/auth/callback?returnUrl=${encodeURIComponent(returnUrl || '/instances')}&email=${encodeURIComponent(normalizedEmail)}${acceptedTerms ? '&terms_accepted=true' : ''}`;
   }
@@ -77,7 +76,8 @@ export async function signUp(prevState: any, formData: FormData) {
   // Check access control — if signups are closed and email isn't allowlisted, block
   let shouldCreateUser = true;
   try {
-    const backendUrl = getServerPublicEnv().BACKEND_URL || 'http://localhost:8008/v1';
+    const backendUrl =
+      getServerPublicEnv().BACKEND_URL || 'http://localhost:8008/v1';
     const res = await fetch(`${backendUrl}/access/check-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -93,19 +93,22 @@ export async function signUp(prevState: any, formData: FormData) {
   }
 
   if (!shouldCreateUser) {
-    return { signupClosed: true, message: 'Signups are currently closed. Request access below.' };
+    return {
+      signupClosed: true,
+      message: 'Signups are currently closed. Request access below.',
+    };
   }
 
   const supabase = await createClient();
 
   // Use magic link (passwordless) authentication - auto-creates account
   let emailRedirectTo: string;
-  if (isDesktopApp && origin.startsWith('acme://')) {
+  if (isDesktopApp && origin.startsWith('aether://')) {
     const params = new URLSearchParams();
     if (acceptedTerms) {
       params.set('terms_accepted', 'true');
     }
-    emailRedirectTo = `acme://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
+    emailRedirectTo = `aether://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
   } else {
     emailRedirectTo = `${origin}/auth/callback?returnUrl=${encodeURIComponent(returnUrl || '/instances')}&email=${encodeURIComponent(normalizedEmail)}${acceptedTerms ? '&terms_accepted=true' : ''}`;
   }
@@ -115,9 +118,11 @@ export async function signUp(prevState: any, formData: FormData) {
     options: {
       emailRedirectTo,
       shouldCreateUser: true,
-      data: referralCode ? {
-        referral_code: referralCode.trim().toUpperCase(),
-      } : undefined,
+      data: referralCode
+        ? {
+            referral_code: referralCode.trim().toUpperCase(),
+          }
+        : undefined,
     },
   });
 
@@ -142,7 +147,8 @@ export async function requestAccess(prevState: any, formData: FormData) {
   }
 
   try {
-    const backendUrl = getServerPublicEnv().BACKEND_URL || 'http://localhost:8008/v1';
+    const backendUrl =
+      getServerPublicEnv().BACKEND_URL || 'http://localhost:8008/v1';
     const res = await fetch(`${backendUrl}/access/request-access`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -153,7 +159,10 @@ export async function requestAccess(prevState: any, formData: FormData) {
       }),
     });
     if (res.ok) {
-      return { success: true, message: 'Your access request has been submitted. We\'ll be in touch!' };
+      return {
+        success: true,
+        message: "Your access request has been submitted. We'll be in touch!",
+      };
     }
     return { message: 'Failed to submit request. Please try again.' };
   } catch {
@@ -228,17 +237,17 @@ export async function resendMagicLink(prevState: any, formData: FormData) {
   const normalizedEmail = email.trim().toLowerCase();
 
   // Use magic link (passwordless) authentication
-  // For desktop app, use custom protocol (acme://auth/callback) - same as mobile
-  // For web, use standard origin (https://acme.dev/auth/callback)
+  // For desktop app, use custom protocol (aether://auth/callback) - same as mobile
+  // For web, use standard origin (https://aether.dev/auth/callback)
   // Include email in redirect URL so it's available if the link expires
   let emailRedirectTo: string;
-  if (isDesktopApp && origin.startsWith('acme://')) {
+  if (isDesktopApp && origin.startsWith('aether://')) {
     // Match mobile implementation - simple protocol URL with optional terms_accepted
     const params = new URLSearchParams();
     if (acceptedTerms) {
       params.set('terms_accepted', 'true');
     }
-    emailRedirectTo = `acme://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
+    emailRedirectTo = `aether://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
   } else {
     emailRedirectTo = `${origin}/auth/callback?returnUrl=${encodeURIComponent(returnUrl || '/instances')}&email=${encodeURIComponent(normalizedEmail)}${acceptedTerms ? '&terms_accepted=true' : ''}`;
   }
@@ -277,8 +286,8 @@ export async function sendOtpCode(prevState: any, formData: FormData) {
   const normalizedEmail = email.trim().toLowerCase();
 
   let emailRedirectTo: string;
-  if (isDesktopApp && origin.startsWith('acme://')) {
-    emailRedirectTo = 'acme://auth/callback';
+  if (isDesktopApp && origin.startsWith('aether://')) {
+    emailRedirectTo = 'aether://auth/callback';
   } else {
     emailRedirectTo = `${origin}/auth/callback?returnUrl=${encodeURIComponent(returnUrl || '/instances')}&email=${encodeURIComponent(normalizedEmail)}`;
   }
@@ -327,9 +336,10 @@ export async function signInWithPassword(prevState: any, formData: FormData) {
   }
 
   // Determine if new user (for analytics)
-  const isNewUser = data.user && (Date.now() - new Date(data.user.created_at).getTime()) < 60000;
+  const isNewUser =
+    data.user && Date.now() - new Date(data.user.created_at).getTime() < 60000;
   const authEvent = isNewUser ? 'signup' : 'login';
-  
+
   // Return success — let the client redirect after auth state hydrates.
   const finalReturnUrl = returnUrl || '/instances';
   const redirectUrl = new URL(finalReturnUrl, 'http://localhost');
@@ -363,7 +373,8 @@ export async function signUpWithPassword(prevState: any, formData: FormData) {
 
   const supabase = await createClient();
 
-  const baseUrl = origin || getServerPublicEnv().APP_URL || 'http://localhost:3000';
+  const baseUrl =
+    origin || getServerPublicEnv().APP_URL || 'http://localhost:3000';
   const emailRedirectTo = `${baseUrl}/auth/callback?returnUrl=${encodeURIComponent(returnUrl || '/instances')}`;
 
   const { error } = await supabase.auth.signUp({
@@ -421,23 +432,27 @@ export async function installOwner(_prevState: any, formData: FormData) {
   });
 
   // If user already exists, fall through to sign-in instead of erroring
-  const alreadyExists = signUpError &&
+  const alreadyExists =
+    signUpError &&
     (signUpError.message?.toLowerCase().includes('already registered') ||
-     signUpError.message?.toLowerCase().includes('already exists') ||
-     signUpError.status === 422);
+      signUpError.message?.toLowerCase().includes('already exists') ||
+      signUpError.status === 422);
 
   if (signUpError && !alreadyExists) {
     return { message: signUpError.message || 'Could not create account' };
   }
 
   // Sign in (either after fresh signup or if user already existed)
-  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-    email: email.trim().toLowerCase(),
-    password,
-  });
+  const { data: signInData, error: signInError } =
+    await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
 
   if (signInError) {
-    return { message: signInError.message || 'Account created but could not sign in' };
+    return {
+      message: signInError.message || 'Account created but could not sign in',
+    };
   }
 
   // Return the access token so the client wizard can provision the sandbox.
@@ -524,7 +539,8 @@ export async function verifyOtp(prevState: any, formData: FormData) {
   }
 
   // Determine if new user (for analytics)
-  const isNewUser = data.user && (Date.now() - new Date(data.user.created_at).getTime()) < 60000;
+  const isNewUser =
+    data.user && Date.now() - new Date(data.user.created_at).getTime() < 60000;
   const authEvent = isNewUser ? 'signup' : 'login';
 
   // For new cloud users with no plan yet, send them to /subscription first.
@@ -534,15 +550,25 @@ export async function verifyOtp(prevState: any, formData: FormData) {
 
   if (billingEnabled && isNewUser && data.session?.access_token) {
     try {
-      const backendUrl = (process.env.BACKEND_URL || runtimeEnv.BACKEND_URL || '').replace(/\/v1\/?$/, '');
+      const backendUrl = (
+        process.env.BACKEND_URL ||
+        runtimeEnv.BACKEND_URL ||
+        ''
+      ).replace(/\/v1\/?$/, '');
       if (backendUrl) {
-        const accountStateRes = await fetch(`${backendUrl}/v1/billing/account-state`, {
-          headers: { 'Authorization': `Bearer ${data.session.access_token}` },
-          signal: AbortSignal.timeout(5000),
-        });
+        const accountStateRes = await fetch(
+          `${backendUrl}/v1/billing/account-state`,
+          {
+            headers: { Authorization: `Bearer ${data.session.access_token}` },
+            signal: AbortSignal.timeout(5000),
+          },
+        );
         if (accountStateRes.ok) {
           const accountState = await accountStateRes.json();
-          const tierKey = accountState?.subscription?.tier_key || accountState?.tier?.name || '';
+          const tierKey =
+            accountState?.subscription?.tier_key ||
+            accountState?.tier?.name ||
+            '';
           if (!tierKey || tierKey === 'none') {
             finalDestination = '/subscription';
           }

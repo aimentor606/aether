@@ -105,7 +105,7 @@ describe('Security Audit: OAuth2 Security', () => {
 
   describe('Token hashing', () => {
     test('tokens are hashed with SHA-256 before storage', () => {
-      const token = 'acme_oat_someRandomAccessToken12345678';
+      const token = 'aether_oat_someRandomAccessToken12345678';
       const hash = hashToken(token);
       // Hash should be 64-char hex
       expect(hash.length).toBe(64);
@@ -113,7 +113,7 @@ describe('Security Audit: OAuth2 Security', () => {
     });
 
     test('same token produces same hash', () => {
-      const token = 'acme_oat_test';
+      const token = 'aether_oat_test';
       expect(hashToken(token)).toBe(hashToken(token));
     });
 
@@ -122,7 +122,7 @@ describe('Security Audit: OAuth2 Security', () => {
     });
 
     test('hash is not reversible to original token', () => {
-      const token = 'acme_oat_secret_value';
+      const token = 'aether_oat_secret_value';
       const hash = hashToken(token);
       // The hash should not contain the original token
       expect(hash).not.toContain(token);
@@ -277,13 +277,13 @@ describe('Security Audit: OAuth2 Security', () => {
 
   describe('Token format validation', () => {
     test('access tokens have correct prefix', () => {
-      const prefix = 'acme_oat_';
-      expect(prefix).toBe('acme_oat_');
+      const prefix = 'aether_oat_';
+      expect(prefix).toBe('aether_oat_');
     });
 
     test('refresh tokens have correct prefix', () => {
-      const prefix = 'acme_ort_';
-      expect(prefix).toBe('acme_ort_');
+      const prefix = 'aether_ort_';
+      expect(prefix).toBe('aether_ort_');
     });
 
     test('access token expiry is 1 hour', () => {

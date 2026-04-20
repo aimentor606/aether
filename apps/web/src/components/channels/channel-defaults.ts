@@ -1,4 +1,4 @@
-export const DEFAULT_CHANNEL_AGENT = 'acme';
+export const DEFAULT_CHANNEL_AGENT = 'aether';
 
 export function buildDefaultChannelInstructions(platform: 'telegram' | 'slack', channelName?: string) {
   const label = channelName?.trim() || platform;

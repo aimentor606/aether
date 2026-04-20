@@ -18,7 +18,7 @@ export const onboardingSteps: OnboardingStep[] = [
     description: 'Introduction from our CEO',
     content: <CEOIntroStep />,
     canSkip: false,
-    actionLabel: 'Launch Your Acme'
+    actionLabel: 'Launch Your Aether'
   },
   {
     id: 'user-type',

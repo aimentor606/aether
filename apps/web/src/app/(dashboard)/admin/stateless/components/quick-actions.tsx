@@ -1,24 +1,22 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
+  Input,
+  Label,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@aether/ui/primitives';
 import {
   RefreshCw,
   Play,
@@ -26,7 +24,7 @@ import {
   RotateCcw,
   Loader2,
   AlertTriangle,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface QuickAction {
   id: string;
@@ -55,36 +53,38 @@ interface QuickActionsProps {
 
 const actions: QuickAction[] = [
   {
-    id: "sweep",
-    name: "Sweep",
-    description: "Scan for stuck or orphaned runs and attempt recovery",
+    id: 'sweep',
+    name: 'Sweep',
+    description: 'Scan for stuck or orphaned runs and attempt recovery',
     icon: <RefreshCw className="w-4 h-4" />,
   },
   {
-    id: "flush",
-    name: "Flush",
-    description: "Force flush all pending writes from WAL to database",
+    id: 'flush',
+    name: 'Flush',
+    description: 'Force flush all pending writes from WAL to database',
     icon: <Play className="w-4 h-4" />,
   },
   {
-    id: "purge",
-    name: "Purge DLQ",
-    description: "Remove old entries from the dead letter queue",
+    id: 'purge',
+    name: 'Purge DLQ',
+    description: 'Remove old entries from the dead letter queue',
     icon: <Trash2 className="w-4 h-4" />,
     dangerous: true,
-    confirmMessage: "This will permanently delete DLQ entries. This action cannot be undone.",
+    confirmMessage:
+      'This will permanently delete DLQ entries. This action cannot be undone.',
     requiresInput: {
-      label: "Delete entries older than (hours)",
-      placeholder: "24",
-      type: "number",
+      label: 'Delete entries older than (hours)',
+      placeholder: '24',
+      type: 'number',
     },
   },
   {
-    id: "reset",
-    name: "Reset Breakers",
-    description: "Reset all circuit breakers to closed state",
+    id: 'reset',
+    name: 'Reset Breakers',
+    description: 'Reset all circuit breakers to closed state',
     icon: <RotateCcw className="w-4 h-4" />,
-    confirmMessage: "This will reset all circuit breakers, potentially allowing failed operations to retry.",
+    confirmMessage:
+      'This will reset all circuit breakers, potentially allowing failed operations to retry.',
   },
 ];
 
@@ -99,22 +99,27 @@ export function QuickActions({
   isResetting,
 }: QuickActionsProps) {
   const [confirmAction, setConfirmAction] = useState<QuickAction | null>(null);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
 
   const isLoading = (id: string) => {
     switch (id) {
-      case "sweep": return isSweeping;
-      case "flush": return isFlushing;
-      case "purge": return isPurging;
-      case "reset": return isResetting;
-      default: return false;
+      case 'sweep':
+        return isSweeping;
+      case 'flush':
+        return isFlushing;
+      case 'purge':
+        return isPurging;
+      case 'reset':
+        return isResetting;
+      default:
+        return false;
     }
   };
 
   const handleAction = (action: QuickAction) => {
     if (action.confirmMessage || action.requiresInput) {
       setConfirmAction(action);
-      setInputValue(action.requiresInput?.placeholder || "");
+      setInputValue(action.requiresInput?.placeholder || '');
     } else {
       executeAction(action.id);
     }
@@ -122,21 +127,21 @@ export function QuickActions({
 
   const executeAction = (id: string, value?: string) => {
     switch (id) {
-      case "sweep":
+      case 'sweep':
         onSweep();
         break;
-      case "flush":
+      case 'flush':
         onFlush();
         break;
-      case "purge":
+      case 'purge':
         onPurgeDLQ(value ? parseInt(value) : undefined);
         break;
-      case "reset":
+      case 'reset':
         onResetBreakers();
         break;
     }
     setConfirmAction(null);
-    setInputValue("");
+    setInputValue('');
   };
 
   const isAnyLoading = isSweeping || isFlushing || isPurging || isResetting;
@@ -152,13 +157,14 @@ export function QuickActions({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    variant={action.dangerous ? "outline" : "outline"}
+                    variant={action.dangerous ? 'outline' : 'outline'}
                     size="sm"
                     onClick={() => handleAction(action)}
                     disabled={isAnyLoading}
                     className={cn(
-                      "gap-1.5",
-                      action.dangerous && "text-destructive hover:text-destructive"
+                      'gap-1.5',
+                      action.dangerous &&
+                        'text-destructive hover:text-destructive',
                     )}
                   >
                     {loading ? (
@@ -179,7 +185,10 @@ export function QuickActions({
       </div>
 
       {/* Confirmation Dialog */}
-      <Dialog open={!!confirmAction} onOpenChange={() => setConfirmAction(null)}>
+      <Dialog
+        open={!!confirmAction}
+        onOpenChange={() => setConfirmAction(null)}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -195,10 +204,12 @@ export function QuickActions({
 
           {confirmAction?.requiresInput && (
             <div className="grid gap-2 py-2">
-              <Label htmlFor="action-input">{confirmAction.requiresInput.label}</Label>
+              <Label htmlFor="action-input">
+                {confirmAction.requiresInput.label}
+              </Label>
               <Input
                 id="action-input"
-                type={confirmAction.requiresInput.type || "text"}
+                type={confirmAction.requiresInput.type || 'text'}
                 placeholder={confirmAction.requiresInput.placeholder}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -211,11 +222,11 @@ export function QuickActions({
               Cancel
             </Button>
             <Button
-              variant={confirmAction?.dangerous ? "destructive" : "default"}
+              variant={confirmAction?.dangerous ? 'destructive' : 'default'}
               onClick={() => executeAction(confirmAction!.id, inputValue)}
-              disabled={isLoading(confirmAction?.id || "")}
+              disabled={isLoading(confirmAction?.id || '')}
             >
-              {isLoading(confirmAction?.id || "") && (
+              {isLoading(confirmAction?.id || '') && (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               )}
               Confirm

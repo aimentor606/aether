@@ -6,7 +6,7 @@
 
 ## Summary
 
-Created two new workspace packages (`@acme/ui` and `@acme/sdk`) as the foundation for Aether's unified UI architecture. Both packages pass TypeScript typecheck cleanly.
+Created two new workspace packages (`@aether/ui` and `@aether/sdk`) as the foundation for Aether's unified UI architecture. Both packages pass TypeScript typecheck cleanly.
 
 ## Completed Tasks
 
@@ -31,8 +31,8 @@ Created two new workspace packages (`@acme/ui` and `@acme/sdk`) as the foundatio
 - 3 vertical directories (finance, healthcare, retail) — empty modules
 
 ### 3. Configuration Updates
-- `tsconfig.base.json` — added path mappings for `@acme/ui` and `@acme/sdk`
-- `apps/web/package.json` — added `@acme/ui: "workspace:*"` and `@acme/sdk: "workspace:*"`
+- `tsconfig.base.json` — added path mappings for `@aether/ui` and `@aether/sdk`
+- `apps/web/package.json` — added `@aether/ui: "workspace:*"` and `@aether/sdk: "workspace:*"`
 - `pnpm install` — completed, workspace symlinks verified
 
 ### 4. Bug Fixes

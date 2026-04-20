@@ -18,7 +18,7 @@ id -u abc >/dev/null 2>&1 || useradd -m -s /bin/bash abc
 passwd -l abc >/dev/null 2>&1 || true
 usermod -aG docker abc >/dev/null 2>&1 || true
 
-cat > /usr/local/bin/acme-authorized-keys <<'EOF'
+cat > /usr/local/bin/aether-authorized-keys <<'EOF'
 #!/bin/bash
 set -euo pipefail
 
@@ -27,9 +27,9 @@ USER_NAME="\${1:-}"
 
 docker exec justavps-workload sh -lc 'cat /config/.ssh/authorized_keys 2>/dev/null' || true
 EOF
-chmod +x /usr/local/bin/acme-authorized-keys
+chmod +x /usr/local/bin/aether-authorized-keys
 
-cat > /usr/local/bin/acme-container-shell <<'EOF'
+cat > /usr/local/bin/aether-container-shell <<'EOF'
 #!/bin/bash
 set -euo pipefail
 
@@ -60,20 +60,20 @@ exec docker exec "\${TTY_ARGS[@]}" \
   justavps-workload \
   bash -l
 EOF
-chmod +x /usr/local/bin/acme-container-shell
+chmod +x /usr/local/bin/aether-container-shell
 
 mkdir -p /etc/ssh/sshd_config.d
 cat > /etc/ssh/sshd_config.d/aether-sandbox.conf <<'EOF'
 Match User abc
     PasswordAuthentication no
     PubkeyAuthentication yes
-    AuthorizedKeysCommand /usr/local/bin/acme-authorized-keys %u
+    AuthorizedKeysCommand /usr/local/bin/aether-authorized-keys %u
     AuthorizedKeysCommandUser root
     PermitTTY yes
     X11Forwarding no
     PermitTunnel no
     GatewayPorts no
-    ForceCommand /usr/local/bin/acme-container-shell
+    ForceCommand /usr/local/bin/aether-container-shell
 EOF
 
 systemctl reload ssh 2>/dev/null || systemctl reload sshd 2>/dev/null || true
@@ -82,7 +82,7 @@ systemctl reload ssh 2>/dev/null || systemctl reload sshd 2>/dev/null || true
 const scriptB64 = Buffer.from(script).toString('base64');
 const result = await execOnHost(
   endpoint,
-  `printf '%s' '${scriptB64}' | base64 -d > /tmp/acme-ssh-bridge.sh && bash /tmp/acme-ssh-bridge.sh`,
+  `printf '%s' '${scriptB64}' | base64 -d > /tmp/aether-ssh-bridge.sh && bash /tmp/aether-ssh-bridge.sh`,
   60,
 );
 

@@ -11,8 +11,8 @@ export const clearUserLocalStorage = () => {
     localStorage.removeItem('opencode-model-store-v1');
     // Clear sandbox/server state — prevents stale sandbox IDs leaking across accounts
     localStorage.removeItem('opencode-servers-v4');
-    localStorage.removeItem('acme-tabs');
-    localStorage.removeItem('acme-tabs-per-server');
+    localStorage.removeItem('aether-tabs');
+    localStorage.removeItem('aether-tabs-per-server');
     // Clear pattern-based keys
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith('maintenance-dismissed-')) {

@@ -28,7 +28,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 // ─── Cached SSH Meta ────────────────────────────────────────────────────────
 
-const SSH_META_KEY = 'acme:ssh-access-meta:v1';
+const SSH_META_KEY = 'aether:ssh-access-meta:v1';
 
 interface SSHMeta {
   ssh_command: string;
@@ -164,7 +164,7 @@ export function SSHPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: SSHPa
     : '';
 
   const sshConfig = sshResult
-    ? `Host acme-sandbox\n  HostName ${sshResult.host}\n  Port ${sshResult.port}\n  User ${sshResult.username}\n  IdentityFile ~/.ssh/aether_sandbox\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null\n  ServerAliveInterval 15\n  ServerAliveCountMax 4`
+    ? `Host aether-sandbox\n  HostName ${sshResult.host}\n  Port ${sshResult.port}\n  User ${sshResult.username}\n  IdentityFile ~/.ssh/aether_sandbox\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null\n  ServerAliveInterval 15\n  ServerAliveCountMax 4`
     : '';
 
   const configCmd = sshResult
@@ -319,7 +319,7 @@ export function SSHPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: SSHPa
               {/* VS Code / Cursor Config */}
               <CodeSection
                 title="VS Code / Cursor"
-                description="Add this to your SSH config, then connect with: ssh acme-sandbox"
+                description="Add this to your SSH config, then connect with: ssh aether-sandbox"
                 code={configCmd}
                 copyField="config-cmd"
                 copiedField={copiedField}

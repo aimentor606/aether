@@ -392,7 +392,7 @@ export default function InstancesPage() {
           {canClaimComputer && !pageLoading && (
             <div className="rounded-2xl border border-border/50 bg-gradient-to-b from-background to-muted/20 px-8 py-14 pb-6 flex flex-col items-center text-center gap-6">
               <img
-                src="/acme-computer.png"
+                src="/aether-computer.png"
                 alt="Aether Computer"
                 className="h-40 w-40 object-contain"
               />

@@ -22,8 +22,8 @@ tests
 **/tests
 !core/tests
 !core/tests/**
-!core/kortix-master/tests
-!core/kortix-master/tests/**
+!core/master/tests
+!core/master/tests/**
 *.test.ts
 *.test.tsx
 *.spec.ts

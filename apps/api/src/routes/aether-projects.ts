@@ -18,7 +18,7 @@ async function resolveActiveSandbox(userId: string): Promise<{ externalId: strin
   const safeAccountId = accountId.replace(/'/g, "''");
   const rows = await db.execute(`
     select external_id, base_url, metadata
-    from acme.sandboxes
+    from aether.sandboxes
     where account_id = '${safeAccountId}'
     order by updated_at desc
     limit 1
@@ -36,8 +36,8 @@ async function resolveActiveSandbox(userId: string): Promise<{ externalId: strin
 }
 
 export async function aetherProxyHandler(c: Context): Promise<Response> {
-  // /v1/aether/projects/xxx → /acme/projects/xxx (sandbox still uses /acme/ routes)
-  const sandboxPath = c.req.path.replace(/^\/v1/, '').replace(/\/+$/, '') || '/acme';
+  // /v1/aether/projects/xxx → /aether/projects/xxx (sandbox still uses /aether/ routes)
+  const sandboxPath = c.req.path.replace(/^\/v1/, '').replace(/\/+$/, '') || '/aether';
 
   // Local/self-hosted can hit the local sandbox directly.
   if (!config.JUSTAVPS_API_KEY) {

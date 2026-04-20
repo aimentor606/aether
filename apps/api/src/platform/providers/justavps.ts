@@ -118,7 +118,7 @@ export async function justavpsFetch<T = any>(
 }
 
 // ─── Auto-resolve latest JustAVPS image ──────────────────────────────────────
-// Images follow the naming convention `acme-computer-v{semver}`.
+// Images follow the naming convention `aether-computer-v{semver}`.
 // We query all images, filter to ready ones matching the prefix, and pick the
 // highest version. Result cached 5 min. JUSTAVPS_IMAGE_ID env var is an override.
 
@@ -132,8 +132,8 @@ interface JustAVPSImage {
 let cachedImageId: string | null = null;
 let cachedImageExpiry = 0;
 const IMAGE_CACHE_TTL_MS = 5 * 60 * 1000;
-const IMAGE_NAME_PREFIX = 'acme-computer-v';
-const DEV_IMAGE_NAME_PREFIX = 'acme-computer-vdev-';
+const IMAGE_NAME_PREFIX = 'aether-computer-v';
+const DEV_IMAGE_NAME_PREFIX = 'aether-computer-vdev-';
 
 function parseSemver(version: string): number[] {
   return version.split('.').map(Number).filter((n) => !isNaN(n));
@@ -163,7 +163,7 @@ async function resolveLatestImageId(): Promise<string | null> {
     const data = await justavpsFetch<{ images: JustAVPSImage[] }>('/images');
     const readyImages = (data.images || []).filter((img) => img.status === 'ready');
 
-    // 1. Prefer dev images (acme-computer-vdev-*) — sorted by creation date, newest first
+    // 1. Prefer dev images (aether-computer-vdev-*) — sorted by creation date, newest first
     const devCandidates = readyImages
       .filter((img) => img.name.startsWith(DEV_IMAGE_NAME_PREFIX))
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -175,7 +175,7 @@ async function resolveLatestImageId(): Promise<string | null> {
       return cachedImageId;
     }
 
-    // 2. Fall back to semver images (acme-computer-v0.8.*) — sorted by version, highest first
+    // 2. Fall back to semver images (aether-computer-v0.8.*) — sorted by version, highest first
     const semverCandidates = readyImages
       .filter((img) => img.name.startsWith(IMAGE_NAME_PREFIX) && !img.name.startsWith(DEV_IMAGE_NAME_PREFIX))
       .map((img) => ({
@@ -192,7 +192,7 @@ async function resolveLatestImageId(): Promise<string | null> {
       return cachedImageId;
     }
 
-    console.warn('[JUSTAVPS] No images matching acme-computer-v* found; provisioning without image_id');
+    console.warn('[JUSTAVPS] No images matching aether-computer-v* found; provisioning without image_id');
     return null;
   } catch (err) {
     console.warn('[JUSTAVPS] Failed to resolve latest image, falling back to no image_id:', err);
@@ -310,9 +310,9 @@ function resolveReachableAetherApiUrl(): string {
 
 export function buildCustomerCloudInitScript(dockerImage: string): string {
   return [
-    'curl -fsSL https://raw.githubusercontent.com/aimentor606/aether/main/scripts/start-sandbox.sh -o /usr/local/bin/acme-start-sandbox.sh',
-    'chmod +x /usr/local/bin/acme-start-sandbox.sh',
-    `/usr/local/bin/acme-start-sandbox.sh ${shellEscape(dockerImage)}`,
+    'curl -fsSL https://raw.githubusercontent.com/aimentor606/aether/main/scripts/start-sandbox.sh -o /usr/local/bin/aether-start-sandbox.sh',
+    'chmod +x /usr/local/bin/aether-start-sandbox.sh',
+    `/usr/local/bin/aether-start-sandbox.sh ${shellEscape(dockerImage)}`,
   ].join('\n');
 }
 
@@ -556,7 +556,7 @@ export class JustAVPSProvider implements SandboxProvider {
       headers['X-Proxy-Token'] = proxyToken;
     }
 
-    // Service key for core/acme-master auth
+    // Service key for core/aether-master auth
     const serviceKey = (row?.config as Record<string, unknown>)?.serviceKey as string | undefined;
     if (serviceKey) {
       headers['Authorization'] = `Bearer ${serviceKey}`;

@@ -29,7 +29,7 @@ Usage: build-local-images.sh [options]
 Options:
   --tag <tag>          Image tag to build (default: latest)
   --tag=<tag>          Same as above
-  --include-postgres   Also build `acme/postgres:<tag>`
+  --include-postgres   Also build `aether/postgres:<tag>`
 EOF
       exit 0
       ;;
@@ -55,11 +55,11 @@ printf "[build-local-images] Building frontend standalone output...\n"
   pnpm run build
 )
 
-printf "[build-local-images] Building acme/acme-frontend:%s...\n" "$TAG"
-docker build --no-cache -f "$REPO_ROOT/apps/web/Dockerfile" -t "acme/acme-frontend:${TAG}" "$REPO_ROOT"
+printf "[build-local-images] Building aether/aether-frontend:%s...\n" "$TAG"
+docker build --no-cache -f "$REPO_ROOT/apps/web/Dockerfile" -t "aether/aether-frontend:${TAG}" "$REPO_ROOT"
 
-printf "[build-local-images] Building acme/aether-api:%s...\n" "$TAG"
-docker build --build-arg SERVICE=apps/api -f "$REPO_ROOT/apps/api/Dockerfile" -t "acme/aether-api:${TAG}" "$REPO_ROOT"
+printf "[build-local-images] Building aether/aether-api:%s...\n" "$TAG"
+docker build --build-arg SERVICE=apps/api -f "$REPO_ROOT/apps/api/Dockerfile" -t "aether/aether-api:${TAG}" "$REPO_ROOT"
 
 printf "[build-local-images] Building aether/computer:%s...\n" "$TAG"
 docker build --build-arg SANDBOX_VERSION="${TAG}" -f "$REPO_ROOT/core/docker/Dockerfile" -t "aether/computer:${TAG}" "$REPO_ROOT"
@@ -67,8 +67,8 @@ docker build --build-arg SANDBOX_VERSION="${TAG}" -f "$REPO_ROOT/core/docker/Doc
 printf "[build-local-images] Build a local sandbox with compose via: docker compose -f %s/core/docker/docker-compose.yml up --build\n" "$REPO_ROOT"
 
 if [ "$INCLUDE_POSTGRES" = "1" ]; then
-  printf "[build-local-images] Building acme/postgres:%s...\n" "$TAG"
-  docker build -f "$REPO_ROOT/services/postgres/Dockerfile" -t "acme/postgres:${TAG}" "$REPO_ROOT/services/postgres"
+  printf "[build-local-images] Building aether/postgres:%s...\n" "$TAG"
+  docker build -f "$REPO_ROOT/services/postgres/Dockerfile" -t "aether/postgres:${TAG}" "$REPO_ROOT/services/postgres"
 fi
 
 printf "[build-local-images] Done.\n"

@@ -4,10 +4,12 @@ import { expenses } from '../schemas';
 import type { CreateExpenseInput, UpdateExpenseInput } from '../schemas';
 
 export const expensesRepository = {
-  async findAll(accountId: string) {
+  async findAll(accountId: string, options?: { limit?: number; offset?: number }) {
     return db.query.expenses.findMany({
       where: eq(expenses.accountId, accountId),
       orderBy: desc(expenses.createdAt),
+      limit: options?.limit ?? 50,
+      offset: options?.offset ?? 0,
     });
   },
 

@@ -20,12 +20,12 @@ set -euo pipefail
 DOMAIN="${1:-}"
 ADMIN_USER="${2:-admin}"
 ADMIN_PASSWORD="${3:-}"
-INSTALL_DIR="${AETHER_HOME:-$HOME/.acme}"
+INSTALL_DIR="${AETHER_HOME:-$HOME/.aether}"
 
 if [ -z "$DOMAIN" ]; then
   echo "Usage: $0 <domain-or-ip> [admin-user] [admin-password]"
   echo ""
-  echo "  If admin-password is not provided, reads from ~/.acme/.credentials"
+  echo "  If admin-password is not provided, reads from ~/.aether/.credentials"
   exit 1
 fi
 
@@ -117,10 +117,10 @@ if [ -n "$ADMIN_PASSWORD" ]; then
 fi
 
 FRONTEND_BODY=$(curl -s -k $AUTH_ARGS "${BASE_URL}" 2>/dev/null)
-if echo "$FRONTEND_BODY" | grep -qi 'acme\|next\|__next'; then
-  pass "frontend serves HTML with Acme/Next.js content"
+if echo "$FRONTEND_BODY" | grep -qi 'aether\|next\|__next'; then
+  pass "frontend serves HTML with aether/Next.js content"
 else
-  fail "frontend serves HTML with Acme/Next.js content"
+  fail "frontend serves HTML with aether/Next.js content"
 fi
 
 echo ""

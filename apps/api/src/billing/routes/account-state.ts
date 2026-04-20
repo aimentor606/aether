@@ -19,7 +19,7 @@ accountStateRouter.get('/', async (c) => {
     }
     return c.json(state);
   } catch (err) {
-    // DB schema may not have billing tables (e.g. local dev without acme schema).
+    // DB schema may not have billing tables (e.g. local dev without aether schema).
     // Fall back to local account state so the app isn't blocked.
     console.error('[billing] account-state failed, falling back to local:', (err as Error)?.message || err);
     return c.json(buildLocalAccountState());

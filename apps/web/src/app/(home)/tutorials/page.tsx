@@ -31,7 +31,7 @@ interface Tutorial {
 
 const tutorials: Tutorial[] = [
   {
-    id: 'introduction-to-acme',
+    id: 'introduction-to-aether',
     title: 'Introduction to Aether',
     description: 'Get a comprehensive overview of Aether and discover the different AI-powered content generation modes available to supercharge your workflow.',
     duration: '3 min',

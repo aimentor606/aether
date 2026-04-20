@@ -8,7 +8,11 @@ interface AetherLogoProps {
   className?: string;
 }
 
-export function AetherLogo({ size = 24, variant = 'symbol', className }: AetherLogoProps) {
+export function AetherLogo({
+  size = 24,
+  variant = 'symbol',
+  className,
+}: AetherLogoProps) {
   // For logomark variant, use logomark-white.svg which is already white
   // and invert it for light mode using CSS (no JS needed)
   if (variant === 'logomark') {
@@ -28,7 +32,7 @@ export function AetherLogo({ size = 24, variant = 'symbol', className }: AetherL
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/acme-symbol.svg"
+      src="/aether-symbol.svg"
       alt="Aether"
       className={cn('dark:invert flex-shrink-0', className)}
       style={{ width: `${size}px`, height: `${size}px` }}

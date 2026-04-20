@@ -33,7 +33,7 @@ interface SSHKeyDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const SSH_META_STORAGE_KEY = 'acme:ssh-access-meta:v1';
+const SSH_META_STORAGE_KEY = 'aether:ssh-access-meta:v1';
 
 type SSHAccessMeta = {
   ssh_command: string;
@@ -50,7 +50,7 @@ function deriveKeyName(host: string) {
 }
 
 function deriveHostAlias(host: string) {
-  return `acme-${host.replace(/\./g, '-')}`;
+  return `aether-${host.replace(/\./g, '-')}`;
 }
 
 /* ─── Copy hook ──────────────────────────────────────────────────────────── */

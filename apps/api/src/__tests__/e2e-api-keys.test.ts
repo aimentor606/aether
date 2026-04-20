@@ -1,5 +1,5 @@
 /**
- * E2E tests for the API key management routes (acme.api_keys).
+ * E2E tests for the API key management routes (aether.api_keys).
  *
  * Routes tested (mounted at /v1/platform/api-keys):
  *   POST   /                        → Create a new API key for a sandbox
@@ -23,7 +23,7 @@ import {
 
 const HAS_DB = !!process.env.DATABASE_URL;
 
-describe.skipIf(!HAS_DB)('Platform — API Keys (acme schema)', () => {
+describe.skipIf(!HAS_DB)('Platform — API Keys (aether schema)', () => {
   const app = createTestApp({
     dockerProvider: createMockProvider('local_docker'),
     daytonaProvider: createMockProvider('daytona'),

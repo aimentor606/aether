@@ -273,7 +273,7 @@ export async function checkInstanceHealth(url: string): Promise<string | null> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch(`${url}/acme/health`, { signal: controller.signal });
+    const res = await fetch(`${url}/aether/health`, { signal: controller.signal });
     clearTimeout(timeout);
     if (!res.ok) return null;
     const data = await res.json();
@@ -467,7 +467,7 @@ export async function getSandboxServices(
   const query = includeAll ? '?all=true' : '';
   const data = await serviceRequest<{ services?: SandboxService[] }>(
     sandboxUrl,
-    `/acme/services${query}`,
+    `/aether/services${query}`,
   );
   return data?.services ?? [];
 }
@@ -480,8 +480,8 @@ export async function sandboxServiceAction(
   const isDelete = action === 'delete';
   const method = isDelete ? 'DELETE' : 'POST';
   const path = isDelete
-    ? `/acme/services/${encodeURIComponent(serviceId)}`
-    : `/acme/services/${encodeURIComponent(serviceId)}/${action}`;
+    ? `/aether/services/${encodeURIComponent(serviceId)}`
+    : `/aether/services/${encodeURIComponent(serviceId)}/${action}`;
   const data = await serviceRequest(sandboxUrl, path, { method });
   return data !== null;
 }
@@ -492,7 +492,7 @@ export async function getSandboxServiceLogs(
 ): Promise<string[]> {
   const data = await serviceRequest<{ logs?: string[] }>(
     sandboxUrl,
-    `/acme/services/${encodeURIComponent(serviceId)}/logs`,
+    `/aether/services/${encodeURIComponent(serviceId)}/logs`,
   );
   return data?.logs ?? [];
 }
@@ -502,7 +502,7 @@ export async function reconcileSandboxServices(
   reload = false,
 ): Promise<boolean> {
   const query = reload ? '?reload=true' : '';
-  const data = await serviceRequest(sandboxUrl, `/acme/services/reconcile${query}`, {
+  const data = await serviceRequest(sandboxUrl, `/aether/services/reconcile${query}`, {
     method: 'POST',
   });
   return data !== null;
@@ -512,7 +512,7 @@ export async function sandboxRuntimeReload(
   sandboxUrl: string,
   mode: 'dispose-only' | 'full',
 ): Promise<boolean> {
-  const data = await serviceRequest(sandboxUrl, `/acme/services/system/reload`, {
+  const data = await serviceRequest(sandboxUrl, `/aether/services/system/reload`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ mode }),

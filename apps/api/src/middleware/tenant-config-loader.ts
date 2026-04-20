@@ -26,17 +26,40 @@ const cache = new Map<string, CacheEntry>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const MAX_CACHE_SIZE = 1000;
 
+// ── Cache metrics ────────────────────────────────────────────────────────────
+let metrics = {
+  hits: 0,
+  misses: 0,
+  evictions: 0,
+  expirations: 0,
+  size: 0,
+};
+
+export function getCacheMetrics() {
+  return { ...metrics, size: cache.size };
+}
+
+export function resetCacheMetrics() {
+  metrics = { hits: 0, misses: 0, evictions: 0, expirations: 0, size: 0 };
+}
+
 function getCacheKey(accountId: string): string {
   return `tenant:${accountId}`;
 }
 
 function getCached(accountId: string): TenantConfig | null {
   const entry = cache.get(getCacheKey(accountId));
-  if (!entry) return null;
-  if (Date.now() > entry.expiresAt) {
-    cache.delete(getCacheKey(accountId));
+  if (!entry) {
+    metrics.misses++;
     return null;
   }
+  if (Date.now() > entry.expiresAt) {
+    cache.delete(getCacheKey(accountId));
+    metrics.expirations++;
+    metrics.misses++;
+    return null;
+  }
+  metrics.hits++;
   return entry.tenant;
 }
 
@@ -44,7 +67,10 @@ function setCached(accountId: string, tenant: TenantConfig): void {
   // Evict oldest entries if cache is full
   if (cache.size >= MAX_CACHE_SIZE) {
     const firstKey = cache.keys().next().value;
-    if (firstKey) cache.delete(firstKey);
+    if (firstKey) {
+      cache.delete(firstKey);
+      metrics.evictions++;
+    }
   }
   cache.set(getCacheKey(accountId), {
     tenant,

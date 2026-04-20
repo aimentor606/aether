@@ -1,6 +1,6 @@
 #!/bin/sh
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Acme Frontend — Docker Entrypoint                                       ║
+# ║  aether Frontend — Docker Entrypoint                                       ║
 # ║                                                                            ║
 # ║  Rewrites baked-in NEXT_PUBLIC_ values in the Next.js bundle at startup.   ║
 # ║                                                                            ║
@@ -59,7 +59,7 @@ fi
 
 # Supabase URL (dev builds with local Supabase CLI URLs)
 # Replace FULL URLs first (http://host:port) to avoid leaving stale scheme prefixes.
-# e.g. http://127.0.0.1:54321 -> https://e2e-test.acme.cloud (not http://https://...)
+# e.g. http://127.0.0.1:54321 -> https://e2e-test.aether.cloud (not http://https://...)
 if [ -n "$RUNTIME_SUPABASE_URL" ]; then
   for dev_url in $DEV_SUPABASE_URLS; do
     for scheme in "https://" "http://"; do

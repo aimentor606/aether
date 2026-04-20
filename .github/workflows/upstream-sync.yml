@@ -29,7 +29,7 @@ jobs:
 
       - name: Fetch upstream
         run: |
-          git remote add upstream https://github.com/acme-ai/suna.git || true
+          git remote add upstream https://github.com/aether-ai/suna.git || true
           git fetch upstream main
 
       - name: Check for upstream changes
@@ -63,7 +63,7 @@ jobs:
         if: steps.check.outputs.has_changes == 'true'
         run: |
           if [ -f scripts/rebrand.sh ]; then
-            BRAND=acme bash scripts/rebrand.sh
+            BRAND=aether bash scripts/rebrand.sh
           fi
 
       - name: Push sync branch
@@ -80,7 +80,7 @@ jobs:
         run: |
           gh pr create \
             --title "chore: upstream sync $(date +%Y-%m-%d)" \
-            --body "Automated upstream sync from acme-ai/suna main branch.
+            --body "Automated upstream sync from aether-ai/suna main branch.
 
           ## What this does
           - Merges the latest upstream changes

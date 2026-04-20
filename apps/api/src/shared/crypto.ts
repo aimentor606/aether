@@ -1,4 +1,4 @@
-import { createHash, createHmac, timingSafeEqual, randomBytes } from 'crypto';
+import { createHash, createHmac, timingSafeEqual, randomBytes, createCipheriv, createDecipheriv } from 'crypto';
 import { config } from '../config';
 
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -161,5 +161,72 @@ export function verifyMessageSignature(
     return timingSafeEqual(sigBuffer, expectedBuffer);
   } catch {
     return false;
+  }
+}
+
+// ─── AES-256-GCM Credential Encryption ──────────────────────────────────────
+
+const CREDENTIAL_ENCRYPTION_KEY_ENV = 'CREDENTIAL_ENCRYPTION_KEY';
+const ALGORITHM = 'aes-256-gcm';
+const IV_LENGTH = 12; // 96-bit IV for GCM
+const TAG_LENGTH = 16; // 128-bit auth tag
+
+function getCredentialEncryptionKey(): Buffer | null {
+  const hexKey = process.env[CREDENTIAL_ENCRYPTION_KEY_ENV];
+  if (!hexKey) return null;
+  try {
+    const key = Buffer.from(hexKey, 'hex');
+    return key.length === 32 ? key : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Encrypt a plaintext string using AES-256-GCM.
+ * Returns a hex-encoded string: `iv:ciphertext:tag`
+ * Returns the plaintext as-is if CREDENTIAL_ENCRYPTION_KEY is not set (dev mode).
+ */
+export function encryptCredential(plaintext: string): string {
+  const key = getCredentialEncryptionKey();
+  if (!key) {
+    console.warn('[crypto] CREDENTIAL_ENCRYPTION_KEY not set — storing credentials in plaintext');
+    return plaintext;
+  }
+
+  const iv = randomBytes(IV_LENGTH);
+  const cipher = createCipheriv(ALGORITHM, key, iv);
+  const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag();
+
+  return `${iv.toString('hex')}:${encrypted.toString('hex')}:${tag.toString('hex')}`;
+}
+
+/**
+ * Decrypt a string encrypted by encryptCredential.
+ * If the input does not match the `iv:ciphertext:tag` format, returns it as-is
+ * (backward compatibility with plaintext data stored before encryption was enabled).
+ */
+export function decryptCredential(encrypted: string): string {
+  // Not encrypted (no colons = plaintext from before encryption was enabled)
+  const parts = encrypted.split(':');
+  if (parts.length !== 3) return encrypted;
+
+  const key = getCredentialEncryptionKey();
+  if (!key) return encrypted;
+
+  try {
+    const iv = Buffer.from(parts[0], 'hex');
+    const ciphertext = Buffer.from(parts[1], 'hex');
+    const tag = Buffer.from(parts[2], 'hex');
+
+    const decipher = createDecipheriv(ALGORITHM, key, iv);
+    decipher.setAuthTag(tag);
+    const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+
+    return decrypted.toString('utf8');
+  } catch {
+    // Decryption failed — likely plaintext data from before encryption was enabled
+    return encrypted;
   }
 }

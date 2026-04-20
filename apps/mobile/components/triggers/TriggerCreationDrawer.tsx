@@ -212,7 +212,7 @@ export function TriggerCreationDrawer({
   const [selectedTrigger, setSelectedTrigger] = useState<ComposioTriggerType | null>(null);
   const [eventConfig, setEventConfig] = useState<Record<string, any>>({});
   const [profileId, setProfileId] = useState('');
-  const [model, setModel] = useState('acme/basic');
+  const [model, setModel] = useState('aether/basic');
   const [showComposioConnector, setShowComposioConnector] = useState(false);
   const [appSearchQuery, setAppSearchQuery] = useState('');
 
@@ -284,7 +284,7 @@ export function TriggerCreationDrawer({
       setTriggerName(existingTrigger.name || '');
       setDescription(existingTrigger.description || '');
       setAgentPrompt(triggerConfig.agent_prompt || '');
-      setModel(triggerConfig.model || 'acme/basic');
+      setModel(triggerConfig.model || 'aether/basic');
 
       if (isComposioTrigger) {
         // Event trigger
@@ -393,7 +393,7 @@ export function TriggerCreationDrawer({
         setSelectedTrigger(null);
         setEventConfig({});
         setProfileId('');
-        setModel('acme/basic');
+        setModel('aether/basic');
         setShowComposioConnector(false);
         setAppSearchQuery('');
       }

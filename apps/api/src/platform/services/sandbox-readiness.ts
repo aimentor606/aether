@@ -18,8 +18,8 @@ const PROBE_TIMEOUT_MS = 8_000;
 
 /**
  * Probe sandbox readiness via multiple paths:
- *   1. Cloudflare proxy: https://{slug}.{proxyDomain}/acme/health
- *   2. Backend proxy fallback: http://localhost:{port}/v1/p/{externalId}/8000/acme/health
+ *   1. Cloudflare proxy: https://{slug}.{proxyDomain}/aether/health
+ *   2. Backend proxy fallback: http://localhost:{port}/v1/p/{externalId}/8000/aether/health
  *
  * If EITHER path returns 200, the sandbox is ready.
  * This prevents sandboxes from staying stuck when the CF proxy has
@@ -69,7 +69,7 @@ async function probeCfProxy(input: JustAvpsReadinessProbeInput): Promise<Sandbox
   }
 
   try {
-    const res = await fetch(`https://8000--${input.slug}.${config.JUSTAVPS_PROXY_DOMAIN}/acme/health`, {
+    const res = await fetch(`https://8000--${input.slug}.${config.JUSTAVPS_PROXY_DOMAIN}/aether/health`, {
       headers,
       signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
     });
@@ -91,7 +91,7 @@ async function probeCfProxy(input: JustAvpsReadinessProbeInput): Promise<Sandbox
 
 async function probeBackendProxy(externalId: string, serviceKey?: string): Promise<SandboxReadinessResult> {
   const backendBase = `http://localhost:${config.PORT}`;
-  const url = `${backendBase}/v1/p/${externalId}/8000/acme/health`;
+  const url = `${backendBase}/v1/p/${externalId}/8000/aether/health`;
 
   const headers: Record<string, string> = {};
   if (serviceKey || config.INTERNAL_SERVICE_KEY) {

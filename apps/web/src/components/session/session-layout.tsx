@@ -1,8 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+  memo,
+} from 'react';
 import * as ResizablePrimitive from 'react-resizable-panels';
-import { AetherComputer } from '@/components/thread/acme-computer';
+import { AetherComputer } from '@/components/thread/aether-computer';
 import { useIsMobile } from '@/hooks/utils';
 import { cn } from '@/lib/utils';
 import {
@@ -10,9 +17,7 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from '@/components/ui/resizable';
-import {
-  useAetherComputerStore,
-} from '@/stores/aether-computer-store';
+import { useAetherComputerStore } from '@/stores/aether-computer-store';
 import {
   useOpenCodeMessages,
   useOpenCodeSession,
@@ -22,7 +27,7 @@ import { useTabStore } from '@/stores/tab-store';
 import {
   adaptMessagesToToolCalls,
   adaptAgentStatus,
-} from '@/lib/adapters/opencode-to-acme-computer';
+} from '@/lib/adapters/opencode-to-aether-computer';
 import { X } from 'lucide-react';
 
 // ============================================================================
@@ -59,10 +64,14 @@ export const SessionLayout = memo(function SessionLayout({
   // subscribes to ALL properties and causes unnecessary re-renders for every
   // open session tab.
   const isSidePanelOpen = useAetherComputerStore((s) => s.isSidePanelOpen);
-  const setIsSidePanelOpen = useAetherComputerStore((s) => s.setIsSidePanelOpen);
+  const setIsSidePanelOpen = useAetherComputerStore(
+    (s) => s.setIsSidePanelOpen,
+  );
   const setActiveSession = useAetherComputerStore((s) => s.setActiveSession);
   const shouldOpenPanel = useAetherComputerStore((s) => s.shouldOpenPanel);
-  const clearShouldOpenPanel = useAetherComputerStore((s) => s.clearShouldOpenPanel);
+  const clearShouldOpenPanel = useAetherComputerStore(
+    (s) => s.clearShouldOpenPanel,
+  );
   const isExpanded = useAetherComputerStore((s) => s.isExpanded);
   const toggleExpanded = useAetherComputerStore((s) => s.toggleExpanded);
 
@@ -85,10 +94,17 @@ export const SessionLayout = memo(function SessionLayout({
     } else if (shouldOpenPanel) {
       clearShouldOpenPanel();
     }
-  }, [shouldOpenPanel, isSidePanelOpen, setIsSidePanelOpen, clearShouldOpenPanel]);
+  }, [
+    shouldOpenPanel,
+    isSidePanelOpen,
+    setIsSidePanelOpen,
+    clearShouldOpenPanel,
+  ]);
 
   const [currentToolIndex, setCurrentToolIndex] = useState(0);
-  const [externalNavIndex, setExternalNavIndex] = useState<number | undefined>(undefined);
+  const [externalNavIndex, setExternalNavIndex] = useState<number | undefined>(
+    undefined,
+  );
 
   const handleSidePanelNavigate = useCallback((index: number) => {
     setCurrentToolIndex(index);
@@ -117,7 +133,9 @@ export const SessionLayout = memo(function SessionLayout({
   const enablePanelTransition = useCallback(() => {
     const el = panelGroupRef.current;
     if (!el) return;
-    const panels = el.querySelectorAll<HTMLElement>('[data-slot="resizable-panel"]');
+    const panels = el.querySelectorAll<HTMLElement>(
+      '[data-slot="resizable-panel"]',
+    );
     panels.forEach((panel) => {
       panel.style.transition = 'flex 300ms cubic-bezier(0.4, 0, 0.2, 1)';
     });
@@ -126,7 +144,9 @@ export const SessionLayout = memo(function SessionLayout({
   const disablePanelTransition = useCallback(() => {
     const el = panelGroupRef.current;
     if (!el) return;
-    const panels = el.querySelectorAll<HTMLElement>('[data-slot="resizable-panel"]');
+    const panels = el.querySelectorAll<HTMLElement>(
+      '[data-slot="resizable-panel"]',
+    );
     panels.forEach((panel) => {
       panel.style.transition = 'none';
     });
@@ -238,13 +258,17 @@ export const SessionLayout = memo(function SessionLayout({
           <ResizablePanel
             ref={mainPanelRef}
             defaultSize={shouldShowPanel ? 50 : 100}
-            minSize={shouldShowPanel ? (isAnimating ? 0 : isExpanded ? 0 : 30) : 100}
-            maxSize={shouldShowPanel ? (isAnimating ? 100 : isExpanded ? 0 : 65) : 100}
+            minSize={
+              shouldShowPanel ? (isAnimating ? 0 : isExpanded ? 0 : 30) : 100
+            }
+            maxSize={
+              shouldShowPanel ? (isAnimating ? 100 : isExpanded ? 0 : 65) : 100
+            }
             collapsible={isExpanded || isAnimating}
             className={cn(
-              "flex flex-col overflow-hidden relative bg-transparent transition-[padding] duration-300 ease-out",
-              shouldShowPanel && "pl-3 pr-1.5",
-              isExpanded && !isAnimating && "opacity-0 pointer-events-none"
+              'flex flex-col overflow-hidden relative bg-transparent transition-[padding] duration-300 ease-out',
+              shouldShowPanel && 'pl-3 pr-1.5',
+              isExpanded && !isAnimating && 'opacity-0 pointer-events-none',
             )}
           >
             <div className="flex-1 overflow-hidden min-h-0 flex flex-col">
@@ -258,7 +282,9 @@ export const SessionLayout = memo(function SessionLayout({
             disabled={!shouldShowPanel || isExpanded}
             className={cn(
               'z-20 transition-opacity duration-300',
-              shouldShowPanel && !isExpanded ? 'w-0 opacity-100' : 'w-0 opacity-0 pointer-events-none'
+              shouldShowPanel && !isExpanded
+                ? 'w-0 opacity-100'
+                : 'w-0 opacity-0 pointer-events-none',
             )}
           />
 
@@ -266,18 +292,24 @@ export const SessionLayout = memo(function SessionLayout({
           <ResizablePanel
             ref={sidePanelRef}
             defaultSize={shouldShowPanel ? 50 : 0}
-            minSize={shouldShowPanel ? (isAnimating ? 0 : isExpanded ? 100 : 35) : 0}
-            maxSize={shouldShowPanel ? (isAnimating ? 100 : isExpanded ? 100 : 70) : 0}
+            minSize={
+              shouldShowPanel ? (isAnimating ? 0 : isExpanded ? 100 : 35) : 0
+            }
+            maxSize={
+              shouldShowPanel ? (isAnimating ? 100 : isExpanded ? 100 : 70) : 0
+            }
             collapsible={!isExpanded || isAnimating}
             className={cn(
               'relative overflow-hidden',
               !shouldShowPanel && 'hidden',
             )}
           >
-            <div className={cn(
-              "h-full transition-[padding] duration-300 ease-out",
-              isExpanded ? "p-0" : "pt-3 pb-6 pr-3 sm:pr-4 pl-1.5"
-            )}>
+            <div
+              className={cn(
+                'h-full transition-[padding] duration-300 ease-out',
+                isExpanded ? 'p-0' : 'pt-3 pb-6 pr-3 sm:pr-4 pl-1.5',
+              )}
+            >
               <AetherComputer
                 isOpen={isSidePanelOpen && hasToolCalls}
                 onClose={handleSidePanelClose}
@@ -296,7 +328,9 @@ export const SessionLayout = memo(function SessionLayout({
                 hideTopBar={true}
                 headerSlot={
                   <div className="flex-shrink-0 flex items-center justify-between pl-4 pr-1.5 pt-1.5">
-                    <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase select-none">Actions</span>
+                    <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase select-none">
+                      Actions
+                    </span>
                     <button
                       onClick={handleSidePanelClose}
                       className="inline-flex items-center justify-center h-8 w-8 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"

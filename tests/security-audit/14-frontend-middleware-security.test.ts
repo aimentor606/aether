@@ -255,7 +255,7 @@ describe('Security Audit: Frontend Middleware', () => {
   describe('Session token handling', () => {
     test('auth cookie is configured with proper attributes', () => {
       const cookieOptions = {
-        name: 'acme-supabase-auth', // AETHER_SUPABASE_AUTH_COOKIE
+        name: 'aether-supabase-auth', // AETHER_SUPABASE_AUTH_COOKIE
         path: '/',
         sameSite: 'lax',
       };

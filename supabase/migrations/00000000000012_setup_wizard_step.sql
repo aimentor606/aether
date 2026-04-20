@@ -5,5 +5,5 @@
 -- 0 means setup has not been started; once setup_complete_at is set, this
 -- column is ignored.
 
-ALTER TABLE acme.accounts
+ALTER TABLE aether.accounts
   ADD COLUMN IF NOT EXISTS setup_wizard_step integer NOT NULL DEFAULT 0;

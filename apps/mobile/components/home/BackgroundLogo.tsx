@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Dimensions, Animated } from 'react-native';
 import { useColorScheme } from 'nativewind';
-import AetherSymbolBlack from '@/assets/brand/acme-symbol-scale-effect-black.svg';
-import AetherSymbolWhite from '@/assets/brand/acme-symbol-scale-effect-white.svg';
+import AetherSymbolBlack from '@/assets/brand/aether-symbol-scale-effect-black.svg';
+import AetherSymbolWhite from '@/assets/brand/aether-symbol-scale-effect-white.svg';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 

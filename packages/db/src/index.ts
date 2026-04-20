@@ -34,7 +34,7 @@ export {
   aetherApiKeysRelations,
   integrationsRelations,
   sandboxIntegrationsRelations,
-  // Billing / Credits (moved from public → acme schema)
+  // Billing / Credits (moved from public → aether schema)
   billingCustomers,
   creditAccounts,
   creditLedger,

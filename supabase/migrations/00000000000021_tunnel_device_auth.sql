@@ -1,13 +1,13 @@
 DO $$ BEGIN
-  CREATE TYPE "acme"."tunnel_device_auth_status" AS ENUM('pending', 'approved', 'denied', 'expired');
+  CREATE TYPE "aether"."tunnel_device_auth_status" AS ENUM('pending', 'approved', 'denied', 'expired');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
-CREATE TABLE IF NOT EXISTS "acme"."tunnel_device_auth_requests" (
+CREATE TABLE IF NOT EXISTS "aether"."tunnel_device_auth_requests" (
     "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
     "device_code" varchar(9) NOT NULL,
     "device_secret_hash" varchar(128) NOT NULL,
-    "status" "acme"."tunnel_device_auth_status" DEFAULT 'pending' NOT NULL,
+    "status" "aether"."tunnel_device_auth_status" DEFAULT 'pending' NOT NULL,
     "machine_hostname" varchar(255),
     "account_id" uuid,
     "tunnel_id" uuid,
@@ -18,12 +18,12 @@ CREATE TABLE IF NOT EXISTS "acme"."tunnel_device_auth_requests" (
 );
 
 DO $$ BEGIN
-  ALTER TABLE "acme"."tunnel_device_auth_requests"
+  ALTER TABLE "aether"."tunnel_device_auth_requests"
     ADD CONSTRAINT "tunnel_device_auth_requests_tunnel_id_tunnel_connections_tunnel_id_fk"
-    FOREIGN KEY ("tunnel_id") REFERENCES "acme"."tunnel_connections"("tunnel_id") ON DELETE SET NULL ON UPDATE NO ACTION;
+    FOREIGN KEY ("tunnel_id") REFERENCES "aether"."tunnel_connections"("tunnel_id") ON DELETE SET NULL ON UPDATE NO ACTION;
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
-CREATE UNIQUE INDEX IF NOT EXISTS "idx_tunnel_device_auth_code" ON "acme"."tunnel_device_auth_requests" USING btree ("device_code");
-CREATE INDEX IF NOT EXISTS "idx_tunnel_device_auth_status" ON "acme"."tunnel_device_auth_requests" USING btree ("status");
-CREATE INDEX IF NOT EXISTS "idx_tunnel_device_auth_expires" ON "acme"."tunnel_device_auth_requests" USING btree ("expires_at");
+CREATE UNIQUE INDEX IF NOT EXISTS "idx_tunnel_device_auth_code" ON "aether"."tunnel_device_auth_requests" USING btree ("device_code");
+CREATE INDEX IF NOT EXISTS "idx_tunnel_device_auth_status" ON "aether"."tunnel_device_auth_requests" USING btree ("status");
+CREATE INDEX IF NOT EXISTS "idx_tunnel_device_auth_expires" ON "aether"."tunnel_device_auth_requests" USING btree ("expires_at");

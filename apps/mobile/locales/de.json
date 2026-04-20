@@ -128,7 +128,7 @@
     "skip": "Überspringen",
     "next": "Weiter",
     "getStarted": "Los geht's",
-    "acmeComputer": "Aether Computer",
+    "aetherComputer": "Aether Computer",
     "ready": "Bereit",
     "examples": {
       "presentations": {
@@ -470,8 +470,8 @@
   "billing": {
     "loadingPaywall": "Pläne werden geladen...",
     "checkoutUnavailable": "Mobile-Checkout nicht verfügbar",
-    "checkoutUnavailableMessage": "Um einen Plan zu abonnieren, besuche bitte acme.com im Web.",
-    "goToWeb": "Zu acme.com gehen",
+    "checkoutUnavailableMessage": "Um einen Plan zu abonnieren, besuche bitte aether.com im Web.",
+    "goToWeb": "Zu aether.com gehen",
     "billingStatus": "Abrechnungsstatus",
     "loading": "Lade Abrechnungsinformationen...",
     "error": "Fehler beim Laden der Abrechnungsinformationen",

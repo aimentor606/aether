@@ -3,7 +3,7 @@ import { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
 import { retailService } from '../services/retail';
-import { getAccountId, formatZodError } from '../middleware/account-context';
+import { getAccountId, formatZodError, pagination } from '../middleware/account-context';
 import {
   createInventoryItemSchema,
   updateInventoryItemSchema,
@@ -18,8 +18,9 @@ const retailRoutes = new Hono();
 retailRoutes.get('/inventory', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
+    const { limit, offset } = pagination(c);
     const inventory = await retailService.listInventory(accountId);
-    return c.json({ success: true, data: inventory });
+    return c.json({ success: true, data: inventory, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     return c.json({ success: false, error: 'Failed to list inventory' }, 500);
@@ -91,8 +92,9 @@ retailRoutes.delete('/inventory/:id', async (c: Context) => {
 retailRoutes.get('/sales', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
+    const { limit, offset } = pagination(c);
     const sales = await retailService.listSales(accountId);
-    return c.json({ success: true, data: sales });
+    return c.json({ success: true, data: sales, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     return c.json({ success: false, error: 'Failed to list sales' }, 500);
@@ -120,8 +122,9 @@ retailRoutes.post('/sales', async (c: Context) => {
 retailRoutes.get('/loyalty', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
+    const { limit, offset } = pagination(c);
     const programs = await retailService.listLoyaltyPrograms(accountId);
-    return c.json({ success: true, data: programs });
+    return c.json({ success: true, data: programs, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     return c.json({ success: false, error: 'Failed to list loyalty programs' }, 500);

@@ -7,7 +7,7 @@
  *
  * Usage:
  *   bun run scripts/build-snapshot.ts --image aether/computer:0.8.26
- *   bun run scripts/build-snapshot.ts --image aether/computer:0.8.26 --name acme-computer-v0.8.26
+ *   bun run scripts/build-snapshot.ts --image aether/computer:0.8.26 --name aether-computer-v0.8.26
  *   bun run scripts/build-snapshot.ts --server-type cx23 --location nbg1
  *   bun run scripts/build-snapshot.ts --keep-machine
  *
@@ -55,7 +55,7 @@ const { values } = parseArgs({
 
 const dockerImage = values.image!;
 const version = dockerImage.includes(':') ? dockerImage.split(':').pop()! : defaultVersion;
-const snapshotName = values.name || `acme-computer-v${version}`;
+const snapshotName = values.name || `aether-computer-v${version}`;
 const serverType = values['server-type']!;
 const location = values.location!;
 
@@ -84,9 +84,9 @@ function shellEscape(s: string): string {
 }
 
 const cloudInitScript = [
-  'curl -fsSL https://raw.githubusercontent.com/aimentor606/aether/main/scripts/start-sandbox.sh -o /usr/local/bin/acme-start-sandbox.sh',
-  'chmod +x /usr/local/bin/acme-start-sandbox.sh',
-  `/usr/local/bin/acme-start-sandbox.sh ${shellEscape(dockerImage)}`,
+  'curl -fsSL https://raw.githubusercontent.com/aimentor606/aether/main/scripts/start-sandbox.sh -o /usr/local/bin/aether-start-sandbox.sh',
+  'chmod +x /usr/local/bin/aether-start-sandbox.sh',
+  `/usr/local/bin/aether-start-sandbox.sh ${shellEscape(dockerImage)}`,
 ].join('\n');
 
 console.log(`\n=== Building snapshot: ${snapshotName} ===`);

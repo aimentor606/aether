@@ -10,7 +10,7 @@ export type NewAccountMember = typeof accountMembers.$inferInsert;
 export type Sandbox = typeof sandboxes.$inferSelect;
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type CreditAccount = typeof creditAccounts.$inferSelect;
-/** @deprecated Use AccountMember instead — basejump.account_user is being migrated to acme.account_members */
+/** @deprecated Use AccountMember instead — basejump.account_user is being migrated to aether.account_members */
 export type AccountUser = typeof accountUser.$inferSelect;
 export type AetherApiKey = typeof aetherApiKeys.$inferSelect;
 

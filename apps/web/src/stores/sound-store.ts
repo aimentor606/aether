@@ -22,9 +22,9 @@ export type SoundEvent = 'completion' | 'error' | 'notification' | 'send';
  *
  * - `off`      – all sounds disabled
  * - `opencode` – default sound pack (OpenCode style)
- * - `acme`   – Aether branded sound pack
+ * - `aether`   – Aether branded sound pack
  */
-export type SoundPack = 'off' | 'opencode' | 'acme';
+export type SoundPack = 'off' | 'opencode' | 'aether';
 
 export interface SoundPreferences {
   /** Active sound pack — 'off' disables all sounds */
@@ -74,7 +74,10 @@ export const useSoundStore = create<SoundState>()(
 
       setVolume: (volume) => {
         set((state) => ({
-          preferences: { ...state.preferences, volume: Math.max(0, Math.min(1, volume)) },
+          preferences: {
+            ...state.preferences,
+            volume: Math.max(0, Math.min(1, volume)),
+          },
         }));
       },
 
@@ -94,7 +97,7 @@ export const useSoundStore = create<SoundState>()(
       },
     }),
     {
-      name: 'acme-sound-preferences',
+      name: 'aether-sound-preferences',
       partialize: (state) => ({
         preferences: state.preferences,
       }),

@@ -20,16 +20,24 @@ export function DashboardPromoBanner() {
   const pathname = usePathname();
   const { setIsVisible } = useWelcomeBannerStore();
   const promo = usePromo();
-  
+
   const tierKey = accountStateSelectors.tierKey(accountState)?.toLowerCase();
   const isFreeTier = !tierKey || tierKey === 'free' || tierKey === 'none';
   const isDashboardPage = pathname === '/dashboard';
-  
-  // Show Welcome Bonus promo or ACME26 for free tier users
-  const shouldShowPromo = promo?.isActive && (promo.promoId === 'welcome-bonus' || promo.promoCode === 'ACME26');
+
+  // Show Welcome Bonus promo or AETHER26 for free tier users
+  const shouldShowPromo =
+    promo?.isActive &&
+    (promo.promoId === 'welcome-bonus' || promo.promoCode === 'AETHER26');
 
   // Compute whether banner should be visible
-  const shouldShow = mounted && !isDismissed && isDashboardPage && !isLoading && isFreeTier && shouldShowPromo;
+  const shouldShow =
+    mounted &&
+    !isDismissed &&
+    isDashboardPage &&
+    !isLoading &&
+    isFreeTier &&
+    shouldShowPromo;
 
   // Update the store whenever visibility changes
   useEffect(() => {
@@ -79,8 +87,10 @@ export function DashboardPromoBanner() {
                 </span>
               </div>
 
-              <span className="text-muted-foreground/50 hidden sm:inline">&middot;</span>
-              
+              <span className="text-muted-foreground/50 hidden sm:inline">
+                &middot;
+              </span>
+
               {/* Countdown */}
               <span className="text-xs text-muted-foreground font-mono hidden sm:inline">
                 {promo.timeLabel}

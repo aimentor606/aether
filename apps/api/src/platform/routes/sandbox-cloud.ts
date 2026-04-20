@@ -944,7 +944,7 @@ export function createCloudSandboxRouter(
     const userId = c.get('userId');
     try {
       const accountId = await resolveAccountId(userId);
-      // 1. Verify legacy paid tier (check acme schema, then fallback to public schema in cloud)
+      // 1. Verify legacy paid tier (check aether schema, then fallback to public schema in cloud)
       const { getCreditAccount, getPublicSchemaTier } = await import('../../billing/repositories/credit-accounts');
       const { isLegacyPaidTier, getTier } = await import('../../billing/services/tiers');
 
@@ -971,8 +971,8 @@ export function createCloudSandboxRouter(
         return c.json({ success: false, error: 'You already have an active computer', sandbox_id: existing[0].sandboxId }, 409);
       }
 
-      // Lazy-migrate: create acme.credit_accounts row with full credits.
-      // Supabase RPCs can't access acme schema, so set everything via drizzle directly.
+      // Lazy-migrate: create aether.credit_accounts row with full credits.
+      // Supabase RPCs can't access aether schema, so set everything via drizzle directly.
       try {
         const { upsertCreditAccount } = await import('../../billing/repositories/credit-accounts');
         const { MACHINE_CREDIT_BONUS } = await import('../../billing/services/tiers');

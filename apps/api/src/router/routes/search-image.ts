@@ -54,7 +54,7 @@ imageSearch.post('/', async (c) => {
 
     if (!billingResult.success && !billingResult.skipped) {
       console.warn(
-        `[ACME] Billing failed for ${accountId} but returning results anyway`
+        `[AETHER] Billing failed for ${accountId} but returning results anyway`
       );
     }
 
@@ -67,11 +67,11 @@ imageSearch.post('/', async (c) => {
     return c.json(response);
   } catch (error) {
     if (error instanceof Error && error.message.includes('not configured')) {
-      console.error(`[ACME] Image search config error: ${error.message}`);
+      console.error(`[AETHER] Image search config error: ${error.message}`);
       throw new HTTPException(500, { message: error.message });
     }
 
-    console.error(`[ACME] Image search error: ${error}`);
+    console.error(`[AETHER] Image search error: ${error}`);
     throw new HTTPException(500, {
       message: `Search failed: ${error instanceof Error ? error.message : String(error)}`,
     });

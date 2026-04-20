@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ─── Acme env setup ───────────────────────────────────────────────────────
+# ─── aether env setup ───────────────────────────────────────────────────────
 # Reads the root .env and generates per-service .env files.
 #
 # Usage:

@@ -409,7 +409,7 @@
     "title": "Aether: あなたの自律型AIワーカー",
     "subtitle": "複雑なタスクのために構築され、すべてのために設計されました。シンプルなリクエストからメガ複雑なプロジェクトまで、すべてを処理する究極のAIアシスタント。",
     "tryItOut": "試してみる",
-    "acmeComputer": "Aether Computer",
+    "aetherComputer": "Aether Computer",
     "running": "実行中",
     "workers": {
       "images": {

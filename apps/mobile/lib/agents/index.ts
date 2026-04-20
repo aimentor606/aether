@@ -25,10 +25,10 @@ export const isAetherDefaultAgent = (agent?: {
   
   // Fallback to name checks
   const name = agent.name?.toLowerCase();
-  return name === 'acme' ||
+  return name === 'aether' ||
          name === 'suna' ||
          name === 'superworker' ||
-         name === 'acme super worker';
+         name === 'aether super worker';
 };
 
 /**

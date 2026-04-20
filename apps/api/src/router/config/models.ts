@@ -101,7 +101,7 @@ export function getAllModels() {
   return Object.entries(MODELS).map(([id, cfg]) => ({
     id,
     object: 'model' as const,
-    owned_by: 'acme',
+    owned_by: 'aether',
     context_window: cfg.contextWindow,
     pricing: {
       input: cfg.inputPer1M,

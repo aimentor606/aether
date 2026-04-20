@@ -3,7 +3,7 @@ import { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
 import { healthcareService } from '../services/healthcare';
-import { getAccountId, formatZodError } from '../middleware/account-context';
+import { getAccountId, formatZodError, pagination } from '../middleware/account-context';
 import {
   createPatientSchema,
   updatePatientSchema,
@@ -18,8 +18,9 @@ const healthcareRoutes = new Hono();
 healthcareRoutes.get('/patients', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
+    const { limit, offset } = pagination(c);
     const patients = await healthcareService.listPatients(accountId);
-    return c.json({ success: true, data: patients });
+    return c.json({ success: true, data: patients, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     return c.json({ success: false, error: 'Failed to list patients' }, 500);
@@ -91,8 +92,9 @@ healthcareRoutes.delete('/patients/:id', async (c: Context) => {
 healthcareRoutes.get('/appointments', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
+    const { limit, offset } = pagination(c);
     const appointments = await healthcareService.listAppointments(accountId);
-    return c.json({ success: true, data: appointments });
+    return c.json({ success: true, data: appointments, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     return c.json({ success: false, error: 'Failed to list appointments' }, 500);
@@ -120,8 +122,9 @@ healthcareRoutes.post('/appointments', async (c: Context) => {
 healthcareRoutes.get('/prescriptions', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
+    const { limit, offset } = pagination(c);
     const prescriptions = await healthcareService.listPrescriptions(accountId);
-    return c.json({ success: true, data: prescriptions });
+    return c.json({ success: true, data: prescriptions, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     return c.json({ success: false, error: 'Failed to list prescriptions' }, 500);

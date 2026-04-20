@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "Aether",
-    "slug": "acme",
+    "slug": "aether",
     "version": "1.1.2",
     "orientation": "portrait",
     "icon": "./assets/images/AppIcon-Light.png",
-    "scheme": "acme",
+    "scheme": "aether",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -18,12 +18,12 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.acme.app",
+      "bundleIdentifier": "com.aether.app",
       "usesAppleSignIn": true,
       "associatedDomains": [
-        "applinks:acme.com",
-        "applinks:www.acme.com",
-        "applinks:staging.acme.com"
+        "applinks:aether.com",
+        "applinks:www.aether.com",
+        "applinks:staging.aether.com"
       ],
       "infoPlist": {
         "NSCameraUsageDescription": "Aether needs camera access to let you capture photos and attach them to your saved conversations with the AI Worker. For example, you can photograph a document, whiteboard, or product for analysis and receive insights that are stored in your conversation history.",
@@ -40,7 +40,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#F0F0E9"
       },
-      "package": "com.acme.app",
+      "package": "com.aether.app",
       "intentFilters": [
         {
           "action": "VIEW",
@@ -48,17 +48,17 @@
           "data": [
             {
               "scheme": "https",
-              "host": "acme.com",
+              "host": "aether.com",
               "pathPrefix": "/auth/callback"
             },
             {
               "scheme": "https",
-              "host": "www.acme.com",
+              "host": "www.aether.com",
               "pathPrefix": "/auth/callback"
             },
             {
               "scheme": "https",
-              "host": "staging.acme.com",
+              "host": "staging.aether.com",
               "pathPrefix": "/auth/callback"
             }
           ],
@@ -73,17 +73,17 @@
           "data": [
             {
               "scheme": "https",
-              "host": "acme.com",
+              "host": "aether.com",
               "pathPrefix": "/share"
             },
             {
               "scheme": "https",
-              "host": "www.acme.com",
+              "host": "www.aether.com",
               "pathPrefix": "/share"
             },
             {
               "scheme": "https",
-              "host": "staging.acme.com",
+              "host": "staging.aether.com",
               "pathPrefix": "/share"
             }
           ],
@@ -153,7 +153,7 @@
         "projectId": "9fca3cff-a291-41c9-88b9-feb8053b990f"
       }
     },
-    "owner": "acme",
+    "owner": "aether",
     "runtimeVersion": "1.1.2",
     "updates": {
       "url": "https://u.expo.dev/9fca3cff-a291-41c9-88b9-feb8053b990f",

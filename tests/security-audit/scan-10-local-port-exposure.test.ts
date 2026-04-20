@@ -126,7 +126,7 @@ describe('Local Scan: Port Exposure Check', () => {
   describe('Docker network isolation', () => {
     test('check Docker network configuration', () => {
       try {
-        const output = execSync('docker network inspect acme-network 2>/dev/null || docker network ls 2>/dev/null || true', {
+        const output = execSync('docker network inspect aether-network 2>/dev/null || docker network ls 2>/dev/null || true', {
           encoding: 'utf-8',
           timeout: 5000,
         });

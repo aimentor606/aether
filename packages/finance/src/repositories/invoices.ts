@@ -4,10 +4,12 @@ import { invoices } from '../schemas';
 import type { CreateInvoiceInput, UpdateInvoiceInput } from '../schemas';
 
 export const invoicesRepository = {
-  async findAll(accountId: string) {
+  async findAll(accountId: string, options?: { limit?: number; offset?: number }) {
     return db.query.invoices.findMany({
       where: eq(invoices.accountId, accountId),
       orderBy: desc(invoices.createdAt),
+      limit: options?.limit ?? 50,
+      offset: options?.offset ?? 0,
     });
   },
 

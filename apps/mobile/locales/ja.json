@@ -123,7 +123,7 @@
     "skip": "スキップ",
     "next": "次へ",
     "getStarted": "始める",
-    "acmeComputer": "Aether Computer",
+    "aetherComputer": "Aether Computer",
     "ready": "準備完了",
     "examples": {
       "presentations": {
@@ -463,8 +463,8 @@
   "billing": {
     "loadingPaywall": "プランを読み込み中...",
     "checkoutUnavailable": "モバイル決済は利用できません",
-    "checkoutUnavailableMessage": "プランに登録するには、ウェブでacme.comにアクセスしてください。",
-    "goToWeb": "acme.comに移動",
+    "checkoutUnavailableMessage": "プランに登録するには、ウェブでaether.comにアクセスしてください。",
+    "goToWeb": "aether.comに移動",
     "billingStatus": "請求ステータス",
     "loading": "請求情報を読み込み中...",
     "error": "請求情報の読み込みに失敗しました",

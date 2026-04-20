@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React, { useState } from 'react';
 import { Terminal, KeyRound, Plug, Globe, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useAetherConnectors, type AetherConnector } from '@/hooks/acme/use-acme-connectors';
+import { useAetherConnectors, type AetherConnector } from '@/hooks/aether/use-aether-connectors';
 import type { IntegrationConnection } from '@/hooks/integrations';
 
 const SOURCE_CONFIG: Record<string, { icon: typeof Plug; label: string; color: string }> = {

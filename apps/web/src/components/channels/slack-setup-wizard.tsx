@@ -51,7 +51,7 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
   const botNameSeed = useId();
   const [step, setStep] = useState(1);
   const [botName, setBotName] = useState(() => defaultBotName(botNameSeed));
-  const [agentName, setAgentName] = useState<string | null>('acme');
+  const [agentName, setAgentName] = useState<string | null>('aether');
   const [selectedModel, setSelectedModel] = useState<{ providerID: string; modelID: string } | null>(null);
   const [manifest, setManifest] = useState<Record<string, unknown> | null>(null);
   const [webhookUrl, setWebhookUrl] = useState('');
@@ -74,7 +74,7 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
         toast.error('No active sandbox');
         return;
       }
-      const res = await authenticatedFetch(`${baseUrl}/acme/channels/slack-manifest`, {
+      const res = await authenticatedFetch(`${baseUrl}/aether/channels/slack-manifest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ publicUrl: '', botName: botName.trim() || undefined }),

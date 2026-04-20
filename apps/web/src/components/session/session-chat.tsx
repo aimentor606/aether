@@ -2099,7 +2099,7 @@ function ReasoningPartCard({
 
 			<CollapsibleContent>
 				<div className="mt-1.5 mb-2 rounded-lg bg-muted/20 border border-border/30 text-xs overflow-hidden">
-					<div className="p-3 text-muted-foreground/65 [&_.acme-markdown]:italic [&_.acme-markdown_div]:!text-[13px] [&_.acme-markdown_div]:!leading-[1.45] [&_.acme-markdown_div]:!text-muted-foreground/65 [&_.acme-markdown_li]:!text-[13px] [&_.acme-markdown_li]:!leading-[1.45] [&_.acme-markdown_li]:!text-muted-foreground/65 [&_.acme-markdown_strong]:!text-muted-foreground/70 [&_.acme-markdown_em]:!text-muted-foreground/70">
+					<div className="p-3 text-muted-foreground/65 [&_.aether-markdown]:italic [&_.aether-markdown_div]:!text-[13px] [&_.aether-markdown_div]:!leading-[1.45] [&_.aether-markdown_div]:!text-muted-foreground/65 [&_.aether-markdown_li]:!text-[13px] [&_.aether-markdown_li]:!leading-[1.45] [&_.aether-markdown_li]:!text-muted-foreground/65 [&_.aether-markdown_strong]:!text-muted-foreground/70 [&_.aether-markdown_em]:!text-muted-foreground/70">
 						<ThrottledMarkdown content={part.text} isStreaming={false} />
 					</div>
 				</div>

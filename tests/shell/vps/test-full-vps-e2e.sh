@@ -3,7 +3,7 @@
 # ║  E2E Test: Full VPS lifecycle                                              ║
 # ║                                                                            ║
 # ║  Tests the COMPLETE lifecycle a real VPS user would experience:            ║
-# ║    1. Fresh install via raw GitHub URL (get-acme.sh)                     ║
+# ║    1. Fresh install via raw GitHub URL (get-aether.sh)                     ║
 # ║    2. Verify all services healthy (Caddy, frontend, API, Supabase, sandbox)║
 # ║    3. Test HTTPS / TLS termination                                        ║
 # ║    4. Test authentication flow (owner bootstrap, sign-in)                  ║
@@ -18,9 +18,9 @@
 # ║                                                                            ║
 # ║  Environment variables:                                                    ║
 # ║    VPS_DOMAIN       Domain or IP to test against                           ║
-# ║    OWNER_EMAIL      Owner account email (default: e2e@acme.ai)           ║
+# ║    OWNER_EMAIL      Owner account email (default: e2e@aether.ai)           ║
 # ║    OWNER_PASSWORD   Owner account password (default: e2e-test-pass-42)     ║
-# ║    INSTALLER_URL    URL to get-acme.sh (default: raw GitHub URL)         ║
+# ║    INSTALLER_URL    URL to get-aether.sh (default: raw GitHub URL)         ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 set -uo pipefail
@@ -33,10 +33,10 @@ BLUE=$'\033[0;34m'; CYAN=$'\033[0;36m'; BOLD=$'\033[1m'
 DIM=$'\033[2m'; NC=$'\033[0m'
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${AETHER_HOME:-$HOME/.acme}"
-OWNER_EMAIL="${OWNER_EMAIL:-e2e@acme.ai}"
+INSTALL_DIR="${AETHER_HOME:-$HOME/.aether}"
+OWNER_EMAIL="${OWNER_EMAIL:-e2e@aether.ai}"
 OWNER_PASSWORD="${OWNER_PASSWORD:-e2e-test-pass-42}"
-INSTALLER_URL="${INSTALLER_URL:-https://raw.githubusercontent.com/acme-ai/suna/main/scripts/get-acme.sh}"
+INSTALLER_URL="${INSTALLER_URL:-https://raw.githubusercontent.com/aether-ai/suna/main/scripts/get-aether.sh}"
 IP_ONLY=false
 SKIP_INSTALL=false
 KEEP_INSTALL=false
@@ -98,7 +98,7 @@ wait_for_url() {
 echo ""
 echo "${BOLD}${CYAN}"
 echo "  ╔═══════════════════════════════════════════════╗"
-echo "  ║  Acme — Full VPS E2E Test Suite             ║"
+echo "  ║  aether — Full VPS E2E Test Suite             ║"
 echo "  ╚═══════════════════════════════════════════════╝"
 echo "${NC}"
 echo "  ${DIM}Domain/IP:${NC}  ${BOLD}${VPS_DOMAIN}${NC}"
@@ -118,18 +118,18 @@ if [ "$SKIP_INSTALL" = "false" ]; then
     docker compose --profile vps down -v --remove-orphans 2>/dev/null || true
     cd /
   fi
-  docker ps -a --format '{{.Names}}' | grep -E '^acme-' | xargs -r docker rm -f 2>/dev/null || true
-  docker volume ls --format '{{.Name}}' | grep -i acme | xargs -r docker volume rm -f 2>/dev/null || true
-  rm -f /usr/local/bin/acme 2>/dev/null || true
+  docker ps -a --format '{{.Names}}' | grep -E '^aether-' | xargs -r docker rm -f 2>/dev/null || true
+  docker volume ls --format '{{.Name}}' | grep -i aether | xargs -r docker volume rm -f 2>/dev/null || true
+  rm -f /usr/local/bin/aether 2>/dev/null || true
   rm -rf "$INSTALL_DIR"
   pass "Existing installation removed"
 
   # Verify clean state
-  run_test "No acme containers running" \
-    "! docker ps --format '{{.Names}}' | grep -q acme"
-  run_test "No acme volumes" \
-    "! docker volume ls --format '{{.Name}}' | grep -qi acme"
-  run_test "No ~/.acme directory" \
+  run_test "No aether containers running" \
+    "! docker ps --format '{{.Names}}' | grep -q aether"
+  run_test "No aether volumes" \
+    "! docker volume ls --format '{{.Name}}' | grep -qi aether"
+  run_test "No ~/.aether directory" \
     "[ ! -d '$INSTALL_DIR' ]"
 
   section "PHASE 2: Fresh install via raw GitHub URL"
@@ -147,7 +147,7 @@ if [ "$SKIP_INSTALL" = "false" ]; then
     INSTALL_STDIN=$(printf "2\n1\n1\n%s\nn\n%s\n%s\n%s\nn\n" "$VPS_DOMAIN" "$OWNER_EMAIL" "$OWNER_PASSWORD" "$OWNER_PASSWORD")
   fi
 
-  INSTALL_LOG="/tmp/acme-vps-e2e-install.log"
+  INSTALL_LOG="/tmp/aether-vps-e2e-install.log"
 
   # Support both local file paths and remote URLs
   if [ -f "$INSTALLER_URL" ]; then
@@ -172,7 +172,7 @@ if [ "$SKIP_INSTALL" = "false" ]; then
   run_test "docker-compose.yml created" "[ -f '$INSTALL_DIR/docker-compose.yml' ]"
   run_test ".env created" "[ -f '$INSTALL_DIR/.env' ]"
   run_test ".credentials created" "[ -f '$INSTALL_DIR/.credentials' ]"
-  run_test "CLI script created" "[ -x '$INSTALL_DIR/acme' ]"
+  run_test "CLI script created" "[ -x '$INSTALL_DIR/aether' ]"
   run_test "Caddyfile created" "[ -f '$INSTALL_DIR/Caddyfile' ]"
   run_test "Kong config created" "[ -d '$INSTALL_DIR/volumes/api' ]"
   run_test "DB init scripts created" "[ -d '$INSTALL_DIR/volumes/db' ]"
@@ -189,7 +189,7 @@ if [ "$SKIP_INSTALL" = "false" ]; then
   fi
 
   # Verify CLI is in PATH
-  run_test "acme CLI in PATH" "which acme"
+  run_test "aether CLI in PATH" "which aether"
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -352,48 +352,48 @@ done
 section "PHASE 7: CLI commands"
 
 # version
-CLI_VERSION=$(acme version 2>&1)
-if echo "$CLI_VERSION" | grep -q 'acme'; then
-  pass "acme version"
+CLI_VERSION=$(aether version 2>&1)
+if echo "$CLI_VERSION" | grep -q 'aether'; then
+  pass "aether version"
 else
-  fail "acme version"
+  fail "aether version"
 fi
 
 # status
-if acme status >/dev/null 2>&1; then
-  pass "acme status"
+if aether status >/dev/null 2>&1; then
+  pass "aether status"
 else
-  fail "acme status"
+  fail "aether status"
 fi
 
 # credentials
-if acme credentials >/dev/null 2>&1; then
-  pass "acme credentials"
+if aether credentials >/dev/null 2>&1; then
+  pass "aether credentials"
 else
-  fail "acme credentials"
+  fail "aether credentials"
 fi
 
 # help (default case shows help)
-HELP_OUTPUT=$(acme 2>&1 || true)
+HELP_OUTPUT=$(aether 2>&1 || true)
 if echo "$HELP_OUTPUT" | grep -q 'start'; then
-  pass "acme help (default)"
+  pass "aether help (default)"
 else
-  fail "acme help (default)"
+  fail "aether help (default)"
 fi
 
 # stop
 echo "  ${BLUE}[e2e]${NC} Testing stop..."
-if acme stop >/dev/null 2>&1; then
+if aether stop >/dev/null 2>&1; then
   sleep 5
   # Verify containers are actually stopped
-  RUNNING=$(docker ps --format '{{.Names}}' 2>/dev/null | grep -c 'acme-' || true)
+  RUNNING=$(docker ps --format '{{.Names}}' 2>/dev/null | grep -c 'aether-' || true)
   if [ "${RUNNING:-0}" -eq 0 ] 2>/dev/null; then
-    pass "acme stop (all containers stopped)"
+    pass "aether stop (all containers stopped)"
   else
-    pass "acme stop (completed, $RUNNING containers winding down)"
+    pass "aether stop (completed, $RUNNING containers winding down)"
   fi
 else
-  fail "acme stop"
+  fail "aether stop"
 fi
 
 # Verify frontend is down after stop
@@ -405,10 +405,10 @@ fi
 
 # start
 echo "  ${BLUE}[e2e]${NC} Testing start..."
-if acme start >/dev/null 2>&1; then
-  pass "acme start"
+if aether start >/dev/null 2>&1; then
+  pass "aether start"
 else
-  fail "acme start"
+  fail "aether start"
 fi
 
 echo "  ${BLUE}[e2e]${NC} Waiting for services after start..."
@@ -420,10 +420,10 @@ fi
 
 # restart
 echo "  ${BLUE}[e2e]${NC} Testing restart..."
-if acme restart >/dev/null 2>&1; then
-  pass "acme restart"
+if aether restart >/dev/null 2>&1; then
+  pass "aether restart"
 else
-  fail "acme restart"
+  fail "aether restart"
 fi
 
 echo "  ${BLUE}[e2e]${NC} Waiting for services after restart..."
@@ -434,11 +434,11 @@ else
 fi
 
 # logs (just verify it doesn't crash — capture a few lines)
-LOG_OUTPUT=$(timeout 5 acme logs --tail 5 2>&1; true)
+LOG_OUTPUT=$(timeout 5 aether logs --tail 5 2>&1; true)
 if [ -n "$LOG_OUTPUT" ]; then
-  pass "acme logs produces output"
+  pass "aether logs produces output"
 else
-  skip "acme logs (no output in 5s)"
+  skip "aether logs (no output in 5s)"
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -447,10 +447,10 @@ fi
 section "PHASE 8: Update"
 
 echo "  ${BLUE}[e2e]${NC} Testing update (pulls and restarts)..."
-if acme update >/dev/null 2>&1; then
-  pass "acme update completed"
+if aether update >/dev/null 2>&1; then
+  pass "aether update completed"
 else
-  fail "acme update"
+  fail "aether update"
 fi
 
 echo "  ${BLUE}[e2e]${NC} Waiting for services after update..."
@@ -480,10 +480,10 @@ fi
 section "PHASE 9: Reset"
 
 echo "  ${BLUE}[e2e]${NC} Testing reset --yes (wipes and recreates)..."
-if acme reset --yes >/dev/null 2>&1; then
-  pass "acme reset --yes completed"
+if aether reset --yes >/dev/null 2>&1; then
+  pass "aether reset --yes completed"
 else
-  fail "acme reset --yes"
+  fail "aether reset --yes"
 fi
 
 echo "  ${BLUE}[e2e]${NC} Waiting for services after reset..."
@@ -519,25 +519,25 @@ if [ "$KEEP_INSTALL" = "false" ]; then
 
   echo "  ${BLUE}[e2e]${NC} Testing uninstall (with volume deletion)..."
   # The uninstall command is interactive — answer 'y' to delete volumes
-  echo "y" | acme uninstall 2>&1 || true
+  echo "y" | aether uninstall 2>&1 || true
 
   # Allow containers to fully stop
   sleep 5
 
   # Belt-and-suspenders: clean up anything the uninstall missed
-  docker ps -a --format '{{.Names}}' 2>/dev/null | grep -E '^acme-' | xargs -r docker rm -f 2>/dev/null || true
+  docker ps -a --format '{{.Names}}' 2>/dev/null | grep -E '^aether-' | xargs -r docker rm -f 2>/dev/null || true
 
   # Verify uninstall
   run_test "Install directory removed" "[ ! -d '$INSTALL_DIR' ]"
 
-  AETHER_CONTAINERS=$(docker ps -a --format '{{.Names}}' 2>/dev/null | grep -c 'acme-' || true)
+  AETHER_CONTAINERS=$(docker ps -a --format '{{.Names}}' 2>/dev/null | grep -c 'aether-' || true)
   if [ "${AETHER_CONTAINERS:-0}" -eq 0 ] 2>/dev/null; then
-    pass "All acme containers removed"
+    pass "All aether containers removed"
   else
-    fail "Acme containers still exist ($AETHER_CONTAINERS)"
+    fail "aether containers still exist ($AETHER_CONTAINERS)"
   fi
 
-  run_test "CLI removed from PATH" "! which acme 2>/dev/null"
+  run_test "CLI removed from PATH" "! which aether 2>/dev/null"
 
   if ! curl -k -sf "$BASE_URL" >/dev/null 2>&1; then
     pass "Frontend unreachable after uninstall"
@@ -551,9 +551,9 @@ if [ "$KEEP_INSTALL" = "false" ]; then
   section "PHASE 11: Re-install (clean second install)"
 
   # Thorough cleanup of anything uninstall may have missed
-  docker ps -a --format '{{.Names}}' 2>/dev/null | grep -E '^acme-' | xargs -r docker rm -f 2>/dev/null || true
-  docker volume ls --format '{{.Name}}' | grep -i acme | xargs -r docker volume rm -f 2>/dev/null || true
-  rm -f /usr/local/bin/acme 2>/dev/null || true
+  docker ps -a --format '{{.Names}}' 2>/dev/null | grep -E '^aether-' | xargs -r docker rm -f 2>/dev/null || true
+  docker volume ls --format '{{.Name}}' | grep -i aether | xargs -r docker volume rm -f 2>/dev/null || true
+  rm -f /usr/local/bin/aether 2>/dev/null || true
   rm -rf "$INSTALL_DIR" 2>/dev/null || true
 
   echo "  ${BLUE}[e2e]${NC} Running installer again..."
@@ -565,7 +565,7 @@ if [ "$KEEP_INSTALL" = "false" ]; then
     REINSTALL_STDIN=$(printf "2\n1\n1\n%s\nn\n%s\n%s\n%s\nn\n" "$VPS_DOMAIN" "$OWNER_EMAIL" "$OWNER_PASSWORD" "$OWNER_PASSWORD")
   fi
 
-  REINSTALL_LOG="/tmp/acme-vps-e2e-reinstall.log"
+  REINSTALL_LOG="/tmp/aether-vps-e2e-reinstall.log"
   if [ -f "$INSTALLER_URL" ]; then
     echo "$REINSTALL_STDIN" | bash "$INSTALLER_URL" >"$REINSTALL_LOG" 2>&1 || {
       fail "Re-install failed"
@@ -585,7 +585,7 @@ if [ "$KEEP_INSTALL" = "false" ]; then
   # Verify re-install
   run_test "docker-compose.yml created (reinstall)" "[ -f '$INSTALL_DIR/docker-compose.yml' ]"
   run_test ".env created (reinstall)" "[ -f '$INSTALL_DIR/.env' ]"
-  run_test "CLI in PATH (reinstall)" "which acme"
+  run_test "CLI in PATH (reinstall)" "which aether"
 
   echo "  ${BLUE}[e2e]${NC} Waiting for services after re-install..."
   if wait_for_url "$BASE_URL" 90 "-k -sf"; then
@@ -635,7 +635,7 @@ fi
 if [ "$FAIL" -eq 0 ]; then
   echo "${GREEN}${BOLD}  ✅  All E2E tests passed!${NC}"
   echo ""
-  echo "  ${CYAN}Acme VPS:${NC}  ${BOLD}${BASE_URL}${NC}"
+  echo "  ${CYAN}aether VPS:${NC}  ${BOLD}${BASE_URL}${NC}"
   echo "  ${CYAN}Login:${NC}       ${OWNER_EMAIL} / ${OWNER_PASSWORD}"
 else
   echo "${RED}${BOLD}  ❌  $FAIL test(s) failed${NC}"

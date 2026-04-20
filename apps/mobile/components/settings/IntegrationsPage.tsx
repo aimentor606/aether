@@ -244,8 +244,8 @@ function IntegrationsContent({
       setConnectingApp(app.slug);
       try {
         // Use app deep link scheme so Safari auto-dismisses after OAuth
-        const successUri = 'acme://integrations/success';
-        const errorUri = 'acme://integrations/error';
+        const successUri = 'aether://integrations/success';
+        const errorUri = 'aether://integrations/error';
 
         const result = await createToken.mutateAsync({
           app: app.slug,
@@ -260,7 +260,7 @@ function IntegrationsContent({
         url = `${url}${separator}app=${encodeURIComponent(app.slug)}`;
 
         // openAuthSessionAsync auto-dismisses when redirected to our app scheme
-        const authResult = await WebBrowser.openAuthSessionAsync(url, 'acme://integrations');
+        const authResult = await WebBrowser.openAuthSessionAsync(url, 'aether://integrations');
 
         if (authResult.type === 'success') {
           const returnUrl = authResult.url;

@@ -14,22 +14,22 @@
 # ║    6. WebSocket upgrade path exists                                        ║
 # ║    7. Subdomain proxy is NOT accessible from external (VPS only)           ║
 # ║                                                                            ║
-# ║  Requires: Acme installed & running with sandbox active                  ║
+# ║  Requires: aether installed & running with sandbox active                  ║
 # ║                                                                            ║
 # ║  Usage:                                                                    ║
 # ║    bash test-proxy-e2e.sh                                                  ║
 # ║                                                                            ║
 # ║  Environment:                                                              ║
 # ║    PUBLIC_URL       Public-facing URL (default: auto-detect from .env)     ║
-# ║    OWNER_EMAIL      For auto-login (default: e2e@acme.ai)               ║
+# ║    OWNER_EMAIL      For auto-login (default: e2e@aether.ai)               ║
 # ║    OWNER_PASSWORD   For auto-login (default: e2e-test-pass-42)            ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 set -uo pipefail
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${AETHER_HOME:-$HOME/.acme}"
-OWNER_EMAIL="${OWNER_EMAIL:-e2e@acme.ai}"
+INSTALL_DIR="${AETHER_HOME:-$HOME/.aether}"
+OWNER_EMAIL="${OWNER_EMAIL:-e2e@aether.ai}"
 OWNER_PASSWORD="${OWNER_PASSWORD:-e2e-test-pass-42}"
 PUBLIC_URL="${PUBLIC_URL:-}"
 
@@ -72,7 +72,7 @@ get_token() {
 echo ""
 echo "${BOLD}${CYAN}"
 echo "  ╔═══════════════════════════════════════════════╗"
-echo "  ║  Acme — Proxy URL E2E Test Suite            ║"
+echo "  ║  aether — Proxy URL E2E Test Suite            ║"
 echo "  ╚═══════════════════════════════════════════════╝"
 echo "${NC}"
 echo "  ${DIM}Public URL:${NC}  ${BOLD}${PUBLIC_URL}${NC}"
@@ -106,13 +106,13 @@ SANDBOX_ID="aether-sandbox"
 PROXY_BASE="${PUBLIC_URL}/v1/p/${SANDBOX_ID}"
 
 # Test each key port via the path-based proxy
-# Port 8000 = Acme Master (internal sandbox orchestrator)
+# Port 8000 = aether Master (internal sandbox orchestrator)
 # Port 6080 = Desktop (Selkies VNC)
 # Port 9224 = Browser (Chromium CDP)
 # Port 3111 = OpenCode UI
 # Port 3211 = Static file server
 
-for port_name in "8000:Acme Master" "6080:Desktop VNC" "3111:OpenCode UI" "3211:Static server"; do
+for port_name in "8000:aether Master" "6080:Desktop VNC" "3111:OpenCode UI" "3211:Static server"; do
   port=$(echo "$port_name" | cut -d: -f1)
   name=$(echo "$port_name" | cut -d: -f2)
 
@@ -177,17 +177,17 @@ else
   fail "Desktop proxy returns content"
 fi
 
-# Acme Master (8000) health check
+# aether Master (8000) health check
 MASTER_HEALTH=$(curl -k -sf -H "Authorization: Bearer $TOKEN" "${PROXY_BASE}/8000/health" 2>/dev/null || true)
 if [ -n "$MASTER_HEALTH" ]; then
-  pass "Acme Master health via proxy"
+  pass "aether Master health via proxy"
 else
   # /health might not exist — try root
   MASTER_ROOT_CODE=$(curl -k -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $TOKEN" "${PROXY_BASE}/8000/" 2>/dev/null)
   if [ "$MASTER_ROOT_CODE" = "200" ] || [ "$MASTER_ROOT_CODE" = "404" ]; then
-    pass "Acme Master responds via proxy ($MASTER_ROOT_CODE)"
+    pass "aether Master responds via proxy ($MASTER_ROOT_CODE)"
   else
-    fail "Acme Master via proxy (got: $MASTER_ROOT_CODE)"
+    fail "aether Master via proxy (got: $MASTER_ROOT_CODE)"
   fi
 fi
 

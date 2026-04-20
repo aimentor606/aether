@@ -18,7 +18,7 @@ test.describe('02 — Services respond on correct ports', () => {
   test('Supabase Auth health passes on :13740', async () => {
     // Kong requires the anon key as apikey header
     const fs = require('fs');
-    const envPath = `${process.env.HOME}/.acme/.env`;
+    const envPath = `${process.env.HOME}/.aether/.env`;
     const anonKey = fs
       .readFileSync(envPath, 'utf8')
       .match(/^SUPABASE_ANON_KEY=(.+)$/m)?.[1]

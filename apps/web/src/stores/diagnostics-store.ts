@@ -181,7 +181,21 @@ export function getRelativePath(absPath: string): string {
     const parts = clean.split('/').filter(Boolean);
     // Look for common project markers going from right to left
     for (let i = 0; i < parts.length; i++) {
-      if (['src', 'lib', 'app', 'pages', 'components', 'public', 'test', 'tests', 'pkg', 'cmd', 'internal'].includes(parts[i])) {
+      if (
+        [
+          'src',
+          'lib',
+          'app',
+          'pages',
+          'components',
+          'public',
+          'test',
+          'tests',
+          'pkg',
+          'cmd',
+          'internal',
+        ].includes(parts[i])
+      ) {
         return parts.slice(i).join('/');
       }
     }
@@ -217,7 +231,8 @@ export function parseDiagnosticsFromToolOutput(
   const result: Record<string, LspDiagnostic[]> = {};
 
   // Extract content from both tag types
-  const tagPattern = /<(?:file_diagnostics|project_diagnostics)>([\s\S]*?)<\/(?:file_diagnostics|project_diagnostics)>/g;
+  const tagPattern =
+    /<(?:file_diagnostics|project_diagnostics)>([\s\S]*?)<\/(?:file_diagnostics|project_diagnostics)>/g;
   let tagMatch;
   const allLines: string[] = [];
 
@@ -237,7 +252,8 @@ export function parseDiagnosticsFromToolOutput(
 
   // Parse each diagnostic line
   // Format: Severity: /path/to/file:line:col [source][code] (tags) message
-  const linePattern = /^(Error|Warn|Info|Hint):\s+(.+?):(\d+):(\d+)\s+\[([^\]]*)\](.*)$/;
+  const linePattern =
+    /^(Error|Warn|Info|Hint):\s+(.+?):(\d+):(\d+)\s+\[([^\]]*)\](.*)$/;
 
   for (const line of allLines) {
     const match = linePattern.exec(line);
@@ -246,9 +262,13 @@ export function parseDiagnosticsFromToolOutput(
     const [, severityStr, filePath, lineStr, colStr, source, rest] = match;
 
     const severity: DiagnosticSeverity =
-      severityStr === 'Error' ? 1 :
-      severityStr === 'Warn' ? 2 :
-      severityStr === 'Hint' ? 4 : 3;
+      severityStr === 'Error'
+        ? 1
+        : severityStr === 'Warn'
+          ? 2
+          : severityStr === 'Hint'
+            ? 4
+            : 3;
 
     // Parse optional [code] and message from the rest
     // rest might be: [6133] (unnecessary) message text
@@ -284,9 +304,13 @@ export function parseDiagnosticsFromToolOutput(
 // Helpers
 // ============================================================================
 
-function normalizeRawDiagnostic(file: string, raw: RawDiagnostic): LspDiagnostic {
+function normalizeRawDiagnostic(
+  file: string,
+  raw: RawDiagnostic,
+): LspDiagnostic {
   const line = raw.range?.start?.line ?? raw.line ?? 0;
-  const column = raw.range?.start?.character ?? raw.column ?? raw.character ?? 0;
+  const column =
+    raw.range?.start?.character ?? raw.column ?? raw.character ?? 0;
   const endLine = raw.range?.end?.line ?? raw.endLine;
   const endColumn = raw.range?.end?.character ?? raw.endColumn;
   const severity = (raw.severity ?? 1) as DiagnosticSeverity;
@@ -309,97 +333,101 @@ function normalizeRawDiagnostic(file: string, raw: RawDiagnostic): LspDiagnostic
 
 export const useDiagnosticsStore = create<DiagnosticsState>()(
   persist(
-  (set, get) => ({
-  byFile: {},
+    (set, get) => ({
+      byFile: {},
 
-  setFileDiagnostics: (file, diagnostics) =>
-    set((state) => ({
-      byFile: {
-        ...state.byFile,
-        [file]: diagnostics,
-      },
-    })),
+      setFileDiagnostics: (file, diagnostics) =>
+        set((state) => ({
+          byFile: {
+            ...state.byFile,
+            [file]: diagnostics,
+          },
+        })),
 
-  setFromLspEvent: (diagnosticsByFile) =>
-    set((state) => {
-      const next = { ...state.byFile };
-      for (const [file, rawDiags] of Object.entries(diagnosticsByFile)) {
-        if (!Array.isArray(rawDiags)) continue;
-        const normalized = rawDiags.map((d) => normalizeRawDiagnostic(file, d));
-        if (normalized.length === 0) {
-          delete next[file];
-        } else {
-          next[file] = normalized;
+      setFromLspEvent: (diagnosticsByFile) =>
+        set((state) => {
+          const next = { ...state.byFile };
+          for (const [file, rawDiags] of Object.entries(diagnosticsByFile)) {
+            if (!Array.isArray(rawDiags)) continue;
+            const normalized = rawDiags.map((d) =>
+              normalizeRawDiagnostic(file, d),
+            );
+            if (normalized.length === 0) {
+              delete next[file];
+            } else {
+              next[file] = normalized;
+            }
+          }
+          return { byFile: next };
+        }),
+
+      clearFile: (file) =>
+        set((state) => {
+          const { [file]: _, ...rest } = state.byFile;
+          return { byFile: rest };
+        }),
+
+      clearAll: () => set({ byFile: {} }),
+
+      getErrorCount: () => {
+        const { byFile } = get();
+        let count = 0;
+        for (const diags of Object.values(byFile)) {
+          for (const d of diags) {
+            if (d.severity === 1) count++;
+          }
         }
-      }
-      return { byFile: next };
+        return count;
+      },
+
+      getWarningCount: () => {
+        const { byFile } = get();
+        let count = 0;
+        for (const diags of Object.values(byFile)) {
+          for (const d of diags) {
+            if (d.severity === 2) count++;
+          }
+        }
+        return count;
+      },
+
+      getAllDiagnostics: () => {
+        const { byFile } = get();
+        const all: LspDiagnostic[] = [];
+        for (const diags of Object.values(byFile)) {
+          all.push(...diags);
+        }
+        // Sort: errors first, then warnings, then by file, then by line
+        all.sort((a, b) => {
+          if (a.severity !== b.severity) return a.severity - b.severity;
+          if (a.file !== b.file) return a.file.localeCompare(b.file);
+          return a.line - b.line;
+        });
+        return all;
+      },
     }),
-
-  clearFile: (file) =>
-    set((state) => {
-      const { [file]: _, ...rest } = state.byFile;
-      return { byFile: rest };
-    }),
-
-  clearAll: () => set({ byFile: {} }),
-
-  getErrorCount: () => {
-    const { byFile } = get();
-    let count = 0;
-    for (const diags of Object.values(byFile)) {
-      for (const d of diags) {
-        if (d.severity === 1) count++;
-      }
-    }
-    return count;
-  },
-
-  getWarningCount: () => {
-    const { byFile } = get();
-    let count = 0;
-    for (const diags of Object.values(byFile)) {
-      for (const d of diags) {
-        if (d.severity === 2) count++;
-      }
-    }
-    return count;
-  },
-
-  getAllDiagnostics: () => {
-    const { byFile } = get();
-    const all: LspDiagnostic[] = [];
-    for (const diags of Object.values(byFile)) {
-      all.push(...diags);
-    }
-    // Sort: errors first, then warnings, then by file, then by line
-    all.sort((a, b) => {
-      if (a.severity !== b.severity) return a.severity - b.severity;
-      if (a.file !== b.file) return a.file.localeCompare(b.file);
-      return a.line - b.line;
-    });
-    return all;
-  },
-}),
-  {
-    name: 'acme-diagnostics',
-    storage: {
-      getItem: (name) => {
-        if (typeof window === 'undefined') return null;
-        const str = sessionStorage.getItem(name);
-        return str ? JSON.parse(str) : null;
+    {
+      name: 'aether-diagnostics',
+      storage: {
+        getItem: (name) => {
+          if (typeof window === 'undefined') return null;
+          const str = sessionStorage.getItem(name);
+          return str ? JSON.parse(str) : null;
+        },
+        setItem: (name, value) => {
+          if (typeof window === 'undefined') return;
+          sessionStorage.setItem(name, JSON.stringify(value));
+        },
+        removeItem: (name) => {
+          if (typeof window === 'undefined') return;
+          sessionStorage.removeItem(name);
+        },
       },
-      setItem: (name, value) => {
-        if (typeof window === 'undefined') return;
-        sessionStorage.setItem(name, JSON.stringify(value));
-      },
-      removeItem: (name) => {
-        if (typeof window === 'undefined') return;
-        sessionStorage.removeItem(name);
-      },
+      partialize: (state) =>
+        ({ byFile: state.byFile }) as unknown as DiagnosticsState,
     },
-    partialize: (state) => ({ byFile: state.byFile }) as unknown as DiagnosticsState,
-  },
-));
+  ),
+);
 
 // Expose on window for console debugging
 if (typeof window !== 'undefined') {

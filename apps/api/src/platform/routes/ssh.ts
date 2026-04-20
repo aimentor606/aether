@@ -28,7 +28,7 @@ const sshRouter = new Hono<{ Variables: AuthVariables }>();
 // ─── Shared: keypair generation ──────────────────────────────────────────────
 
 function generateKeypair(): { privateKey: string; publicKey: string } {
-  const tmpPath = join(tmpdir(), `acme-ssh-${Date.now()}`);
+  const tmpPath = join(tmpdir(), `aether-ssh-${Date.now()}`);
   mkdirSync(tmpPath, { recursive: true });
   const keyPath = join(tmpPath, 'key');
 
@@ -50,7 +50,7 @@ function generateKeypair(): { privateKey: string; publicKey: string } {
 
 // ─── Shared: authorized_keys injection via remote host toolbox exec ──────────
 // JustAVPS resolveEndpoint() points at the VPS host toolbox endpoint, not the
-// sandbox's acme-master API. To inject a key into the Dockerized sandbox we
+// sandbox's aether-master API. To inject a key into the Dockerized sandbox we
 // must exec on the host, then docker exec into the workload container.
 
 async function injectPublicKeyViaHostExec(

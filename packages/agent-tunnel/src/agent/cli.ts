@@ -101,7 +101,7 @@ async function printStartup(config: { tunnelId: string; apiUrl: string }, capabi
     .map(name => `${c.green}●${c.reset} ${c.white}${name}${c.reset}`)
     .join('   ');
 
-  const brand = 'created by acme';
+  const brand = 'created by aether';
   const brandFill = W - brand.length - 3;
 
   console.log('');
@@ -114,7 +114,7 @@ async function printStartup(config: { tunnelId: string; apiUrl: string }, capabi
   row(`   ${c.dim}relay${c.reset}     ${c.white}${apiDisplay}${c.reset}`);
   row(`   ${c.dim}machine${c.reset}   ${c.white}${machineDisplay}${c.reset} ${c.dim}(${plat})${c.reset}`);
   blank();
-  console.log(`  ${c.gray}╰${'─'.repeat(brandFill)} ${c.dim}created by ${c.cyan}acme${c.reset} ${c.gray}─╯${c.reset}`);
+  console.log(`  ${c.gray}╰${'─'.repeat(brandFill)} ${c.dim}created by ${c.cyan}aether${c.reset} ${c.gray}─╯${c.reset}`);
   console.log('');
 }
 
@@ -336,7 +336,7 @@ function showHelp(): void {
   console.log(`  ${c.white}--api-url${c.reset} ${c.dim}<url>${c.reset}       API URL ${c.dim}(default: http://localhost:8080)${c.reset}`);
   console.log('');
   console.log(`  ${c.dim}Config: ~/.agent-tunnel/config.json${c.reset}`);
-  console.log(`  ${c.dim}powered by ${c.cyan}acme${c.reset}`);
+  console.log(`  ${c.dim}powered by ${c.cyan}aether${c.reset}`);
   console.log('');
 }
 

@@ -53,8 +53,8 @@ import { QuestionPrompt } from './QuestionPrompt';
 import { useSessions } from '@/lib/platform/hooks';
 import { FileViewer } from '@/components/files/FileViewer';
 import type { SandboxFile } from '@/api/types';
-import AetherSymbolBlack from '@/assets/brand/acme-symbol-scale-effect-black.svg';
-import AetherSymbolWhite from '@/assets/brand/acme-symbol-scale-effect-white.svg';
+import AetherSymbolBlack from '@/assets/brand/aether-symbol-scale-effect-black.svg';
+import AetherSymbolWhite from '@/assets/brand/aether-symbol-scale-effect-white.svg';
 
 interface SessionPageProps {
   sessionId: string;

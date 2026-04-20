@@ -88,15 +88,15 @@ async function handleAetherProxy(
     throw new HTTPException(402, { message: creditCheck.message });
   }
 
-  const acmeKey = service.getAetherApiKey();
-  if (!acmeKey) {
+  const aetherKey = service.getAetherApiKey();
+  if (!aetherKey) {
     throw new HTTPException(503, {
       message: `${service.name} not configured`,
     });
   }
 
   // Use alternate target/key injection for Aether-managed if configured (e.g. OpenRouter)
-  const baseUrl = service.acmeTargetBaseUrl || service.targetBaseUrl;
+  const baseUrl = service.aetherTargetBaseUrl || service.targetBaseUrl;
   const targetUrl = `${baseUrl}${subPath}${queryString}`;
   const headers = buildForwardHeaders(c);
   // Strip Aether-specific and auth headers — upstream gets injected key only
@@ -111,7 +111,7 @@ async function handleAetherProxy(
   // Route-specific billing overrides service default
   const billingToolName = matchedRoute.billingToolName || service.billingToolName;
 
-  console.log(`[PROXY] ${service.name} (acme:${accountId}) ${method} ${subPath} → ${targetUrl} [bill:${billingToolName}]`);
+  console.log(`[PROXY] ${service.name} (aether:${accountId}) ${method} ${subPath} → ${targetUrl} [bill:${billingToolName}]`);
 
   const upstream = await fetch(targetUrl, {
     method,
@@ -127,7 +127,7 @@ async function handleAetherProxy(
       return billLlmAetherProxy(upstream, service, subPath, accountId);
     }
     // Upstream error — don't bill for failed requests
-    console.warn(`[PROXY] LLM acme proxy ${service.name} upstream error ${upstream.status} — no billing`);
+    console.warn(`[PROXY] LLM aether proxy ${service.name} upstream error ${upstream.status} — no billing`);
     return new Response(upstream.body, {
       status: upstream.status,
       statusText: upstream.statusText,
@@ -228,11 +228,11 @@ async function billLlmAetherProxy(
       promptTokens,
       completionTokens,
       cost,
-    ).catch((err) => console.error(`[PROXY] LLM acme billing error: ${err}`));
+    ).catch((err) => console.error(`[PROXY] LLM aether billing error: ${err}`));
 
-    console.log(`[PROXY] LLM acme ${modelId}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${AETHER_MARKUP}x)`);
+    console.log(`[PROXY] LLM aether ${modelId}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${AETHER_MARKUP}x)`);
   } else {
-    console.warn(`[PROXY] LLM acme ${service.name}: no usage data in response — billing skipped`);
+    console.warn(`[PROXY] LLM aether ${service.name}: no usage data in response — billing skipped`);
   }
 
   return new Response(JSON.stringify(responseBody), {
@@ -302,18 +302,18 @@ async function extractUsageFromAetherProxyStream(
 
     if (isAnthropic) {
       if (!(anthropicInputTokens > 0 || anthropicOutputTokens > 0)) {
-        console.warn(`[PROXY] LLM acme stream (${service.name}): zero tokens — billing skipped`);
+        console.warn(`[PROXY] LLM aether stream (${service.name}): zero tokens — billing skipped`);
         return;
       }
       const modelConfig = getModel(detectedModel);
       const cost = calculateCost(modelConfig, anthropicInputTokens, anthropicOutputTokens, 0, 0, AETHER_MARKUP);
       await deductLLMCredits(accountId, detectedModel, anthropicInputTokens, anthropicOutputTokens, cost);
-      console.log(`[PROXY] LLM acme stream ${detectedModel}: ${anthropicInputTokens}/${anthropicOutputTokens} tokens, cost=$${cost.toFixed(6)} (${AETHER_MARKUP}x)`);
+      console.log(`[PROXY] LLM aether stream ${detectedModel}: ${anthropicInputTokens}/${anthropicOutputTokens} tokens, cost=$${cost.toFixed(6)} (${AETHER_MARKUP}x)`);
       return;
     }
 
     if (!lastUsage) {
-      console.warn(`[PROXY] LLM acme stream (${service.name}): no usage data — billing skipped`);
+      console.warn(`[PROXY] LLM aether stream (${service.name}): no usage data — billing skipped`);
       return;
     }
 
@@ -322,12 +322,12 @@ async function extractUsageFromAetherProxyStream(
       const modelConfig = getModel(detectedModel);
       const cost = calculateCost(modelConfig, promptTokens, completionTokens, cachedTokens, cacheWriteTokens, AETHER_MARKUP);
       await deductLLMCredits(accountId, detectedModel, promptTokens, completionTokens, cost);
-      console.log(`[PROXY] LLM acme stream ${detectedModel}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${AETHER_MARKUP}x)`);
+      console.log(`[PROXY] LLM aether stream ${detectedModel}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${AETHER_MARKUP}x)`);
     } else {
-      console.warn(`[PROXY] LLM acme stream (${service.name}): zero tokens — billing skipped`);
+      console.warn(`[PROXY] LLM aether stream (${service.name}): zero tokens — billing skipped`);
     }
   } catch (err) {
-    console.error(`[PROXY] Error extracting usage from acme proxy stream:`, err);
+    console.error(`[PROXY] Error extracting usage from aether proxy stream:`, err);
   }
 }
 
@@ -706,10 +706,10 @@ async function tryAuthenticate(c: any): Promise<AuthResult> {
   // If X-aether-Token looks like a Aether token but fails → hard reject.
 
   if (config.DATABASE_URL) {
-    const acmeTokenHeader = c.req.header('X-aether-Token');
-    if (acmeTokenHeader && isAetherToken(acmeTokenHeader)) {
+    const aetherTokenHeader = c.req.header('X-aether-Token');
+    if (aetherTokenHeader && isAetherToken(aetherTokenHeader)) {
       try {
-        const result = await validateSecretKey(acmeTokenHeader);
+        const result = await validateSecretKey(aetherTokenHeader);
         if (result.isValid && result.accountId) {
           return { isAetherUser: true, accountId: result.accountId, isPassthrough: true };
         }
@@ -837,7 +837,7 @@ function injectApiKey(
   body: ArrayBuffer | string | undefined,
   useAetherInjection = false,
 ): ArrayBuffer | string | undefined {
-  const injection = (useAetherInjection && service.acmeKeyInjection) || service.keyInjection;
+  const injection = (useAetherInjection && service.aetherKeyInjection) || service.keyInjection;
   const key = service.getAetherApiKey();
 
   switch (injection.type) {

@@ -5,7 +5,7 @@ set -e
 
 FRONTEND_URL="http://localhost:13737"
 SUPABASE_URL="http://localhost:13740"
-INSTALL_DIR="$HOME/.acme"
+INSTALL_DIR="$HOME/.aether"
 
 echo "Testing auth flow..."
 
@@ -14,7 +14,7 @@ if [ -f "$INSTALL_DIR/.credentials" ]; then
     OWNER_EMAIL=$(grep "Email:" "$INSTALL_DIR/.credentials" | cut -d: -f2 | tr -d ' ')
     OWNER_PASSWORD=$(grep "Password:" "$INSTALL_DIR/.credentials" | cut -d: -f2 | tr -d ' ')
 else
-    OWNER_EMAIL="marko@acme.ai"
+    OWNER_EMAIL="marko@aether.ai"
     OWNER_PASSWORD="password1112"
 fi
 
@@ -38,7 +38,7 @@ print(urllib.parse.quote(json.dumps(s, separators=(',', ':')), safe=''))
 # Test dashboard
 echo "Testing /dashboard access..."
 HTTP_CODE=$(curl -s "$FRONTEND_URL/dashboard" \
-    -H "Cookie: sb-acme-auth-token.0=$COOKIE" \
+    -H "Cookie: sb-aether-auth-token.0=$COOKIE" \
     -o /dev/null -w "%{http_code}")
 
 if [ "$HTTP_CODE" = "200" ]; then

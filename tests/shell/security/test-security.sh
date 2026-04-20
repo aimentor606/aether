@@ -4,9 +4,9 @@
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 ROOT_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
-SCRIPT="$ROOT_DIR/scripts/get-acme.sh"
-MASTER_INDEX="$ROOT_DIR/core/acme-master/src/index.ts"
-MASTER_CONFIG="$ROOT_DIR/core/acme-master/src/config.ts"
+SCRIPT="$ROOT_DIR/scripts/get-aether.sh"
+MASTER_INDEX="$ROOT_DIR/core/aether-master/src/index.ts"
+MASTER_CONFIG="$ROOT_DIR/core/aether-master/src/config.ts"
 
 PASS=0; FAIL=0; TOTAL=0
 

@@ -297,7 +297,7 @@ export default function HomeScreen() {
       // Check if we previously completed setup (persisted across app restarts).
       // If so, keep polling longer before showing wizard — the sandbox is likely
       // just booting and the env isn't populated yet.
-      const SETUP_DONE_KEY = 'acme-instance-setup-done';
+      const SETUP_DONE_KEY = 'aether-instance-setup-done';
       const wasSetupDone = (await AsyncStorage.getItem(SETUP_DONE_KEY)) === '1';
       const maxWaitMs = wasSetupDone ? 90_000 : 60_000;
       const pollMs = 3_000;
@@ -407,7 +407,7 @@ export default function HomeScreen() {
 
   const handleSetupComplete = useCallback(() => {
     // Persist that setup completed so we don't show wizard on next boot
-    AsyncStorage.setItem('acme-instance-setup-done', '1').catch(() => {});
+    AsyncStorage.setItem('aether-instance-setup-done', '1').catch(() => {});
     setSetupState('onboarding');
   }, []);
 

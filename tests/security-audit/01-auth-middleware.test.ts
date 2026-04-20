@@ -8,7 +8,7 @@
  *  - Missing Authorization header
  *  - Empty Bearer token
  *  - Malformed Authorization header (no "Bearer " prefix)
- *  - Non-acme token sent to apiKeyAuth
+ *  - Non-aether token sent to apiKeyAuth
  *  - Random/forged aether_ tokens
  *  - Expired JWT tokens
  *  - Tampered JWT tokens
@@ -82,7 +82,7 @@ describe('Security Audit: Auth Middleware', () => {
       expect(token).toBeNull();
     });
 
-    test('rejects non-acme token format', () => {
+    test('rejects non-aether token format', () => {
       const token = 'sk-abc123def456';
       expect(isAetherToken(token)).toBe(false);
     });

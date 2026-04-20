@@ -53,7 +53,7 @@ jobs:
           V="${{ inputs.version || 'dev-latest' }}"
           echo "version=$V" >> "$GITHUB_OUTPUT"
           echo "image=aether/computer:$V" >> "$GITHUB_OUTPUT"
-          echo "snapshot=acme-computer-v$V" >> "$GITHUB_OUTPUT"
+          echo "snapshot=aether-computer-v$V" >> "$GITHUB_OUTPUT"
           echo "Version: $V"
 
       - name: Create builder machine
@@ -62,7 +62,7 @@ jobs:
           STARTUP=$(cat <<'SCRIPT'
           #!/bin/bash
           set -e
-          curl -fsSL https://raw.githubusercontent.com/acme-ai/suna/main/scripts/start-sandbox.sh -o /tmp/start-sandbox.sh
+          curl -fsSL https://raw.githubusercontent.com/aether-ai/suna/main/scripts/start-sandbox.sh -o /tmp/start-sandbox.sh
           chmod +x /tmp/start-sandbox.sh
           /tmp/start-sandbox.sh '${{ steps.v.outputs.image }}'
           SCRIPT
@@ -197,9 +197,9 @@ jobs:
           # every deploy-dev run.
           TARGET="${{ inputs.target || 'dev' }}"
           if [ "$TARGET" = "dev" ]; then
-            PREFIX="acme-computer-vdev-"
+            PREFIX="aether-computer-vdev-"
           else
-            PREFIX="acme-computer-v"
+            PREFIX="aether-computer-v"
           fi
 
           # Fetch all images, filter by prefix, sort newest first, skip first 3, delete rest
@@ -210,7 +210,7 @@ jobs:
             # For stable, exclude dev-prefixed names that overlap
             | map(select(
                 if $target == "prod"
-                then (.name | startswith("acme-computer-vdev-") | not)
+                then (.name | startswith("aether-computer-vdev-") | not)
                 else true
                 end
             ))

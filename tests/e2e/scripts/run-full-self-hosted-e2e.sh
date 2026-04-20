@@ -25,26 +25,26 @@ wait_for_url() {
   return 1
 }
 
-if [ -d "$HOME/.acme" ]; then
-  echo "[e2e] Cleaning existing ~/.acme stack"
-  docker compose -f "$HOME/.acme/docker-compose.yml" down --remove-orphans --volumes >/dev/null 2>&1 || true
-  rm -rf "$HOME/.acme"
+if [ -d "$HOME/.aether" ]; then
+  echo "[e2e] Cleaning existing ~/.aether stack"
+  docker compose -f "$HOME/.aether/docker-compose.yml" down --remove-orphans --volumes >/dev/null 2>&1 || true
+  rm -rf "$HOME/.aether"
 fi
 
 echo "[e2e] Running installer (local mode, minimal prompts)"
-printf "y\n\n\n\nn\nn\n" | bash "scripts/get-acme.sh" >"$INSTALL_LOG" 2>&1
+printf "y\n\n\n\nn\nn\n" | bash "scripts/get-aether.sh" >"$INSTALL_LOG" 2>&1
 
 echo "[e2e] Building local frontend image (multi-stage Docker build)"
 docker build -f "apps/web/Dockerfile" \
   --build-arg NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-http://localhost:8000}" \
   --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}" \
   --build-arg NEXT_PUBLIC_BACKEND_URL="${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8008/v1}" \
-  -t "acme/acme-frontend:latest" . >/dev/null
+  -t "aether/aether-frontend:latest" . >/dev/null
 
 echo "[e2e] Building local API image with current source"
-docker build --build-arg SERVICE=aether-api -f "apps/api/Dockerfile" -t "acme/aether-api:latest" . >/dev/null
+docker build --build-arg SERVICE=aether-api -f "apps/api/Dockerfile" -t "aether/aether-api:latest" . >/dev/null
 
-docker compose -f "$HOME/.acme/docker-compose.yml" up -d aether-api frontend >/dev/null
+docker compose -f "$HOME/.aether/docker-compose.yml" up -d aether-api frontend >/dev/null
 
 echo "[e2e] Verifying local endpoints"
 wait_for_url "http://localhost:13737/auth"

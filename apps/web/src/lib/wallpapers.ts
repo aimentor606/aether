@@ -21,8 +21,8 @@ export const WALLPAPERS: Wallpaper[] = [
     id: 'brandmark',
     name: 'Aether',
     type: 'svg',
-    svgUrl: '/acme-brandmark-bg.svg',
-    thumbnailUrl: '/acme-brandmark-bg.svg',
+    svgUrl: '/aether-brandmark-bg.svg',
+    thumbnailUrl: '/aether-brandmark-bg.svg',
   },
 ];
 

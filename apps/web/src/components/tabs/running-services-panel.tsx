@@ -116,9 +116,13 @@ function ServiceCard({
   pendingAction: string | null;
   onOpen: (s: SandboxService) => void;
   onShowLogs: (id: string) => void;
-  onAction: (s: SandboxService, a: 'start' | 'stop' | 'restart' | 'delete') => void;
+  onAction: (
+    s: SandboxService,
+    a: 'start' | 'stop' | 'restart' | 'delete',
+  ) => void;
 }) {
-  const isRunning = service.status === 'running' || service.status === 'starting';
+  const isRunning =
+    service.status === 'running' || service.status === 'starting';
   const canOpen = service.port > 0 && service.status === 'running';
   const isManaged = service.managed;
   const mainAction = isRunning ? 'stop' : 'start';
@@ -149,23 +153,43 @@ function ServiceCard({
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
-                <h3 className="text-sm font-semibold text-foreground truncate">{service.name}</h3>
+                <h3 className="text-sm font-semibold text-foreground truncate">
+                  {service.name}
+                </h3>
                 <Badge
-                  variant={service.status === 'running' ? 'highlight' : service.status === 'failed' ? 'destructive' : 'secondary'}
+                  variant={
+                    service.status === 'running'
+                      ? 'highlight'
+                      : service.status === 'failed'
+                        ? 'destructive'
+                        : 'secondary'
+                  }
                   className="text-[10px] shrink-0"
                 >
-                  {service.status === 'running' ? 'Running' : service.status === 'starting' ? 'Starting' : service.status === 'failed' ? 'Failed' : 'Stopped'}
+                  {service.status === 'running'
+                    ? 'Running'
+                    : service.status === 'starting'
+                      ? 'Starting'
+                      : service.status === 'failed'
+                        ? 'Failed'
+                        : 'Stopped'}
                 </Badge>
               </div>
               <div className="flex items-center gap-1.5 mt-0.5">
                 {service.adapter && (
-                  <span className="text-xs text-muted-foreground">{service.adapter}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {service.adapter}
+                  </span>
                 )}
                 {service.port > 0 && (
-                  <span className="text-xs text-muted-foreground/50 font-mono">:{service.port}</span>
+                  <span className="text-xs text-muted-foreground/50 font-mono">
+                    :{service.port}
+                  </span>
                 )}
                 {service.framework && service.framework !== 'unknown' && (
-                  <span className="text-xs text-muted-foreground/50">{service.framework}</span>
+                  <span className="text-xs text-muted-foreground/50">
+                    {service.framework}
+                  </span>
                 )}
               </div>
             </div>
@@ -174,7 +198,11 @@ function ServiceCard({
           {/* Description area */}
           <div className="h-[34px] mb-3">
             <p className="text-xs text-muted-foreground/80 leading-relaxed line-clamp-2">
-              {service.sourcePath ? shortenPath(service.sourcePath) : service.scope ? `${service.scope} service` : '\u00A0'}
+              {service.sourcePath
+                ? shortenPath(service.sourcePath)
+                : service.scope
+                  ? `${service.scope} service`
+                  : '\u00A0'}
             </p>
           </div>
 
@@ -182,19 +210,29 @@ function ServiceCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {service.startedAt && (
-                <span className="text-[11px] text-muted-foreground/50">{formatTimeAgo(service.startedAt)}</span>
+                <span className="text-[11px] text-muted-foreground/50">
+                  {formatTimeAgo(service.startedAt)}
+                </span>
               )}
               {service.builtin && (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Built-in</Badge>
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                  Built-in
+                </Badge>
               )}
               {!service.managed && (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 border-dashed">Observed</Badge>
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] px-1.5 py-0 border-dashed"
+                >
+                  Observed
+                </Badge>
               )}
             </div>
             <div className="flex items-center gap-0.5">
               {canOpen && (
                 <Button
-                  variant="ghost" size="sm"
+                  variant="ghost"
+                  size="sm"
                   className="px-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                   onClick={() => onOpen(service)}
                 >
@@ -205,23 +243,36 @@ function ServiceCard({
               {isManaged && (
                 <>
                   <Button
-                    variant="ghost" size="sm"
+                    variant="ghost"
+                    size="sm"
                     className="px-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                     disabled={!!pendingAction}
                     onClick={() => onAction(service, mainAction)}
                   >
-                    {busy(mainAction) ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : mainAction === 'start' ? <Play className="h-3.5 w-3.5" /> : <Square className="h-3.5 w-3.5" />}
+                    {busy(mainAction) ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : mainAction === 'start' ? (
+                      <Play className="h-3.5 w-3.5" />
+                    ) : (
+                      <Square className="h-3.5 w-3.5" />
+                    )}
                   </Button>
                   <Button
-                    variant="ghost" size="sm"
+                    variant="ghost"
+                    size="sm"
                     className="px-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                     disabled={!!pendingAction}
                     onClick={() => onAction(service, 'restart')}
                   >
-                    {busy('restart') ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />}
+                    {busy('restart') ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <RotateCcw className="h-3.5 w-3.5" />
+                    )}
                   </Button>
                   <Button
-                    variant="ghost" size="sm"
+                    variant="ghost"
+                    size="sm"
                     className="px-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                     onClick={() => onShowLogs(service.id)}
                   >
@@ -229,12 +280,17 @@ function ServiceCard({
                   </Button>
                   {!service.builtin && (
                     <Button
-                      variant="ghost" size="sm"
+                      variant="ghost"
+                      size="sm"
                       className="px-2 text-xs text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
                       disabled={!!pendingAction}
                       onClick={() => onAction(service, 'delete')}
                     >
-                      {busy('delete') ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                      {busy('delete') ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" />
+                      )}
                     </Button>
                   )}
                 </>
@@ -282,9 +338,13 @@ function EmptyState() {
         <div className="w-16 h-16 bg-muted border rounded-2xl flex items-center justify-center mb-4">
           <Server className="h-7 w-7 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">No services found</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">
+          No services found
+        </h3>
         <p className="text-sm text-muted-foreground text-center leading-relaxed max-w-md">
-          Services will appear here when Aether Master starts managing them. Register a project app or wait for the built-in services to come online.
+          Services will appear here when Aether Master starts managing them.
+          Register a project app or wait for the built-in services to come
+          online.
         </p>
       </div>
     </div>
@@ -295,7 +355,11 @@ function EmptyState() {
 
 export function RunningServicesPanel() {
   const { getServiceUrl } = useSandboxProxy();
-  const { data: services = [], isLoading, error } = useSandboxServices({ includeAll: true });
+  const {
+    data: services = [],
+    isLoading,
+    error,
+  } = useSandboxServices({ includeAll: true });
   const { data: templates = [] } = useSandboxServiceTemplates();
   const actionMutation = useSandboxServiceAction();
   const runtimeReloadMutation = useSandboxRuntimeReload();
@@ -310,30 +374,51 @@ export function RunningServicesPanel() {
   const [pendingGlobal, setPendingGlobal] = useState<string | null>(null);
   const [restartDialogOpen, setRestartDialogOpen] = useState(false);
 
-  const selectedLogService = useMemo(() => services.find((s) => s.id === logsServiceId) ?? null, [logsServiceId, services]);
-  const { data: logLines = [], isLoading: logsLoading } = useSandboxServiceLogs(logsServiceId, { enabled: !!logsServiceId });
+  const selectedLogService = useMemo(
+    () => services.find((s) => s.id === logsServiceId) ?? null,
+    [logsServiceId, services],
+  );
+  const { data: logLines = [], isLoading: logsLoading } = useSandboxServiceLogs(
+    logsServiceId,
+    { enabled: !!logsServiceId },
+  );
 
   // ── Derived data ──
 
-  const counts = useMemo(() => ({
-    all: services.length,
-    managed: services.filter((s) => s.managed).length,
-    projects: services.filter((s) => s.managed && (s.scope === 'project' || s.scope === 'session')).length,
-    system: services.filter((s) => s.managed && (s.scope === 'core' || s.scope === 'bootstrap')).length,
-    unmanaged: services.filter((s) => !s.managed).length,
-  }), [services]);
+  const counts = useMemo(
+    () => ({
+      all: services.length,
+      managed: services.filter((s) => s.managed).length,
+      projects: services.filter(
+        (s) => s.managed && (s.scope === 'project' || s.scope === 'session'),
+      ).length,
+      system: services.filter(
+        (s) => s.managed && (s.scope === 'core' || s.scope === 'bootstrap'),
+      ).length,
+      unmanaged: services.filter((s) => !s.managed).length,
+    }),
+    [services],
+  );
 
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return services
       .filter((s) => {
         if (filter === 'managed') return s.managed;
-        if (filter === 'projects') return s.managed && (s.scope === 'project' || s.scope === 'session');
-        if (filter === 'system') return s.managed && (s.scope === 'core' || s.scope === 'bootstrap');
+        if (filter === 'projects')
+          return s.managed && (s.scope === 'project' || s.scope === 'session');
+        if (filter === 'system')
+          return s.managed && (s.scope === 'core' || s.scope === 'bootstrap');
         if (filter === 'unmanaged') return !s.managed;
         return true;
       })
-      .filter((s) => !q || [s.id, s.name, s.framework, s.scope, s.adapter, s.status].filter(Boolean).some((v) => String(v).toLowerCase().includes(q)))
+      .filter(
+        (s) =>
+          !q ||
+          [s.id, s.name, s.framework, s.scope, s.adapter, s.status]
+            .filter(Boolean)
+            .some((v) => String(v).toLowerCase().includes(q)),
+      )
       .sort((a, b) => {
         if (a.managed !== b.managed) return a.managed ? -1 : 1;
         return a.name.localeCompare(b.name);
@@ -342,83 +427,128 @@ export function RunningServicesPanel() {
 
   const templateOptions = useMemo(() => {
     const hasCustom = templates.some((t) => t.id === 'custom-command');
-    const base = hasCustom ? [] : [{ id: 'custom-command', name: 'Custom command', description: '', framework: undefined, defaultPort: undefined }];
+    const base = hasCustom
+      ? []
+      : [
+          {
+            id: 'custom-command',
+            name: 'Custom command',
+            description: '',
+            framework: undefined,
+            defaultPort: undefined,
+          },
+        ];
     return [...base, ...templates];
   }, [templates]);
 
   const selectedTemplate = useMemo(
-    () => templateOptions.find((t) => t.id === form.template) ?? templateOptions[0],
+    () =>
+      templateOptions.find((t) => t.id === form.template) ?? templateOptions[0],
     [form.template, templateOptions],
   );
   const needsCustomCmd = selectedTemplate?.id === 'custom-command';
 
   // ── Handlers ──
 
-  const handleOpen = useCallback((s: SandboxService) => {
-    if (s.port <= 0 || s.status !== 'running') return;
-    openTabAndNavigate({
-      id: `preview:${s.port}`,
-      title: s.name || `localhost:${s.port}`,
-      type: 'preview',
-      href: `/preview/${s.port}`,
-      metadata: { url: getServiceUrl(s.port), port: s.port, originalUrl: `http://localhost:${s.port}/` },
-    });
-  }, [getServiceUrl]);
+  const handleOpen = useCallback(
+    (s: SandboxService) => {
+      if (s.port <= 0 || s.status !== 'running') return;
+      openTabAndNavigate({
+        id: `preview:${s.port}`,
+        title: s.name || `localhost:${s.port}`,
+        type: 'preview',
+        href: `/preview/${s.port}`,
+        metadata: {
+          url: getServiceUrl(s.port),
+          port: s.port,
+          originalUrl: `http://localhost:${s.port}/`,
+        },
+      });
+    },
+    [getServiceUrl],
+  );
 
-  const handleAction = useCallback(async (s: SandboxService, action: 'start' | 'stop' | 'restart' | 'delete') => {
-    setPendingAction(`${s.id}:${action}`);
-    try {
-      await actionMutation.mutateAsync({ serviceId: s.id, action });
-      if (action === 'delete' && logsServiceId === s.id) setLogsServiceId(null);
-    } catch (e) {
-      toast.warning(e instanceof Error ? e.message : `Failed to ${action} ${s.name}`);
-    } finally {
-      setPendingAction(null);
-    }
-  }, [actionMutation, logsServiceId]);
+  const handleAction = useCallback(
+    async (
+      s: SandboxService,
+      action: 'start' | 'stop' | 'restart' | 'delete',
+    ) => {
+      setPendingAction(`${s.id}:${action}`);
+      try {
+        await actionMutation.mutateAsync({ serviceId: s.id, action });
+        if (action === 'delete' && logsServiceId === s.id)
+          setLogsServiceId(null);
+      } catch (e) {
+        toast.warning(
+          e instanceof Error ? e.message : `Failed to ${action} ${s.name}`,
+        );
+      } finally {
+        setPendingAction(null);
+      }
+    },
+    [actionMutation, logsServiceId],
+  );
 
-  const handleRestart = useCallback(async (mode: 'full' | 'dispose-only') => {
-    setRestartDialogOpen(false);
-    setPendingGlobal(mode);
-    try {
-      await runtimeReloadMutation.mutateAsync({ mode });
-      toast.success(mode === 'full' ? 'Restarting — all managed services will come back up' : 'Config rescanned');
-    } catch (e) {
-      toast.warning(e instanceof Error ? e.message : 'Restart failed');
-    } finally { setPendingGlobal(null); }
-  }, [runtimeReloadMutation]);
+  const handleRestart = useCallback(
+    async (mode: 'full' | 'dispose-only') => {
+      setRestartDialogOpen(false);
+      setPendingGlobal(mode);
+      try {
+        await runtimeReloadMutation.mutateAsync({ mode });
+        toast.success(
+          mode === 'full'
+            ? 'Restarting — all managed services will come back up'
+            : 'Config rescanned',
+        );
+      } catch (e) {
+        toast.warning(e instanceof Error ? e.message : 'Restart failed');
+      } finally {
+        setPendingGlobal(null);
+      }
+    },
+    [runtimeReloadMutation],
+  );
 
-  const handleRegister = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.id.trim()) { toast.warning('Service ID is required'); return; }
-    if (needsCustomCmd && !form.startCommand.trim()) { toast.warning('Start command is required'); return; }
-    const port = form.port.trim() ? Number(form.port) : undefined;
+  const handleRegister = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!form.id.trim()) {
+        toast.warning('Service ID is required');
+        return;
+      }
+      if (needsCustomCmd && !form.startCommand.trim()) {
+        toast.warning('Start command is required');
+        return;
+      }
+      const port = form.port.trim() ? Number(form.port) : undefined;
 
-    const payload: RegisterSandboxServicePayload = {
-      id: form.id.trim(),
-      name: form.name.trim() || form.id.trim(),
-      scope: 'project',
-      sourcePath: form.sourcePath.trim(),
-      template: selectedTemplate?.id,
-      framework: form.framework.trim() || undefined,
-      port,
-      desiredState: 'running',
-      autoStart: true,
-      userVisible: true,
-      startNow: true,
-    };
-    if (needsCustomCmd) {
-      payload.adapter = 'spawn';
-      payload.startCommand = form.startCommand.trim();
-    }
-    try {
-      await registerMutation.mutateAsync(payload);
-      setIsRegisterOpen(false);
-      setForm(DEFAULT_FORM);
-    } catch (e) {
-      toast.warning(e instanceof Error ? e.message : 'Registration failed');
-    }
-  }, [form, registerMutation, needsCustomCmd, selectedTemplate?.id]);
+      const payload: RegisterSandboxServicePayload = {
+        id: form.id.trim(),
+        name: form.name.trim() || form.id.trim(),
+        scope: 'project',
+        sourcePath: form.sourcePath.trim(),
+        template: selectedTemplate?.id,
+        framework: form.framework.trim() || undefined,
+        port,
+        desiredState: 'running',
+        autoStart: true,
+        userVisible: true,
+        startNow: true,
+      };
+      if (needsCustomCmd) {
+        payload.adapter = 'spawn';
+        payload.startCommand = form.startCommand.trim();
+      }
+      try {
+        await registerMutation.mutateAsync(payload);
+        setIsRegisterOpen(false);
+        setForm(DEFAULT_FORM);
+      } catch (e) {
+        toast.warning(e instanceof Error ? e.message : 'Registration failed');
+      }
+    },
+    [form, registerMutation, needsCustomCmd, selectedTemplate?.id],
+  );
 
   // ── Filters config ──
   const filters: { key: ServiceFilter; label: string; count: number }[] = [
@@ -461,7 +591,11 @@ export function RunningServicesPanel() {
                 data-state={filter === f.key ? 'active' : 'inactive'}
               >
                 {f.label}
-                {f.count > 0 && <span className="ml-1 tabular-nums opacity-60">{f.count}</span>}
+                {f.count > 0 && (
+                  <span className="ml-1 tabular-nums opacity-60">
+                    {f.count}
+                  </span>
+                )}
               </FilterBarItem>
             ))}
           </FilterBar>
@@ -469,15 +603,21 @@ export function RunningServicesPanel() {
           {/* Actions */}
           <div className="flex items-center gap-1.5">
             <Button
-              variant="outline" size="default"
+              variant="outline"
+              size="default"
               disabled={pendingGlobal !== null}
               onClick={() => setRestartDialogOpen(true)}
             >
-              {pendingGlobal ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCcw className="h-4 w-4" />}
+              {pendingGlobal ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RotateCcw className="h-4 w-4" />
+              )}
               <span className="hidden xs:inline">Restart</span>
             </Button>
             <Button
-              variant="default" size="default"
+              variant="default"
+              size="default"
               onClick={() => setIsRegisterOpen(true)}
             >
               <Plus className="h-4 w-4" />
@@ -490,7 +630,9 @@ export function RunningServicesPanel() {
         <div className="pb-6 sm:pb-8 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 fill-mode-both delay-150">
           {error ? (
             <div className="text-center py-12 text-destructive text-sm">
-              {error instanceof Error ? error.message : 'Failed to load services'}
+              {error instanceof Error
+                ? error.message
+                : 'Failed to load services'}
             </div>
           ) : isLoading ? (
             <LoadingSkeleton />
@@ -534,11 +676,18 @@ export function RunningServicesPanel() {
       </div>
 
       {/* Logs dialog */}
-      <Dialog open={!!selectedLogService} onOpenChange={(open) => !open && setLogsServiceId(null)}>
+      <Dialog
+        open={!!selectedLogService}
+        onOpenChange={(open) => !open && setLogsServiceId(null)}
+      >
         <DialogContent className="max-w-4xl p-0">
           <DialogHeader className="border-b border-border/60 px-6 py-5">
-            <DialogTitle>{selectedLogService?.name || 'Service logs'}</DialogTitle>
-            <DialogDescription>{selectedLogService?.id || ''}</DialogDescription>
+            <DialogTitle>
+              {selectedLogService?.name || 'Service logs'}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedLogService?.id || ''}
+            </DialogDescription>
           </DialogHeader>
           <div className="px-6 py-5">
             <ScrollArea className="h-[28rem] rounded-2xl border border-border/60 bg-muted/20">
@@ -548,9 +697,13 @@ export function RunningServicesPanel() {
                     <Loader2 className="h-4 w-4 animate-spin" /> Loading…
                   </div>
                 ) : logLines.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No logs captured yet.</p>
+                  <p className="text-sm text-muted-foreground">
+                    No logs captured yet.
+                  </p>
                 ) : (
-                  <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-6 text-foreground">{logLines.join('\n')}</pre>
+                  <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-6 text-foreground">
+                    {logLines.join('\n')}
+                  </pre>
                 )}
               </div>
             </ScrollArea>
@@ -570,24 +723,66 @@ export function RunningServicesPanel() {
           <form className="space-y-4" onSubmit={handleRegister}>
             <label className="space-y-2 text-sm font-medium">
               <span>Service ID</span>
-              <Input type="text" value={form.id} onChange={(e) => setForm((c) => ({ ...c, id: e.target.value }))} placeholder="my-web-app" />
+              <Input
+                type="text"
+                value={form.id}
+                onChange={(e) => setForm((c) => ({ ...c, id: e.target.value }))}
+                placeholder="my-web-app"
+              />
             </label>
             <label className="space-y-2 text-sm font-medium">
               <span>Source path</span>
-              <Input type="text" value={form.sourcePath} onChange={(e) => setForm((c) => ({ ...c, sourcePath: e.target.value }))} placeholder="/workspace/my-app" />
+              <Input
+                type="text"
+                value={form.sourcePath}
+                onChange={(e) =>
+                  setForm((c) => ({ ...c, sourcePath: e.target.value }))
+                }
+                placeholder="/workspace/my-app"
+              />
             </label>
             <label className="space-y-2 text-sm font-medium">
               <span>Start command</span>
-              <Input type="text" value={form.startCommand} onChange={(e) => setForm((c) => ({ ...c, startCommand: e.target.value }))} placeholder="bun server.js" />
+              <Input
+                type="text"
+                value={form.startCommand}
+                onChange={(e) =>
+                  setForm((c) => ({ ...c, startCommand: e.target.value }))
+                }
+                placeholder="bun server.js"
+              />
             </label>
             <label className="space-y-2 text-sm font-medium">
-              <span>Port <span className="text-muted-foreground font-normal">(optional — auto-assigned if empty)</span></span>
-              <Input type="text" value={form.port} onChange={(e) => setForm((c) => ({ ...c, port: e.target.value }))} placeholder="3000" inputMode="numeric" />
+              <span>
+                Port{' '}
+                <span className="text-muted-foreground font-normal">
+                  (optional — auto-assigned if empty)
+                </span>
+              </span>
+              <Input
+                type="text"
+                value={form.port}
+                onChange={(e) =>
+                  setForm((c) => ({ ...c, port: e.target.value }))
+                }
+                placeholder="3000"
+                inputMode="numeric"
+              />
             </label>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsRegisterOpen(false)}>Cancel</Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsRegisterOpen(false)}
+              >
+                Cancel
+              </Button>
               <Button type="submit" disabled={registerMutation.isPending}>
-                {registerMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                {registerMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
                 Start
               </Button>
             </DialogFooter>
@@ -602,17 +797,34 @@ export function RunningServicesPanel() {
             <AlertDialogTitle>Restart Instance</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-2 text-sm text-muted-foreground">
-                <p><strong>Config Only</strong> — Hot-reload agents, skills, commands, and config. Fast (~2s). Use after editing .md files or opencode.jsonc.</p>
-                <p><strong>Full Restart</strong> — Kill and restart every service (OpenCode, static server, acme-master). Clears all module caches. Use after editing .ts plugin/route code. Active sessions will be interrupted.</p>
+                <p>
+                  <strong>Config Only</strong> — Hot-reload agents, skills,
+                  commands, and config. Fast (~2s). Use after editing .md files
+                  or opencode.jsonc.
+                </p>
+                <p>
+                  <strong>Full Restart</strong> — Kill and restart every service
+                  (OpenCode, static server, aether-master). Clears all module
+                  caches. Use after editing .ts plugin/route code. Active
+                  sessions will be interrupted.
+                </p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <Button variant="outline" onClick={() => void handleRestart('dispose-only')} disabled={!!pendingGlobal}>
+            <Button
+              variant="outline"
+              onClick={() => void handleRestart('dispose-only')}
+              disabled={!!pendingGlobal}
+            >
               Config Only
             </Button>
-            <Button variant="destructive" onClick={() => void handleRestart('full')} disabled={!!pendingGlobal}>
+            <Button
+              variant="destructive"
+              onClick={() => void handleRestart('full')}
+              disabled={!!pendingGlobal}
+            >
               {pendingGlobal ? 'Restarting\u2026' : 'Full Restart'}
             </Button>
           </AlertDialogFooter>

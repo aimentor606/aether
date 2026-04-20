@@ -951,7 +951,7 @@ export const UnifiedMarkdown = React.memo<UnifiedMarkdownProps>(({
 
   return (
     <div
-      className={cn('acme-markdown', isStreaming && 'streaming-active', className)}
+      className={cn('aether-markdown', isStreaming && 'streaming-active', className)}
       data-streaming={isStreaming ? 'true' : 'false'}
     >
       <Streamdown

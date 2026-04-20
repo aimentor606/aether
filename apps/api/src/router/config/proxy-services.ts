@@ -27,13 +27,13 @@ export interface ProxyServiceConfig {
   /** Real upstream base URL (e.g. "https://api.tavily.com") — used for passthrough (Mode 2/3) */
   targetBaseUrl: string;
   /** Alternate upstream base URL for Aether-managed requests (Mode 1). Falls back to targetBaseUrl. */
-  acmeTargetBaseUrl?: string;
+  aetherTargetBaseUrl?: string;
   /** Aether-owned API key for this upstream service */
   getAetherApiKey: () => string;
   /** How to inject the API key into upstream requests (passthrough) */
   keyInjection: KeyInjectionMethod;
   /** Alternate key injection for Aether-managed requests (Mode 1). Falls back to keyInjection. */
-  acmeKeyInjection?: KeyInjectionMethod;
+  aetherKeyInjection?: KeyInjectionMethod;
   /** Only these routes are allowed when using Aether's key (prevents cost abuse) */
   allowedRoutes: AllowedRoute[];
   /** Default tool name for billing attribution (can be overridden per-route) */

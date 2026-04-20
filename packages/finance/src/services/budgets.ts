@@ -3,8 +3,8 @@ import { createBudgetSchema, updateBudgetSchema } from '@aether/db';
 import type { CreateBudgetInput, UpdateBudgetInput } from '@aether/db';
 
 export const budgetsService = {
-  async listAll(accountId: string) {
-    return budgetsRepository.findAll(accountId);
+  async listAll(accountId: string, options?: { limit?: number; offset?: number }) {
+    return budgetsRepository.findAll(accountId, options);
   },
 
   async getById(accountId: string, id: string) {

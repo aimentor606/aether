@@ -10,7 +10,7 @@
 # ║    5. Regeneration produces a new key that also works                      ║
 # ║    6. Multiple keys can coexist (append, not overwrite)                    ║
 # ║                                                                            ║
-# ║  Requires: Acme installed & running (sandbox container active)           ║
+# ║  Requires: aether installed & running (sandbox container active)           ║
 # ║                                                                            ║
 # ║  Usage:                                                                    ║
 # ║    bash test-ssh-e2e.sh [--api-url URL] [--auth-token TOKEN]               ║
@@ -18,15 +18,15 @@
 # ║  Environment:                                                              ║
 # ║    API_URL         API base URL (default: auto-detect from .env)           ║
 # ║    AUTH_TOKEN       Supabase access token (default: auto-login)            ║
-# ║    OWNER_EMAIL      For auto-login (default: e2e@acme.ai)               ║
+# ║    OWNER_EMAIL      For auto-login (default: e2e@aether.ai)               ║
 # ║    OWNER_PASSWORD   For auto-login (default: e2e-test-pass-42)            ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 set -uo pipefail
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${AETHER_HOME:-$HOME/.acme}"
-OWNER_EMAIL="${OWNER_EMAIL:-e2e@acme.ai}"
+INSTALL_DIR="${AETHER_HOME:-$HOME/.aether}"
+OWNER_EMAIL="${OWNER_EMAIL:-e2e@aether.ai}"
 OWNER_PASSWORD="${OWNER_PASSWORD:-e2e-test-pass-42}"
 API_URL="${API_URL:-}"
 AUTH_TOKEN="${AUTH_TOKEN:-}"
@@ -97,7 +97,7 @@ get_auth_token() {
 echo ""
 echo "${BOLD}${CYAN}"
 echo "  ╔═══════════════════════════════════════════════╗"
-echo "  ║  Acme — SSH Key E2E Test Suite              ║"
+echo "  ║  aether — SSH Key E2E Test Suite              ║"
 echo "  ╚═══════════════════════════════════════════════╝"
 echo "${NC}"
 echo "  ${DIM}API:${NC}      ${BOLD}${API_URL}${NC}"

@@ -189,7 +189,7 @@ if (enabledCount === 1 && config.isDaytonaEnabled()) {
 
     const origin = c.req.header('Origin') || '';
 
-    // Auth: proxy token for CF Worker, service key for core/acme-master
+    // Auth: proxy token for CF Worker, service key for core/aether-master
     const extraHeaders: Record<string, string> = {};
     if (resolved.proxyToken) {
       extraHeaders['X-Proxy-Token'] = resolved.proxyToken;

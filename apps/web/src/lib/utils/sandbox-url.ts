@@ -134,7 +134,9 @@ function stripUrlWrappers(url: string): string {
 }
 
 function extractLocalhostCandidate(text: string): string | null {
-  const match = text.match(/https?:\/\/(?:localhost|127\.0\.0\.1):\d{1,5}[^\s"'<>)]*/i);
+  const match = text.match(
+    /https?:\/\/(?:localhost|127\.0\.0\.1):\d{1,5}[^\s"'<>)]*/i,
+  );
   return match?.[0] ?? null;
 }
 
@@ -152,13 +154,15 @@ const AETHER_MASTER_PROXY_REGEX = /^\/proxy\/(\d{1,5})(\/.*)?$/;
  * localhost/127.0.0.1 are same-app navigations, NOT sandbox services
  * to proxy. They should render as plain clickable links.
  */
-const APP_ROUTE_PREFIXES = /^\/(connectors|settings|dashboard|projects|agents|skills|tools|commands|deployments|support|changelog|files|p|browser|desktop|terminal|sessions|services|workspace|channels|scheduled-tasks|marketplace|templates|tunnel|admin|auth)(\/|$|\?)/;
+const APP_ROUTE_PREFIXES =
+  /^\/(connectors|settings|dashboard|projects|agents|skills|tools|commands|deployments|support|changelog|files|p|browser|desktop|terminal|sessions|services|workspace|channels|scheduled-tasks|marketplace|templates|tunnel|admin|auth)(\/|$|\?)/;
 
 export function isAppRouteUrl(rawUrl: string | undefined): boolean {
   if (!rawUrl) return false;
   try {
     const parsed = new URL(rawUrl);
-    if (parsed.hostname !== 'localhost' && parsed.hostname !== '127.0.0.1') return false;
+    if (parsed.hostname !== 'localhost' && parsed.hostname !== '127.0.0.1')
+      return false;
     return APP_ROUTE_PREFIXES.test(parsed.pathname);
   } catch {
     return false;
@@ -208,8 +212,8 @@ export function parseLocalhostUrl(
 
     // Special case: localhost:8000/proxy/{port}/... (Aether Master proxy URL).
     // Extract the real port and remaining path so detection/rewriting works.
-    const acmeMasterPort = parseInt(SANDBOX_PORTS.AETHER_MASTER, 10);
-    if (port === acmeMasterPort) {
+    const aetherMasterPort = parseInt(SANDBOX_PORTS.AETHER_MASTER, 10);
+    if (port === aetherMasterPort) {
       const proxyMatch = parsed.pathname.match(AETHER_MASTER_PROXY_REGEX);
       if (proxyMatch) {
         const realPort = parseInt(proxyMatch[1], 10);
@@ -407,10 +411,10 @@ export function isProxiableLocalhostUrl(url: string): boolean {
 
   if (EXCLUDED_PORTS.has(parsed.port)) return false;
 
-   // If the URL is a known frontend app route (e.g. /connectors?connect=...,
+  // If the URL is a known frontend app route (e.g. /connectors?connect=...,
   // /settings, /dashboard) it must NOT be proxied — it is a navigation link to
   // the local frontend, not a sandbox service.  This is critical for the
-   // connector-connect flow which generates http://localhost:3000/connectors?...
+  // connector-connect flow which generates http://localhost:3000/connectors?...
   // URLs that should open in the same browser tab, not go through the p3000-...
   // subdomain proxy.
   if (isAppRouteUrl(url)) return false;
@@ -463,8 +467,7 @@ export function toInternalUrl(port: number, path: string = '/'): string {
  * Regex to detect path-based proxy URLs:
  *   https://domain/v1/p/{sandboxId}/{port}/{path}
  */
-const PATH_PROXY_URL_REGEX =
-  /^https?:\/\/[^/]+\/v1\/p\/([^/]+)\/(\d+)(\/.*)?$/;
+const PATH_PROXY_URL_REGEX = /^https?:\/\/[^/]+\/v1\/p\/([^/]+)\/(\d+)(\/.*)?$/;
 
 /**
  * Parse a preview proxy URL back to its components.
@@ -498,7 +501,9 @@ export function parseSubdomainUrl(url: string): {
       return {
         port: parseInt(pathMatch[2], 10),
         sandboxId: pathMatch[1],
-        backendPort: parseInt(parsed.port, 10) || (parsed.protocol === 'https:' ? 443 : 80),
+        backendPort:
+          parseInt(parsed.port, 10) ||
+          (parsed.protocol === 'https:' ? 443 : 80),
         path: pathMatch[3] || '/',
       };
     } catch {
@@ -580,7 +585,8 @@ export function buildWebProxyUrl(
 ): string | null {
   try {
     const parsed = new URL(targetUrl);
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:')
+      return null;
     const scheme = parsed.protocol.replace(':', '');
     const proxyPath = `${WEB_PROXY_PATH_PREFIX}${scheme}/${parsed.host}${parsed.pathname}${parsed.search}${parsed.hash}`;
 
@@ -588,7 +594,12 @@ export function buildWebProxyUrl(
 
     // 1. If subdomainOpts is provided, use the standard rewrite
     if (subdomainOpts) {
-      const baseUrl = rewriteLocalhostUrl(parseInt(kmPort, 10), '/', serverUrl, subdomainOpts);
+      const baseUrl = rewriteLocalhostUrl(
+        parseInt(kmPort, 10),
+        '/',
+        serverUrl,
+        subdomainOpts,
+      );
       return `${baseUrl.replace(/\/$/, '')}${proxyPath}`;
     }
 
@@ -609,7 +620,9 @@ export function buildWebProxyUrl(
       if (pathMatch) {
         return `${server.origin}${pathMatch[1]}/${kmPort}${proxyPath}`;
       }
-    } catch { /* fall through */ }
+    } catch {
+      /* fall through */
+    }
 
     // 4. Last resort: bare localhost (only works if Aether Master is accessible directly)
     return `http://localhost:${kmPort}${proxyPath}`;

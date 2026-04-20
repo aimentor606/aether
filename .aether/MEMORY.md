@@ -1,6 +1,6 @@
 # Global Memory
 
-Keep this file concise. Put deeper notes in `.acme/memory/*.md` and reference them here.
+Keep this file concise. Put deeper notes in `.aether/memory/*.md` and reference them here.
 
 ## Environment
 

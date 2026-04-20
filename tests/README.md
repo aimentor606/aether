@@ -48,7 +48,7 @@ tests/
 
   shell/                  # Shell-based tests (no browser)
     run-all.sh            #   Runs installer + CLI + security
-    installer/            #   get-acme.sh structure validation
+    installer/            #   get-aether.sh structure validation
       test-install.sh
       test-e2e-install.sh
     cli/                  #   Embedded CLI verification
@@ -80,7 +80,7 @@ tests/
 
 | Suite | What it verifies |
 |-------|------------------|
-| `installer/test-install.sh` | get-acme.sh has correct structure, functions, compose |
+| `installer/test-install.sh` | get-aether.sh has correct structure, functions, compose |
 | `cli/test-cli.sh` | Embedded CLI has all commands, correct syntax |
 | `security/test-security.sh` | INTERNAL_SERVICE_KEY, CORS, port bindings, secrets |
 | `security/test-auth-e2e.sh` | Full auth chain: sandbox <-> API <-> frontend |
@@ -112,6 +112,6 @@ npm run test:shell:auth     # Auth E2E (needs running stack)
 ## Note on Unit Tests
 
 Unit tests that live with their packages (e.g. `apps/api/src/__tests__/`,
-`core/acme-master/tests/`, `packages/*/test/`) stay in-place. They are
+`core/aether-master/tests/`, `packages/*/test/`) stay in-place. They are
 run via each package's own `npm test` command. This directory only centralises
 integration, E2E, and cross-cutting tests.

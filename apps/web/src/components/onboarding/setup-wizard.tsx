@@ -504,7 +504,7 @@ function DefaultModelPane({ onNext, onBack }: { onNext: () => void; onBack: () =
       // survives across devices / reinstalls and is written to opencode.jsonc.
       const base = getActiveOpenCodeUrl();
       if (base) {
-        authenticatedFetch(`${base}/acme/preferences/model`, {
+        authenticatedFetch(`${base}/aether/preferences/model`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ model: `${model.providerID}/${model.modelID}` }),

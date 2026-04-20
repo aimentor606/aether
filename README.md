@@ -9,7 +9,7 @@ A cloud computer where AI agents run your company. Full Linux sandbox, persisten
 Run locally on your laptop or on a VPS/server — the installer handles both.
 
 ```bash
-curl -fsSL https://acme.com/install | bash
+curl -fsSL https://aether.com/install | bash
 ```
 
 The installer will ask where you're running:
@@ -17,26 +17,26 @@ The installer will ask where you're running:
 1. **Local machine** (laptop/desktop) — binds to `localhost`
 2. **VPS / Server** — binds to `0.0.0.0`, accessible over the network
 
-Aether works best when it can run 24/7 — even when your laptop is closed. We recommend a server or VPS: [Aether Cloud](https://acme.com/) (managed), your own server, or a VPS from [Hetzner](https://hetzner.com/) or [JustAVPS](https://justavps.com/).
+Aether works best when it can run 24/7 — even when your laptop is closed. We recommend a server or VPS: [Aether Cloud](https://aether.com/) (managed), your own server, or a VPS from [Hetzner](https://hetzner.com/) or [JustAVPS](https://justavps.com/).
 
 On any server, just SSH in and run the same install command:
 
 ```bash
 # SSH into your server, then run the same install:
-curl -fsSL https://acme.com/install | bash
+curl -fsSL https://aether.com/install | bash
 ```
 
-After install, manage everything with the `acme` CLI:
+After install, manage everything with the `aether` CLI:
 
 ```
-acme start       Start all services
-acme stop        Stop all services
-acme restart     Restart all services
-acme logs        Tail logs
-acme status      Show service status
-acme update      Pull latest images and restart
-acme reset       Wipe local data and start fresh
-acme uninstall   Remove Aether completely
+aether start       Start all services
+aether stop        Stop all services
+aether restart     Restart all services
+aether logs        Tail logs
+aether status      Show service status
+aether update      Pull latest images and restart
+aether reset       Wipe local data and start fresh
+aether uninstall   Remove Aether completely
 ```
 
 ## DEV Commands

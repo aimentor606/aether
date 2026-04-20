@@ -45,15 +45,15 @@ jobs:
       - name: POST to staging QA hook
         env:
           QA_STAGING_HOOK_URL: ${{ secrets.QA_STAGING_HOOK_URL }}
-          QA_STAGING_ACME_TOKEN: ${{ secrets.QA_STAGING_ACME_TOKEN }}
+          QA_STAGING_aether_TOKEN: ${{ secrets.QA_STAGING_aether_TOKEN }}
           QA_STAGING_TRIGGER_SECRET: ${{ secrets.QA_STAGING_TRIGGER_SECRET }}
         run: |
           set -euo pipefail
 
           curl --fail-with-body --silent --show-error \
             -X POST "$QA_STAGING_HOOK_URL" \
-            -H "X-Acme-Token: $QA_STAGING_ACME_TOKEN" \
-            -H "x-acme-trigger-secret: $QA_STAGING_TRIGGER_SECRET" \
+            -H "X-aether-Token: $QA_STAGING_aether_TOKEN" \
+            -H "x-aether-trigger-secret: $QA_STAGING_TRIGGER_SECRET" \
             -H "Content-Type: application/json" \
             --data @payload.json
 

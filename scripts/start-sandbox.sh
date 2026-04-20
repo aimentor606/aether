@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# start-sandbox.sh — Acme sandbox Docker workload setup
+# start-sandbox.sh — aether sandbox Docker workload setup
 #
 # Runs once during image build. The snapshot preserves everything for future boots.
 # On boot from snapshot, the systemd service waits for fresh env vars before starting.
@@ -42,12 +42,12 @@ stage_callback() {
 
 wait_for() {
   local desc="$1"; shift
-  echo "[acme] Waiting for ${desc}..."
+  echo "[aether] Waiting for ${desc}..."
   for i in $(seq 1 120); do
     "$@" && return 0
     sleep 2
   done
-  echo "[acme] Timed out waiting for ${desc}"
+  echo "[aether] Timed out waiting for ${desc}"
 }
 
 # ── Build port args ───────────────────────────────────────────────────────
@@ -79,7 +79,7 @@ chmod +x /usr/local/bin/${SERVICE}-start.sh
 # ── Systemd service ───────────────────────────────────────────────────────
 cat > /etc/systemd/system/${SERVICE}.service << SVCEOF
 [Unit]
-Description=Acme sandbox workload
+Description=aether sandbox workload
 After=network-online.target docker.service
 Requires=docker.service
 Wants=network-online.target
@@ -99,8 +99,8 @@ printf '%s\n' "${HOST_PORTS[@]}" > "$PORTS_FILE"
 
 docker volume create ${VOLUME} 2>/dev/null || true
 WS=$(docker volume inspect ${VOLUME} --format '{{.Mountpoint}}')
-mkdir -p "${WS}/.acme"
-cat > "${WS}/.acme/container.json" << CFGEOF
+mkdir -p "${WS}/.aether"
+cat > "${WS}/.aether/container.json" << CFGEOF
 {
   "image": "${DOCKER_IMAGE}",
   "name": "${CONTAINER}",
@@ -115,7 +115,7 @@ CFGEOF
 
 # ── Pull image ────────────────────────────────────────────────────────────
 stage_callback "docker_pulling" "Pulling Docker image..."
-echo "[acme] Pulling $DOCKER_IMAGE..."
+echo "[aether] Pulling $DOCKER_IMAGE..."
 docker pull "$DOCKER_IMAGE"
 
 # ── Host SSH bridge into the sandbox container ───────────────────────────
@@ -126,16 +126,16 @@ id -u abc >/dev/null 2>&1 || useradd -m -s /bin/bash abc
 passwd -l abc >/dev/null 2>&1 || true
 usermod -aG docker abc >/dev/null 2>&1 || true
 
-cat > /usr/local/bin/acme-authorized-keys << 'AUTHORIZEDKEYSEOF'
+cat > /usr/local/bin/aether-authorized-keys << 'AUTHORIZEDKEYSEOF'
 #!/bin/bash
 set -euo pipefail
 USER_NAME="${1:-}"
 [ "$USER_NAME" = "abc" ] || exit 0
 docker exec justavps-workload sh -lc 'cat /config/.ssh/authorized_keys 2>/dev/null' || true
 AUTHORIZEDKEYSEOF
-chmod +x /usr/local/bin/acme-authorized-keys
+chmod +x /usr/local/bin/aether-authorized-keys
 
-cat > /usr/local/bin/acme-container-shell << 'CONTAINERSHELLEOF'
+cat > /usr/local/bin/aether-container-shell << 'CONTAINERSHELLEOF'
 #!/bin/bash
 set -euo pipefail
 TTY_ARGS=(-i)
@@ -153,20 +153,20 @@ exec docker exec "${TTY_ARGS[@]}" \
   -e TERM="${TERM:-xterm-256color}" \
   justavps-workload bash -l
 CONTAINERSHELLEOF
-chmod +x /usr/local/bin/acme-container-shell
+chmod +x /usr/local/bin/aether-container-shell
 
 mkdir -p /etc/ssh/sshd_config.d
 cat > /etc/ssh/sshd_config.d/aether-sandbox.conf << 'SSHEOF'
 Match User abc
     PasswordAuthentication no
     PubkeyAuthentication yes
-    AuthorizedKeysCommand /usr/local/bin/acme-authorized-keys %u
+    AuthorizedKeysCommand /usr/local/bin/aether-authorized-keys %u
     AuthorizedKeysCommandUser root
     PermitTTY yes
     X11Forwarding no
     PermitTunnel no
     GatewayPorts no
-    ForceCommand /usr/local/bin/acme-container-shell
+    ForceCommand /usr/local/bin/aether-container-shell
 SSHEOF
 
 systemctl reload ssh 2>/dev/null || systemctl reload sshd 2>/dev/null || true
@@ -180,7 +180,7 @@ wait_for "container" sh -c "docker ps --format '{{.Names}}' 2>/dev/null | grep -
 stage_callback "docker_running" "Docker container started"
 
 stage_callback "services_starting" "Services booting..."
-wait_for "services" sh -c "curl -sf http://localhost:8000/acme/health >/dev/null 2>&1"
+wait_for "services" sh -c "curl -sf http://localhost:8000/aether/health >/dev/null 2>&1"
 stage_callback "services_ready" "All services are up"
 
-echo "[acme] Sandbox ready."
+echo "[aether] Sandbox ready."

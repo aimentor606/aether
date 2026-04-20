@@ -334,7 +334,7 @@ function Hex({ value }: { value: string }) {
 function LogoCard({ asset, fmt }: { asset: LogoAsset; fmt: LogoFormat }) {
   const isWordmark = asset.label === 'Wordmark';
   const downloadHref = fmt === 'png' ? asset.pngSrc : asset.svgSrc;
-  const downloadName = `acme-${asset.label.toLowerCase()}-${asset.variant.toLowerCase()}.${fmt}`;
+  const downloadName = `aether-${asset.label.toLowerCase()}-${asset.variant.toLowerCase()}.${fmt}`;
 
   return (
     <div className="group relative">

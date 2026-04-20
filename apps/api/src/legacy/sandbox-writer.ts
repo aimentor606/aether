@@ -195,7 +195,7 @@ function buildMessageInsert(msg: TransformedMessage): string {
       role: 'user',
       time: { created: msg.createdAt },
       summary: { title: '', diffs: [] },
-      agent: 'acme',
+      agent: 'aether',
       model: { providerID: 'anthropic', modelID: 'claude-sonnet-4-20250514' },
     };
   } else {
@@ -207,7 +207,7 @@ function buildMessageInsert(msg: TransformedMessage): string {
       modelID: 'claude-sonnet-4-20250514',
       providerID: 'anthropic',
       mode: 'default',
-      agent: 'acme',
+      agent: 'aether',
       path: { cwd: '/home/daytona', root: '/home/daytona' },
       cost: 0,
       tokens: { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },

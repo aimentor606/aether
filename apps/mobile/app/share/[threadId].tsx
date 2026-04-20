@@ -26,7 +26,7 @@ import { Icon } from '@/components/ui/icon';
 import { AetherLoader } from '@/components/ui/aether-loader';
 import { AetherLogo } from '@/components/ui/AetherLogo';
 import { ThreadContent, type ToolMessagePair } from '@/components/chat/ThreadContent';
-import { AetherComputer } from '@/components/acme-computer';
+import { AetherComputer } from '@/components/aether-computer';
 import { useAetherComputerStore } from '@/stores/aether-computer-store';
 
 // Fetch public thread without requiring auth

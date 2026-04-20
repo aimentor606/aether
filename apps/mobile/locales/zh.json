@@ -128,7 +128,7 @@
     "skip": "跳过",
     "next": "下一步",
     "getStarted": "开始使用",
-    "acmeComputer": "Aether Computer",
+    "aetherComputer": "Aether Computer",
     "ready": "就绪",
     "examples": {
       "presentations": {
@@ -470,8 +470,8 @@
   "billing": {
     "loadingPaywall": "加载套餐中...",
     "checkoutUnavailable": "移动端结账不可用",
-    "checkoutUnavailableMessage": "要订阅套餐，请在网页上访问 acme.com。",
-    "goToWeb": "前往 acme.com",
+    "checkoutUnavailableMessage": "要订阅套餐，请在网页上访问 aether.com。",
+    "goToWeb": "前往 aether.com",
     "billingStatus": "账单状态",
     "loading": "加载账单信息中...",
     "error": "加载账单信息失败",

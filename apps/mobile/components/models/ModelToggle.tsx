@@ -37,16 +37,16 @@ export function ModelToggle({
 
   const basicModel = React.useMemo(() => {
     return models.find(m =>
-      m.id === 'acme/basic' ||
-      m.id === 'acme-basic' ||
+      m.id === 'aether/basic' ||
+      m.id === 'aether-basic' ||
       m.id.includes('claude-haiku-4-5')
     );
   }, [models]);
 
   const advancedModel = React.useMemo(() => {
     return models.find(m =>
-      m.id === 'acme/power' ||
-      m.id === 'acme-power' ||
+      m.id === 'aether/power' ||
+      m.id === 'aether-power' ||
       m.id.includes('claude-sonnet-4-5')
     );
   }, [models]);

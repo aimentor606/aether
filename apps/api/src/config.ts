@@ -130,7 +130,7 @@ const envSchema = z.object({
   // ── JustAVPS — Sandbox provisioning via JustAVPS API (conditional: required if justavps provider enabled) ──
   JUSTAVPS_API_URL:                   optStrDefault('http://localhost:3001'),
   JUSTAVPS_API_KEY:                   optStr,
-  JUSTAVPS_IMAGE_ID:                  optStr,   // Optional pin — if unset, auto-resolves latest acme-computer-v* image from JustAVPS
+  JUSTAVPS_IMAGE_ID:                  optStr,   // Optional pin — if unset, auto-resolves latest aether-computer-v* image from JustAVPS
   JUSTAVPS_DEFAULT_LOCATION:          optStrDefault('hel1'),
   JUSTAVPS_DEFAULT_SERVER_TYPE:       optStrDefault('pro'),
   JUSTAVPS_PROXY_DOMAIN:              optStrDefault('aether.cloud'),  // CF Worker proxy domain ({slug}.aether.cloud)
@@ -255,7 +255,7 @@ function validateEnv(): z.infer<typeof envSchema> {
   // ── Conditional: justavps → need JustAVPS keys ────────────────────────
   if (providers.includes('justavps')) {
     if (!raw.JUSTAVPS_API_KEY) issues.push({ var: 'JUSTAVPS_API_KEY', message: 'Required when ALLOWED_SANDBOX_PROVIDERS includes "justavps"', level: 'error' });
-    // JUSTAVPS_IMAGE_ID is optional — if unset, the provider auto-resolves the latest acme-computer-v* image at runtime.
+    // JUSTAVPS_IMAGE_ID is optional — if unset, the provider auto-resolves the latest aether-computer-v* image at runtime.
   }
 
   // ── Conditional: Pipedream integration → warn if credentials missing ────
@@ -453,7 +453,7 @@ export const config = {
    * This is how aether-api authenticates itself TO the sandbox. Every request
    * from aether-api to the sandbox (proxy, cron, health, queue drain, etc.)
    * includes `Authorization: Bearer <INTERNAL_SERVICE_KEY>`. The sandbox's
-   * acme-master middleware validates it.
+   * aether-master middleware validates it.
    *
    * Counterpart: AETHER_TOKEN goes the other direction (sandbox -> aether-api).
    *

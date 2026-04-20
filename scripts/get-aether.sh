@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Acme — One-Click Install                                               ║
+# ║  aether — One-Click Install                                               ║
 # ║                                                                            ║
-# ║  curl -fsSL https://acme.dev/install | bash                              ║
+# ║  curl -fsSL https://aether.dev/install | bash                              ║
 # ║                                                                            ║
 # ║  Supports two modes (same stack, different bind address):                  ║
 # ║    1. Local (laptop/desktop) — binds to 127.0.0.1                          ║
@@ -65,14 +65,14 @@ dots_done() { printf "${GREEN}done${NC}\n"; }
 dots_ok()   { printf "${GREEN}✓${NC}\n"; }
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${AETHER_HOME:-$HOME/.acme}"
+INSTALL_DIR="${AETHER_HOME:-$HOME/.aether}"
 
 # Resolve the latest released version from GitHub Releases API.
 # Falls back to the 'latest' Docker tag if the API is unreachable.
 resolve_latest_version() {
   local gh_version
   gh_version=$(curl -sf --connect-timeout 5 \
-    "https://api.github.com/repos/acme-ai/suna/releases/latest" 2>/dev/null \
+    "https://api.github.com/repos/aether-ai/suna/releases/latest" 2>/dev/null \
     | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"].lstrip("v"))' 2>/dev/null) || true
   if [ -n "$gh_version" ]; then
     printf '%s' "$gh_version"
@@ -123,7 +123,7 @@ compute_compose_project_name() {
   local raw
   raw="$(basename "$INSTALL_DIR")"
   raw="$(printf '%s' "$raw" | tr '[:upper:]' '[:lower:]' | sed 's/^[._-]*//; s/[^a-z0-9_-]//g')"
-  [ -n "$raw" ] || raw="acme"
+  [ -n "$raw" ] || raw="aether"
   printf '%s' "$raw"
 }
 
@@ -192,7 +192,7 @@ parse_args() {
         ;;
       -h|--help)
         cat <<'EOF'
-Usage: get-acme.sh [options]
+Usage: get-aether.sh [options]
 
 Options:
   --local             Use local Docker images instead of pulling from registry
@@ -205,13 +205,13 @@ Options:
   --query "version=<tag>"
 
 Examples:
-  bash get-acme.sh
-  bash get-acme.sh --local
-  bash get-acme.sh --local --build-local
-  bash get-acme.sh --local --local-tag latest
-  bash get-acme.sh --version 0.7.14
-  bash get-acme.sh --query "v=0.7.14"
-  AETHER_VERSION=0.7.15 bash get-acme.sh
+  bash get-aether.sh
+  bash get-aether.sh --local
+  bash get-aether.sh --local --build-local
+  bash get-aether.sh --local --local-tag latest
+  bash get-aether.sh --version 0.7.14
+  bash get-aether.sh --query "v=0.7.14"
+  AETHER_VERSION=0.7.15 bash get-aether.sh
 EOF
         exit 0
         ;;
@@ -238,8 +238,8 @@ if [ "$AETHER_LOCAL_IMAGES" = "1" ]; then
   SANDBOX_IMAGE_REPO="aether/computer"
 fi
 
-FRONTEND_IMAGE="${AETHER_FRONTEND_IMAGE:-acme/acme-frontend:${IMAGE_TAG}}"
-API_IMAGE="${AETHER_API_IMAGE:-acme/aether-api:${IMAGE_TAG}}"
+FRONTEND_IMAGE="${AETHER_FRONTEND_IMAGE:-aether/aether-frontend:${IMAGE_TAG}}"
+API_IMAGE="${AETHER_API_IMAGE:-aether/aether-api:${IMAGE_TAG}}"
 SANDBOX_IMAGE="${AETHER_SANDBOX_IMAGE:-${SANDBOX_IMAGE_REPO}:${IMAGE_TAG}}"
 FRONTEND_IMAGE_OVERRIDDEN="0"
 API_IMAGE_OVERRIDDEN="0"
@@ -255,7 +255,7 @@ SUPABASE_REST_IMAGE="postgrest/postgrest:v14.5"
 # ─── Self-hosted sandbox isolation ────────────────────────────────────────────
 # Different name + port range from dev (aether-sandbox / 14000) so both can
 # run simultaneously on the same Docker daemon.
-SANDBOX_CONTAINER_NAME="${SANDBOX_CONTAINER_NAME:-acme-hosted-sandbox}"
+SANDBOX_CONTAINER_NAME="${SANDBOX_CONTAINER_NAME:-aether-hosted-sandbox}"
 SANDBOX_PORT_BASE="${SANDBOX_PORT_BASE:-15000}"
 
 # Installer state
@@ -416,7 +416,7 @@ resolve_release_images() {
     if [ "$FRONTEND_IMAGE_OVERRIDDEN" = "1" ]; then
       fatal "Configured frontend image not found: ${FRONTEND_IMAGE}"
     fi
-    local fallback_frontend="acme/acme-frontend:latest"
+    local fallback_frontend="aether/aether-frontend:latest"
     if docker_manifest_exists "$fallback_frontend"; then
       warn "Frontend image ${FRONTEND_IMAGE} not found; falling back to ${fallback_frontend}"
       FRONTEND_IMAGE="$fallback_frontend"
@@ -429,7 +429,7 @@ resolve_release_images() {
     if [ "$API_IMAGE_OVERRIDDEN" = "1" ]; then
       fatal "Configured API image not found: ${API_IMAGE}"
     fi
-    local fallback_api="acme/aether-api:latest"
+    local fallback_api="aether/aether-api:latest"
     if docker_manifest_exists "$fallback_api"; then
       warn "API image ${API_IMAGE} not found; falling back to ${fallback_api}"
       API_IMAGE="$fallback_api"
@@ -462,10 +462,10 @@ pull_images_parallel() {
     | xargs -r -n1 -P "$AETHER_PULL_PARALLELISM" docker pull
 }
 
-# Free ports used by Acme (local mode)
-# Usage: free_acme_ports [project_name]
+# Free ports used by aether (local mode)
+# Usage: free_aether_ports [project_name]
 # If project_name is provided, only cleans containers from that project
-free_acme_ports() {
+free_aether_ports() {
   local project_name="${1:-}"
   local is_local=0
   
@@ -486,12 +486,12 @@ free_acme_ports() {
   # First, clean up any lingering containers that might hold ports
   # Use project-specific pattern if project_name is provided
   if [ -n "$project_name" ]; then
-    # Clean up containers from this compose project (e.g. acme-frontend-1).
-    # EXCLUDES standalone sandbox containers (aether-sandbox, acme-hosted-sandbox)
+    # Clean up containers from this compose project (e.g. aether-frontend-1).
+    # EXCLUDES standalone sandbox containers (aether-sandbox, aether-hosted-sandbox)
     # which are managed by the API, not compose — killing them breaks dev mode.
     docker ps -a --format '{{.Names}}' 2>/dev/null \
       | grep -E "^${project_name}-" \
-      | grep -v -E "^(aether-sandbox|acme-hosted-sandbox)$" \
+      | grep -v -E "^(aether-sandbox|aether-hosted-sandbox)$" \
       | xargs -r docker rm -f 2>/dev/null || true
   fi
   
@@ -505,7 +505,7 @@ free_acme_ports() {
     fi
   done
   
-  [ $freed -eq 1 ] && info "Freed Acme ports" || true
+  [ $freed -eq 1 ] && info "Freed aether ports" || true
 }
 
 # Generate a Supabase JWT (anon or service_role)
@@ -563,7 +563,7 @@ preflight() {
 
 # ─── Mode Selection ──────────────────────────────────────────────────────────
 prompt_mode() {
-  section "Where are you running Acme?"
+  section "Where are you running aether?"
 
   printf "\n"
   printf "    ${WHITE}1)${NC}  Local machine   ${FADED}laptop / desktop — binds to localhost${NC}\n"
@@ -829,22 +829,22 @@ ALTER ROLE authenticator WITH PASSWORD 'POSTGRES_PASSWORD_PLACEHOLDER';
 ALTER ROLE supabase_admin WITH PASSWORD 'POSTGRES_PASSWORD_PLACEHOLDER';
 ROLESEOF
 
-  # Acme extensions and schemas
-  cat > "$INSTALL_DIR/volumes/db/acme.sql" << 'ACMEEOF'
--- Acme bootstrap: extensions and schemas
+  # aether extensions and schemas
+  cat > "$INSTALL_DIR/volumes/db/aether.sql" << 'aetherEOF'
+-- aether bootstrap: extensions and schemas
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 CREATE EXTENSION IF NOT EXISTS pg_net;
-CREATE SCHEMA IF NOT EXISTS acme;
+CREATE SCHEMA IF NOT EXISTS aether;
 CREATE SCHEMA IF NOT EXISTS basejump;
 
 -- Scheduler helper (pg_cron → tick endpoint)
-CREATE OR REPLACE FUNCTION acme.configure_scheduler(api_url TEXT, tick_secret TEXT)
+CREATE OR REPLACE FUNCTION aether.configure_scheduler(api_url TEXT, tick_secret TEXT)
 RETURNS void AS $$
 BEGIN
-  PERFORM cron.unschedule('acme_global_tick')
-    WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'acme_global_tick');
+  PERFORM cron.unschedule('aether_global_tick')
+    WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'aether_global_tick');
   PERFORM cron.schedule(
-    'acme_global_tick',
+    'aether_global_tick',
     '* * * * *',
     format(
       'SELECT net.http_post(url := %L, headers := ''{"Content-Type": "application/json", "x-cron-secret": "%s"}''::jsonb, body := ''{"source": "pg_cron"}''::jsonb, timeout_milliseconds := 30000)',
@@ -863,7 +863,7 @@ GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
-ACMEEOF
+aetherEOF
 
   dots "Writing DB init scripts"; dots_done
 }
@@ -897,7 +897,7 @@ ${db_ports}
     volumes:
       - supabase-db-data:/var/lib/postgresql/data
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
-      - ./volumes/db/acme.sql:/docker-entrypoint-initdb.d/init-scripts/99-acme.sql:Z
+      - ./volumes/db/aether.sql:/docker-entrypoint-initdb.d/init-scripts/99-aether.sql:Z
     environment:
       POSTGRES_HOST: /var/run/postgresql
       POSTGRES_PORT: \"5432\"
@@ -946,7 +946,7 @@ ${db_ports}
       GOTRUE_SMTP_PORT: \"587\"
       GOTRUE_SMTP_USER: unused
       GOTRUE_SMTP_PASS: unused
-      GOTRUE_SMTP_SENDER_NAME: Acme
+      GOTRUE_SMTP_SENDER_NAME: aether
       GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
       GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
       GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
@@ -1044,7 +1044,7 @@ ${supabase_ports}
   fi
 
   cat > "$INSTALL_DIR/docker-compose.yml" << COMPOSE
-# Acme — auto-generated by get-acme.sh
+# aether — auto-generated by get-aether.sh
 # Mode: ${DEPLOY_MODE} | Database: ${DB_MODE}
 services:
 ${supabase_services}
@@ -1101,8 +1101,8 @@ COMPOSE
 write_env() {
   cat > "$INSTALL_DIR/.env" << ENVEOF
 # ──────────────────────────────────────────────────────────────────────────────
-# Acme — Environment Configuration
-# Auto-generated by get-acme.sh on $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+# aether — Environment Configuration
+# Auto-generated by get-aether.sh on $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 # ──────────────────────────────────────────────────────────────────────────────
 
 # ─── Mode ────────────────────────────────────────────────────────────────────
@@ -1211,7 +1211,7 @@ fixup_db_init() {
 
 # ─── Write CLI ───────────────────────────────────────────────────────────────
 write_cli() {
-  cat > "$INSTALL_DIR/acme" << 'CLIPATH'
+  cat > "$INSTALL_DIR/aether" << 'CLIPATH'
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -1241,10 +1241,10 @@ prompt_read() {
 
 # Installed release metadata is persisted in .env so updates stay pinned.
 VERSION=$(grep -m1 '^AETHER_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
-FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme/acme-frontend:${VERSION}")
-API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme/aether-api:${VERSION}")
+FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "aether/aether-frontend:${VERSION}")
+API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "aether/aether-api:${VERSION}")
 SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "aether/computer:${VERSION}")
-SANDBOX_NAME=$(grep -m1 '^SANDBOX_CONTAINER_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme-hosted-sandbox")
+SANDBOX_NAME=$(grep -m1 '^SANDBOX_CONTAINER_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "aether-hosted-sandbox")
 LOCAL_IMAGES=$(grep -m1 '^AETHER_LOCAL_IMAGES=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "0")
 LOCAL_TAG=$(grep -m1 '^AETHER_LOCAL_TAG=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "latest")
 LOCAL_REPO_ROOT=$(grep -m1 '^AETHER_LOCAL_REPO_ROOT=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "")
@@ -1252,7 +1252,7 @@ LOCAL_REPO_ROOT=$(grep -m1 '^AETHER_LOCAL_REPO_ROOT=' "$DIR/.env" 2>/dev/null | 
 _resolve_latest_version() {
   local gh_version
   gh_version=$(curl -sf --connect-timeout 5 \
-    "https://api.github.com/repos/acme-ai/suna/releases/latest" 2>/dev/null \
+    "https://api.github.com/repos/aether-ai/suna/releases/latest" 2>/dev/null \
     | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"].lstrip("v"))' 2>/dev/null) || true
   if [ -n "$gh_version" ]; then
     printf '%s' "$gh_version"
@@ -1283,8 +1283,8 @@ PY
 
 _refresh_state_from_env() {
   VERSION=$(grep -m1 '^AETHER_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
-  FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme/acme-frontend:${VERSION}")
-  API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme/aether-api:${VERSION}")
+  FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "aether/aether-frontend:${VERSION}")
+  API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "aether/aether-api:${VERSION}")
   SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "aether/computer:${VERSION}")
 }
 
@@ -1322,15 +1322,15 @@ PY
 }
 
 _refresh_installer_and_cli() {
-  local tmp_script="$DIR/get-acme.sh.tmp"
-  curl -fsSL "https://raw.githubusercontent.com/acme-ai/suna/main/scripts/get-acme.sh" -o "$tmp_script" || return 0
+  local tmp_script="$DIR/get-aether.sh.tmp"
+  curl -fsSL "https://raw.githubusercontent.com/aether-ai/suna/main/scripts/get-aether.sh" -o "$tmp_script" || return 0
   chmod +x "$tmp_script"
-  mv "$tmp_script" "$DIR/get-acme.sh"
+  mv "$tmp_script" "$DIR/get-aether.sh"
   awk '
     capture && $0 == "CLIPATH" { exit }
     capture { print; next }
     /<< '\''CLIPATH'\''$/ { capture = 1 }
-  ' "$DIR/get-acme.sh" > "$DIR/acme.new" && chmod +x "$DIR/acme.new" && mv "$DIR/acme.new" "$DIR/acme" || true
+  ' "$DIR/get-aether.sh" > "$DIR/aether.new" && chmod +x "$DIR/aether.new" && mv "$DIR/aether.new" "$DIR/aether" || true
 }
 
 _show_update_notice() {
@@ -1339,7 +1339,7 @@ _show_update_notice() {
   latest=$(_resolve_latest_version)
   [ -n "$latest" ] || return 0
   [ "$latest" = "$VERSION" ] && return 0
-  printf "  ${Y}!${N}  ${Y}Update available:${N} v%s ${F}(run: acme update)${N}\n" "$latest"
+  printf "  ${Y}!${N}  ${Y}Update available:${N} v%s ${F}(run: aether update)${N}\n" "$latest"
 }
 
 _open() {
@@ -1375,14 +1375,14 @@ _mode() {
 
 _project_name() {
   if [ -f "$DIR/.env" ]; then
-    grep -m1 '^COMPOSE_PROJECT_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "acme"
+    grep -m1 '^COMPOSE_PROJECT_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "aether"
   else
-    echo "acme"
+    echo "aether"
   fi
 }
 
-# Free ports used by Acme (local mode)
-_free_acme_ports() {
+# Free ports used by aether (local mode)
+_free_aether_ports() {
   local project_name
   project_name=$(_project_name)
   local ports=(13737 13738 13740 13741)
@@ -1405,7 +1405,7 @@ _free_acme_ports() {
     fi
   done
 
-  [ $freed -eq 1 ] && _info "Freed Acme ports" || true
+  [ $freed -eq 1 ] && _info "Freed aether ports" || true
 }
 
 _sync_supabase_passwords() {
@@ -1460,7 +1460,7 @@ _reset_stack() {
   docker compose down -v --remove-orphans 2>/dev/null || true
   docker rm -f "$SANDBOX_NAME" 2>/dev/null || true
   docker volume rm "${SANDBOX_NAME}-data" 2>/dev/null || true
-  [ "$(_mode)" = "local" ] && _free_acme_ports
+  [ "$(_mode)" = "local" ] && _free_aether_ports
 
   _info "Starting fresh stack..."
   docker compose up -d || true
@@ -1530,7 +1530,7 @@ _refresh_sandbox_container() {
 
 _banner() {
   printf "\n"
-  printf "  ${C}${B}Acme CLI${N}  ${F}v${VERSION}${N}\n"
+  printf "  ${C}${B}aether CLI${N}  ${F}v${VERSION}${N}\n"
   printf "  ${F}────────────────────────────────────────${N}\n"
   _show_update_notice
 }
@@ -1538,7 +1538,7 @@ _banner() {
 case "${1:-help}" in
   start)
     _banner
-    [ "$(_mode)" = "local" ] && _free_acme_ports
+    [ "$(_mode)" = "local" ] && _free_aether_ports
     _sync_supabase_passwords
     docker compose up -d || true
     # Also restart the sandbox container if it exists but is stopped
@@ -1549,7 +1549,7 @@ case "${1:-help}" in
       fi
     fi
     echo ""
-    _ok "Acme is running!"
+    _ok "aether is running!"
     printf "  ${W}Dashboard${N}:  ${C}$(_url)${N}\n\n"
     ;;
   stop)
@@ -1562,7 +1562,7 @@ case "${1:-help}" in
   restart)
     _banner
     docker compose down 2>/dev/null || true
-    [ "$(_mode)" = "local" ] && _free_acme_ports
+    [ "$(_mode)" = "local" ] && _free_aether_ports
     _sync_supabase_passwords
     docker compose up -d || true
     _ok "Restarted."
@@ -1595,8 +1595,8 @@ case "${1:-help}" in
       if [ -n "$local_latest" ] && [ "$local_latest" != "$VERSION" ]; then
         _info "Updating from v${VERSION} to v${local_latest}..."
         VERSION="$local_latest"
-        FRONTEND_IMAGE="acme/acme-frontend:${VERSION}"
-        API_IMAGE="acme/aether-api:${VERSION}"
+        FRONTEND_IMAGE="aether/aether-frontend:${VERSION}"
+        API_IMAGE="aether/aether-api:${VERSION}"
         SANDBOX_IMAGE="aether/computer:${VERSION}"
         _env_set AETHER_VERSION "$VERSION"
         _env_set AETHER_SANDBOX_VERSION "$VERSION"
@@ -1615,7 +1615,7 @@ case "${1:-help}" in
       } | python3 -c 'import sys; print("\n".join(sorted(set(line.strip() for line in sys.stdin if line.strip()))))' | xargs -r -n1 -P 4 docker pull
     fi
     _info "Restarting services..."
-    [ "$(_mode)" = "local" ] && _free_acme_ports
+    [ "$(_mode)" = "local" ] && _free_aether_ports
     _sync_supabase_passwords
     docker compose down 2>/dev/null || true
     docker compose up -d || true
@@ -1643,22 +1643,22 @@ case "${1:-help}" in
     if echo "$del_volumes" | grep -qi '^y'; then
       docker compose down -v --remove-orphans 2>/dev/null || true
       docker volume rm "${SANDBOX_NAME}-data" 2>/dev/null || true
-      docker volume rm acme_supabase-db-data 2>/dev/null || true
-      docker volume rm supabase_db_acme-local 2>/dev/null || true
+      docker volume rm aether_supabase-db-data 2>/dev/null || true
+      docker volume rm supabase_db_aether-local 2>/dev/null || true
       _ok "Volumes removed."
     else
       docker compose down 2>/dev/null || true
     fi
-    [ -L "/usr/local/bin/acme" ] && rm -f /usr/local/bin/acme 2>/dev/null || true
+    [ -L "/usr/local/bin/aether" ] && rm -f /usr/local/bin/aether 2>/dev/null || true
     rm -rf "$DIR"
-    _ok "Acme uninstalled."
+    _ok "aether uninstalled."
     echo ""
     ;;
   open)
     _open "$(_url)"
     ;;
   version)
-    echo "  acme v${VERSION}"
+    echo "  aether v${VERSION}"
     ;;
   *)
     _banner
@@ -1666,12 +1666,12 @@ case "${1:-help}" in
     printf "  ${C}start${N}       Start all services\n"
     printf "  ${C}stop${N}        Stop all services\n"
     printf "  ${C}restart${N}     Restart all services\n"
-    printf "  ${C}logs${N}        Tail logs ${F}(acme logs aether-api)${N}\n"
+    printf "  ${C}logs${N}        Tail logs ${F}(aether logs aether-api)${N}\n"
     printf "  ${C}status${N}      Show running containers\n"
     printf "  ${C}setup${N}       Open sign-in page\n"
     printf "  ${C}update${N}      Pull latest images & restart\n"
     printf "  ${C}reset${N}       Wipe data and recreate stack\n"
-    printf "  ${C}uninstall${N}   Remove Acme completely\n"
+    printf "  ${C}uninstall${N}   Remove aether completely\n"
     printf "  ${C}open${N}        Open dashboard in browser\n"
     printf "  ${C}version${N}     Show installed version\n"
     echo ""
@@ -1679,14 +1679,14 @@ case "${1:-help}" in
  esac
 CLIPATH
 
-  chmod +x "$INSTALL_DIR/acme"
+  chmod +x "$INSTALL_DIR/aether"
 }
 
 # ─── Add to PATH ─────────────────────────────────────────────────────────────
 setup_path() {
   if [ -d "/usr/local/bin" ] && [ -w "/usr/local/bin" ]; then
-    ln -sf "$INSTALL_DIR/acme" /usr/local/bin/acme 2>/dev/null && {
-      success "Linked 'acme' -> /usr/local/bin/acme"
+    ln -sf "$INSTALL_DIR/aether" /usr/local/bin/aether 2>/dev/null && {
+      success "Linked 'aether' -> /usr/local/bin/aether"
       return
     }
   fi
@@ -1703,9 +1703,9 @@ setup_path() {
   fi
 
   echo "" >> "$shell_rc"
-  echo "# Acme CLI" >> "$shell_rc"
+  echo "# aether CLI" >> "$shell_rc"
   echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$shell_rc"
-  success "Added 'acme' to PATH (restart terminal or: source $shell_rc)"
+  success "Added 'aether' to PATH (restart terminal or: source $shell_rc)"
 }
 
 # ─── Pull & Start ───────────────────────────────────────────────────────────
@@ -1738,7 +1738,7 @@ pull_and_start() {
   section "Starting Services"
 
   # Free ports in local mode to avoid conflicts
-  free_acme_ports
+  free_aether_ports
 
   docker compose up -d || true
 
@@ -1763,7 +1763,7 @@ pull_and_start() {
   # ─── Final success output ────────────────────────────────────────────
   printf "\n"
   printf "  ${GREEN}${BOLD}╔══════════════════════════════════════════════════╗${NC}\n"
-  printf "  ${GREEN}${BOLD}║             Acme is running!                  ║${NC}\n"
+  printf "  ${GREEN}${BOLD}║             aether is running!                  ║${NC}\n"
   printf "  ${GREEN}${BOLD}╚══════════════════════════════════════════════════╝${NC}\n"
   printf "\n"
   printf "    ${WHITE}Dashboard${NC}   ${CYAN}${BOLD}${PUBLIC_URL}${NC}\n"
@@ -1783,7 +1783,7 @@ pull_and_start() {
 
   if [ "$DEPLOY_MODE" = "local" ]; then
     subsection "Want 24/7 uptime?"
-    printf "    ${WHITE}Acme Cloud${NC}   ${CYAN}https://acme.com${NC}     ${FADED}managed, zero setup${NC}\n"
+    printf "    ${WHITE}aether Cloud${NC}   ${CYAN}https://aether.com${NC}     ${FADED}managed, zero setup${NC}\n"
     printf "    ${WHITE}Self-host${NC}      ${CYAN}hetzner.com${NC} / ${CYAN}justavps.com${NC}\n"
   fi
 
@@ -1791,12 +1791,12 @@ pull_and_start() {
   printf "    Open the dashboard and create your owner account.\n"
 
   subsection "CLI Reference"
-  printf "    ${CYAN}acme start${NC}    Start services\n"
-  printf "    ${CYAN}acme stop${NC}     Stop services\n"
-  printf "    ${CYAN}acme setup${NC}    Open sign-in page\n"
-  printf "    ${CYAN}acme update${NC}   Pull latest & restart\n"
-  printf "    ${CYAN}acme logs${NC}     Tail service logs\n"
-  printf "    ${CYAN}acme status${NC}   Show running containers\n"
+  printf "    ${CYAN}aether start${NC}    Start services\n"
+  printf "    ${CYAN}aether stop${NC}     Stop services\n"
+  printf "    ${CYAN}aether setup${NC}    Open sign-in page\n"
+  printf "    ${CYAN}aether update${NC}   Pull latest & restart\n"
+  printf "    ${CYAN}aether logs${NC}     Tail service logs\n"
+  printf "    ${CYAN}aether status${NC}   Show running containers\n"
   printf "\n"
 }
 
@@ -1806,11 +1806,11 @@ main() {
   preflight
 
   # Clean up any stale Docker volumes from a previous install that was
-  # manually removed (rm -rf ~/.acme) without running `docker compose down -v`.
+  # manually removed (rm -rf ~/.aether) without running `docker compose down -v`.
   # Without this, fresh installs reuse old Postgres data with old passwords,
   # causing supabase-auth to fail with SASL auth errors.
   if [ ! -f "$INSTALL_DIR/docker-compose.yml" ]; then
-    docker volume rm acme_supabase-db-data 2>/dev/null || true
+    docker volume rm aether_supabase-db-data 2>/dev/null || true
     docker rm -f "${SANDBOX_CONTAINER_NAME}" 2>/dev/null || true
     docker volume rm "${SANDBOX_CONTAINER_NAME}-data" 2>/dev/null || true
   fi
@@ -1829,7 +1829,7 @@ main() {
       local existing_url
       existing_url=$(grep -m1 '^PUBLIC_URL=' "$INSTALL_DIR/.env" 2>/dev/null | cut -d= -f2- || echo "http://localhost:13737")
       echo ""
-      success "Acme is running!"
+      success "aether is running!"
       printf "    ${WHITE}Dashboard${NC}:  ${CYAN}${existing_url}${NC}\n\n"
       exit 0
     fi
@@ -1842,8 +1842,8 @@ main() {
     docker compose down -v 2>/dev/null || true
     docker rm -f "${SANDBOX_CONTAINER_NAME}" 2>/dev/null || true
     # Also remove any leftover named volumes from previous installs
-    docker volume rm acme_supabase-db-data 2>/dev/null || true
-    docker volume rm supabase_db_acme-local 2>/dev/null || true
+    docker volume rm aether_supabase-db-data 2>/dev/null || true
+    docker volume rm supabase_db_aether-local 2>/dev/null || true
     docker volume rm "${SANDBOX_CONTAINER_NAME}-data" 2>/dev/null || true
     echo ""
   fi

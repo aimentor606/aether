@@ -1,7 +1,7 @@
 /**
  * Secrets routes — raw KV CRUD for sandbox environment variables.
  *
- * Pure proxy to acme-master's /env API. That's the single source of truth.
+ * Pure proxy to aether-master's /env API. That's the single source of truth.
  * Template keys are seeded at container startup (Dockerfile / init script),
  * not here.
  *
@@ -14,7 +14,7 @@ import { config } from '../config';
 
 export const secretsApp = new Hono<AppEnv>();
 
-// ─── acme-master proxy helpers ────────────────────────────────────────────
+// ─── aether-master proxy helpers ────────────────────────────────────────────
 
 function getMasterUrlCandidates(): string[] {
   const candidates: string[] = [];
@@ -47,7 +47,7 @@ async function fetchMaster(path: string, init: RequestInit = {}, timeoutMs = 500
       lastErr = e;
     }
   }
-  throw lastErr instanceof Error ? lastErr : new Error('Failed to reach acme-master');
+  throw lastErr instanceof Error ? lastErr : new Error('Failed to reach aether-master');
 }
 
 function maskValue(val: string): string {
@@ -103,7 +103,7 @@ secretsApp.put('/:key', async (c) => {
 
     if (!res.ok) {
       const detail = await res.text().catch(() => '');
-      return c.json({ ok: false, error: `acme-master returned ${res.status}`, details: detail }, 500);
+      return c.json({ ok: false, error: `aether-master returned ${res.status}`, details: detail }, 500);
     }
     return c.json({ ok: true });
   } catch (e: any) {
@@ -119,7 +119,7 @@ secretsApp.delete('/:key', async (c) => {
     const res = await fetchMaster(`/env/${key}`, { method: 'DELETE' }, 5000);
     if (!res.ok) {
       const detail = await res.text().catch(() => '');
-      return c.json({ ok: false, error: `acme-master returned ${res.status}`, details: detail }, 500);
+      return c.json({ ok: false, error: `aether-master returned ${res.status}`, details: detail }, 500);
     }
     return c.json({ ok: true });
   } catch (e: any) {

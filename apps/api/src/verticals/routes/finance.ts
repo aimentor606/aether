@@ -3,7 +3,7 @@ import { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
 import { financeService } from '../services/finance';
-import { getAccountId, formatZodError } from '../middleware/account-context';
+import { getAccountId, formatZodError, pagination } from '../middleware/account-context';
 import {
   createInvoiceSchema,
   updateInvoiceSchema,
@@ -19,8 +19,9 @@ const financeRoutes = new Hono();
 financeRoutes.get('/invoices', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
-    const invoices = await financeService.listInvoices(accountId);
-    return c.json({ success: true, data: invoices });
+    const { limit, offset } = pagination(c);
+    const invoices = await financeService.listInvoices(accountId, { limit, offset });
+    return c.json({ success: true, data: invoices, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     return c.json({ success: false, error: 'Failed to list invoices' }, 500);
@@ -47,7 +48,7 @@ financeRoutes.get('/invoices/:id', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
     const id = c.req.param('id');
-    const invoice = await financeService.getInvoice(accountId, id);
+    const invoice = await financeService.getInvoice(accountId, id!);
     if (!invoice) {
       return c.json({ success: false, error: 'Invoice not found' }, 404);
     }
@@ -64,7 +65,7 @@ financeRoutes.put('/invoices/:id', async (c: Context) => {
     const id = c.req.param('id');
     const body = await c.req.json();
     const validated = updateInvoiceSchema.parse(body);
-    const invoice = await financeService.updateInvoice(accountId, id, validated);
+    const invoice = await financeService.updateInvoice(accountId, id!, validated);
     return c.json({ success: true, data: invoice });
   } catch (error) {
     if (error instanceof ZodError) {
@@ -79,7 +80,7 @@ financeRoutes.delete('/invoices/:id', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
     const id = c.req.param('id');
-    await financeService.deleteInvoice(accountId, id);
+    await financeService.deleteInvoice(accountId, id!);
     return c.json({ success: true });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
@@ -92,8 +93,9 @@ financeRoutes.delete('/invoices/:id', async (c: Context) => {
 financeRoutes.get('/expenses', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
-    const expenses = await financeService.listExpenses(accountId);
-    return c.json({ success: true, data: expenses });
+    const { limit, offset } = pagination(c);
+    const expenses = await financeService.listExpenses(accountId, { limit, offset });
+    return c.json({ success: true, data: expenses, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     return c.json({ success: false, error: 'Failed to list expenses' }, 500);
@@ -121,8 +123,9 @@ financeRoutes.post('/expenses', async (c: Context) => {
 financeRoutes.get('/ledger', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
-    const entries = await financeService.listLedgerEntries(accountId);
-    return c.json({ success: true, data: entries });
+    const { limit, offset } = pagination(c);
+    const entries = await financeService.listLedgerEntries(accountId, { limit, offset });
+    return c.json({ success: true, data: entries, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     return c.json({ success: false, error: 'Failed to retrieve ledger' }, 500);
@@ -150,8 +153,9 @@ financeRoutes.post('/ledger', async (c: Context) => {
 financeRoutes.get('/budgets', async (c: Context) => {
   try {
     const accountId = await getAccountId(c);
-    const budgets = await financeService.listBudgets(accountId);
-    return c.json({ success: true, data: budgets });
+    const { limit, offset } = pagination(c);
+    const budgets = await financeService.listBudgets(accountId, { limit, offset });
+    return c.json({ success: true, data: budgets, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
     return c.json({ success: false, error: 'Failed to list budgets' }, 500);

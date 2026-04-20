@@ -3,13 +3,27 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useServerStore } from '@/stores/server-store';
-import { getCurrentInstanceIdFromWindow, toInstanceAwarePath } from '@/lib/instance-routes';
+import {
+  getCurrentInstanceIdFromWindow,
+  toInstanceAwarePath,
+} from '@/lib/instance-routes';
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type TabType = 'session' | 'file' | 'dashboard' | 'settings' | 'project' | 'page' | 'preview' | 'terminal' | 'services' | 'browser' | 'desktop';
+export type TabType =
+  | 'session'
+  | 'file'
+  | 'dashboard'
+  | 'settings'
+  | 'project'
+  | 'page'
+  | 'preview'
+  | 'terminal'
+  | 'services'
+  | 'browser'
+  | 'desktop';
 
 /** The permanent dashboard/home tab. Always pinned, always first. */
 export const DASHBOARD_TAB_ID = 'page:/dashboard';
@@ -41,7 +55,10 @@ function pushFocusHistory(history: string[], tabId: string): string[] {
 /**
  * Remove all occurrences of given tab IDs from focus history.
  */
-function cleanFocusHistory(history: string[], removedIds: Set<string>): string[] {
+function cleanFocusHistory(
+  history: string[],
+  removedIds: Set<string>,
+): string[] {
   return history.filter((id) => !removedIds.has(id));
 }
 
@@ -54,7 +71,11 @@ function ensureDashboardTab(
   if (!newTabs[DASHBOARD_TAB_ID]) {
     newTabs[DASHBOARD_TAB_ID] = { ...DASHBOARD_TAB };
   } else {
-    newTabs[DASHBOARD_TAB_ID] = { ...newTabs[DASHBOARD_TAB_ID], pinned: true, title: '' };
+    newTabs[DASHBOARD_TAB_ID] = {
+      ...newTabs[DASHBOARD_TAB_ID],
+      pinned: true,
+      title: '',
+    };
   }
   const orderWithout = tabOrder.filter((id) => id !== DASHBOARD_TAB_ID);
   return { tabs: newTabs, tabOrder: [DASHBOARD_TAB_ID, ...orderWithout] };
@@ -154,20 +175,26 @@ export const useTabStore = create<TabState>()(
         const { tabs, tabOrder, activeTabId, tabFocusHistory } = get();
 
         // Record current active tab in focus history before switching
-        const newHistory = activeTabId && activeTabId !== tabInput.id
-          ? pushFocusHistory(tabFocusHistory, activeTabId)
-          : tabFocusHistory;
+        const newHistory =
+          activeTabId && activeTabId !== tabInput.id
+            ? pushFocusHistory(tabFocusHistory, activeTabId)
+            : tabFocusHistory;
 
         // If tab already exists, update its metadata (URL may have changed) and activate it.
         // Bump refreshCounter so preview tabs know to reload the iframe.
         if (tabs[tabInput.id]) {
           const existing = tabs[tabInput.id];
-          const prevCounter = (existing.metadata?.refreshCounter as number) || 0;
+          const prevCounter =
+            (existing.metadata?.refreshCounter as number) || 0;
           const merged: Tab = {
             ...existing,
             ...tabInput,
             openedAt: existing.openedAt,
-            metadata: { ...existing.metadata, ...tabInput.metadata, refreshCounter: prevCounter + 1 },
+            metadata: {
+              ...existing.metadata,
+              ...tabInput.metadata,
+              refreshCounter: prevCounter + 1,
+            },
           };
           set({
             tabs: { ...tabs, [tabInput.id]: merged },
@@ -182,10 +209,10 @@ export const useTabStore = create<TabState>()(
           openedAt: Date.now(),
         };
 
-        const updated = ensureDashboardTab(
-          { ...tabs, [newTab.id]: newTab },
-          [...tabOrder, newTab.id],
-        );
+        const updated = ensureDashboardTab({ ...tabs, [newTab.id]: newTab }, [
+          ...tabOrder,
+          newTab.id,
+        ]);
 
         set({
           ...updated,
@@ -195,13 +222,23 @@ export const useTabStore = create<TabState>()(
       },
 
       closeTab: (tabId) => {
-        const { tabs, tabOrder, activeTabId, recentlyClosedTabs, tabFocusHistory } = get();
+        const {
+          tabs,
+          tabOrder,
+          activeTabId,
+          recentlyClosedTabs,
+          tabFocusHistory,
+        } = get();
         const tab = tabs[tabId];
         // Prevent closing dashboard tab or any pinned tab
-        if (!tab || tab.pinned || tabId === DASHBOARD_TAB_ID) return activeTabId;
+        if (!tab || tab.pinned || tabId === DASHBOARD_TAB_ID)
+          return activeTabId;
 
         // Push closed tab onto recently-closed stack
-        const updatedClosedTabs = [tab, ...recentlyClosedTabs].slice(0, MAX_RECENTLY_CLOSED);
+        const updatedClosedTabs = [tab, ...recentlyClosedTabs].slice(
+          0,
+          MAX_RECENTLY_CLOSED,
+        );
 
         const { [tabId]: _, ...remainingTabs } = tabs;
         const newOrder = tabOrder.filter((id) => id !== tabId);
@@ -275,9 +312,10 @@ export const useTabStore = create<TabState>()(
       setActiveTab: (tabId) => {
         const { tabs, activeTabId, tabFocusHistory } = get();
         if (!tabs[tabId]) return;
-        const newHistory = activeTabId && activeTabId !== tabId
-          ? pushFocusHistory(tabFocusHistory, activeTabId)
-          : tabFocusHistory;
+        const newHistory =
+          activeTabId && activeTabId !== tabId
+            ? pushFocusHistory(tabFocusHistory, activeTabId)
+            : tabFocusHistory;
         set({ activeTabId: tabId, tabFocusHistory: newHistory });
       },
 
@@ -352,19 +390,20 @@ export const useTabStore = create<TabState>()(
         if (index === -1) return;
 
         const remainingSet = new Set<string>();
-        const newOrder = tabOrder.filter(
-          (id, i) => {
-            const keep = i <= index || tabs[id]?.pinned || id === DASHBOARD_TAB_ID;
-            if (keep) remainingSet.add(id);
-            return keep;
-          }
-        );
+        const newOrder = tabOrder.filter((id, i) => {
+          const keep =
+            i <= index || tabs[id]?.pinned || id === DASHBOARD_TAB_ID;
+          if (keep) remainingSet.add(id);
+          return keep;
+        });
         const remainingTabs: Record<string, Tab> = {};
         for (const id of newOrder) {
           remainingTabs[id] = tabs[id];
         }
 
-        const removedIds = new Set(tabOrder.filter((id) => !remainingSet.has(id)));
+        const removedIds = new Set(
+          tabOrder.filter((id) => !remainingSet.has(id)),
+        );
         const ensured = ensureDashboardTab(remainingTabs, newOrder);
         set({
           ...ensured,
@@ -392,7 +431,7 @@ export const useTabStore = create<TabState>()(
         set({
           ...ensured,
           activeTabId: ensured.tabOrder[0] || null,
-          tabFocusHistory: [],  // All non-pinned tabs are gone, clear history
+          tabFocusHistory: [], // All non-pinned tabs are gone, clear history
         });
       },
 
@@ -407,15 +446,24 @@ export const useTabStore = create<TabState>()(
         // Save the entire current tab state for the old server
         if (currentServerId) {
           try {
-            const cache = JSON.parse(localStorage.getItem('acme-tabs-per-server') || '{}');
-            cache[currentServerId] = { tabs, tabOrder, activeTabId, tabFocusHistory };
-            localStorage.setItem('acme-tabs-per-server', JSON.stringify(cache));
+            const cache = JSON.parse(
+              localStorage.getItem('aether-tabs-per-server') || '{}',
+            );
+            cache[currentServerId] = {
+              tabs,
+              tabOrder,
+              activeTabId,
+              tabFocusHistory,
+            };
+            localStorage.setItem('aether-tabs-per-server', JSON.stringify(cache));
           } catch {}
         }
 
         // Restore the full tab state for the new server
         try {
-          const cache = JSON.parse(localStorage.getItem('acme-tabs-per-server') || '{}');
+          const cache = JSON.parse(
+            localStorage.getItem('aether-tabs-per-server') || '{}',
+          );
           const saved = cache[newServerId];
           if (saved?.tabs && saved?.tabOrder) {
             const ensured = ensureDashboardTab(saved.tabs, saved.tabOrder);
@@ -434,7 +482,7 @@ export const useTabStore = create<TabState>()(
       },
     }),
     {
-      name: 'acme-tabs',
+      name: 'aether-tabs',
       partialize: (state) => ({
         tabs: state.tabs,
         tabOrder: state.tabOrder,
@@ -457,8 +505,8 @@ export const useTabStore = create<TabState>()(
           }
         }
       },
-    }
-  )
+    },
+  ),
 );
 
 // ============================================================================
@@ -466,7 +514,19 @@ export const useTabStore = create<TabState>()(
 // ============================================================================
 
 /** Tab types rendered via pre-mounted CSS show/hide (use pushState, not router). */
-const PRE_MOUNTED_TAB_TYPES: ReadonlySet<TabType> = new Set(['session', 'file', 'preview', 'terminal', 'settings', 'page', 'project', 'dashboard', 'services', 'browser', 'desktop']);
+const PRE_MOUNTED_TAB_TYPES: ReadonlySet<TabType> = new Set([
+  'session',
+  'file',
+  'preview',
+  'terminal',
+  'settings',
+  'page',
+  'project',
+  'dashboard',
+  'services',
+  'browser',
+  'desktop',
+]);
 
 /**
  * Open (or activate) a tab AND navigate the browser to it.
@@ -484,7 +544,10 @@ export function openTabAndNavigate(
 ) {
   useTabStore.getState().openTab(tabInput);
   if (typeof window === 'undefined') return;
-  const href = toInstanceAwarePath(tabInput.href, getCurrentInstanceIdFromWindow());
+  const href = toInstanceAwarePath(
+    tabInput.href,
+    getCurrentInstanceIdFromWindow(),
+  );
   if (PRE_MOUNTED_TAB_TYPES.has(tabInput.type)) {
     window.history.pushState(null, '', href);
   } else if (router) {
@@ -510,14 +573,16 @@ useTabStore.subscribe((state) => {
       const serverId = useServerStore.getState().activeServerId;
       if (!serverId) return;
 
-      const cache = JSON.parse(localStorage.getItem('acme-tabs-per-server') || '{}');
+      const cache = JSON.parse(
+        localStorage.getItem('aether-tabs-per-server') || '{}',
+      );
       cache[serverId] = {
         tabs: state.tabs,
         tabOrder: state.tabOrder,
         activeTabId: state.activeTabId,
         tabFocusHistory: state.tabFocusHistory,
       };
-      localStorage.setItem('acme-tabs-per-server', JSON.stringify(cache));
+      localStorage.setItem('aether-tabs-per-server', JSON.stringify(cache));
     } catch {}
   }, 500);
 });

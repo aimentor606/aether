@@ -1,11 +1,11 @@
 /**
- * OpenCode File API — filesystem access via the SDK client + acme-master.
+ * OpenCode File API — filesystem access via the SDK client + aether-master.
  *
  * Read endpoints (list, read, status, find) go through the upstream
  * `@opencode-ai/sdk` client singleton which proxies to OpenCode.
  *
  * Write endpoints (upload, delete, mkdir, rename) and binary downloads
- * use `authenticatedFetch()` to hit acme-master's /file/* routes
+ * use `authenticatedFetch()` to hit aether-master's /file/* routes
  * directly, since the upstream SDK has no write methods.
  */
 
@@ -77,8 +77,13 @@ export async function readFile(filePath: string): Promise<FileContent> {
   if (!response.ok) {
     const text = await response.text().catch(() => '');
     let parsed: any = null;
-    try { parsed = JSON.parse(text); } catch { /* not JSON */ }
-    const message = parsed?.error || text || response.statusText || `HTTP ${response.status}`;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      /* not JSON */
+    }
+    const message =
+      parsed?.error || text || response.statusText || `HTTP ${response.status}`;
     throw new Error(message);
   }
 
@@ -119,7 +124,11 @@ export async function readFileAsBlob(filePath: string): Promise<Blob> {
     if (response.status === 404) {
       const text = await response.text().catch(() => '');
       let parsed: any = null;
-      try { parsed = JSON.parse(text); } catch { /* not JSON */ }
+      try {
+        parsed = JSON.parse(text);
+      } catch {
+        /* not JSON */
+      }
       if (parsed?.error) {
         // Server explicitly says file doesn't exist
         throw new Error(parsed.error);
@@ -135,7 +144,10 @@ export async function readFileAsBlob(filePath: string): Promise<Blob> {
     }
   } catch (err) {
     // If it's our own thrown error (non-404 HTTP), re-throw immediately
-    if (err instanceof Error && err.message.startsWith('Failed to fetch file')) {
+    if (
+      err instanceof Error &&
+      err.message.startsWith('Failed to fetch file')
+    ) {
       throw err;
     }
     // Network error (fetch itself failed) — server not reachable.
@@ -218,7 +230,8 @@ export async function downloadDirectory(
   onProgress?: (progress: number) => void,
 ): Promise<void> {
   const zip = new JSZip();
-  const name = dirName || dirPath.split('/').filter(Boolean).pop() || 'directory';
+  const name =
+    dirName || dirPath.split('/').filter(Boolean).pop() || 'directory';
 
   // Collect all file paths recursively
   const allFiles = await listAllFilesRecursive(dirPath);
@@ -342,7 +355,7 @@ export async function mkdirFile(dirPath: string): Promise<boolean> {
  * Upload a file to a specific path using the field-name-as-path convention.
  *
  * Sets the FormData field name to the desired relative path so
- * acme-master's /file/upload endpoint places it correctly.
+ * aether-master's /file/upload endpoint places it correctly.
  */
 async function uploadToPath(
   filePath: string,

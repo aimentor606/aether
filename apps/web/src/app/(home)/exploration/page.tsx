@@ -47,7 +47,7 @@ const stackStudies = [
 const filesystemProof = [
   '/workspace/.local/share/opencode/storage/session',
   '/workspace/.local/share/opencode/storage/message',
-  '/workspace/.local/share/opencode/storage/acme-memory.db',
+  '/workspace/.local/share/opencode/storage/aether-memory.db',
   '/workspace/.opencode/agents',
   '/workspace/.opencode/skills',
   '/workspace/.secrets',

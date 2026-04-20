@@ -60,7 +60,7 @@ export const AgentAvatar: React.FC<AgentAvatarProps> = ({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/acme-symbol.svg"
+          src="/aether-symbol.svg"
           alt="Aether"
           className="flex-shrink-0 invert dark:invert-0"
           style={{ width: `${size * 0.5}px`, height: `${size * 0.5}px` }}

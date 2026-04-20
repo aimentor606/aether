@@ -18,3 +18,4 @@ export { useAdminSandboxes, type AdminSandbox, type AdminSandboxesParams, type A
 export { useAdminStateless } from './hooks/use-admin-stateless';
 export { useAdminStressTest } from './hooks/use-admin-stress-test';
 export { useAdminSystemStatus, type SystemStatus, type MaintenanceNotice, type TechnicalIssue } from './hooks/use-admin-system-status';
+export { useFeatureFlags, type FeatureFlag, type FeatureFlagCreateParams } from './hooks/use-feature-flags';

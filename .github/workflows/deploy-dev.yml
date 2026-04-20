@@ -84,10 +84,10 @@ jobs:
         run: |
           SHA8="${GITHUB_SHA::8}"
           docker build --file apps/api/Dockerfile --build-arg SERVICE=apps/api \
-            --tag "acme/aether-api:dev-${SHA8}-amd64" \
-            --tag "acme/aether-api:dev-latest-amd64" .
-          docker push "acme/aether-api:dev-${SHA8}-amd64"
-          docker push "acme/aether-api:dev-latest-amd64"
+            --tag "aether/aether-api:dev-${SHA8}-amd64" \
+            --tag "aether/aether-api:dev-latest-amd64" .
+          docker push "aether/aether-api:dev-${SHA8}-amd64"
+          docker push "aether/aether-api:dev-latest-amd64"
 
   build-api-arm64:
     name: API (arm64)
@@ -106,10 +106,10 @@ jobs:
         run: |
           SHA8="${GITHUB_SHA::8}"
           docker build --file apps/api/Dockerfile --build-arg SERVICE=apps/api \
-            --tag "acme/aether-api:dev-${SHA8}-arm64" \
-            --tag "acme/aether-api:dev-latest-arm64" .
-          docker push "acme/aether-api:dev-${SHA8}-arm64"
-          docker push "acme/aether-api:dev-latest-arm64"
+            --tag "aether/aether-api:dev-${SHA8}-arm64" \
+            --tag "aether/aether-api:dev-latest-arm64" .
+          docker push "aether/aether-api:dev-${SHA8}-arm64"
+          docker push "aether/aether-api:dev-latest-arm64"
 
   merge-api:
     name: API manifest
@@ -126,17 +126,17 @@ jobs:
         id: meta
         run: |
           SHA8="${GITHUB_SHA::8}"
-          docker manifest create "acme/aether-api:dev-${SHA8}" \
-            "acme/aether-api:dev-${SHA8}-amd64" \
-            "acme/aether-api:dev-${SHA8}-arm64"
-          docker manifest push "acme/aether-api:dev-${SHA8}"
+          docker manifest create "aether/aether-api:dev-${SHA8}" \
+            "aether/aether-api:dev-${SHA8}-amd64" \
+            "aether/aether-api:dev-${SHA8}-arm64"
+          docker manifest push "aether/aether-api:dev-${SHA8}"
 
-          docker manifest create "acme/aether-api:dev-latest" \
-            "acme/aether-api:dev-latest-amd64" \
-            "acme/aether-api:dev-latest-arm64"
-          docker manifest push "acme/aether-api:dev-latest"
+          docker manifest create "aether/aether-api:dev-latest" \
+            "aether/aether-api:dev-latest-amd64" \
+            "aether/aether-api:dev-latest-arm64"
+          docker manifest push "aether/aether-api:dev-latest"
 
-          echo "image=acme/aether-api:dev-${SHA8}" >> "$GITHUB_OUTPUT"
+          echo "image=aether/aether-api:dev-${SHA8}" >> "$GITHUB_OUTPUT"
 
   # ── Build Frontend (amd64 + arm64 in parallel) ─────────────────────────────
   build-frontend-amd64:
@@ -161,10 +161,10 @@ jobs:
         run: |
           SHA8="${GITHUB_SHA::8}"
           docker build --file apps/web/Dockerfile \
-            --tag "acme/acme-frontend:dev-${SHA8}-amd64" \
-            --tag "acme/acme-frontend:dev-latest-amd64" .
-          docker push "acme/acme-frontend:dev-${SHA8}-amd64"
-          docker push "acme/acme-frontend:dev-latest-amd64"
+            --tag "aether/aether-frontend:dev-${SHA8}-amd64" \
+            --tag "aether/aether-frontend:dev-latest-amd64" .
+          docker push "aether/aether-frontend:dev-${SHA8}-amd64"
+          docker push "aether/aether-frontend:dev-latest-amd64"
 
   build-frontend-arm64:
     name: Frontend (arm64)
@@ -188,10 +188,10 @@ jobs:
         run: |
           SHA8="${GITHUB_SHA::8}"
           docker build --file apps/web/Dockerfile \
-            --tag "acme/acme-frontend:dev-${SHA8}-arm64" \
-            --tag "acme/acme-frontend:dev-latest-arm64" .
-          docker push "acme/acme-frontend:dev-${SHA8}-arm64"
-          docker push "acme/acme-frontend:dev-latest-arm64"
+            --tag "aether/aether-frontend:dev-${SHA8}-arm64" \
+            --tag "aether/aether-frontend:dev-latest-arm64" .
+          docker push "aether/aether-frontend:dev-${SHA8}-arm64"
+          docker push "aether/aether-frontend:dev-latest-arm64"
 
   merge-frontend:
     name: Frontend manifest
@@ -205,15 +205,15 @@ jobs:
       - name: Create multi-arch manifest
         run: |
           SHA8="${GITHUB_SHA::8}"
-          docker manifest create "acme/acme-frontend:dev-${SHA8}" \
-            "acme/acme-frontend:dev-${SHA8}-amd64" \
-            "acme/acme-frontend:dev-${SHA8}-arm64"
-          docker manifest push "acme/acme-frontend:dev-${SHA8}"
+          docker manifest create "aether/aether-frontend:dev-${SHA8}" \
+            "aether/aether-frontend:dev-${SHA8}-amd64" \
+            "aether/aether-frontend:dev-${SHA8}-arm64"
+          docker manifest push "aether/aether-frontend:dev-${SHA8}"
 
-          docker manifest create "acme/acme-frontend:dev-latest" \
-            "acme/acme-frontend:dev-latest-amd64" \
-            "acme/acme-frontend:dev-latest-arm64"
-          docker manifest push "acme/acme-frontend:dev-latest"
+          docker manifest create "aether/aether-frontend:dev-latest" \
+            "aether/aether-frontend:dev-latest-amd64" \
+            "aether/aether-frontend:dev-latest-arm64"
+          docker manifest push "aether/aether-frontend:dev-latest"
 
   # ── Build Computer (amd64 + arm64 in parallel) ────────────────────────────
   build-computer-amd64:

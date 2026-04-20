@@ -535,15 +535,15 @@ export class LocalDockerProvider implements SandboxProvider {
    *   - INTERNAL_SERVICE_KEY   (aether-api → sandbox auth)
    *
    * If any differ from what aether-api has, inject via s6 env dir and restart
-   * acme-master so the sandbox picks them up without a full container recreate.
+   * aether-master so the sandbox picks them up without a full container recreate.
    */
   /**
    * Sync the 3 core env vars to the sandbox via the secrets manager API.
    *
-   * Uses acme-master's /env endpoint which does triple-write:
+   * Uses aether-master's /env endpoint which does triple-write:
    *   1. SecretStore (.secrets.json — encrypted at rest)
    *   2. s6 env dir  (/run/s6/container_environment/ — tools read this on every call)
-   *   3. process.env (acme-master's own process)
+   *   3. process.env (aether-master's own process)
    *
    * Since getEnv() reads s6 first (always fresh from disk), updated values
    * take effect immediately — no service restart needed.
@@ -621,7 +621,7 @@ export class LocalDockerProvider implements SandboxProvider {
   }
 
   /**
-   * GET /env from acme-master — returns all current env vars.
+   * GET /env from aether-master — returns all current env vars.
    */
   private async fetchMasterEnv(): Promise<Record<string, string>> {
     const url = `http://localhost:${config.SANDBOX_PORT_BASE || 14000}/env`;
@@ -636,7 +636,7 @@ export class LocalDockerProvider implements SandboxProvider {
   }
 
   /**
-   * POST /env to acme-master — sets env vars via the secrets manager.
+   * POST /env to aether-master — sets env vars via the secrets manager.
    * No restart needed: getEnv() reads s6 env dir directly on every call.
    */
   private async postMasterEnv(keys: Record<string, string>): Promise<void> {
@@ -655,7 +655,7 @@ export class LocalDockerProvider implements SandboxProvider {
 
   /**
    * Fallback: write directly to s6 env dir via docker exec.
-   * Used only when the /env API is unreachable (e.g. acme-master not ready yet).
+   * Used only when the /env API is unreachable (e.g. aether-master not ready yet).
    */
   private syncCoreEnvVarsFallback(stale: Record<string, string>): void {
     const env = { ...process.env };
@@ -865,7 +865,7 @@ export class LocalDockerProvider implements SandboxProvider {
       'TZ=Etc/UTC',
       'SUBFOLDER=/',
       'TITLE=Aether Sandbox',
-      'OPENCODE_CONFIG_DIR=/ephemeral/acme-master/opencode',
+      'OPENCODE_CONFIG_DIR=/ephemeral/aether-master/opencode',
       'OPENCODE_PERMISSION={"*":"allow"}',
       'DISPLAY=:1',
       'LSS_DIR=/workspace/.lss',
@@ -917,9 +917,9 @@ export class LocalDockerProvider implements SandboxProvider {
         ...(config.SANDBOX_NETWORK ? { NetworkMode: config.SANDBOX_NETWORK } : {}),
       },
       Labels: {
-        'acme.sandbox': 'true',
-        'acme.account': 'local',
-        'acme.user': 'local',
+        'aether.sandbox': 'true',
+        'aether.account': 'local',
+        'aether.user': 'local',
       },
     });
 
@@ -970,11 +970,11 @@ export class LocalDockerProvider implements SandboxProvider {
 
   /**
    * Wait for the sandbox to pass health checks.
-   * Polls GET /acme/health until it returns 200 with status "ok".
+   * Polls GET /aether/health until it returns 200 with status "ok".
    */
   private async waitForHealth(timeoutMs: number): Promise<void> {
     const start = Date.now();
-    const healthUrl = `http://localhost:${PORT_MAP['8000']}/acme/health`;
+    const healthUrl = `http://localhost:${PORT_MAP['8000']}/aether/health`;
 
     while (Date.now() - start < timeoutMs) {
       try {

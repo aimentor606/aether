@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION public.atomic_daily_credit_refresh(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'acme', 'public'
+SET search_path TO 'aether', 'public'
 AS $function$
 DECLARE
     v_last_refresh TIMESTAMPTZ;
@@ -30,7 +30,7 @@ BEGIN
 
     SELECT last_daily_refresh, daily_credits_balance, balance
     INTO v_last_refresh, v_old_daily, v_old_total
-    FROM acme.credit_accounts
+    FROM aether.credit_accounts
     WHERE account_id = p_account_id
     FOR UPDATE;
 
@@ -93,7 +93,7 @@ BEGIN
     v_credits_added := p_credit_amount - COALESCE(v_old_daily, 0);
     v_new_total := v_old_total + v_credits_added;
 
-    UPDATE acme.credit_accounts
+    UPDATE aether.credit_accounts
     SET
         daily_credits_balance = v_new_daily,
         balance = v_new_total,
@@ -101,7 +101,7 @@ BEGIN
         updated_at = v_now
     WHERE account_id = p_account_id;
 
-    INSERT INTO acme.credit_ledger (
+    INSERT INTO aether.credit_ledger (
         account_id, amount, balance_after, type, description,
         is_expiring, expires_at, metadata
     ) VALUES (

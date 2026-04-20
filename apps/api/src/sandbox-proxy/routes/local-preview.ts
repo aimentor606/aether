@@ -47,12 +47,12 @@ function trySyncServiceKey(): boolean {
     execSync(
       `docker exec ${config.SANDBOX_CONTAINER_NAME} bash -c "mkdir -p /run/s6/container_environment && ` +
       `printf '%s' '${ourKey}' > /run/s6/container_environment/INTERNAL_SERVICE_KEY && ` +
-      `sudo s6-svc -r /run/service/svc-acme-master"`,
+      `sudo s6-svc -r /run/service/svc-aether-master"`,
       { timeout: 15_000, stdio: 'pipe', env },
     );
     _serviceKeySynced = true;
     console.log('[LOCAL-PREVIEW] INTERNAL_SERVICE_KEY synced, waiting for restart...');
-    // Give acme-master a moment to restart
+    // Give aether-master a moment to restart
     execSync('sleep 2', { stdio: 'pipe' });
     return true;
   } catch (err: any) {

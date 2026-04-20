@@ -1,7 +1,7 @@
 /**
  * Public URL Share Endpoints — /v1/p/share
  *
- * Proxies to the sandbox's /acme/share endpoints so the frontend can create,
+ * Proxies to the sandbox's /aether/share endpoints so the frontend can create,
  * list, and revoke share links without talking to the sandbox directly.
  *
  * Routes:
@@ -28,7 +28,7 @@ type NgrokTunnel = {
 }
 
 const NGROK_API_PORTS = [4040, 4041, 4042]
-const LOCAL_SHARE_TUNNEL_NAME = 'acme-share'
+const LOCAL_SHARE_TUNNEL_NAME = 'aether-share'
 type ResolvedProvider = NonNullable<Awaited<ReturnType<typeof resolveProvider>>>
 
 function isNgrokInstalled(): boolean {
@@ -129,10 +129,10 @@ function buildSharedUrl(baseUrl: string, token: string): string {
 function buildSandboxShareBaseUrl(resolved: ResolvedProvider): string | null {
   if (resolved.provider === 'justavps' && resolved.slug && resolved.proxyToken) {
     const domain = config.JUSTAVPS_PROXY_DOMAIN
-    return `https://8000--${resolved.slug}.${domain}/acme/share`
+    return `https://8000--${resolved.slug}.${domain}/aether/share`
   }
   if (resolved.baseUrl) {
-    return `${resolved.baseUrl}/acme/share`
+    return `${resolved.baseUrl}/aether/share`
   }
   return null
 }

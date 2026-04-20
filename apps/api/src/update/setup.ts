@@ -12,7 +12,7 @@ export interface SetupOpts {
 }
 
 export function buildContainerConfig(opts: SetupOpts): ContainerConfig {
-  const volumeName = opts.volumeName || 'acme-data';
+  const volumeName = opts.volumeName || 'aether-data';
   const ports = sanitizePorts(opts.ports || DEFAULT_PORTS);
   return {
     image: opts.image,
@@ -43,7 +43,7 @@ export async function deploySandbox(
     console.log(`[SETUP] Pulling ${config.image}...`);
     await execOnHost(
       endpoint,
-      `systemd-run --unit=acme-image-pull docker pull ${config.image}`,
+      `systemd-run --unit=aether-image-pull docker pull ${config.image}`,
       15,
     );
 

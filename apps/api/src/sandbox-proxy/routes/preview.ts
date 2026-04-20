@@ -79,7 +79,7 @@ function setCachedPreviewLink(sandboxId: string, port: number, url: string, toke
   previewLinkCache.set(key, { url, token, expiresAt: Date.now() + CACHE_TTL_MS });
 }
 
-// === Ownership verification via acme.sandboxes ===
+// === Ownership verification via aether.sandboxes ===
 
 async function verifyOwnership(sandboxId: string, userId: string): Promise<boolean> {
   // If no userId is set, skip ownership check.
@@ -91,7 +91,7 @@ async function verifyOwnership(sandboxId: string, userId: string): Promise<boole
   if (cached !== null) return cached;
 
   try {
-    // Find sandbox by externalId in acme.sandboxes.
+    // Find sandbox by externalId in aether.sandboxes.
     // Allow any status except 'pooled' (unassigned) — the auto-wake logic
     // downstream handles stopped/archived sandboxes gracefully.
     const [sandbox] = await db
@@ -112,10 +112,10 @@ async function verifyOwnership(sandboxId: string, userId: string): Promise<boole
     }
 
     // Check if user belongs to the account that owns this sandbox.
-    // Dual-read: try acme.account_members first, fall back to basejump.account_user.
+    // Dual-read: try aether.account_members first, fall back to basejump.account_user.
     let allowed = false;
 
-    // Try acme.account_members (new table)
+    // Try aether.account_members (new table)
     try {
       const [membership] = await db
         .select({ accountRole: accountMembers.accountRole })

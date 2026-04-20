@@ -6,7 +6,7 @@
  *   - If running a stable build, compares against latest stable
  *
  * Docker image-based update flow:
- *   - `currentVersion` is provided by the caller (from /acme/health)
+ *   - `currentVersion` is provided by the caller (from /aether/health)
  *   - `latestVersion` is fetched from the platform API (channel-aware)
  *   - Frontend compares them → `updateAvailable`
  *   - `update()` POSTs to aether-api which pulls new image + recreates container
@@ -35,35 +35,35 @@ export type { UpdatePhase, SandboxUpdateStatus };
 
 // Human-readable label for each phase (Docker-based flow)
 export const PHASE_LABELS: Record<UpdatePhase, string> = {
-  idle:         'Idle',
-  backing_up:   'Creating backup...',
-  pulling:      'Downloading update...',
-  patching:     'Preparing update...',
-  stopping:     'Stopping sandbox...',
-  removing:     'Preparing update...',
-  recreating:   'Installing update...',
-  restarting:   'Restarting sandbox...',
-  verifying:    'Verifying update...',
-  starting:     'Starting sandbox...',
+  idle: 'Idle',
+  backing_up: 'Creating backup...',
+  pulling: 'Downloading update...',
+  patching: 'Preparing update...',
+  stopping: 'Stopping sandbox...',
+  removing: 'Preparing update...',
+  recreating: 'Installing update...',
+  restarting: 'Restarting sandbox...',
+  verifying: 'Verifying update...',
+  starting: 'Starting sandbox...',
   health_check: 'Running health checks...',
-  complete:     'Update complete',
-  failed:       'Update failed',
+  complete: 'Update complete',
+  failed: 'Update failed',
 };
 
 export const PHASE_PROGRESS: Record<UpdatePhase, number> = {
-  idle:         0,
-  backing_up:   5,
-  pulling:      15,
-  patching:     35,
-  stopping:     50,
-  removing:     55,
-  recreating:   65,
-  restarting:   60,
-  verifying:    80,
-  starting:     75,
+  idle: 0,
+  backing_up: 5,
+  pulling: 15,
+  patching: 35,
+  stopping: 50,
+  removing: 55,
+  recreating: 65,
+  restarting: 60,
+  verifying: 80,
+  starting: 75,
   health_check: 90,
-  complete:     100,
-  failed:       100,
+  complete: 100,
+  failed: 100,
 };
 
 /**
@@ -116,7 +116,8 @@ export function useSandboxUpdate(currentVersion: string | null) {
         sandbox_id: activeServer.instanceId,
         external_id: activeServer.sandboxId ?? '',
         name: activeServer.label,
-        provider: (activeServer.provider ?? 'local_docker') as SandboxInfo['provider'],
+        provider: (activeServer.provider ??
+          'local_docker') as SandboxInfo['provider'],
         base_url: activeServer.url,
         status: 'active',
         created_at: '',
@@ -125,20 +126,24 @@ export function useSandboxUpdate(currentVersion: string | null) {
     : null;
 
   // Detect which channel the running instance belongs to
-  const currentChannel = useMemo(() => detectChannel(currentVersion), [currentVersion]);
+  const currentChannel = useMemo(
+    () => detectChannel(currentVersion),
+    [currentVersion],
+  );
 
   // ── Latest version from platform (channel-aware) ────────────────────────
   const latestQuery = useQuery({
     queryKey: ['sandbox', 'latest-version', currentChannel],
     queryFn: () => getLatestSandboxVersion(currentChannel),
     enabled: !!sandbox,
-    staleTime: 5 * 60 * 1000,        // re-fetch from GitHub at most every 5 min
+    staleTime: 5 * 60 * 1000, // re-fetch from GitHub at most every 5 min
     refetchInterval: 10 * 60 * 1000, // background poll every 10 min
-    refetchOnWindowFocus: true,       // re-check when user returns to the tab
+    refetchOnWindowFocus: true, // re-check when user returns to the tab
   });
 
   const latestVersion = latestQuery.data?.version ?? null;
-  const latestChannel = (latestQuery.data?.channel as VersionChannel) ?? currentChannel;
+  const latestChannel =
+    (latestQuery.data?.channel as VersionChannel) ?? currentChannel;
 
   const updateAvailable = useMemo(() => {
     if (!currentVersion || !latestVersion) return false;
@@ -149,9 +154,14 @@ export function useSandboxUpdate(currentVersion: string | null) {
   }, [currentVersion, latestVersion, currentChannel]);
 
   // ── Live update status (polled while in-progress) ────────────────────────
-  const [liveStatus, setLiveStatus] = useState<SandboxUpdateStatus | null>(null);
+  const [liveStatus, setLiveStatus] = useState<SandboxUpdateStatus | null>(
+    null,
+  );
   const [isPolling, setIsPolling] = useState(false);
-  const [updateResult, setUpdateResult] = useState<{ success: boolean; currentVersion: string } | null>(null);
+  const [updateResult, setUpdateResult] = useState<{
+    success: boolean;
+    currentVersion: string;
+  } | null>(null);
   const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollActiveRef = useRef(false);
 
@@ -178,7 +188,10 @@ export function useSandboxUpdate(currentVersion: string | null) {
           setUpdateResult({ success: true, currentVersion: newVersion });
           setSandboxVersion(newVersion);
         } else if (status.phase === 'failed') {
-          setUpdateResult({ success: false, currentVersion: status.currentVersion || currentVersion || '0.0.0' });
+          setUpdateResult({
+            success: false,
+            currentVersion: status.currentVersion || currentVersion || '0.0.0',
+          });
         }
         return;
       }
@@ -211,7 +224,8 @@ export function useSandboxUpdate(currentVersion: string | null) {
   const updateMutation = useMutation({
     mutationFn: async (targetVersion?: string) => {
       const versionToInstall = targetVersion || latestVersion;
-      if (!sandbox || !versionToInstall) throw new Error('No sandbox or version');
+      if (!sandbox || !versionToInstall)
+        throw new Error('No sandbox or version');
       // Start polling immediately — the POST returns immediately (fire-and-forget)
       startPolling();
       return triggerSandboxUpdate(sandbox, versionToInstall);
@@ -219,19 +233,36 @@ export function useSandboxUpdate(currentVersion: string | null) {
     onSuccess: (data) => {
       // The POST returns { started: true } immediately — actual progress comes from polling.
       // If data.started is true, keep polling. If it returned an error, stop.
-      if (!(data as { started?: boolean })?.started && (data as { success?: boolean })?.success === false) {
+      if (
+        !(data as { started?: boolean })?.started &&
+        (data as { success?: boolean })?.success === false
+      ) {
         stopPolling();
-        setUpdateResult({ success: false, currentVersion: currentVersion ?? '0.0.0' });
+        setUpdateResult({
+          success: false,
+          currentVersion: currentVersion ?? '0.0.0',
+        });
       }
     },
     onError: (error) => {
       stopPolling();
-      setUpdateResult({ success: false, currentVersion: currentVersion ?? '0.0.0' });
-      setLiveStatus(prev => prev ? {
-        ...prev, phase: 'failed',
-        message: 'Update failed',
-        error: error instanceof Error ? error.message : 'Failed to start update',
-      } : null);
+      setUpdateResult({
+        success: false,
+        currentVersion: currentVersion ?? '0.0.0',
+      });
+      setLiveStatus((prev) =>
+        prev
+          ? {
+              ...prev,
+              phase: 'failed',
+              message: 'Update failed',
+              error:
+                error instanceof Error
+                  ? error.message
+                  : 'Failed to start update',
+            }
+          : null,
+      );
     },
   });
 
@@ -241,10 +272,17 @@ export function useSandboxUpdate(currentVersion: string | null) {
   // Use the real progress from the API if available, otherwise use phase-based progress
   const phaseProgress = liveStatus?.progress ?? PHASE_PROGRESS[phase];
   const phaseMessage = liveStatus?.message ?? '';
-  const updateErrorMessage = liveStatus?.error ?? (updateMutation.error instanceof Error ? updateMutation.error.message : null);
-  const update = useCallback((targetVersion?: string) => {
-    updateMutation.mutate(targetVersion);
-  }, [updateMutation]);
+  const updateErrorMessage =
+    liveStatus?.error ??
+    (updateMutation.error instanceof Error
+      ? updateMutation.error.message
+      : null);
+  const update = useCallback(
+    (targetVersion?: string) => {
+      updateMutation.mutate(targetVersion);
+    },
+    [updateMutation],
+  );
 
   return {
     /** Whether a newer version is available */

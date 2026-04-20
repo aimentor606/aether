@@ -49,7 +49,7 @@ sys.exit(1)
 PY
 
 echo "[dev] Starting frontend..."
-pnpm --filter Acme-Computer-Frontend dev &
+pnpm --filter aether-Computer-Frontend dev &
 FRONTEND_PID=$!
 
 echo "[dev] Starting API..."

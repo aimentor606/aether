@@ -21,3 +21,12 @@ export async function getAccountId(c: Context): Promise<string> {
 export function formatZodError(error: ZodError) {
   return { success: false, error: error.errors };
 }
+
+const DEFAULT_LIMIT = 50;
+const MAX_LIMIT = 200;
+
+export function pagination(c: Context) {
+  const rawLimit = Number(c.req.query('limit')) || DEFAULT_LIMIT;
+  const rawOffset = Number(c.req.query('offset')) || 0;
+  return { limit: Math.min(rawLimit, MAX_LIMIT), offset: Math.max(rawOffset, 0) };
+}

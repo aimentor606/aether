@@ -6,8 +6,8 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@acme/theme": ["../theme/src"],
-      "@acme/sdk": ["../sdk/src"]
+      "@aether/theme": ["../theme/src"],
+      "@aether/sdk": ["../sdk/src"]
     }
   },
   "include": ["src/**/*"],

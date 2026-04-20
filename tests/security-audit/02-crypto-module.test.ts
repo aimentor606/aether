@@ -55,7 +55,7 @@ function timingSafeStringEqual(a: string, b: string): boolean {
 }
 
 function deriveSigningKey(token: string): string {
-  return createHmac('sha256', 'acme-tunnel-signing-v1').update(token).digest('hex');
+  return createHmac('sha256', 'aether-tunnel-signing-v1').update(token).digest('hex');
 }
 
 function signMessage(signingKey: string, payload: string, nonce: number): string {

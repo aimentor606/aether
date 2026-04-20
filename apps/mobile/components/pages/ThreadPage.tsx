@@ -23,7 +23,7 @@ import {
 } from '@/components/chat';
 import { parseToolMessage } from '@agentpress/shared';
 import { ThreadHeader } from '@/components/threads';
-import { AetherComputer } from '@/components/acme-computer';
+import { AetherComputer } from '@/components/aether-computer';
 import { useAetherComputerStore } from '@/stores/aether-computer-store';
 import { useVoicePlayerStore } from '@/stores/voice-player-store';
 import { useChatCommons, type UseChatReturn, useDeleteThread, useShareThread, useUpgradePaywall } from '@/hooks';

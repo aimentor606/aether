@@ -1,7 +1,7 @@
 """OpenAI-compatible proxy that connects VAPI to OpenCode.
 
 VAPI sends standard /chat/completions requests with conversation history.
-We forward the latest user message to OpenCode via the kortix-proxy agent,
+We forward the latest user message to OpenCode via theproxy agent,
 stream back text deltas in OpenAI SSE format.
 
 Architecture:

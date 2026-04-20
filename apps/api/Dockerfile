@@ -76,9 +76,9 @@ COPY --from=deps /app/packages/agent-tunnel/package.json ./${SERVICE}/node_modul
 WORKDIR /app/${SERVICE}
 
 # Pre-create the data dir and give the bun user write access before dropping privileges.
-# The queue drainer writes to .kortix-data/queue at runtime; without this it fails with EACCES.
-RUN mkdir -p /app/${SERVICE}/.kortix-data && \
-    chown -R bun:bun /app/${SERVICE}/.kortix-data
+# The queue drainer writes to .aether-data/queue at runtime; without this it fails with EACCES.
+RUN mkdir -p /app/${SERVICE}/.aether-data && \
+    chown -R bun:bun /app/${SERVICE}/.aether-data
 
 # Non-root user (bun image ships with 'bun' user)
 USER bun

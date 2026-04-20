@@ -8,7 +8,7 @@ const SYMBOL =
   'M25.5614 24.916H29.8268C29.8268 19.6306 26.9378 15.0039 22.6171 12.4587C26.9377 9.91355 29.8267 5.28685 29.8267 0.00146484H25.5613C25.5613 5.00287 21.8906 9.18692 17.0654 10.1679V0.00146484H12.8005V10.1679C7.9526 9.20401 4.3046 5.0186 4.3046 0.00146484H0.0391572C0.0391572 5.28685 2.92822 9.91355 7.24884 12.4587C2.92818 15.0039 0.0390625 19.6306 0.0390625 24.916H4.30451C4.30451 19.8989 7.95259 15.7135 12.8005 14.7496V24.9206H17.0654V14.7496C21.9133 15.7134 25.5614 19.8989 25.5614 24.916Z';
 
 const BIOS_LINES: { text: string; bold?: boolean }[] = [
-  { text: 'ACME BIOS v2.0.1', bold: true },
+  { text: 'AETHER BIOS v2.0.1', bold: true },
   { text: '' },
   { text: 'CPU: Aether Inference Engine X1 @ 3.80 GHz' },
   { text: 'Memory test................. OK' },
@@ -19,7 +19,7 @@ const BIOS_LINES: { text: string; bold?: boolean }[] = [
   { text: 'Mounting workspace......... done' },
   { text: 'Connecting to services..... done' },
   { text: '' },
-  { text: 'All systems nominal. Starting ACME OS...' },
+  { text: 'All systems nominal. Starting AETHER OS...' },
 ];
 
 type Phase = 'bios' | 'logo';
@@ -38,7 +38,7 @@ export function BootOverlay({ onComplete }: BootOverlayProps) {
 
   // Boot sound
   useEffect(() => {
-    const audio = new Audio('/sounds/acme/startup.mp3');
+    const audio = new Audio('/sounds/aether/startup.mp3');
     audio.volume = 0.6;
     audio.preload = 'auto';
     audioRef.current = audio;
@@ -130,7 +130,11 @@ export function BootOverlay({ onComplete }: BootOverlayProps) {
                   <motion.span
                     className="font-mono text-[13px] sm:text-sm text-foreground/90"
                     animate={{ opacity: [1, 0.3] }}
-                    transition={{ duration: 0.7, repeat: Infinity, repeatType: 'reverse' }}
+                    transition={{
+                      duration: 0.7,
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                    }}
                   >
                     Press Enter to boot...
                   </motion.span>
@@ -154,20 +158,30 @@ export function BootOverlay({ onComplete }: BootOverlayProps) {
               className="relative z-10 flex flex-col items-center"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                duration: 0.8,
+                delay: 0.1,
+                ease: [0.16, 1, 0.3, 1],
+              }}
             >
-              <svg viewBox="0 0 30 25" className="h-11 sm:h-[52px] w-auto text-foreground">
+              <svg
+                viewBox="0 0 30 25"
+                className="h-11 sm:h-[52px] w-auto text-foreground"
+              >
                 <path d={SYMBOL} fill="currentColor" />
               </svg>
               <div className="mt-10 w-44 sm:w-52 h-px bg-foreground/[0.06] overflow-hidden">
                 <div
-                   className={cn("h-full bg-foreground/30", progressFill ? "w-full" : "w-0")}
-                   style={{
-                     transition: progressFill
-                       ? 'width 2.5s cubic-bezier(0.4, 0, 0.2, 1)'
-                       : 'none',
-                   }}
-                 />
+                  className={cn(
+                    'h-full bg-foreground/30',
+                    progressFill ? 'w-full' : 'w-0',
+                  )}
+                  style={{
+                    transition: progressFill
+                      ? 'width 2.5s cubic-bezier(0.4, 0, 0.2, 1)'
+                      : 'none',
+                  }}
+                />
               </div>
             </motion.div>
           </motion.div>

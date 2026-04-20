@@ -27,7 +27,7 @@ mock.module('../middleware/auth', () => ({
 
 const { setupApp } = await import('../setup');
 
-const TEST_DIR = `/tmp/acme-setup-test-${Date.now()}`;
+const TEST_DIR = `/tmp/aether-setup-test-${Date.now()}`;
 
 // ─── Test app factory ───────────────────────────────────────────────────────
 

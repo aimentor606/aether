@@ -324,7 +324,7 @@ export const useTabStore = create<TabState>()(
       },
     }),
     {
-      name: 'acme-tab-state',
+      name: 'aether-tab-state',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         activeSessionId: state.activeSessionId,

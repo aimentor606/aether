@@ -4,7 +4,7 @@
  * Provides:
  * - createTestApp() — Hono app mimicking the monolith with auth bypassed + injectable mock providers
  * - getTestDb()     — shared Drizzle DB instance for assertions
- * - cleanupTestData() — deletes all test rows from the shared acme schema
+ * - cleanupTestData() — deletes all test rows from the shared aether schema
  * - Mock provider factories
  * - Request helpers (jsonPost, jsonGet, jsonPatch, jsonDelete)
  *
@@ -192,7 +192,7 @@ export function createTestApp(opts: TestAppOptions = {}) {
   app.get('/v1/health', (c) =>
     c.json({
       status: 'ok',
-      service: 'acme',
+      service: 'aether',
       timestamp: new Date().toISOString(),
     }),
   );
@@ -329,7 +329,7 @@ export function createTestApp(opts: TestAppOptions = {}) {
 // ─── Cleanup ─────────────────────────────────────────────────────────────────
 
 /**
- * Delete all test data from acme schema tables.
+ * Delete all test data from aether schema tables.
  * Order respects FK constraints: children before parents.
  */
 export async function cleanupTestData(): Promise<void> {

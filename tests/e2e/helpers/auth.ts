@@ -10,7 +10,7 @@ export const supabaseUrl = process.env.E2E_SUPABASE_URL || 'http://localhost:137
  */
 export function getAnonKey(): string {
   const fs = require('fs');
-  const envPath = `${process.env.HOME}/.acme/.env`;
+  const envPath = `${process.env.HOME}/.aether/.env`;
   if (!fs.existsSync(envPath)) {
     throw new Error(`Aether .env not found at ${envPath} — is it installed?`);
   }

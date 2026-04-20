@@ -3,8 +3,8 @@ import { createInvoiceSchema, updateInvoiceSchema } from '@aether/db';
 import type { CreateInvoiceInput, UpdateInvoiceInput } from '@aether/db';
 
 export const invoicesService = {
-  async listAll(accountId: string) {
-    return invoicesRepository.findAll(accountId);
+  async listAll(accountId: string, options?: { limit?: number; offset?: number }) {
+    return invoicesRepository.findAll(accountId, options);
   },
 
   async getById(accountId: string, id: string) {

@@ -13,7 +13,7 @@ export interface ContainerConfig {
   securityOpt: string[];
 }
 
-const CONFIG_PATH = '/workspace/.acme/container.json';
+const CONFIG_PATH = '/workspace/.aether/container.json';
 
 // Port mapping for cloud/JustAVPS sandboxes.
 export const DEFAULT_PORTS = [
@@ -71,7 +71,7 @@ export async function writeContainerConfig(
   const b64 = Buffer.from(json).toString('base64');
   await execOnHost(
     endpoint,
-    `mkdir -p /workspace/.acme && echo '${b64}' | base64 -d > ${CONFIG_PATH}`,
+    `mkdir -p /workspace/.aether && echo '${b64}' | base64 -d > ${CONFIG_PATH}`,
     5,
   );
 }
@@ -108,7 +108,7 @@ export async function buildFromInspect(
       return {
         image: containerConfig.Image || '',
         name,
-        volumes: volumes.length > 0 ? volumes : ['acme-data:/workspace', 'acme-data:/config'],
+        volumes: volumes.length > 0 ? volumes : ['aether-data:/workspace', 'aether-data:/config'],
         ports: sanitizePorts(ports).length > 0 ? sanitizePorts(ports) : DEFAULT_PORTS,
         caps: (hostConfig.CapAdd || []) as string[],
         shmSize: formatShmSize(hostConfig.ShmSize),

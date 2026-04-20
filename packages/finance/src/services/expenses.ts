@@ -3,8 +3,8 @@ import { createExpenseSchema, updateExpenseSchema } from '@aether/db';
 import type { CreateExpenseInput, UpdateExpenseInput } from '@aether/db';
 
 export const expensesService = {
-  async listAll(accountId: string) {
-    return expensesRepository.findAll(accountId);
+  async listAll(accountId: string, options?: { limit?: number; offset?: number }) {
+    return expensesRepository.findAll(accountId, options);
   },
 
   async getById(accountId: string, id: string) {

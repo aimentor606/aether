@@ -7,7 +7,7 @@
   "replacementRules": {
     "keepDirectoryNames": [
       "core/kortix-master",
-      "core/acme-master",
+      "core/aether-master",
       "packages/kortix-ocx-registry"
     ],
     "skipPatterns": [

@@ -12,13 +12,13 @@
 # ║    supabase stop           (stop all containers)                           ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
-project_id = "kortix-local"
+project_id = "aether-local"
 
 # ─── API (PostgREST) ─────────────────────────────────────────────────────────
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "kortix"]
+schemas = ["public", "aether"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 

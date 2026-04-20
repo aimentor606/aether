@@ -36,7 +36,7 @@ import { log } from '@/lib/logger';
 // ─── BIOS lines (matches web frontend) ──────────────────────────────────────
 
 const BIOS_LINES = [
-  { text: 'ACME BIOS v2.0.1', bold: true },
+  { text: 'aether BIOS v2.0.1', bold: true },
   { text: '' },
   { text: 'CPU: Aether Inference Engine X1 @ 3.80 GHz' },
   { text: 'Memory test................. OK' },
@@ -47,7 +47,7 @@ const BIOS_LINES = [
   { text: 'Mounting workspace......... done' },
   { text: 'Connecting to services..... done' },
   { text: '' },
-  { text: 'All systems nominal. Starting ACME OS...' },
+  { text: 'All systems nominal. Starting aether OS...' },
 ];
 
 const LINE_DELAY_MS = 160;

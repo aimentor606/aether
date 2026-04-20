@@ -49,7 +49,7 @@ jobs:
 
       - name: Re-tag all images
         run: |
-          for IMAGE in acme/aether-api acme/acme-frontend aether/computer; do
+          for IMAGE in aether/aether-api aether/aether-frontend aether/computer; do
             echo "Re-tagging $IMAGE:dev-latest → $IMAGE:${{ env.VERSION }} + $IMAGE:latest"
 
             # Use buildx imagetools to create new tags from existing multi-arch manifest
@@ -64,8 +64,8 @@ jobs:
       - name: Summary
         run: |
           echo "### Re-tagged dev-latest → v${{ env.VERSION }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- \`acme/aether-api:${{ env.VERSION }}\` (multi-arch)" >> "$GITHUB_STEP_SUMMARY"
-          echo "- \`acme/acme-frontend:${{ env.VERSION }}\` (multi-arch)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- \`aether/aether-api:${{ env.VERSION }}\` (multi-arch)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- \`aether/aether-frontend:${{ env.VERSION }}\` (multi-arch)" >> "$GITHUB_STEP_SUMMARY"
           echo "- \`aether/computer:${{ env.VERSION }}\` (multi-arch)" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "_Zero rebuilds — re-tagged from dev-latest manifests._" >> "$GITHUB_STEP_SUMMARY"
@@ -87,14 +87,14 @@ jobs:
           script: |
             set -e
             if [ ! -d ~/suna ]; then
-              git clone https://github.com/acme-ai/suna.git ~/suna
+              git clone https://github.com/aether-ai/suna.git ~/suna
             fi
             cd ~/suna
             git -c fetch.recurseSubmodules=false fetch origin main
             git reset --hard origin/main
             git submodule sync --recursive
             git submodule update --init --recursive --remote
-            PREBUILT_IMAGE="acme/aether-api:${{ env.VERSION }}" bash scripts/deploy-zero-downtime.sh
+            PREBUILT_IMAGE="aether/aether-api:${{ env.VERSION }}" bash scripts/deploy-zero-downtime.sh
 
       - name: Summary
         run: |
@@ -156,8 +156,8 @@ jobs:
             echo "### Docker Images"
             echo ""
             echo "- \`aether/computer:${{ env.VERSION }}\`"
-            echo "- \`acme/aether-api:${{ env.VERSION }}\`"
-            echo "- \`acme/acme-frontend:${{ env.VERSION }}\`"
+            echo "- \`aether/aether-api:${{ env.VERSION }}\`"
+            echo "- \`aether/aether-frontend:${{ env.VERSION }}\`"
           } > /tmp/release-notes.md
           cat /tmp/release-notes.md
 
@@ -173,7 +173,7 @@ jobs:
           gh release create "v${{ env.VERSION }}" \
             --title "v${{ env.VERSION }} — ${{ env.TITLE }}" \
             --notes-file /tmp/release-notes.md \
-            --repo acme-ai/suna
+            --repo aether-ai/suna
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -21,7 +21,7 @@ if [[ -f "$CONFIG_FILE" ]]; then
   BRAND_TWITTER="${BRAND_TWITTER:-$(python3 -c "import json,sys; print(json.load(open('$CONFIG_FILE')).get('brandTwitter',''))" 2>/dev/null)}"
 fi
 
-BRAND="${BRAND:?Set BRAND env var. Example: BRAND=acme bash scripts/rebrand.sh}"
+BRAND="${BRAND:?Set BRAND env var. Example: BRAND=aether bash scripts/rebrand.sh}"
 BRAND_DOMAIN="${BRAND_DOMAIN:-${BRAND}.com}"
 BRAND_TWITTER="${BRAND_TWITTER:-@${BRAND}}"
 BRAND_UPPER="$(echo "$BRAND" | tr '[:lower:]' '[:upper:]')"
@@ -54,8 +54,8 @@ cd "$PROJECT_ROOT"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Rebrand: kortix → ${BRAND}"
-echo "  Rebrand: acme → ${BRAND}"
+echo "  Rebrand:master → ${BRAND}"
+echo "  Rebrand: aether → ${BRAND}"
 echo "  Domain: ${BRAND_DOMAIN}  Twitter: ${BRAND_TWITTER}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
@@ -210,7 +210,7 @@ done
 success "Phase 7 done"
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PHASE 8: kortix_system XML tags (skip with SKIP_XML_TAGS=1)
+# PHASE 8:system XML tags (skip with SKIP_XML_TAGS=1)
 # ══════════════════════════════════════════════════════════════════════════════
 info "Phase 8: XML tags"
 
@@ -308,14 +308,14 @@ done
 success "Phase 11 done"
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PHASE 12: Blanket — any remaining kortix (excluding core/kortix-master/ dirs)
+# PHASE 12: Blanket — any remainingmaster (excluding core/master/ dirs)
 # ══════════════════════════════════════════════════════════════════════════════
 info "Phase 12: Blanket catch-all"
 
 sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' -o \
   -name '*.json' -o -name '*.css' -o -name '*.html' -o -name '*.yml' -o -name '*.yaml' -o \
   -name '*.sh' -o -name '*.md' -o -name '*.env*' -o -name '*.sql' \) \
-  | grep -v 'core/kortix-master' \
+  | grep -v 'core/master' \
   | grep -v 'packages/kortix-ocx-registry' \
   | grep -v 'schema/kortix\.ts' \
   | while read -r f; do
@@ -332,7 +332,7 @@ info "Phase 13: File and directory renames"
 # Skip if explicitly disabled
 if [[ "${SKIP_FILE_RENAMES:-0}" != "1" ]]; then
   # ── Rename files (not directories) containing 'kortix' in name ──
-  # Exclude: core/kortix-master/*, core/kortix-ocx/*, packages/kortix-ocx-registry/*,
+  # Exclude: core/master/*, core/kortix-ocx/*, packages/kortix-ocx-registry/*,
   #          packages/kortix-ai/*, packages/db/src/schema/kortix.ts, node_modules
 
   while IFS= read -r oldpath; do
@@ -340,7 +340,7 @@ if [[ "${SKIP_FILE_RENAMES:-0}" != "1" ]]; then
     case "$oldpath" in
       */node_modules/*|*/.git/*|*/core/kortix-*|*/packages/kortix-*) continue ;;
       */schema/kortix.ts) continue ;;
-      */core/s6-services/svc-kortix-master*) continue ;;
+      */core/s6-services/svc-master*) continue ;;
       */core/init-scripts/kortix-env-setup.sh) continue ;;
     esac
 
@@ -358,13 +358,13 @@ if [[ "${SKIP_FILE_RENAMES:-0}" != "1" ]]; then
   done < <(find . -type f -name '*kortix*' -not -path '*/node_modules/*' -not -path '*/.git/*' 2>/dev/null)
 
   # ── Rename directories containing 'kortix' (bottom-up to avoid nesting issues) ──
-  # Exclude: core/kortix-master, core/kortix-ocx, packages/kortix-*, svc-kortix-master
+  # Exclude: core/master, core/kortix-ocx, packages/kortix-*, svc-master
   while IFS= read -r oldpath; do
     case "$oldpath" in
       */node_modules/*|*/.git/*) continue ;;
       ./core/kortix-*|./packages/kortix-*) continue ;;
       */core/kortix-*|*/packages/kortix-*) continue ;;
-      *svc-kortix-master*) continue ;;
+      *svc-master*) continue ;;
       *kortix-env-setup*) continue ;;
     esac
 
@@ -397,100 +397,100 @@ else
 fi
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PHASE 14: Acme → Brand replacements
+# PHASE 14: aether → Brand replacements
 # ══════════════════════════════════════════════════════════════════════════════
-info "Phase 14: Acme brand replacements"
+info "Phase 14: aether brand replacements"
 
-# Package names: @acme/* → @brand/*
+# Package names: @aether/* → @brand/*
 sf -name 'package.json' -type f | while read -r f; do
   eval "$SI \
-    -e 's/@acme\//@${BRAND}\//g' \
-    -e 's/\"acme-Frontend\"/\"${BRAND_PASCAL}-Frontend\"/g' \
-    -e 's/\"acme\"/\"${BRAND}\"/g' \
+    -e 's/@aether\//@${BRAND}\//g' \
+    -e 's/\"aether-Frontend\"/\"${BRAND_PASCAL}-Frontend\"/g' \
+    -e 's/\"aether\"/\"${BRAND}\"/g' \
     '$f'"
 done
 
-# Import statements: @acme/* → @brand/*
+# Import statements: @aether/* → @brand/*
 sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' \) | while read -r f; do
-  eval "$SI -e 's/@acme\//@${BRAND}\//g' '$f'"
+  eval "$SI -e 's/@aether\//@${BRAND}\//g' '$f'"
 done
 
-# Environment variables: ACME_* → BRAND_*
+# Environment variables: aether_* → BRAND_*
 sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.env*' -o -name '*.sh' \) | while read -r f; do
   eval "$SI \
-    -e 's/ACME_PUBLIC_/${BRAND_UPPER}_PUBLIC_/g' \
-    -e 's/ACME_SUPABASE_AUTH_COOKIE/${BRAND_UPPER}_SUPABASE_AUTH_COOKIE/g' \
-    -e 's/ACME_BILLING_INTERNAL_ENABLED/${BRAND_UPPER}_BILLING_INTERNAL_ENABLED/g' \
-    -e 's/ACME_DEPLOYMENTS_ENABLED/${BRAND_UPPER}_DEPLOYMENTS_ENABLED/g' \
-    -e 's/ACME_LOCAL_IMAGES/${BRAND_UPPER}_LOCAL_IMAGES/g' \
-    -e 's/ACME_MARKUP/${BRAND_UPPER}_MARKUP/g' \
-    -e 's/ACME_DATA_DIR/${BRAND_UPPER}_DATA_DIR/g' \
-    -e 's/ACME_WORKSPACE_ROOT/${BRAND_UPPER}_WORKSPACE_ROOT/g' \
-    -e 's/ACME_WORKSPACE/${BRAND_UPPER}_WORKSPACE/g' \
-    -e 's/ACME_TOKEN/${BRAND_UPPER}_TOKEN/g' \
-    -e 's/ACME_API_URL/${BRAND_UPPER}_API_URL/g' \
-    -e 's/ACME_URL/${BRAND_UPPER}_URL/g' \
-    -e 's/ACME_MASTER_URL/${BRAND_UPPER}_MASTER_URL/g' \
-    -e 's/INTERNAL_ACME_ENV/INTERNAL_${BRAND_UPPER}_ENV/g' \
-    -e 's/ACME_SKIP_ENSURE_SCHEMA/${BRAND_UPPER}_SKIP_ENSURE_SCHEMA/g' \
-    -e 's/ACME_/${BRAND_UPPER}_/g' \
+    -e 's/aether_PUBLIC_/${BRAND_UPPER}_PUBLIC_/g' \
+    -e 's/aether_SUPABASE_AUTH_COOKIE/${BRAND_UPPER}_SUPABASE_AUTH_COOKIE/g' \
+    -e 's/aether_BILLING_INTERNAL_ENABLED/${BRAND_UPPER}_BILLING_INTERNAL_ENABLED/g' \
+    -e 's/aether_DEPLOYMENTS_ENABLED/${BRAND_UPPER}_DEPLOYMENTS_ENABLED/g' \
+    -e 's/aether_LOCAL_IMAGES/${BRAND_UPPER}_LOCAL_IMAGES/g' \
+    -e 's/aether_MARKUP/${BRAND_UPPER}_MARKUP/g' \
+    -e 's/aether_DATA_DIR/${BRAND_UPPER}_DATA_DIR/g' \
+    -e 's/aether_WORKSPACE_ROOT/${BRAND_UPPER}_WORKSPACE_ROOT/g' \
+    -e 's/aether_WORKSPACE/${BRAND_UPPER}_WORKSPACE/g' \
+    -e 's/aether_TOKEN/${BRAND_UPPER}_TOKEN/g' \
+    -e 's/aether_API_URL/${BRAND_UPPER}_API_URL/g' \
+    -e 's/aether_URL/${BRAND_UPPER}_URL/g' \
+    -e 's/aether_MASTER_URL/${BRAND_UPPER}_MASTER_URL/g' \
+    -e 's/INTERNAL_aether_ENV/INTERNAL_${BRAND_UPPER}_ENV/g' \
+    -e 's/aether_SKIP_ENSURE_SCHEMA/${BRAND_UPPER}_SKIP_ENSURE_SCHEMA/g' \
+    -e 's/aether_/${BRAND_UPPER}_/g' \
     '$f'"
 done
 
-# HTTP headers: X-Acme-Token → X-Brand-Token
+# HTTP headers: X-aether-Token → X-Brand-Token
 sf -type f \( -name '*.ts' -o -name '*.tsx' \) | while read -r f; do
   eval "$SI \
-    -e 's/X-Acme-Token/X-${BRAND_PASCAL}-Token/g' \
-    -e 's/x-acme-token/x-${BRAND}-token/g' \
+    -e 's/X-aether-Token/X-${BRAND_PASCAL}-Token/g' \
+    -e 's/x-aether-token/x-${BRAND}-token/g' \
     '$f'"
 done
 
-# API key prefixes: acme_ → brand_ (with backward compat note)
+# API key prefixes: aether_ → brand_ (with backward compat note)
 sf -type f \( -name '*.ts' -o -name '*.tsx' \) | while read -r f; do
   eval "$SI \
-    -e 's/acme_sb_/${BRAND}_sb_/g' \
-    -e 's/acme_tnl_/${BRAND}_tnl_/g' \
-    -e 's/acme_/${BRAND}_/g' \
+    -e 's/aether_sb_/${BRAND}_sb_/g' \
+    -e 's/aether_tnl_/${BRAND}_tnl_/g' \
+    -e 's/aether_/${BRAND}_/g' \
     '$f'"
 done
 
-# User-visible strings: Acme → Brand
+# User-visible strings: aether → Brand
 sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.json' -o -name '*.md' \) -not -path '*/packages/db/drizzle/*' | while read -r f; do
-  eval "$SI -e 's/Acme/${BRAND_CAP}/g' '$f'"
+  eval "$SI -e 's/aether/${BRAND_CAP}/g' '$f'"
 done
 
-# Docker images: acme/computer → brand/computer
+# Docker images: aether/computer → brand/computer
 sf -type f \( -name '*.ts' -o -name '*.yml' -o -name '*.yaml' -o -name '*.sh' \) | while read -r f; do
   eval "$SI \
-    -e 's/acme\/computer/${BRAND}\/computer/g' \
-    -e 's/acme-sandbox/${BRAND}-sandbox/g' \
-    -e 's/acme-api/${BRAND}-api/g' \
-    -e 's/acme\/acme-api/${BRAND}\/${BRAND}-api/g' \
+    -e 's/aether\/computer/${BRAND}\/computer/g' \
+    -e 's/aether-sandbox/${BRAND}-sandbox/g' \
+    -e 's/aether-api/${BRAND}-api/g' \
+    -e 's/aether\/aether-api/${BRAND}\/${BRAND}-api/g' \
     '$f'"
 done
 
-# Domains: acme.dev → brand.dev etc
+# Domains: aether.dev → brand.dev etc
 sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.yml' -o -name '*.md' \) | while read -r f; do
-  eval "$SI -e 's/acme\.dev/${BRAND}.dev/g' -e 's/acme\.cloud/${BRAND}.cloud/g' -e 's/acme\.ai/${BRAND}.ai/g' '$f'"
+  eval "$SI -e 's/aether\.dev/${BRAND}.dev/g' -e 's/aether\.cloud/${BRAND}.cloud/g' -e 's/aether\.ai/${BRAND}.ai/g' '$f'"
 done
 
-# CamelCase/kebab identifiers: acmeSchema, acme-computer-store etc
+# CamelCase/kebab identifiers: aetherSchema, aether-computer-store etc
 sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.css' \) | while read -r f; do
   eval "$SI \
-    -e 's/acmeSchema/${BRAND}Schema/g' \
-    -e 's/acmeApiKeys/${BRAND}ApiKeys/g' \
-    -e 's/acme-computer-store/${BRAND}-computer-store/g' \
-    -e 's/acme-loader/${BRAND}-loader/g' \
-    -e 's/acme-logo/${BRAND}-logo/g' \
-    -e 's/acme-enterprise-modal/${BRAND}-enterprise-modal/g' \
-    -e 's/acme-tool-output/${BRAND}-tool-output/g' \
-    -e 's/acme-system-tags/${BRAND}-system-tags/g' \
-    -e 's/acme-box-display/${BRAND}-box-display/g' \
-    -e 's/acme-spreadsheet/${BRAND}-spreadsheet/g' \
+    -e 's/aetherSchema/${BRAND}Schema/g' \
+    -e 's/aetherApiKeys/${BRAND}ApiKeys/g' \
+    -e 's/aether-computer-store/${BRAND}-computer-store/g' \
+    -e 's/aether-loader/${BRAND}-loader/g' \
+    -e 's/aether-logo/${BRAND}-logo/g' \
+    -e 's/aether-enterprise-modal/${BRAND}-enterprise-modal/g' \
+    -e 's/aether-tool-output/${BRAND}-tool-output/g' \
+    -e 's/aether-system-tags/${BRAND}-system-tags/g' \
+    -e 's/aether-box-display/${BRAND}-box-display/g' \
+    -e 's/aether-spreadsheet/${BRAND}-spreadsheet/g' \
     '$f'"
 done
 
-# File renames: acme-* → brand-*
+# File renames: aether-* → brand-*
 if [[ "${SKIP_FILE_RENAMES:-0}" != "1" ]]; then
   while IFS= read -r oldpath; do
     case "$oldpath" in
@@ -498,32 +498,32 @@ if [[ "${SKIP_FILE_RENAMES:-0}" != "1" ]]; then
     esac
     dir="$(dirname "$oldpath")"
     base="$(basename "$oldpath")"
-    newbase="$(echo "$base" | sed "s/acme/${BRAND}/g; s/Acme/${BRAND_CAP}/g")"
+    newbase="$(echo "$base" | sed "s/aether/${BRAND}/g; s/aether/${BRAND_CAP}/g")"
     if [[ "$base" != "$newbase" && ! -e "${dir}/${newbase}" ]]; then
       mv "$oldpath" "${dir}/${newbase}"
       info "  Renamed: $oldpath → ${dir}/${newbase}"
     fi
-  done < <(find . -type f -name '*acme*' -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/drizzle/*' 2>/dev/null)
+  done < <(find . -type f -name '*aether*' -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/drizzle/*' 2>/dev/null)
 fi
 
 success "Phase 14 done"
 # VERIFICATION
 # ══════════════════════════════════════════════════════════════════════════════
 echo ""
-info "Verification: scanning for remaining kortix references..."
+info "Verification: scanning for remainingmaster references..."
 
 remaining=$(sf -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.json' -o -name '*.sh' -o -name '*.yml' -o -name '*.md' \) 2>/dev/null \
-  | grep -v 'core/kortix-master' \
+  | grep -v 'core/master' \
   | grep -v 'packages/kortix-ocx-registry' \
   | grep -v 'packages/db/drizzle' \
-  | xargs grep -il 'kortix\|acme' 2>/dev/null | wc -l | tr -d ' ')
+  | xargs grep -il 'kortix\|aether' 2>/dev/null | wc -l | tr -d ' ')
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if [[ "${remaining:-0}" -eq 0 ]]; then
-  success "Rebrand complete: kortix/acme → ${BRAND} — no stray references found"
+  success "Rebrand complete: kortix/aether → ${BRAND} — no stray references found"
 else
-  warn "${remaining} files still contain 'kortix' or 'acme' (allowed dirs or comments)"
+  warn "${remaining} files still contain 'kortix' or 'aether' (allowed dirs or comments)"
 fi
 echo ""
 warn "Run to verify:  pnpm install && pnpm build"

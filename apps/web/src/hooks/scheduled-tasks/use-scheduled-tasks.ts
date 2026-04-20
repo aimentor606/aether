@@ -168,7 +168,7 @@ interface ApiRunResponse {
 
 async function getTriggersBaseUrl(): Promise<string> {
   const { sandbox } = await ensureSandbox();
-  return `${getSandboxUrl(sandbox)}/acme/triggers`;
+  return `${getSandboxUrl(sandbox)}/aether/triggers`;
 }
 
 async function fetchTriggersJson<T>(path: string, init?: RequestInit): Promise<T> {

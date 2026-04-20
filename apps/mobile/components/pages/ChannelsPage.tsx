@@ -796,7 +796,7 @@ function TelegramWizard({
 }) {
   const [botToken, setBotToken] = useState('');
   const [botInfo, setBotInfo] = useState<{ username: string; firstName: string } | null>(null);
-  const [agentName, setAgentName] = useState('acme');
+  const [agentName, setAgentName] = useState('aether');
   const [selectedModelIdx, setSelectedModelIdx] = useState(0);
 
   const verifyMutation = useTelegramVerifyToken();
@@ -1020,7 +1020,7 @@ function SlackWizard({
 
   // Step 1: Configure
   const [botName, setBotName] = useState(() => randomBotName());
-  const [agentName, setAgentName] = useState('acme');
+  const [agentName, setAgentName] = useState('aether');
   const [selectedModelIdx, setSelectedModelIdx] = useState(0);
 
   // Step 2: Manifest

@@ -71,7 +71,7 @@ import { useDocumentModalStore } from '@/stores/use-document-modal-store';
 import { isBillingEnabled } from '@/lib/config';
 
 import { useCreateOpenCodeSession, useOpenCodeSessions } from '@/hooks/opencode/use-opencode-sessions';
-import { useAetherProjects, type AetherProject } from '@/hooks/acme/use-acme-projects';
+import { useAetherProjects, type AetherProject } from '@/hooks/aether/use-aether-projects';
 import { openTabAndNavigate } from '@/stores/tab-store';
 import { useServerStore } from '@/stores/server-store';
 import { useOpenCodePendingStore } from '@/stores/opencode-pending-store';

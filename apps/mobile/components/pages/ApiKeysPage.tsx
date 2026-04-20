@@ -139,7 +139,7 @@ function ApiKeysContent() {
     enabled: !!sandboxUrl,
     queryFn: async (): Promise<PublicShareEntry[]> => {
       const token = await getAuthToken();
-      const res = await fetch(`${sandboxUrl}/acme/share`, {
+      const res = await fetch(`${sandboxUrl}/aether/share`, {
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -155,7 +155,7 @@ function ApiKeysContent() {
     mutationFn: async (shareToken: string) => {
       if (!sandboxUrl) throw new Error('No sandbox URL');
       const token = await getAuthToken();
-      const res = await fetch(`${sandboxUrl}/acme/share/${shareToken}`, {
+      const res = await fetch(`${sandboxUrl}/aether/share/${shareToken}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

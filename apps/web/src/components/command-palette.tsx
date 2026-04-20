@@ -71,7 +71,7 @@ import {
   MODEL_SELECTOR_PROVIDER_IDS,
 } from '@/components/providers/provider-branding';
 import { useWorkspaceSearch, useFilesStore } from '@/features/files';
-import { useAetherProjects, type AetherProject } from '@/hooks/acme/use-acme-projects';
+import { useAetherProjects, type AetherProject } from '@/hooks/aether/use-aether-projects';
 import { useOpenCodeMessages } from '@/hooks/opencode/use-opencode-sessions';
 import { useMessageJumpStore } from '@/stores/message-jump-store';
 import { groupMessagesIntoTurns, isTextPart, type TextPart } from '@/ui';
@@ -885,7 +885,7 @@ export function CommandPalette() {
   const handleRestartConfig = useCallback(() => {
     close();
     const serverUrl = useServerStore.getState().getActiveServerUrl();
-    authenticatedFetch(`${serverUrl}/acme/services/system/reload`, {
+    authenticatedFetch(`${serverUrl}/aether/services/system/reload`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode: 'dispose-only' }),
     }).then((res) => {
@@ -897,7 +897,7 @@ export function CommandPalette() {
   const handleRestartFull = useCallback(() => {
     close();
     const serverUrl = useServerStore.getState().getActiveServerUrl();
-    authenticatedFetch(`${serverUrl}/acme/services/system/reload`, {
+    authenticatedFetch(`${serverUrl}/aether/services/system/reload`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode: 'full' }),
     }).then((res) => {

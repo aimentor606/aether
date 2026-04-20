@@ -42,7 +42,10 @@ import {
 import { cn } from '@/lib/utils';
 import { useFileContent } from '@/features/files/hooks/use-file-content';
 import { useBinaryBlob } from '@/features/files/hooks/use-binary-blob';
-import { CodeHighlight, UnifiedMarkdown } from '@/components/markdown/unified-markdown';
+import {
+  CodeHighlight,
+  UnifiedMarkdown,
+} from '@/components/markdown/unified-markdown';
 import { isAppRouteUrl, parseLocalhostUrl } from '@/lib/utils/sandbox-url';
 import { TextWithPaths } from '@/components/common/clickable-path';
 import { ImageRenderer } from './image-renderer';
@@ -72,7 +75,8 @@ const PptxRenderer = lazy(() =>
 
 // ── Extension regexes ──────────────────────────────────────────────────────
 
-export const SHOW_IMAGE_EXT_RE = /\.(png|jpe?g|gif|webp|svg|bmp|ico|avif|tiff?|heic|heif)$/i;
+export const SHOW_IMAGE_EXT_RE =
+  /\.(png|jpe?g|gif|webp|svg|bmp|ico|avif|tiff?|heic|heif)$/i;
 export const SHOW_VIDEO_EXT_RE = /\.(mp4|webm|mov|avi|mkv|m4v|ogv)$/i;
 export const SHOW_AUDIO_EXT_RE = /\.(mp3|wav|ogg|aac|flac|m4a|opus|wma)$/i;
 export const SHOW_PDF_EXT_RE = /\.pdf$/i;
@@ -85,16 +89,24 @@ export const SHOW_HTML_EXT_RE = /\.(html?|htm)$/i;
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 export function showFavicon(url: string): string | null {
-  try { return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=128`; }
-  catch { return null; }
+  try {
+    return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=128`;
+  } catch {
+    return null;
+  }
 }
 
 export function showDomain(url: string): string {
-  try { return new URL(url).hostname.replace('www.', ''); }
-  catch { return url; }
+  try {
+    return new URL(url).hostname.replace('www.', '');
+  } catch {
+    return url;
+  }
 }
 
-export function showAspectRatioToCSS(ar: string | undefined): string | undefined {
+export function showAspectRatioToCSS(
+  ar: string | undefined,
+): string | undefined {
   if (!ar || ar === 'auto') return undefined;
   const [w, h] = ar.split(':').map(Number);
   if (w && h) return `${w}/${h}`;
@@ -147,15 +159,27 @@ function LoadError({ message }: { message: string }) {
   );
 }
 
-function FileCard({ title, fileName, path }: { title?: string; fileName: string; path: string }) {
+function FileCard({
+  title,
+  fileName,
+  path,
+}: {
+  title?: string;
+  fileName: string;
+  path: string;
+}) {
   return (
     <div className="flex items-center gap-4 px-5 py-5">
       <div className="flex items-center justify-center size-12 rounded-xl bg-muted/20">
         <FileText className="size-6 text-muted-foreground/40" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-foreground truncate">{title || fileName}</div>
-        <div className="text-xs text-muted-foreground/50 font-mono truncate mt-0.5">{path}</div>
+        <div className="text-sm font-medium text-foreground truncate">
+          {title || fileName}
+        </div>
+        <div className="text-xs text-muted-foreground/50 font-mono truncate mt-0.5">
+          {path}
+        </div>
       </div>
     </div>
   );
@@ -215,7 +239,7 @@ export function ShowContentRenderer({
 
   // ── Sandbox file path normalization ──
   // The show tool backend resolves paths to absolute (e.g. /workspace/foo.png).
-  // The /file/raw endpoint on acme-master accepts absolute paths and validates
+  // The /file/raw endpoint on aether-master accepts absolute paths and validates
   // them against ALLOWED_ROOTS (/workspace, /opt, /tmp, /home).
   // Keep the path absolute — do NOT strip /workspace/ prefix.
   const isLocalPath = path ? isLocalSandboxFilePath(path) : false;
@@ -235,7 +259,12 @@ export function ShowContentRenderer({
   // NOT the SDK text-read endpoint. More reliable for binary content.
   const needsBlob = BLOB_TYPES.has(effectiveType) && !!sandboxPath;
   const blobFilePath = needsBlob ? sandboxPath : null;
-  const { blobUrl, blob: rawBlob, isLoading: blobLoading, error: blobError } = useBinaryBlob(blobFilePath);
+  const {
+    blobUrl,
+    blob: rawBlob,
+    isLoading: blobLoading,
+    error: blobError,
+  } = useBinaryBlob(blobFilePath);
 
   // HEIC conversion — converts the raw blob to renderable JPEG
   const isHeic = isImage && isHeicFile(fileName);
@@ -246,10 +275,9 @@ export function ShowContentRenderer({
 
   // CSV/TSV: text content via SDK
   const csvLoadPath = isCsv && sandboxPath ? sandboxPath : null;
-  const { data: csvData, isLoading: csvLoading } = useFileContent(
-    csvLoadPath,
-    { enabled: !!csvLoadPath },
-  );
+  const { data: csvData, isLoading: csvLoading } = useFileContent(csvLoadPath, {
+    enabled: !!csvLoadPath,
+  });
 
   // HTML blob URL (inline content, no SDK call)
   const htmlBlobUrl = useMemo(() => {
@@ -259,26 +287,35 @@ export function ShowContentRenderer({
   }, [isHtml, content]);
 
   // Error fallback for FileContentRenderer (used for generic 'file' type)
-  const fileErrorFallback = useCallback((_error: string, fp: string) => {
-    const name = fp.split('/').pop() || fp;
-    return (
-      <div className="flex items-center gap-4 px-5 py-5 h-full">
-        <div className="flex items-center justify-center size-12 rounded-xl bg-muted/20">
-          <FileText className="size-6 text-muted-foreground/40" />
+  const fileErrorFallback = useCallback(
+    (_error: string, fp: string) => {
+      const name = fp.split('/').pop() || fp;
+      return (
+        <div className="flex items-center gap-4 px-5 py-5 h-full">
+          <div className="flex items-center justify-center size-12 rounded-xl bg-muted/20">
+            <FileText className="size-6 text-muted-foreground/40" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium text-foreground truncate">
+              {title || name}
+            </div>
+            <div className="text-xs text-muted-foreground/50 font-mono truncate mt-0.5">
+              {path}
+            </div>
+          </div>
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-foreground truncate">{title || name}</div>
-          <div className="text-xs text-muted-foreground/50 font-mono truncate mt-0.5">{path}</div>
-        </div>
-      </div>
-    );
-  }, [title, path]);
+      );
+    },
+    [title, path],
+  );
 
   // ═════════════════════════════════════════════════════════════════════════
   // Localhost URL → proxied iframe (caller provides the component)
   // ═════════════════════════════════════════════════════════════════════════
   if (hasLocalhostUrl && LocalhostPreview) {
-    return <LocalhostPreview url={url} label={title || description || undefined} />;
+    return (
+      <LocalhostPreview url={url} label={title || description || undefined} />
+    );
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -288,9 +325,18 @@ export function ShowContentRenderer({
   if ((isHtmlFile || (isHtml && !content)) && sandboxPath && LocalhostPreview) {
     const staticPort = parseInt(SANDBOX_PORTS.STATIC_FILE_SERVER ?? '3211', 10);
     const normalizedPath = ensureWorkspacePath(sandboxPath);
-    const encodedPath = normalizedPath.split('/').filter(Boolean).map(encodeURIComponent).join('/');
+    const encodedPath = normalizedPath
+      .split('/')
+      .filter(Boolean)
+      .map(encodeURIComponent)
+      .join('/');
     const staticUrl = `http://localhost:${staticPort}/open?path=/${encodedPath}`;
-    return <LocalhostPreview url={staticUrl} label={title || fileName || undefined} />;
+    return (
+      <LocalhostPreview
+        url={staticUrl}
+        label={title || fileName || undefined}
+      />
+    );
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -314,7 +360,9 @@ export function ShowContentRenderer({
                 src={favicon}
                 alt=""
                 className="size-6 rounded"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
               />
             ) : (
               <Globe className="size-5 text-muted-foreground/50" />
@@ -387,9 +435,16 @@ export function ShowContentRenderer({
             <Music className="size-6 text-muted-foreground/40" />
           </div>
           {(title || fileName) && (
-            <p className="text-xs text-muted-foreground/60">{title || fileName}</p>
+            <p className="text-xs text-muted-foreground/60">
+              {title || fileName}
+            </p>
           )}
-          <audio controls src={blobUrl} className="w-full max-w-sm" preload="metadata" />
+          <audio
+            controls
+            src={blobUrl}
+            className="w-full max-w-sm"
+            preload="metadata"
+          />
         </div>
       );
     }
@@ -411,7 +466,13 @@ export function ShowContentRenderer({
         </Suspense>
       );
     }
-    return <FileCard title={title || 'PDF Document'} fileName={fileName} path={path} />;
+    return (
+      <FileCard
+        title={title || 'PDF Document'}
+        fileName={fileName}
+        path={path}
+      />
+    );
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -438,7 +499,11 @@ export function ShowContentRenderer({
     return (
       <Suspense fallback={<RendererFallback />}>
         <div className="h-[420px] overflow-hidden">
-          <XlsxRenderer filePath={sandboxPath} fileName={fileName} className="h-full" />
+          <XlsxRenderer
+            filePath={sandboxPath}
+            fileName={fileName}
+            className="h-full"
+          />
         </div>
       </Suspense>
     );
@@ -459,7 +524,13 @@ export function ShowContentRenderer({
         </Suspense>
       );
     }
-    return <FileCard title={title || 'Word Document'} fileName={fileName} path={path} />;
+    return (
+      <FileCard
+        title={title || 'Word Document'}
+        fileName={fileName}
+        path={path}
+      />
+    );
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -483,7 +554,13 @@ export function ShowContentRenderer({
         </Suspense>
       );
     }
-    return <FileCard title={title || 'PowerPoint Presentation'} fileName={fileName} path={path} />;
+    return (
+      <FileCard
+        title={title || 'PowerPoint Presentation'}
+        fileName={fileName}
+        path={path}
+      />
+    );
   }
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -510,10 +587,7 @@ export function ShowContentRenderer({
   if (isCode && content) {
     return (
       <div className="px-5 py-5 max-h-96 overflow-auto">
-        <CodeHighlight
-          code={content}
-          language={language || 'text'}
-        />
+        <CodeHighlight code={content} language={language || 'text'} />
       </div>
     );
   }
@@ -550,7 +624,10 @@ export function ShowContentRenderer({
           src={htmlBlobUrl}
           title={title || 'HTML Preview'}
           className="w-full border-0 bg-white"
-          style={{ height: arCSS ? undefined : '540px', aspectRatio: arCSS || undefined }}
+          style={{
+            height: arCSS ? undefined : '540px',
+            aspectRatio: arCSS || undefined,
+          }}
           sandbox="allow-scripts allow-same-origin"
         />
       </div>
@@ -565,7 +642,9 @@ export function ShowContentRenderer({
       <div className="px-5 py-4">
         <div className="flex items-start gap-3">
           <AlertTriangle className="size-4 flex-shrink-0 mt-0.5 text-red-500" />
-          <p className="text-sm text-foreground whitespace-pre-wrap"><TextWithPaths text={content} /></p>
+          <p className="text-sm text-foreground whitespace-pre-wrap">
+            <TextWithPaths text={content} />
+          </p>
         </div>
       </div>
     );
@@ -588,7 +667,12 @@ export function ShowContentRenderer({
         </div>
       )}
       {url && !content && (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary font-mono text-xs truncate hover:underline flex items-center gap-1.5">
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary font-mono text-xs truncate hover:underline flex items-center gap-1.5"
+        >
           <ExternalLink className="size-3.5" />
           {url}
         </a>
@@ -620,15 +704,22 @@ export interface ShowCarouselProps {
   onIndexChange?: (index: number) => void;
 }
 
-export function ShowCarousel({ items, LocalhostPreview, onIndexChange }: ShowCarouselProps) {
+export function ShowCarousel({
+  items,
+  LocalhostPreview,
+  onIndexChange,
+}: ShowCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const count = items.length;
 
-  const goTo = useCallback((idx: number) => {
-    const clamped = Math.max(0, Math.min(idx, count - 1));
-    setCurrentIndex(clamped);
-    onIndexChange?.(clamped);
-  }, [count, onIndexChange]);
+  const goTo = useCallback(
+    (idx: number) => {
+      const clamped = Math.max(0, Math.min(idx, count - 1));
+      setCurrentIndex(clamped);
+      onIndexChange?.(clamped);
+    },
+    [count, onIndexChange],
+  );
 
   const prev = useCallback(() => goTo(currentIndex - 1), [goTo, currentIndex]);
   const next = useCallback(() => goTo(currentIndex + 1), [goTo, currentIndex]);

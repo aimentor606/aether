@@ -1,7 +1,7 @@
 -- Pool configuration: what machine types to keep warm
-CREATE TABLE IF NOT EXISTS acme.pool_resources (
+CREATE TABLE IF NOT EXISTS aether.pool_resources (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  provider acme.sandbox_provider NOT NULL,
+  provider aether.sandbox_provider NOT NULL,
   server_type VARCHAR(64) NOT NULL,
   location VARCHAR(64) NOT NULL,
   desired_count INTEGER NOT NULL DEFAULT 2,
@@ -11,13 +11,13 @@ CREATE TABLE IF NOT EXISTS acme.pool_resources (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_pool_resources_unique
-  ON acme.pool_resources (provider, server_type, location);
+  ON aether.pool_resources (provider, server_type, location);
 
 -- Pool inventory: actual pre-provisioned machines waiting to be claimed
-CREATE TABLE IF NOT EXISTS acme.pool_sandboxes (
+CREATE TABLE IF NOT EXISTS aether.pool_sandboxes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  resource_id UUID REFERENCES acme.pool_resources(id) ON DELETE SET NULL,
-  provider acme.sandbox_provider NOT NULL,
+  resource_id UUID REFERENCES aether.pool_resources(id) ON DELETE SET NULL,
+  provider aether.sandbox_provider NOT NULL,
   external_id TEXT NOT NULL,
   base_url TEXT NOT NULL DEFAULT '',
   server_type VARCHAR(64) NOT NULL,
@@ -29,4 +29,4 @@ CREATE TABLE IF NOT EXISTS acme.pool_sandboxes (
 );
 
 CREATE INDEX IF NOT EXISTS idx_pool_sandboxes_claim
-  ON acme.pool_sandboxes (status, created_at) WHERE status = 'ready';
+  ON aether.pool_sandboxes (status, created_at) WHERE status = 'ready';

@@ -4,10 +4,12 @@ import { ledgers } from '../schemas';
 import type { CreateLedgerInput, UpdateLedgerInput } from '../schemas';
 
 export const ledgersRepository = {
-  async findAll(accountId: string) {
+  async findAll(accountId: string, options?: { limit?: number; offset?: number }) {
     return db.query.ledgers.findMany({
       where: eq(ledgers.accountId, accountId),
       orderBy: desc(ledgers.entryDate),
+      limit: options?.limit ?? 50,
+      offset: options?.offset ?? 0,
     });
   },
 

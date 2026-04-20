@@ -68,7 +68,7 @@ export const integrationStatusEnum = aetherSchema.enum('integration_status', [
 ]);
 
 // ─── Accounts & Members ─────────────────────────────────────────────────────
-// Replaces basejump.account_user. Fully kortix-native.
+// Replaces basejump.account_user. Fullynative.
 
 export const accountRoleEnum = aetherSchema.enum('account_role', [
   'owner',
@@ -233,10 +233,10 @@ export const aetherApiKeys = aetherSchema.table(
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex('idx_kortix_api_keys_public_key').on(table.publicKey),
-    index('idx_kortix_api_keys_secret_hash').on(table.secretKeyHash),
-    index('idx_kortix_api_keys_sandbox').on(table.sandboxId),
-    index('idx_kortix_api_keys_account').on(table.accountId),
+    uniqueIndex('idx_aether_api_keys_public_key').on(table.publicKey),
+    index('idx_aether_api_keys_secret_hash').on(table.secretKeyHash),
+    index('idx_aether_api_keys_sandbox').on(table.sandboxId),
+    index('idx_aether_api_keys_account').on(table.accountId),
   ],
 );
 
@@ -478,7 +478,7 @@ export const billingCustomers = aetherSchema.table(
     provider: text(),
   },
   (table) => [
-    index('idx_kortix_billing_customers_account_id').on(table.accountId),
+    index('idx_aether_billing_customers_account_id').on(table.accountId),
   ],
 );
 
@@ -560,7 +560,7 @@ export const creditLedger = aetherSchema.table(
   },
   (table) => [
     unique('aether_unique_stripe_event').on(table.stripeEventId),
-    index('idx_kortix_credit_ledger_idempotency')
+    index('idx_aether_credit_ledger_idempotency')
       .on(table.idempotencyKey)
       .where(sql`${table.idempotencyKey} IS NOT NULL`),
   ],

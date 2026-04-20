@@ -82,7 +82,7 @@ describe('Cloud Scan: Proxy Route Map — All Should Require aether_ Token', () 
   });
 
   describe('These should all return Aether 401 instead of upstream errors', () => {
-    test('EXPECTED: all non-acme requests should get Aether 401', () => {
+    test('EXPECTED: all non-aether requests should get Aether 401', () => {
       // Current: request forwards to upstream, upstream auth error leaks through
       // Expected: Aether rejects BEFORE forwarding
       // Fix in proxy.ts handleProxy():

@@ -81,3 +81,29 @@ export class WebhookVerificationError extends HTTPException {
     super(401, { message });
   }
 }
+
+// ─── Tenant & Vertical Errors ──────────────────────────────────────────────
+
+export class TenantIsolationError extends HTTPException {
+  constructor(accountId: string, resource: string) {
+    super(403, { message: `Account ${accountId} does not have access to ${resource}` });
+  }
+}
+
+export class VerticalNotFoundError extends HTTPException {
+  constructor(vertical: string) {
+    super(404, { message: `Vertical '${vertical}' not found` });
+  }
+}
+
+export class FeatureFlagDisabledError extends HTTPException {
+  constructor(flag: string) {
+    super(403, { message: `Feature '${flag}' is not enabled for this account` });
+  }
+}
+
+export class ConfigLoadError extends HTTPException {
+  constructor(detail: string) {
+    super(503, { message: `Failed to load tenant configuration: ${detail}` });
+  }
+}

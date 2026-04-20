@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ─── Zero-Downtime Deploy for Acme API ─────────────────────────────────────
+# ─── Zero-Downtime Deploy for aether API ─────────────────────────────────────
 #
 # Blue/green deployment using nginx as the traffic switcher:
 #
@@ -14,15 +14,15 @@ set -euo pipefail
 #   7. On failure at any step: automatic rollback
 #
 # Port allocation: Blue = 8008, Green = 8009
-# State file: ~/.acme-deploy-slot tracks which slot is active
+# State file: ~/.aether-deploy-slot tracks which slot is active
 # ─────────────────────────────────────────────────────────────────────────────
 
 IMAGE_NAME="aether-api"
-STATE_FILE="$HOME/.acme-deploy-slot"
+STATE_FILE="$HOME/.aether-deploy-slot"
 NGINX_CONF="/etc/nginx/sites-available/aether-api"
 HEALTH_TIMEOUT=60
 HEALTH_INTERVAL=2
-LOCK_FILE="$HOME/.acme-deploy.lock"
+LOCK_FILE="$HOME/.aether-deploy.lock"
 PREBUILT_IMAGE="${PREBUILT_IMAGE:-}"
 
 cd ~/suna
@@ -89,7 +89,7 @@ fi
 echo "[3/6] Starting $STANDBY_SLOT on port $STANDBY_PORT..."
 docker rm -f "aether-api-$STANDBY_SLOT" 2>/dev/null || true
 
-# Extract version from image tag (e.g. "acme/aether-api:0.8.29" → "0.8.29")
+# Extract version from image tag (e.g. "aether/aether-api:0.8.29" → "0.8.29")
 # Falls back to git commit short SHA for dev builds
 SANDBOX_VERSION="${IMAGE_TAG##*:}"
 echo "  SANDBOX_VERSION=$SANDBOX_VERSION"

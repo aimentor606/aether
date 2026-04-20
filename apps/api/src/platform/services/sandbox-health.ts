@@ -81,7 +81,7 @@ async function checkSandboxHealth(): Promise<void> {
     // 1. Check basic reachability (health endpoint bypasses auth)
     // 503 means Aether Master is running but the agent runtime isn't ready yet —
     // treat it as a soft failure (sandbox is reachable but not fully ready).
-    const healthRes = await fetch(`${baseUrl}/acme/health`, {
+    const healthRes = await fetch(`${baseUrl}/aether/health`, {
       signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
     });
 
@@ -104,7 +104,7 @@ async function checkSandboxHealth(): Promise<void> {
     }
 
     // 2. Check auth works (protected endpoint)
-    const authRes = await fetch(`${baseUrl}/acme/ports`, {
+    const authRes = await fetch(`${baseUrl}/aether/ports`, {
       headers: { Authorization: `Bearer ${config.INTERNAL_SERVICE_KEY}` },
       signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
     });
@@ -117,7 +117,7 @@ async function checkSandboxHealth(): Promise<void> {
         throw new Error('Auth failed and key sync unsuccessful');
       }
       // Key synced — verify again
-      const retryRes = await fetch(`${baseUrl}/acme/ports`, {
+      const retryRes = await fetch(`${baseUrl}/aether/ports`, {
         headers: { Authorization: `Bearer ${config.INTERNAL_SERVICE_KEY}` },
         signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
       });
@@ -154,7 +154,7 @@ async function checkSandboxHealth(): Promise<void> {
  * Attempt to sync all 3 core env vars to the sandbox container.
  * Syncs AETHER_API_URL, AETHER_TOKEN (if set), and INTERNAL_SERVICE_KEY.
  * Tries the secrets manager /env API first (preferred — triple-write + no restart needed).
- * Falls back to docker exec if the API is unreachable (e.g. acme-master down).
+ * Falls back to docker exec if the API is unreachable (e.g. aether-master down).
  */
 async function attemptKeySync(baseUrl: string): Promise<boolean> {
   const ourKey = config.INTERNAL_SERVICE_KEY;
@@ -225,7 +225,7 @@ async function attemptKeySync(baseUrl: string): Promise<boolean> {
 
 /**
  * Fallback: write core env vars directly to s6 env dir via docker exec.
- * Used when the /env API is unreachable (e.g. acme-master auth mismatch).
+ * Used when the /env API is unreachable (e.g. aether-master auth mismatch).
  */
 async function attemptKeySyncFallback(keys: Record<string, string>): Promise<boolean> {
   // Only works in local docker mode (not network mode)

@@ -93,7 +93,7 @@ describe('preview auth ownership', () => {
     expect(res.status).toBe(401);
   });
 
-  test('allows owner via Bearer acme token', async () => {
+  test('allows owner via Bearer aether token', async () => {
     const app = createApp();
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
       headers: { Authorization: 'Bearer aether_owner' },
@@ -109,7 +109,7 @@ describe('preview auth ownership', () => {
     expect(res.status).toBe(200);
   });
 
-  test('allows owner via preview session cookie with acme token', async () => {
+  test('allows owner via preview session cookie with aether token', async () => {
     const app = createApp();
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
       headers: { Cookie: '__preview_session=aether_owner' },
@@ -117,7 +117,7 @@ describe('preview auth ownership', () => {
     expect(res.status).toBe(200);
   });
 
-  test('rejects non-owner acme token', async () => {
+  test('rejects non-owner aether token', async () => {
     const app = createApp();
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
       headers: { Authorization: 'Bearer aether_other' },

@@ -61,7 +61,7 @@ export interface UpdateChannelData {
 
 async function sandboxChannelFetch<T>(sandboxUrl: string, path: string, options?: RequestInit): Promise<T> {
   const token = await getAuthToken();
-  const res = await fetch(`${sandboxUrl}/acme/channels${path}`, {
+  const res = await fetch(`${sandboxUrl}/aether/channels${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',

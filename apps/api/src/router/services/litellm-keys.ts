@@ -22,7 +22,7 @@ const KEY_CACHE_TTL_MS = 5 * 60 * 1000;
 const keyCache = new Map<string, CachedKey>();
 
 function getAlias(accountId: string): string {
-  return `acme-${accountId}`;
+  return `aether-${accountId}`;
 }
 
 function getCachedKey(accountId: string): string | null {

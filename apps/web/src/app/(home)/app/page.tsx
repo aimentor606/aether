@@ -9,8 +9,8 @@ import { AppDownloadQR, APP_DOWNLOAD_URL } from '@/components/common/app-downloa
 // This page only renders for desktop users
 
 const STORE_LINKS = {
-  ios: 'https://apps.apple.com/ie/app/acme/id6754448524',
-  android: 'https://play.google.com/store/apps/details?id=com.acme.app',
+  ios: 'https://apps.apple.com/ie/app/aether/id6754448524',
+  android: 'https://play.google.com/store/apps/details?id=com.aether.app',
 };
 
 // Aether symbol SVG (inline to avoid loading issues)

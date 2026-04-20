@@ -15,7 +15,7 @@ const router = new Hono();
 router.get('/health', (c) => {
   return c.json({
     status: 'ok',
-    service: 'acme-router',
+    service: 'aether-router',
     timestamp: new Date().toISOString(),
     env: config.ENV_MODE,
   });

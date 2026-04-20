@@ -793,7 +793,7 @@
     "title": "Aether: Dein autonomer KI-Worker",
     "subtitle": "Gebaut für komplexe Aufgaben, entwickelt für alles. Der ultimative KI-Assistent, der alles bewältigt—von einfachen Anfragen bis hin zu mega-komplexen Projekten.",
     "tryItOut": "Ausprobieren",
-    "acmeComputer": "Aether Computer",
+    "aetherComputer": "Aether Computer",
     "running": "Läuft",
     "workers": {
       "images": {

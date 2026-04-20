@@ -899,7 +899,7 @@ function ExampleCard({ example, index, scrollX, isActive, isDark, t }: ExampleCa
               <View className="flex-row items-center gap-2">
                 <AetherLogo variant="symbol" size={14} color={isDark ? 'dark' : 'light'} />
                 <Text className="text-[14px] font-roobert-medium text-foreground">
-                  {t('onboarding.acmeComputer')}
+                  {t('onboarding.aetherComputer')}
                 </Text>
               </View>
 

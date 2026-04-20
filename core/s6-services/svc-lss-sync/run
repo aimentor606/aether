@@ -3,7 +3,7 @@
 
 #
 # OPENAI_API_KEY is optional. If not set, lss-sync is skipped entirely.
-# auth-sync (kortix-master) writes the key to s6 env at boot.
+# auth-sync (master) writes the key to s6 env at boot.
 
 
 # Quick check — don't block startup with a long wait loop

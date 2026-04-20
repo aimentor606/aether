@@ -29,7 +29,7 @@ const { providersApp } = await import('../providers/routes');
 const { setupApp } = await import('../setup');
 const { PROVIDER_REGISTRY } = await import('../providers/registry');
 
-const TEST_DIR = `/tmp/acme-providers-test-${Date.now()}`;
+const TEST_DIR = `/tmp/aether-providers-test-${Date.now()}`;
 
 // ─── Test app factory ───────────────────────────────────────────────────────
 

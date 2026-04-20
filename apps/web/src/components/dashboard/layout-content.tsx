@@ -578,11 +578,11 @@ export default function DashboardLayoutContent({
 		// Persist skip/redo intent in sessionStorage so it survives auth redirects.
 		// The auth callback strips query params, so we stash the intent before redirect
 		// and check it after login when we land back on the dashboard.
-		if (wantsSkip) sessionStorage.setItem("acme-onboarding-skip", "1");
-		if (wantsRedo) sessionStorage.setItem("acme-onboarding-redo", "1");
+		if (wantsSkip) sessionStorage.setItem("aether-onboarding-skip", "1");
+		if (wantsRedo) sessionStorage.setItem("aether-onboarding-redo", "1");
 
-		const storedSkip = sessionStorage.getItem("acme-onboarding-skip") === "1";
-		const storedRedo = sessionStorage.getItem("acme-onboarding-redo") === "1";
+		const storedSkip = sessionStorage.getItem("aether-onboarding-skip") === "1";
+		const storedRedo = sessionStorage.getItem("aether-onboarding-redo") === "1";
 		const shouldSkip = wantsSkip || storedSkip;
 		const shouldRedo = wantsRedo || storedRedo;
 
@@ -599,7 +599,7 @@ export default function DashboardLayoutContent({
 			if (shouldSkip) {
 				const ok = await persistEnv("ONBOARDING_COMPLETE", "true");
 				if (!ok) return; // sandbox unreachable — keep intent, retry on next activeServerId change
-				sessionStorage.removeItem("acme-onboarding-skip");
+				sessionStorage.removeItem("aether-onboarding-skip");
 				// Clean URL and let the normal check pass through
 				const clean = new URL(window.location.href);
 				clean.searchParams.delete("onboarding-skip");
@@ -611,7 +611,7 @@ export default function DashboardLayoutContent({
 				if (!ok) return; // sandbox unreachable — keep intent, retry on next activeServerId change
 				await persistEnv("ONBOARDING_SESSION_ID", "");
 				await persistEnv("ONBOARDING_COMMAND_FIRED", "");
-				sessionStorage.removeItem("acme-onboarding-redo");
+				sessionStorage.removeItem("aether-onboarding-redo");
 				const clean = new URL(window.location.href);
 				clean.searchParams.delete("onboarding-redo");
 				window.history.replaceState({}, "", clean.pathname + clean.search);

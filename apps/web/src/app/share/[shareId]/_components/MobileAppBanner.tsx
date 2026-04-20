@@ -8,10 +8,13 @@ import { AetherLogo } from '@/components/sidebar/aether-logo';
 
 function isMobileDevice(): boolean {
   if (typeof window === 'undefined') return false;
-  const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+  const userAgent =
+    navigator.userAgent || navigator.vendor || (window as any).opera;
   const ua = userAgent.toLowerCase();
-  const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i;
-  const isIOSSimulator = ua.includes('macintosh') && navigator.maxTouchPoints > 0;
+  const mobileRegex =
+    /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i;
+  const isIOSSimulator =
+    ua.includes('macintosh') && navigator.maxTouchPoints > 0;
   return mobileRegex.test(ua) || isIOSSimulator;
 }
 
@@ -19,7 +22,8 @@ function getMobilePlatform(): 'ios' | 'android' | null {
   if (typeof window === 'undefined') return null;
   const userAgent = navigator.userAgent.toLowerCase();
   if (/iphone|ipad|ipod/.test(userAgent)) return 'ios';
-  if (userAgent.includes('macintosh') && navigator.maxTouchPoints > 0) return 'ios';
+  if (userAgent.includes('macintosh') && navigator.maxTouchPoints > 0)
+    return 'ios';
   if (/android/.test(userAgent)) return 'android';
   return null;
 }
@@ -58,14 +62,16 @@ export function MobileAppBanner({ shareId }: MobileAppBannerProps) {
   };
 
   const handleOpenInApp = () => {
-    const appUrl = `acme://share/${shareId}`;
+    const appUrl = `aether://share/${shareId}`;
     window.location.href = appUrl;
 
     setTimeout(() => {
       if (platform === 'ios') {
-        window.location.href = 'https://apps.apple.com/ie/app/acme/id6754448524';
+        window.location.href =
+          'https://apps.apple.com/ie/app/aether/id6754448524';
       } else if (platform === 'android') {
-        window.location.href = 'https://play.google.com/store/apps/details?id=com.acme.app';
+        window.location.href =
+          'https://play.google.com/store/apps/details?id=com.aether.app';
       }
     }, 2000);
   };
@@ -74,8 +80,9 @@ export function MobileAppBanner({ shareId }: MobileAppBannerProps) {
 
   return (
     <div
-      className={cn('fixed top-0 left-0 right-0 z-50 transform transition-transform duration-300 ease-out', 
-        isVisible ? 'translate-y-0' : '-translate-y-full'
+      className={cn(
+        'fixed top-0 left-0 right-0 z-50 transform transition-transform duration-300 ease-out',
+        isVisible ? 'translate-y-0' : '-translate-y-full',
       )}
     >
       <div className="bg-background/95 backdrop-blur-md border-b border-border/50 px-3 py-2.5 safe-area-top">
@@ -96,11 +103,7 @@ export function MobileAppBanner({ shareId }: MobileAppBannerProps) {
           </div>
 
           {/* Open button */}
-          <Button
-            onClick={handleOpenInApp}
-            size="sm"
-            className="px-4 text-xs"
-          >
+          <Button onClick={handleOpenInApp} size="sm" className="px-4 text-xs">
             Open
           </Button>
 

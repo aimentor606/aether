@@ -154,15 +154,15 @@ export async function combinedAuth(c: Context, next: Next) {
 
   // Extract token: header → X-aether-Token (preview only) → cookie → query param
   const authHeader = c.req.header('Authorization');
-  const acmeTokenHeader = previewSandboxId ? c.req.header('X-aether-Token') : undefined;
+  const aetherTokenHeader = previewSandboxId ? c.req.header('X-aether-Token') : undefined;
   let token: string | undefined;
 
   if (authHeader?.startsWith('Bearer ')) {
     token = authHeader.slice(7);
   }
 
-  if (!token && acmeTokenHeader && isAetherToken(acmeTokenHeader)) {
-    token = acmeTokenHeader;
+  if (!token && aetherTokenHeader && isAetherToken(aetherTokenHeader)) {
+    token = aetherTokenHeader;
   }
 
   if (!token) {

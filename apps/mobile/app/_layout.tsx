@@ -286,7 +286,7 @@ export default function RootLayout() {
         return;
       }
 
-      // Handle custom scheme: acme://auth/callback
+      // Handle custom scheme: aether://auth/callback
       if (parsedUrl.hostname === 'auth' && parsedUrl.path === 'callback') {
         log.log('📧 Auth callback received, processing...');
 
@@ -455,7 +455,7 @@ export default function RootLayout() {
           router.replace('/auth');
         }
       } else if (parsedUrl.path?.startsWith('share/') || parsedUrl.hostname === 'share') {
-        // Handle share links: acme://share/xxx or https://yourbrand.com/share/xxx
+        // Handle share links: aether://share/xxx or https://yourbrand.com/share/xxx
         console.log('🔗 Share link detected');
 
         // Extract thread ID from path
@@ -465,7 +465,7 @@ export default function RootLayout() {
           // Path format: share/xxx
           threadId = parsedUrl.path.replace('share/', '');
         } else if (parsedUrl.hostname === 'share' && parsedUrl.path) {
-          // Custom scheme format: acme://share/xxx -> hostname=share, path=xxx
+          // Custom scheme format: aether://share/xxx -> hostname=share, path=xxx
           threadId = parsedUrl.path.replace(/^\//, '');
         }
 

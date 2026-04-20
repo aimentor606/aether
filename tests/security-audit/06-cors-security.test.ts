@@ -95,14 +95,14 @@ describe('Security Audit: CORS Security', () => {
       expect(isOriginAllowed('*')).toBe(false);
     });
 
-    test('rejects acme subdomain not in allowlist', () => {
+    test('rejects aether subdomain not in allowlist', () => {
       expect(isOriginAllowed('https://evil.aether.dev')).toBe(false);
       expect(isOriginAllowed('https://malicious.aether.dev')).toBe(false);
     });
 
     test('rejects similar-looking domains', () => {
       expect(isOriginAllowed('https://k0rtix.com')).toBe(false); // zero instead of o
-      expect(isOriginAllowed('https://acme-evil.com')).toBe(false);
+      expect(isOriginAllowed('https://aether-evil.com')).toBe(false);
       expect(isOriginAllowed('https://aether.dev.evil.com')).toBe(false);
     });
 

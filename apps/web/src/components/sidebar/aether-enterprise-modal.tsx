@@ -21,7 +21,7 @@ interface EnterpriseModalProps {
 export function AetherEnterpriseModal({
   children,
   open: controlledOpen,
-  onOpenChange: controlledOnOpenChange
+  onOpenChange: controlledOnOpenChange,
 }: EnterpriseModalProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 768px)');
@@ -40,21 +40,19 @@ export function AetherEnterpriseModal({
   }, []);
 
   const benefits = [
-    "Dedicated solution architect assigned",
-    "Enterprise-grade security & compliance",
-    "Custom integration with existing systems",
-    "Comprehensive team training included",
-    "Priority support & ongoing optimization",
-    "Scalable architecture for growth",
-    "Performance monitoring & analytics",
-    "100% satisfaction guarantee"
+    'Dedicated solution architect assigned',
+    'Enterprise-grade security & compliance',
+    'Custom integration with existing systems',
+    'Comprehensive team training included',
+    'Priority support & ongoing optimization',
+    'Scalable architecture for growth',
+    'Performance monitoring & analytics',
+    '100% satisfaction guarantee',
   ];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="p-0 gap-0 border-none max-w-[90vw] lg:max-w-[80vw] xl:max-w-[70vw] rounded-xl overflow-hidden">
         <DialogTitle className="sr-only">
           Enterprise AI Implementation - Schedule Consultation
@@ -70,26 +68,34 @@ export function AetherEnterpriseModal({
               <div className="mb-6 flex-shrink-0">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 mb-4">
                   <div className="w-2 h-2 rounded-full bg-primary"></div>
-                  <span className="text-xs font-medium text-primary">Enterprise Implementation</span>
+                  <span className="text-xs font-medium text-primary">
+                    Enterprise Implementation
+                  </span>
                 </div>
 
                 <h2 className="text-2xl lg:text-3xl font-semibold tracking-tight mb-3 text-foreground">
                   Let's Design Your Custom AI Solution
                 </h2>
                 <p className="text-base lg:text-lg text-muted-foreground mb-6 leading-relaxed">
-                  Schedule a strategy session with our solution architects to explore how custom AI workers can transform your specific business processes and workflows.
+                  Schedule a strategy session with our solution architects to
+                  explore how custom AI workers can transform your specific
+                  business processes and workflows.
                 </p>
               </div>
 
               <div className="border-t border-gray-200 dark:border-gray-800 pt-6 flex-1">
-                <h3 className="text-lg font-semibold mb-4 text-foreground">What's Included</h3>
+                <h3 className="text-lg font-semibold mb-4 text-foreground">
+                  What's Included
+                </h3>
                 <div className="space-y-3">
                   {benefits.map((benefit, index) => (
                     <div key={index} className="flex items-start gap-3">
                       <div className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center mt-0.5">
                         <Check className="w-3 h-3 text-primary" />
                       </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{benefit}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {benefit}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -114,7 +120,7 @@ export function AetherEnterpriseModal({
             <div className="h-full overflow-auto">
               <Cal
                 namespace="enterprise-demo"
-                calLink="team/acme/enterprise-demo"
+                calLink="team/aether/enterprise-demo"
                 style={{ width: '100%', height: '100%' }}
                 config={{
                   layout: 'month_view',

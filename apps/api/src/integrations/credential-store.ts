@@ -6,6 +6,7 @@
 import { eq, and } from 'drizzle-orm';
 import { db } from '../shared/db';
 import { integrationCredentials } from '@aether/db';
+import { encryptCredential, decryptCredential } from '../shared/crypto';
 
 export interface PipedreamCreds {
   client_id: string;
@@ -32,7 +33,7 @@ export async function getAccountCreds(accountId: string, provider = 'pipedream')
   if (!creds.client_id || !creds.client_secret || !creds.project_id) return null;
   return {
     client_id: creds.client_id,
-    client_secret: creds.client_secret,
+    client_secret: decryptCredential(creds.client_secret),
     project_id: creds.project_id,
     environment: creds.environment || 'production',
   };
@@ -41,7 +42,7 @@ export async function getAccountCreds(accountId: string, provider = 'pipedream')
 export async function upsertAccountCreds(accountId: string, creds: PipedreamCreds, provider = 'pipedream'): Promise<void> {
   const payload = {
     client_id: creds.client_id,
-    client_secret: creds.client_secret,
+    client_secret: encryptCredential(creds.client_secret),
     project_id: creds.project_id,
     environment: creds.environment || 'production',
   };

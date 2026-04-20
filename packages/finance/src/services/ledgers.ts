@@ -3,8 +3,8 @@ import { createLedgerSchema, updateLedgerSchema } from '@aether/db';
 import type { CreateLedgerInput, UpdateLedgerInput } from '@aether/db';
 
 export const ledgersService = {
-  async listAll(accountId: string) {
-    return ledgersRepository.findAll(accountId);
+  async listAll(accountId: string, options?: { limit?: number; offset?: number }) {
+    return ledgersRepository.findAll(accountId, options);
   },
 
   async getById(accountId: string, id: string) {

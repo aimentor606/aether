@@ -11,7 +11,7 @@
 - **整合方案**: 方案 B — 流水线并行 (10-12 周)
 - **核心策略**: Single Codebase Multi-Tenant，垂直包从 `packages/vertical/*` 拆为顶层独立包
 - **UI 策略**: 完全自主，不同步上游 UI；LiteLLM 管理界面重写
-- **品牌名称**: ✅ **Aether** — P0 阶段统一处理 acme → aether rename
+- **品牌名称**: ✅ **Aether** — P0 阶段统一处理 aether → aether rename
 - **品牌标识**: ✅ 暂时用 Placeholder（文字 Logo + 通用主题色）
 - **域名**: ✅ 已有域名
 - **包命名空间**: ✅ 统一 `@aether/*`
@@ -33,7 +33,7 @@
 - **DB**: Supabase Cloud + RLS 策略
 - **LLM 网关**: LiteLLM Proxy
 - **Agent 运行时**: OpenCode
-- **品牌迁移**: P0 阶段统一 acme → aether
+- **品牌迁移**: P0 阶段统一 aether → aether
 - **测试框架**: P0 搭建（vitest 或 bun test，待定）
 - **品牌标识**: Placeholder（文字 Logo + 通用色），后续请设计师
 
@@ -43,7 +43,7 @@
 
 | 阶段 | 名称 | 工期 | 依赖 | 核心交付 |
 |------|------|------|------|---------|
-| P0 | 基线稳定 + 品牌迁移 | W1 | 无 | 提交变更 + acme→aether rename + 测试框架 + build 通过 |
+| P0 | 基线稳定 + 品牌迁移 | W1 | 无 | 提交变更 + aether→aether rename + 测试框架 + build 通过 |
 | P1 | 垂直包固化 | W1-W2 | P0 | 垂直包迁移完成，DB schema + migration |
 | P2 | 多租户中间件 | W2-W3 | P1 | Config Loader + Feature Flags + Tenant Context |
 | P3 | Finance API + 集成 | W3-W4 | P2 | Finance API routes + 外部集成适配器 |

@@ -107,7 +107,7 @@ Add to your existing `docker-compose.yml`:
 
 ```yaml
 services:
-  # ... your existing services (acme, etc.) ...
+  # ... your existing services (aether, etc.) ...
 
   opensandbox-server:
     image: opensandbox/server:latest
@@ -644,11 +644,11 @@ version: '3.8'
 
 services:
   # Existing services
-  acme-service:
-    image: acme/service:latest
+  aether-service:
+    image: aether/service:latest
     # ... existing config ...
     networks:
-      - acme-network
+      - aether-network
 
   # Add OpenSandbox
   opensandbox-server:
@@ -661,11 +661,11 @@ services:
     environment:
       - SANDBOX_CONFIG_PATH=/etc/opensandbox/config.toml
     networks:
-      - acme-network  # Share network with existing services
+      - aether-network  # Share network with existing services
     restart: unless-stopped
 
 networks:
-  acme-network:
+  aether-network:
     external: true  # Or define if not external
 ```
 

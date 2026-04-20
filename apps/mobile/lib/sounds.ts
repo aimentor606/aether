@@ -4,16 +4,16 @@ import { useSoundStore, type SoundEvent } from '@/stores/sound-store';
 // ---------------------------------------------------------------------------
 // Bundled assets — only files that actually exist on disk.
 // Missing events (error, notification) fall back to completion.mp3.
-// The opencode pack has no files yet, so it falls back to acme.
+// The opencode pack has no files yet, so it falls back to aether.
 // ---------------------------------------------------------------------------
 
 const AETHER_ASSETS: Partial<Record<SoundEvent, AVPlaybackSource>> = {
-  completion: require('@/assets/sounds/acme/completion.mp3'),
-  send: require('@/assets/sounds/acme/send.mp3'),
+  completion: require('@/assets/sounds/aether/completion.mp3'),
+  send: require('@/assets/sounds/aether/send.mp3'),
 };
 
 function resolveAsset(pack: string, event: SoundEvent): AVPlaybackSource | null {
-  if (pack === 'acme') {
+  if (pack === 'aether') {
     return AETHER_ASSETS[event] ?? AETHER_ASSETS.completion ?? null;
   }
   // opencode pack has no files yet — returns null (no sound)
@@ -83,7 +83,7 @@ export async function playSound(event: SoundEvent) {
 
 export async function previewSound(event: SoundEvent) {
   const { preferences } = useSoundStore.getState();
-  const pack = preferences.pack === 'off' ? 'acme' : preferences.pack;
+  const pack = preferences.pack === 'off' ? 'aether' : preferences.pack;
   const volume = Math.max(preferences.pack === 'off' ? 0.5 : preferences.volume, 0.2);
 
   const asset = resolveAsset(pack, event);

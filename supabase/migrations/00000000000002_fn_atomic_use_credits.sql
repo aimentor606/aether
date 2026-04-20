@@ -1,5 +1,5 @@
 -- atomic_use_credits: Deducts credits from an account.
--- Priority: daily → monthly → extra. Logs in acme.credit_ledger.
+-- Priority: daily → monthly → extra. Logs in aether.credit_ledger.
 CREATE OR REPLACE FUNCTION public.atomic_use_credits(
     p_account_id UUID,
     p_amount NUMERIC,
@@ -33,7 +33,7 @@ BEGIN
         COALESCE(balance, 0)
     INTO
         v_daily_balance, v_expiring_balance, v_non_expiring_balance, v_total_balance
-    FROM acme.credit_accounts
+    FROM aether.credit_accounts
     WHERE account_id = p_account_id
     FOR UPDATE;
 
@@ -81,7 +81,7 @@ BEGIN
     v_new_non_expiring := v_non_expiring_balance - v_amount_from_non_expiring;
     v_new_total := v_new_daily + v_new_expiring + v_new_non_expiring;
 
-    UPDATE acme.credit_accounts
+    UPDATE aether.credit_accounts
     SET
         daily_credits_balance = v_new_daily,
         expiring_credits = v_new_expiring,
@@ -90,7 +90,7 @@ BEGIN
         updated_at = NOW()
     WHERE account_id = p_account_id;
 
-    INSERT INTO acme.credit_ledger (
+    INSERT INTO aether.credit_ledger (
         account_id, amount, balance_after, type, description, metadata
     ) VALUES (
         p_account_id, -p_amount, v_new_total, 'usage', p_description,

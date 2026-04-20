@@ -135,7 +135,7 @@ export function useSandboxConnection() {
 				if (!portsFetchedRef.current) {
 					portsFetchedRef.current = true;
 					try {
-						const portsRes = await authenticatedFetch(`${url}/acme/ports`, {
+						const portsRes = await authenticatedFetch(`${url}/aether/ports`, {
 							signal: AbortSignal.timeout(3000),
 						}, { retryOnAuthError: false });
 						if (portsRes.ok) {
@@ -156,7 +156,7 @@ export function useSandboxConnection() {
 				// Fetch sandbox version on every successful connect (detects upgrades/downgrades)
 				{
 					try {
-						const hRes = await authenticatedFetch(`${url}/acme/health`, {
+						const hRes = await authenticatedFetch(`${url}/aether/health`, {
 							signal: AbortSignal.timeout(3000),
 						}, { retryOnAuthError: false });
 						if (hRes.ok) {

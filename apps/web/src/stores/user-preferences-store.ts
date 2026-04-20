@@ -29,7 +29,9 @@ export interface UserPreferences {
 // Helpers
 // ============================================================================
 
-const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+const isMac =
+  typeof navigator !== 'undefined' &&
+  /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 
 function getDefaultKeyboardPreferences(): KeyboardShortcutPreferences {
   return {
@@ -116,10 +118,10 @@ export const useUserPreferencesStore = create<UserPreferencesState>()(
       },
     }),
     {
-      name: 'acme-user-preferences',
+      name: 'aether-user-preferences',
       partialize: (state) => ({
         preferences: state.preferences,
       }),
-    }
-  )
+    },
+  ),
 );

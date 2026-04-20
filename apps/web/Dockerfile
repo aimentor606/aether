@@ -6,11 +6,11 @@
 #   cd apps/web && NEXT_OUTPUT=standalone pnpm run build
 #
 # Then from repo root:
-#   docker build -f apps/web/Dockerfile -t kortix/kortix-frontend:latest .
+#   docker build -f apps/web/Dockerfile -taether/aether-frontend:latest .
 #
-# For CLOUD builds (kortix.ai), override billing at build time:
+# For CLOUD builds (aether.ai), override billing at build time:
 #   NEXT_PUBLIC_BILLING_ENABLED=true pnpm build
-#   docker build -f apps/web/Dockerfile -t kortix/kortix-frontend:cloud .
+#   docker build -f apps/web/Dockerfile -taether/aether-frontend:cloud .
 #
 # Build-time env vars (baked into the image):
 #   NEXT_PUBLIC_ENV_MODE       - "local" or "cloud"
@@ -46,7 +46,7 @@ RUN rm -f /app/apps/web/.env /app/apps/web/.env.local /app/apps/web/.env.product
 COPY apps/web/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-# In local mode (no KORTIX_PUBLIC_URL), runs as nextjs user via CMD.
+# In local mode (noPUBLIC_URL), runs as nextjs user via CMD.
 # In VPS mode, entrypoint does sed as root, then exec's node as nextjs.
 USER nextjs
 

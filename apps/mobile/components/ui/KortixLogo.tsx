@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, type ViewProps, type ViewStyle } from 'react-native';
 import { useColorScheme } from 'nativewind';
-import AetherSymbolBlack from '@/assets/brand/acme-symbol.svg';
+import AetherSymbolBlack from '@/assets/brand/aether-symbol.svg';
 import AetherSymbolWhite from '@/assets/brand/Symbol.svg';
 import LogomarkBlack from '@/assets/brand/Logomark-Black.svg';
 import LogomarkWhite from '@/assets/brand/Logomark-White.svg';

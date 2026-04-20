@@ -7,7 +7,7 @@
  */
 
 import type { MessageWithParts, ToolPart, ToolState } from '@/ui';
-import type { ToolCallInput } from '@/components/thread/acme-computer/AetherComputer';
+import type { ToolCallInput } from '@/components/thread/aether-computer/AetherComputer';
 import type { ToolCallData, ToolResultData } from '@/components/thread/tool-views/types';
 
 /**

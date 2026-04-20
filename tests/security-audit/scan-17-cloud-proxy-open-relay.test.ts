@@ -19,7 +19,7 @@
  * - Attacker uses Aether as free relay with their own keys — no billing
  * - Aether's IP used for upstream requests (IP reputation risk)
  * - Bandwidth/compute consumed without payment
- * - Violates the design intent: "only acme token with billing"
+ * - Violates the design intent: "only aether token with billing"
  *
  * Fix: In cloud mode, reject all requests without a valid aether_ token.
  *   if (!auth.isAetherUser && config.isCloud()) {

@@ -34,7 +34,9 @@ import { useIntegrationConnectStore } from '@/stores/integration-connect-store';
  * Check if a URL is a connector connect URL (e.g. /connectors?connect=github&sandbox_id=xxx).
  * Returns { appSlug, sandboxId } if matched, null otherwise.
  */
-function parseIntegrationConnectUrl(href: string): { appSlug: string; sandboxId?: string } | null {
+function parseIntegrationConnectUrl(
+  href: string,
+): { appSlug: string; sandboxId?: string } | null {
   try {
     const url = new URL(href);
     // Must be pointing to /integrations with a ?connect= param
@@ -51,7 +53,8 @@ function parseIntegrationConnectUrl(href: string): { appSlug: string; sandboxId?
 }
 
 export function LocalhostLinkInterceptor() {
-  const { activeServer, serverUrl, subdomainOpts, rewritePortPath } = useSandboxProxy();
+  const { activeServer, serverUrl, subdomainOpts, rewritePortPath } =
+    useSandboxProxy();
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -74,14 +77,19 @@ export function LocalhostLinkInterceptor() {
         e.preventDefault();
         e.stopPropagation();
         const store = useIntegrationConnectStore.getState();
-        store.triggerConnect(integrationConnect.appSlug, integrationConnect.sandboxId);
+        store.triggerConnect(
+          integrationConnect.appSlug,
+          integrationConnect.sandboxId,
+        );
         return;
       }
 
       // Never intercept links pointing at the app itself (same origin)
       try {
         if (new URL(href).origin === window.location.origin) return;
-      } catch { /* not a valid URL, skip */ }
+      } catch {
+        /* not a valid URL, skip */
+      }
 
       // Resolve the proxy URL using the active server
       // ── Case 1: Fresh localhost:PORT URL (not yet proxied) ──
@@ -101,13 +109,18 @@ export function LocalhostLinkInterceptor() {
           title: `localhost:${port}`,
           type: 'preview',
           href: `/p/${port}`,
-          metadata: enrichPreviewMetadata({ url: proxyUrl, port, originalUrl: internalUrl, path }),
+          metadata: enrichPreviewMetadata({
+            url: proxyUrl,
+            port,
+            originalUrl: internalUrl,
+            path,
+          }),
         });
         return;
       }
 
       // ── Case 2: Already-proxied URL (subdomain or path-based) ──
-      // The href is something like http://p3210-acme-sandbox.localhost:8008/
+      // The href is something like http://p3210-aether-sandbox.localhost:8008/
       // or http://localhost:8008/v1/p/.../proxy/3210/
       // which would navigate the browser away from the app. Instead, open as tab.
       if (isPreviewUrl(href)) {
@@ -127,7 +140,12 @@ export function LocalhostLinkInterceptor() {
               title: `localhost:${port}`,
               type: 'preview',
               href: `/p/${port}`,
-              metadata: enrichPreviewMetadata({ url: proxyUrl, port, originalUrl: internalUrl, path }),
+              metadata: enrichPreviewMetadata({
+                url: proxyUrl,
+                port,
+                originalUrl: internalUrl,
+                path,
+              }),
             });
             return;
           }
@@ -140,7 +158,11 @@ export function LocalhostLinkInterceptor() {
       if (isWebProxyUrl(href)) {
         const originalUrl = parseWebProxyUrl(href);
         if (originalUrl) {
-          const proxyUrl = buildWebProxyUrl(originalUrl, serverUrl, subdomainOpts);
+          const proxyUrl = buildWebProxyUrl(
+            originalUrl,
+            serverUrl,
+            subdomainOpts,
+          );
           if (proxyUrl) {
             e.preventDefault();
             e.stopPropagation();
@@ -159,7 +181,8 @@ export function LocalhostLinkInterceptor() {
     }
 
     document.addEventListener('click', handleClick, { capture: true });
-    return () => document.removeEventListener('click', handleClick, { capture: true });
+    return () =>
+      document.removeEventListener('click', handleClick, { capture: true });
   }, [activeServer, rewritePortPath, serverUrl, subdomainOpts]);
 
   return null;

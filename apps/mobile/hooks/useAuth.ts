@@ -253,7 +253,7 @@ export function useAuth() {
             data: {
               full_name: fullName,
             },
-            emailRedirectTo: 'acme://auth/callback',
+            emailRedirectTo: 'aether://auth/callback',
           },
         });
 
@@ -358,7 +358,7 @@ export function useAuth() {
       
       // Create redirect URL using expo-auth-session
       const redirectTo = makeRedirectUri({
-        scheme: 'acme',
+        scheme: 'aether',
         path: 'auth/callback',
       });
 
@@ -623,7 +623,7 @@ export function useAuth() {
   /**
    * Sign in with magic link (passwordless)
    * Auto-creates account if it doesn't exist
-   * Uses acme:// deep link - works when app is installed
+   * Uses aether:// deep link - works when app is installed
    */
   const signInWithMagicLink = useCallback(async ({ email, acceptedTerms }: { email: string; acceptedTerms?: boolean }) => {
     try {
@@ -637,7 +637,7 @@ export function useAuth() {
         params.set('terms_accepted', 'true');
       }
       
-      const emailRedirectTo = `acme://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
+      const emailRedirectTo = `aether://auth/callback${params.toString() ? `?${params.toString()}` : ''}`;
 
       log.log('📱 Magic link redirect URL:', emailRedirectTo);
 
@@ -654,7 +654,7 @@ export function useAuth() {
           message: magicLinkError.message,
           status: magicLinkError.status,
           attemptedUrl: emailRedirectTo,
-          hint: 'Make sure acme://auth/callback is in Supabase Dashboard → Auth → Redirect URLs',
+          hint: 'Make sure aether://auth/callback is in Supabase Dashboard → Auth → Redirect URLs',
         });
       }
 
@@ -690,7 +690,7 @@ export function useAuth() {
       setError(null);
 
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'acme://auth/reset-password',
+        redirectTo: 'aether://auth/reset-password',
       });
 
       if (resetError) {

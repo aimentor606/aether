@@ -56,7 +56,7 @@ export async function webSearchTavily(
     published_date: item.published_date || null,
   }));
 
-  console.log(`[ACME] Web search for '${query}' returned ${results.length} results`);
+  console.log(`[AETHER] Web search for '${query}' returned ${results.length} results`);
 
   return results;
 }

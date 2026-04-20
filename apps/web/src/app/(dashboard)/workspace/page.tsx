@@ -47,8 +47,8 @@ import {
   type Command,
   type McpStatus,
 } from '@/hooks/opencode/use-opencode-sessions';
-import { useAetherProjects, type AetherProject } from '@/hooks/acme/use-acme-projects';
-import { useAetherConnectors, type AetherConnector } from '@/hooks/acme/use-acme-connectors';
+import { useAetherProjects, type AetherProject } from '@/hooks/aether/use-aether-projects';
+import { useAetherConnectors, type AetherConnector } from '@/hooks/aether/use-aether-connectors';
 
 // Re-export as Project for backward compat in this file
 type Project = AetherProject;

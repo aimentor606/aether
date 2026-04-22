@@ -21,15 +21,15 @@ importers:
       '@aether/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@aether/vertical-advisor':
+        specifier: workspace:*
+        version: link:../../packages/advisor
       '@aether/vertical-finance':
         specifier: workspace:*
         version: link:../../packages/finance
-      '@aether/vertical-healthcare':
+      '@aether/vertical-insurance':
         specifier: workspace:*
-        version: link:../../packages/healthcare
-      '@aether/vertical-retail':
-        specifier: workspace:*
-        version: link:../../packages/retail
+        version: link:../../packages/insurance
       '@ai-sdk/anthropic':
         specifier: ^3.0.38
         version: 3.0.69(zod@3.25.76)
@@ -1283,6 +1283,18 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
+  packages/advisor:
+    dependencies:
+      '@aether/db':
+        specifier: workspace:*
+        version: link:../db
+      drizzle-orm:
+        specifier: ^0.44.0
+        version: 0.44.7(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(bun-types@1.3.12)(postgres@3.4.9)(sql.js@1.14.1)
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+
   packages/agent-tunnel:
     dependencies:
       hono:
@@ -1333,17 +1345,17 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
 
-  packages/healthcare:
+  packages/insurance:
     dependencies:
       '@aether/db':
         specifier: workspace:*
         version: link:../db
-
-  packages/retail:
-    dependencies:
-      '@aether/db':
-        specifier: workspace:*
-        version: link:../db
+      drizzle-orm:
+        specifier: ^0.44.0
+        version: 0.44.7(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(bun-types@1.3.12)(postgres@3.4.9)(sql.js@1.14.1)
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
 
   packages/sdk:
     dependencies:

@@ -14,8 +14,8 @@
   "dependencies": {
     "@aether/db": "workspace:*",
     "@aether/vertical-finance": "workspace:*",
-    "@aether/vertical-healthcare": "workspace:*",
-    "@aether/vertical-retail": "workspace:*",
+    "@aether/vertical-insurance": "workspace:*",
+    "@aether/vertical-advisor": "workspace:*",
     "@ai-sdk/anthropic": "^3.0.38",
     "@ai-sdk/google": "^3.0.22",
     "@ai-sdk/openai": "^3.0.26",

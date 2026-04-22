@@ -1,9 +1,8 @@
 import { Hono } from 'hono';
 import { setContextField } from '../lib/request-context';
 import { financeRoutes } from './routes/finance';
-import { healthcareRoutes } from './routes/healthcare';
-import { retailRoutes } from './routes/retail';
-import { previewOnly } from './middleware/preview-gate';
+import { insuranceRoutes } from './routes/insurance';
+import { advisorRoutes } from './routes/advisor';
 
 const verticalsApp = new Hono();
 
@@ -16,9 +15,7 @@ verticalsApp.use('/:vertical/*', async (c, next) => {
 
 // Mount vertical-specific routes
 verticalsApp.route('/finance', financeRoutes);
-verticalsApp.use('/healthcare/*', previewOnly('healthcare'));
-verticalsApp.route('/healthcare', healthcareRoutes);
-verticalsApp.use('/retail/*', previewOnly('retail'));
-verticalsApp.route('/retail', retailRoutes);
+verticalsApp.route('/insurance', insuranceRoutes);
+verticalsApp.route('/advisor', advisorRoutes);
 
 export { verticalsApp };

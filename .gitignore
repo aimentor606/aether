@@ -54,6 +54,9 @@ supabase/.temp/
 supabase/.branches/
 
 # Misc
+.omc/
+docs.bak/
+TODOS.md
 state.json
 .release-state.json
 *.db

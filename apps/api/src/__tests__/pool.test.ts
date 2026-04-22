@@ -6,6 +6,35 @@
  */
 import { describe, it, expect, beforeEach, mock, spyOn } from 'bun:test';
 
+// ─── Mock config and dependency modules ─────────────────────────────────────
+
+mock.module('../config', () => ({
+  config: {
+    ENV_MODE: 'test',
+    AETHER_URL: 'http://localhost:8008/v1/router',
+    SANDBOX_VERSION: 'test-v1',
+    TAVILY_API_KEY: '',
+    SERPER_API_KEY: '',
+    FIRECRAWL_API_KEY: '',
+    REPLICATE_API_TOKEN: '',
+    JUSTAVPS_PROXY_DOMAIN: 'aether.cloud',
+  },
+  SANDBOX_VERSION: 'test-v1',
+}));
+
+mock.module('../router/config/litellm-config', () => ({
+  litellmConfig: {
+    LITELLM_URL: 'http://litellm:4000',
+    LITELLM_PUBLIC_URL: 'https://llm.test',
+    LITELLM_MASTER_KEY: 'test-master',
+  },
+}));
+
+mock.module('../router/services/litellm-keys', () => ({
+  resolveVirtualKey: async () => 'sk-test-virtual',
+  syncKeyBudget: async () => {},
+}));
+
 // ─── Mock DB layer ──────────────────────────────────────────────────────────
 
 const mockDbRows: Record<string, any[]> = {};

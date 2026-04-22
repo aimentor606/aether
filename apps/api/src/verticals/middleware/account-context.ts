@@ -1,7 +1,7 @@
 import { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
-import { resolveAccountId } from '../../shared/resolve-account';
+import { resolveAccountIdStrict } from '../../shared/resolve-account';
 
 /**
  * Extract accountId from request context.
@@ -13,7 +13,7 @@ export async function getAccountId(c: Context): Promise<string> {
   if (accountId) return accountId as string;
 
   const userId = c.get('userId');
-  if (userId) return resolveAccountId(userId as string);
+  if (userId) return resolveAccountIdStrict(userId as string);
 
   throw new HTTPException(403, { message: 'Account context required' });
 }

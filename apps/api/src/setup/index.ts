@@ -18,7 +18,7 @@ import { supabaseAuth } from '../middleware/auth';
 import { eq, sql } from 'drizzle-orm';
 import { accounts } from '@aether/db';
 import { db, hasDatabase } from '../shared/db';
-import { resolveAccountId } from '../shared/resolve-account';
+import { reconcileResolvedAccount, resolveAccountIdStrict as resolveAccountId } from '../shared/resolve-account';
 import { getSupabase } from '../shared/supabase';
 
 export const setupApp = new Hono<AppEnv>();
@@ -384,13 +384,14 @@ setupApp.post('/bootstrap-owner', async (c) => {
       if ((firstUser.email || '').toLowerCase() === email) {
         try {
           const accountId = await resolveAccountId(firstUser.id);
+          await reconcileResolvedAccount(firstUser.id, accountId);
           await db
             .update(accounts)
             .set({ setupCompleteAt: null, setupWizardStep: 2, updatedAt: new Date() })
             .where(eq(accounts.accountId, accountId));
           await setSandboxEnv({ ONBOARDING_COMPLETE: 'false', ONBOARDING_SESSION_ID: '', ONBOARDING_COMMAND_FIRED: 'false' }).catch(() => {});
-        } catch {
-          // best effort reset
+        } catch (error) {
+          console.warn('[setup] owner reset best-effort failed', error);
         }
         return c.json({ success: true, created: false, message: 'Owner already exists for this email' });
       }
@@ -412,13 +413,14 @@ setupApp.post('/bootstrap-owner', async (c) => {
     if (userId) {
       try {
         const accountId = await resolveAccountId(userId);
+        await reconcileResolvedAccount(userId, accountId);
         await db
           .update(accounts)
           .set({ setupCompleteAt: null, setupWizardStep: 2, updatedAt: new Date() })
           .where(eq(accounts.accountId, accountId));
         await setSandboxEnv({ ONBOARDING_COMPLETE: 'false', ONBOARDING_SESSION_ID: '', ONBOARDING_COMMAND_FIRED: 'false' }).catch(() => {});
-      } catch {
-        // best effort
+      } catch (error) {
+        console.warn('[setup] owner bootstrap best-effort failed', error);
       }
     }
 

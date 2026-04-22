@@ -24,8 +24,8 @@ export async function grab(opts?: ClaimOpts): Promise<ClaimedSandbox | null> {
   return result;
 }
 
-export async function injectEnv(claimed: ClaimedSandbox, serviceKey: string): Promise<void> {
-  return envInjector.inject(claimed.poolSandbox, serviceKey);
+export async function injectEnv(claimed: ClaimedSandbox, serviceKey: string, accountId?: string): Promise<void> {
+  return envInjector.inject(claimed.poolSandbox, serviceKey, accountId);
 }
 
 export async function replenish(): Promise<{ created: number }> {

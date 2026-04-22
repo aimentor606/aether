@@ -17,7 +17,7 @@ import { sandboxes, aetherApiKeys, type Database } from '@aether/db';
 import { db as defaultDb } from '../../shared/db';
 import { hashSecretKey, generateApiKeyPair, generateSandboxKeyPair, isApiKeySecretConfigured } from '../../shared/crypto';
 import type { AuthVariables } from '../../types';
-import { resolveAccountId as defaultResolveAccountId } from '../../shared/resolve-account';
+import { resolveAccountIdStrict as defaultResolveAccountId } from '../../shared/resolve-account';
 import { supabaseAuth } from '../../middleware/auth';
 import { getProvider, type ProviderName } from '../providers';
 

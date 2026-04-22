@@ -5,14 +5,14 @@ import { logger as appLogger } from './lib/logger';
 
 import { Hono } from 'hono';
 import { config } from './config';
+import { connectRedis } from './shared/redis';
 
 // ─── Sub-Service Imports ──────────────────────────────────────────────────── 
 
 import { router } from './router';
 import { billingApp } from './billing';
 import { platformApp } from './platform';
-import { sandboxProxyApp, resolveProvider } from './sandbox-proxy';
-import { proxyToSandbox } from './sandbox-proxy/routes/local-preview';
+import { sandboxProxyApp } from './sandbox-proxy';
 import { setupApp } from './setup';
 import { providersApp } from './providers/routes';
 import { secretsApp } from './secrets/routes';
@@ -30,6 +30,7 @@ import { startAutoReplenish, stopAutoReplenish } from './pool';
 import { accessControlApp } from './access-control';
 import { startAccessControlCache, stopAccessControlCache } from './shared/access-control-cache';
 import { legacyApp } from './legacy';
+import { credentialsApp } from './router/routes/credentials';
 // [channels v2] Old channel routes removed — channels now managed via sandbox CLI (kchannel, ktelegram, kslack)
 import { adminApp } from './admin';
 import { sandboxPoolAdminApp } from './platform/routes/sandbox-pool-admin';
@@ -41,13 +42,13 @@ import { corsMiddleware } from './middleware/cors-config';
 import { requestContextMiddleware, requestLoggerMiddleware, observabilityMiddleware, devPrettyJsonMiddleware } from './middleware/global';
 import { globalErrorHandler, notFoundHandler } from './middleware/error-handler';
 import { ensureLocalSandboxRegistered, startLocalSandboxSelfHeal } from './startup/local-sandbox';
-import { parsePreviewSubdomain, extractCookieToken, validatePreviewToken, isSubdomainAuthenticated, markSubdomainAuthenticated } from './startup/subdomain-preview';
-import { WsProxyData, WS_CONNECT_TIMEOUT_MS, WS_BUFFER_MAX_BYTES, clearWsTimers, resetIdleTimer, resolveWsTarget } from './startup/ws-proxy-helpers';
 import { getCacheMetrics } from './middleware/tenant-config-loader';
 
 // ─── App Setup ──────────────────────────────────────────────────────────────
 
 const app = new Hono();
+
+await connectRedis();
 
 // === Global Middleware ===
 
@@ -236,6 +237,27 @@ app.route('/v1/oauth', oauthApp);
 app.use('/v1/verticals/*', combinedAuth);
 app.use('/v1/verticals/*', tenantConfigLoader);
 app.use('/v1/verticals/*', tenantRateLimit({ limit: 100, windowMs: 60_000 }));
+
+// Control plane — credential issuance and control-only operations
+app.use('/v1/control/*', combinedAuth);
+app.route('/v1/control', credentialsApp);
+
+if (config.RECONCILIATION_ENABLED) {
+  const RECONCILE_INTERVAL_MS = 30_000;
+  console.log('[Reconciler] Spend reconciliation enabled, polling every 30s');
+  setInterval(async () => {
+    try {
+      const { reconcileSpend } = await import('./router/services/spend-reconciler');
+      const result = await reconcileSpend();
+      if (result.processed > 0 || result.errors > 0) {
+        console.log(`[Reconciler] processed=${result.processed} skipped=${result.skipped} errors=${result.errors}`);
+      }
+    } catch (err) {
+      console.error('[Reconciler] Interval error:', err);
+    }
+  }, RECONCILE_INTERVAL_MS);
+}
+
 app.route('/v1/verticals', verticalsApp); // /v1/verticals/finance/*, /v1/verticals/healthcare/*, /v1/verticals/retail/*
 
 // All remaining routes require authentication (JWT or aether_ token).
@@ -277,13 +299,8 @@ app.use('/v1/aether', combinedAuth);
 app.all('/v1/aether/*', aetherProxyHandler);
 app.all('/v1/aether', aetherProxyHandler);
 
-// Preview Proxy — unified route for both cloud (Daytona) and local mode.
-// Pattern: /v1/p/{sandboxId}/{port}/* for ALL modes.
-// Cloud:  sandboxId = Daytona external ID → proxied via Daytona SDK
-// Local:  sandboxId = container name (e.g. 'aether-sandbox') → Docker DNS resolution
-// JustAVPS: sandboxId → CF Worker proxy at {port}--{slug}.aether.cloud
-// Auth: unified previewProxyAuth (accepts Supabase JWT and aether_ tokens).
-// MUST be after all explicit routes (wildcard catch-all).
+// Sandbox control endpoints — auth cookie issuance and share link management.
+// Proxy routes removed: clients now connect to sandboxes directly.
 app.route('/v1/p', sandboxProxyApp);
 
 // === Error Handling ===
@@ -305,14 +322,14 @@ console.log(`
 ║  Env:  ${config.INTERNAL_AETHER_ENV.padEnd(49)}║
 ╠═══════════════════════════════════════════════════════════╣
 ║  Services:                                                ║
-║    /v1/router     (search, LLM, proxy)                    ║
+║    /v1/router     (search, finance)                     ║
 ║    /v1/billing    (subscriptions, credits, webhooks)       ║
 ║    /v1/platform   (sandbox lifecycle)                      ║
 ${config.AETHER_DEPLOYMENTS_ENABLED ? '║    /v1/deployments (deploy lifecycle)                      ║\n' : ''}║    /v1/pipedream   (Pipedream OAuth integrations)           ║
 ║    /v1/setup      (setup & env management)                 ║
 ║    /v1/queue      (persistent message queue)               ║
 ║    /v1/tunnel     (reverse-tunnel to local machines)         ║
-║    /v1/p         (sandbox proxy — local + cloud)            ║
+║    /v1/p         (sandbox auth + share)                     ║
 ╠═══════════════════════════════════════════════════════════╣
 ║  Database:   ${config.DATABASE_URL ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
 ║  Supabase:   ${config.SUPABASE_URL ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
@@ -399,154 +416,12 @@ async function shutdown(signal: string) {
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
-// ─── WebSocket proxy for sandbox PTY ─────────────────────────────────────────
-// Helpers extracted to startup/ws-proxy-helpers.ts and startup/subdomain-preview.ts.
-
-let activeWsConnections = 0;
-
 export default {
   port: config.PORT,
 
   async fetch(req: Request, server: any): Promise<Response | undefined> {
-    const host = req.headers.get('host') || '';
     const url = new URL(req.url);
     const isWsUpgrade = req.headers.get('upgrade')?.toLowerCase() === 'websocket';
-
-    // ── Subdomain preview routing (primary) ────────────────────────────
-    // Matches: p{port}-{sandboxId}.localhost:{serverPort}
-    // Only for local_docker mode (Daytona has its own preview URLs).
-    const subdomain = !config.isDaytonaEnabled() ? parsePreviewSubdomain(host) : null;
-
-    if (subdomain) {
-      const { port, sandboxId } = subdomain;
-
-      // ── CORS preflight must be handled BEFORE auth ──────────────────
-      // Browsers send OPTIONS without Authorization headers. If we block
-      // the preflight with 401, the browser can never send the actual
-      // request that carries the Bearer token to authenticate the subdomain.
-      if (req.method === 'OPTIONS') {
-        const origin = req.headers.get('Origin') || '';
-        return new Response(null, {
-          status: 204,
-          headers: {
-            'Access-Control-Allow-Origin': origin || '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS',
-            'Access-Control-Allow-Headers': req.headers.get('Access-Control-Request-Headers') || '*',
-            'Access-Control-Allow-Credentials': 'true',
-            'Access-Control-Max-Age': '86400',
-          },
-        });
-      }
-
-      // ── Auth: first request validates, then the subdomain is "open" ──
-      // Bearer header or cookie on first load proves you're legit,
-      // then all subsequent requests (sub-resources, WS, etc.) pass through.
-      // This avoids third-party cookie issues in iframes.
-      if (!isSubdomainAuthenticated(sandboxId, port)) {
-        const authHeader = req.headers.get('Authorization');
-        const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-        const aetherTokenHeader = req.headers.get('X-aether-Token');
-        const cookieToken = extractCookieToken(req);
-        // Also accept ?token= query param — browser WebSocket API can't set
-        // custom headers, and initial page loads may not have cookies yet.
-        const queryToken = url.searchParams.get('token');
-        const token = bearerToken || cookieToken || aetherTokenHeader || queryToken;
-
-        if (!token || !(await validatePreviewToken(token, sandboxId))) {
-          return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-            status: 401,
-            headers: {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': req.headers.get('Origin') || '*',
-              'Access-Control-Allow-Credentials': 'true',
-            },
-          });
-        }
-        // Auth succeeded — mark this subdomain as authenticated
-        markSubdomainAuthenticated(sandboxId, port);
-      }
-
-      // ── WebSocket upgrade via subdomain ──────────────────────────────
-      if (isWsUpgrade) {
-        const resolved = await resolveProvider(sandboxId).catch(() => null);
-        const provider = resolved?.provider ?? 'local_docker';
-
-        const wsTarget = resolveWsTarget(provider, {
-          sandboxId,
-          port,
-          remainingPath: url.pathname,
-          searchParams: url.searchParams,
-          slug: resolved?.slug,
-          serviceKey: resolved?.serviceKey,
-          proxyToken: resolved?.proxyToken,
-        });
-
-        const success = server.upgrade(req, {
-          data: {
-            targetUrl: wsTarget.url,
-            upstreamHeaders: wsTarget.headers,
-            upstream: null,
-            buffered: [],
-            bufferBytes: 0,
-            connectTimer: null,
-            idleTimer: null,
-            closed: false,
-          } satisfies WsProxyData,
-        });
-        if (success) return undefined;
-      }
-
-      // ── HTTP/SSE via subdomain — direct proxy, no Hono ───────────────
-      const origin = req.headers.get('Origin') || '';
-      let body: ArrayBuffer | undefined;
-      if (req.method !== 'GET' && req.method !== 'HEAD') {
-        body = await req.arrayBuffer();
-      }
-
-      // NOTE: CORS preflight (OPTIONS) is handled above, before the auth check.
-
-      try {
-        // JustAVPS: route through CF Worker proxy at {port}--{slug}.{domain}
-        if (config.isJustAVPSEnabled()) {
-          const { sandboxes } = await import('@aether/db');
-          const { db } = await import('./shared/db');
-          const { eq, and, ne } = await import('drizzle-orm');
-          const [sandbox] = await db
-            .select({ provider: sandboxes.provider, config: sandboxes.config, metadata: sandboxes.metadata })
-            .from(sandboxes)
-            .where(and(eq(sandboxes.externalId, sandboxId), ne(sandboxes.status, 'pooled')))
-            .limit(1);
-
-          if (sandbox?.provider === 'justavps') {
-            const meta = (sandbox.metadata || {}) as Record<string, unknown>;
-            const slug = meta.justavpsSlug as string || '';
-            const proxyToken = meta.justavpsProxyToken as string || '';
-            const svcKey = (sandbox.config as Record<string, unknown>)?.serviceKey as string || '';
-            const proxyDomain = config.JUSTAVPS_PROXY_DOMAIN;
-            const cfProxyUrl = `https://${port}--${slug}.${proxyDomain}`;
-            const extra: Record<string, string> = {};
-            if (proxyToken) {
-              extra['X-Proxy-Token'] = proxyToken;
-            }
-            return await proxyToSandbox(
-              sandboxId, 8000, req.method, url.pathname, url.search,
-              req.headers, body, false, origin, cfProxyUrl, svcKey, extra,
-            );
-          }
-        }
-
-        return await proxyToSandbox(
-          sandboxId, port, req.method, url.pathname, url.search,
-          req.headers, body, false, origin,
-        );
-      } catch (error) {
-        console.error(`[subdomain-proxy] Error for ${sandboxId}:${port}${url.pathname}: ${error instanceof Error ? error.message : String(error)}`);
-        return new Response(JSON.stringify({ error: 'Failed to proxy to sandbox', details: String(error) }), {
-          status: 502,
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
-    }
 
     // ── Tunnel Agent WebSocket ──────────────────────────────────────────
     // Agent connects, then authenticates via first message (auth handshake).
@@ -590,153 +465,28 @@ export default {
       if (success) return undefined;
     }
 
-    // ── Path-based WebSocket proxy ─────────────────────────────────────────
-    // Matches: ws://localhost:8008/v1/p/{sandboxId}/{port}/*
-    // Used for OpenCode PTY terminals, SSE-over-WS, etc.
-    // Must be handled HERE (at Bun server level) because Hono can't do WS upgrades.
-    // Each provider resolves the upstream WebSocket URL differently.
-    if (isWsUpgrade && !config.isDaytonaEnabled()) {
-      const wsPathMatch = url.pathname.match(/^\/v1\/p\/([^/]+)\/(\d+)(\/.*)?$/);
-      if (wsPathMatch) {
-        const wsSandboxId = wsPathMatch[1];
-        const wsPort = parseInt(wsPathMatch[2], 10);
-        const wsRemainingPath = wsPathMatch[3] || '/';
-
-        const wsAuthHeader = req.headers.get('Authorization');
-        const wsBearerToken = wsAuthHeader?.startsWith('Bearer ') ? wsAuthHeader.slice(7) : null;
-        const wsAetherTokenHeader = req.headers.get('X-aether-Token');
-        const wsCookieToken = extractCookieToken(req);
-        const wsQueryToken = url.searchParams.get('token');
-        const wsToken = wsBearerToken || wsCookieToken || wsAetherTokenHeader || wsQueryToken;
-
-        if (wsToken && (await validatePreviewToken(wsToken, wsSandboxId))) {
-          const resolved = await resolveProvider(wsSandboxId).catch(() => null);
-          const provider = resolved?.provider ?? 'local_docker';
-
-          const wsTarget = resolveWsTarget(provider, {
-            sandboxId: wsSandboxId,
-            port: wsPort,
-            remainingPath: wsRemainingPath,
-            searchParams: url.searchParams,
-            slug: resolved?.slug,
-            serviceKey: resolved?.serviceKey,
-            proxyToken: resolved?.proxyToken,
-          });
-
-          const success = server.upgrade(req, {
-            data: {
-              targetUrl: wsTarget.url,
-              upstreamHeaders: wsTarget.headers,
-              upstream: null,
-              buffered: [],
-              bufferBytes: 0,
-              connectTimer: null,
-              idleTimer: null,
-              closed: false,
-            } satisfies WsProxyData,
-          });
-          if (success) return undefined;
-        }
-      }
-    }
-
     return app.fetch(req, server);
   },
 
   websocket: {
-    // Disable Bun's default 120s idle timeout — tunnel agents use their own
-    // heartbeat mechanism (30s ping/pong) for liveness detection.
     idleTimeout: 0,
 
-    open(ws: { data: any; send: (data: any) => void; close: (code?: number, reason?: string) => void }) {
+    open(ws: { data: any }) {
       if (ws.data?.type === 'tunnel-agent') {
         tunnelWsHandlers.onOpen(ws.data.tunnelId, ws as any);
-        return;
-      }
-
-      activeWsConnections++;
-      resetIdleTimer(ws);
-
-      ws.data.connectTimer = setTimeout(() => {
-        if (ws.data.upstream?.readyState === WebSocket.CONNECTING) {
-          console.warn(`[preview-proxy] WS upstream connect timeout`);
-          try { ws.data.upstream.close(); } catch {}
-          try { ws.close(1011, 'upstream connect timeout'); } catch {}
-        }
-      }, WS_CONNECT_TIMEOUT_MS);
-
-      try {
-        const upstream = new WebSocket(ws.data.targetUrl, { headers: ws.data.upstreamHeaders || {} } as any);
-        ws.data.upstream = upstream;
-
-        upstream.addEventListener('open', () => {
-          if (ws.data.connectTimer) { clearTimeout(ws.data.connectTimer); ws.data.connectTimer = null; }
-          for (const msg of ws.data.buffered) {
-            upstream.send(msg);
-          }
-          ws.data.buffered = [];
-          ws.data.bufferBytes = 0;
-        });
-
-        upstream.addEventListener('message', (e: MessageEvent) => {
-          resetIdleTimer(ws);
-          try { ws.send(e.data); } catch {
-            try { upstream.close(); } catch {}
-          }
-        });
-
-        upstream.addEventListener('close', () => {
-          if (!ws.data.closed) {
-            try { ws.close(); } catch {}
-          }
-        });
-
-        upstream.addEventListener('error', () => {
-          if (!ws.data.closed) {
-            try { ws.close(1011, 'upstream error'); } catch {}
-          }
-        });
-      } catch (err) {
-        console.error(`[preview-proxy] WS connect failed:`, err);
-        try { ws.close(1011, 'upstream connection failed'); } catch {}
       }
     },
 
-    message(ws: { data: any; close: (code?: number, reason?: string) => void }, message: string | Buffer) {
+    message(ws: { data: any }, message: string | Buffer) {
       if (ws.data?.type === 'tunnel-agent') {
         tunnelWsHandlers.onMessage(ws.data.tunnelId, message);
-        return;
-      }
-
-      resetIdleTimer(ws);
-      const upstream = ws.data.upstream;
-      if (upstream && upstream.readyState === WebSocket.OPEN) {
-        upstream.send(message);
-      } else if (upstream && upstream.readyState === WebSocket.CONNECTING) {
-        const size = typeof message === 'string' ? message.length : (message as Buffer).byteLength;
-        if (ws.data.bufferBytes + size > WS_BUFFER_MAX_BYTES) {
-          console.warn(`[preview-proxy] WS buffer overflow, closing`);
-          try { ws.close(1011, 'buffer overflow'); } catch {}
-          return;
-        }
-        ws.data.buffered.push(message);
-        ws.data.bufferBytes += size;
       }
     },
 
     close(ws: { data: any }) {
       if (ws.data?.type === 'tunnel-agent') {
         tunnelWsHandlers.onClose(ws.data.tunnelId);
-        return;
       }
-
-      activeWsConnections--;
-      ws.data.closed = true;
-      clearWsTimers(ws.data);
-      try { ws.data.upstream?.close(); } catch {}
-      ws.data.upstream = null;
-      ws.data.buffered = [];
-      ws.data.bufferBytes = 0;
     },
   },
 };

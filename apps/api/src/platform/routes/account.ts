@@ -23,7 +23,7 @@ import {
   type SandboxProvider,
 } from '../providers';
 import type { AuthVariables } from '../../types';
-import { resolveAccountId as defaultResolveAccountId } from '../../shared/resolve-account';
+import { reconcileResolvedAccount, resolveAccountIdStrict as defaultResolveAccountId } from '../../shared/resolve-account';
 import { config } from '../../config';
 import { generateSandboxName } from '../services/ensure-sandbox';
 
@@ -110,6 +110,7 @@ export function createAccountRouter(
       const requestedServerType = (body?.serverType as string | undefined) || undefined;
 
       const accountId = await resolveAccountId(userId);
+      await reconcileResolvedAccount(userId, accountId);
 
       // In cloud billing mode, managed VPS provisioning is paid-only.
       // Free/new accounts must complete billing setup first (or connect custom instance).
@@ -168,6 +169,7 @@ export function createAccountRouter(
 
     try {
       const accountId = await resolveAccountId(userId);
+      await reconcileResolvedAccount(userId, accountId);
 
       // If there's already an active sandbox, return it
       const [active] = await db
@@ -415,6 +417,7 @@ export function createAccountRouter(
 
     try {
       const accountId = await resolveAccountId(userId);
+      await reconcileResolvedAccount(userId, accountId);
 
       const [row] = await db
         .select()

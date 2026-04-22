@@ -2,9 +2,6 @@ import { Hono } from 'hono';
 import { eq, and, ne } from 'drizzle-orm';
 import { sandboxes } from '@aether/db';
 import { config } from '../config';
-import { combinedAuth } from '../middleware/auth';
-import { preview, proxyToDaytona } from './routes/preview';
-import { proxyToSandbox } from './routes/local-preview';
 import { getAuthToken } from './routes/auth';
 import { shareApp } from './routes/share';
 import { db } from '../shared/db';
@@ -18,11 +15,6 @@ sandboxProxyApp.route('/auth', getAuthToken);
 // ── Public URL share endpoint ───────────────────────────────────────────────
 // POST /v1/p/share — returns a shareable URL for a sandbox port.
 sandboxProxyApp.route('/share', shareApp);
-
-// ── Path-based proxy ────────────────────────────────────────────────────────
-// Auth middleware for both modes (Supabase JWT, aether_ tokens, cookies).
-sandboxProxyApp.use('/:sandboxId/:port/*', combinedAuth);
-sandboxProxyApp.use('/:sandboxId/:port', combinedAuth);
 
 // ── Provider cache ──────────────────────────────────────────────────────────
 // Cache sandbox provider lookups to avoid a DB query on every request.
@@ -108,163 +100,6 @@ export async function resolveProvider(externalId: string): Promise<{ provider: C
     console.error(`[PREVIEW] Provider lookup failed for ${externalId}:`, err);
     return null;
   }
-}
-
-// ── Single-provider fast paths ──────────────────────────────────────────────
-// When only ONE provider is configured, skip the per-request DB lookup entirely
-// and route all requests to the appropriate handler (same behavior as before).
-
-const enabledCount = [config.isDaytonaEnabled(), config.isLocalDockerEnabled(), config.isJustAVPSEnabled()].filter(Boolean).length;
-
-if (enabledCount === 1 && config.isDaytonaEnabled()) {
-  // Cloud-only: all requests go to Daytona preview handler
-  sandboxProxyApp.route('/', preview);
-} else if (enabledCount === 1 && config.isLocalDockerEnabled()) {
-  // Local-only: all requests go to local Docker proxy
-  const localOnlyProxy = new Hono();
-
-  localOnlyProxy.all('/:sandboxId/:port/*', async (c) => {
-    const sandboxId = c.req.param('sandboxId');
-    const port = parseInt(c.req.param('port'), 10);
-    if (isNaN(port) || port < 1 || port > 65535) {
-      return c.json({ error: `Invalid port: ${c.req.param('port')}` }, 400);
-    }
-
-    const fullPath = new URL(c.req.url).pathname;
-    const prefix = `/${sandboxId}/${port}`;
-    const idx = fullPath.indexOf(prefix);
-    const remainingPath = idx !== -1 ? fullPath.slice(idx + prefix.length) || '/' : '/';
-
-    const queryString = new URL(c.req.url).search;
-
-    const method = c.req.method;
-    let body: ArrayBuffer | undefined;
-    if (method !== 'GET' && method !== 'HEAD') {
-      body = await c.req.raw.arrayBuffer();
-    }
-
-    const origin = c.req.header('Origin') || '';
-
-    return proxyToSandbox(sandboxId, port, method, remainingPath, queryString, c.req.raw.headers, body, false, origin);
-  });
-
-  localOnlyProxy.all('/:sandboxId/:port', async (c) => {
-    const sandboxId = c.req.param('sandboxId');
-    const port = c.req.param('port');
-    return c.redirect(`/${sandboxId}/${port}/`, 301);
-  });
-
-  sandboxProxyApp.route('/', localOnlyProxy);
-} else if (enabledCount === 1 && config.isJustAVPSEnabled()) {
-  // JustAVPS-only: route through CF Worker proxy at {port}--{slug}.aether.cloud
-  const justavpsOnlyProxy = new Hono();
-
-  justavpsOnlyProxy.all('/:sandboxId/:port/*', async (c) => {
-    const sandboxId = c.req.param('sandboxId');
-    const port = parseInt(c.req.param('port'), 10);
-    if (isNaN(port) || port < 1 || port > 65535) {
-      return c.json({ error: `Invalid port: ${c.req.param('port')}` }, 400);
-    }
-
-    const resolved = await resolveProvider(sandboxId);
-    if (!resolved?.slug) {
-      return c.json({ error: 'Sandbox not found' }, 404);
-    }
-
-    // Route through CF Worker: https://{port}--{slug}.{domain}
-    const proxyDomain = config.JUSTAVPS_PROXY_DOMAIN;
-    const cfProxyUrl = `https://${port}--${resolved.slug}.${proxyDomain}`;
-
-    const fullPath = new URL(c.req.url).pathname;
-    const prefix = `/${sandboxId}/${port}`;
-    const idx = fullPath.indexOf(prefix);
-    const remainingPath = idx !== -1 ? fullPath.slice(idx + prefix.length) || '/' : '/';
-
-    const queryString = new URL(c.req.url).search;
-    const method = c.req.method;
-    let body: ArrayBuffer | undefined;
-    if (method !== 'GET' && method !== 'HEAD') {
-      body = await c.req.raw.arrayBuffer();
-    }
-
-    const origin = c.req.header('Origin') || '';
-
-    // Auth: proxy token for CF Worker, service key for core/aether-master
-    const extraHeaders: Record<string, string> = {};
-    if (resolved.proxyToken) {
-      extraHeaders['X-Proxy-Token'] = resolved.proxyToken;
-    }
-
-    return proxyToSandbox(sandboxId, 8000, method, remainingPath, queryString, c.req.raw.headers, body, false, origin, cfProxyUrl, resolved.serviceKey, extraHeaders);
-  });
-
-  justavpsOnlyProxy.all('/:sandboxId/:port', async (c) => {
-    const sandboxId = c.req.param('sandboxId');
-    const port = c.req.param('port');
-    return c.redirect(`/${sandboxId}/${port}/`, 301);
-  });
-
-  sandboxProxyApp.route('/', justavpsOnlyProxy);
-} else {
-  // ── Multi-provider mode ─────────────────────────────────────────────────
-  // Multiple providers enabled: look up the sandbox's provider per request
-  // and dispatch to the correct handler.
-
-  const multiProxy = new Hono<{ Variables: { userId: string; userEmail: string } }>();
-
-  multiProxy.all('/:sandboxId/:port/*', async (c) => {
-    const sandboxId = c.req.param('sandboxId');
-    const portStr = c.req.param('port');
-    const port = parseInt(portStr, 10);
-    if (isNaN(port) || port < 1 || port > 65535) {
-      return c.json({ error: `Invalid port: ${portStr}` }, 400);
-    }
-
-    const resolved = await resolveProvider(sandboxId);
-
-    // Extract common request data
-    const fullPath = new URL(c.req.url).pathname;
-    const prefix = `/${sandboxId}/${port}`;
-    const idx = fullPath.indexOf(prefix);
-    const remainingPath = idx !== -1 ? fullPath.slice(idx + prefix.length) || '/' : '/';
-
-    const queryString = new URL(c.req.url).search;
-
-    const method = c.req.method;
-    let body: ArrayBuffer | undefined;
-    if (method !== 'GET' && method !== 'HEAD') {
-      body = await c.req.raw.arrayBuffer();
-    }
-
-    const origin = c.req.header('Origin') || '';
-
-    if (resolved?.provider === 'local_docker') {
-      return proxyToSandbox(sandboxId, port, method, remainingPath, queryString, c.req.raw.headers, body, false, origin);
-    }
-
-    if (resolved?.provider === 'justavps') {
-      // JustAVPS: route through CF Worker proxy at {port}--{slug}.{domain}
-      const proxyDomain = config.JUSTAVPS_PROXY_DOMAIN;
-      const cfProxyUrl = `https://${port}--${resolved.slug}.${proxyDomain}`;
-      const extra: Record<string, string> = {};
-      if (resolved.proxyToken) {
-        extra['X-Proxy-Token'] = resolved.proxyToken;
-      }
-      return proxyToSandbox(sandboxId, 8000, method, remainingPath, queryString, c.req.raw.headers, body, false, origin, cfProxyUrl, resolved.serviceKey, extra);
-    }
-
-    // Default: route to Daytona preview handler
-    const userId = (c.get('userId') as string) || '';
-    return proxyToDaytona(sandboxId, port, userId, method, remainingPath, queryString, c.req.raw.headers, body, origin);
-  });
-
-  multiProxy.all('/:sandboxId/:port', async (c) => {
-    const sandboxId = c.req.param('sandboxId');
-    const port = c.req.param('port');
-    return c.redirect(`/${sandboxId}/${port}/`, 301);
-  });
-
-  sandboxProxyApp.route('/', multiProxy);
 }
 
 export { sandboxProxyApp };

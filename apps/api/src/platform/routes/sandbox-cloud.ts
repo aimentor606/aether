@@ -26,7 +26,7 @@ import {
 import { config } from '../../config';
 import { justavpsFetch, listServerTypes as listJustAVPSServerTypes } from '../providers/justavps';
 import type { AuthVariables } from '../../types';
-import { resolveAccountId as defaultResolveAccountId } from '../../shared/resolve-account';
+import { resolveAccountIdStrict as defaultResolveAccountId } from '../../shared/resolve-account';
 import * as pool from '../../pool';
 import { generateSandboxName } from '../services/ensure-sandbox';
 
@@ -50,6 +50,23 @@ const defaultDeps: SandboxCloudRouterDeps = {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+function buildPreviewUrl(row: typeof sandboxes.$inferSelect): string | null {
+  const metadata = row.metadata as Record<string, unknown> | null;
+  switch (row.provider) {
+    case 'daytona':
+      return row.baseUrl || null;
+    case 'justavps': {
+      const slug = (metadata?.justavpsSlug as string) || '';
+      const domain = config.JUSTAVPS_PROXY_DOMAIN;
+      return slug ? `https://8000--${slug}.${domain}` : null;
+    }
+    case 'local_docker':
+      return row.baseUrl || (config.SANDBOX_PORT_BASE ? `http://localhost:${config.SANDBOX_PORT_BASE}` : null);
+    default:
+      return row.baseUrl || null;
+  }
+}
+
 function serializeSandbox(row: typeof sandboxes.$inferSelect) {
   const metadata = row.metadata as Record<string, unknown> | null;
   const cancelAtPeriodEnd = Boolean((metadata?.cancel_at_period_end as boolean) ?? false);
@@ -60,6 +77,7 @@ function serializeSandbox(row: typeof sandboxes.$inferSelect) {
     name: row.name,
     provider: row.provider,
     base_url: row.baseUrl,
+    preview_url: buildPreviewUrl(row),
     status: row.status,
     version: metadata?.version ?? null,
     metadata: row.metadata,
@@ -1020,7 +1038,7 @@ export function createCloudSandboxRouter(
 
   router.post('/mark-error', async (c) => {
     const userId = c.get('userId');
-    const accountId = await resolveAccountId(userId);
+      const accountId = await resolveAccountId(userId);
     const body = await c.req.json().catch(() => ({}));
     const sandboxId = body?.sandbox_id as string | undefined;
     const errorMessage = (body?.error_message as string | undefined) || 'Health check timed out after provisioning.';

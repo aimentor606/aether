@@ -5,6 +5,34 @@ import { HTTPException } from 'hono/http-exception';
 // Mock resolve-account BEFORE importing anything that depends on it
 mock.module('../shared/resolve-account', () => ({
   resolveAccountId: async (userId: string) => `resolved_account_for_${userId}`,
+  resolveAccountIdStrict: async (userId: string) => `resolved_account_for_${userId}`,
+}));
+
+class MockRedisClient {
+  private store = new Map<string, number>();
+  private expirations = new Map<string, number>();
+
+  async incr(key: string) {
+    const value = (this.store.get(key) ?? 0) + 1;
+    this.store.set(key, value);
+    return value;
+  }
+
+  async expire(key: string, seconds: number) {
+    this.expirations.set(key, seconds);
+    return 1;
+  }
+
+  async ttl(key: string) {
+    return this.expirations.get(key) ?? -1;
+  }
+}
+
+const mockRedis = new MockRedisClient();
+
+mock.module('../shared/redis', () => ({
+  isRedisConfigured: () => true,
+  getRedisClient: () => mockRedis,
 }));
 
 // Now we can safely import the rate limiter
@@ -12,7 +40,7 @@ const { tenantRateLimit } = require('../middleware/tenant-rate-limit');
 
 describe('Tenant Rate Limiting', () => {
   function createRateLimitedApp(limit: number) {
-    const app = new Hono();
+    const app = new Hono<{ Variables: { accountId: string } }>();
     app.onError((err, c) => {
       if (err instanceof HTTPException) {
         return c.json({ message: err.message }, err.status);

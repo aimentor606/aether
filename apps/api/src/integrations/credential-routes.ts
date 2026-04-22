@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 import type { AppEnv } from '../types';
-import { resolveAccountId } from '../shared/resolve-account';
+import { resolveAccountIdStrict } from '../shared/resolve-account';
 import { upsertAccountCreds, getAccountCreds, deleteAccountCreds } from './credential-store';
 
 const schema = z.object({
@@ -72,7 +72,7 @@ async function resolveAccount(c: any): Promise<string> {
 
   // supabaseAuth sets userId — resolve to accountId
   const userId = c.get('userId') as string | undefined;
-  if (userId) return resolveAccountId(userId);
+  if (userId) return resolveAccountIdStrict(userId);
 
   throw new HTTPException(401, { message: 'Unable to determine account' });
 }

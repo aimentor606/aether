@@ -1,10 +1,17 @@
 import { Context, Next } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { getAccountId } from '../verticals/middleware/account-context';
+import { getRedisClient, isRedisConfigured } from '../shared/redis';
 
 interface Bucket {
   tokens: number;
   lastRefill: number;
+}
+
+interface RateLimitCheckResult {
+  allowed: boolean;
+  remaining: number;
+  retryAfterMs: number;
 }
 
 const DEFAULT_LIMIT = 100;
@@ -50,6 +57,46 @@ function checkAndConsume(key: string, limit: number, windowMs: number): { allowe
   return { allowed: true, retryAfterMs: 0 };
 }
 
+async function checkAndConsumeRedis(
+  key: string,
+  limit: number,
+  windowMs: number,
+): Promise<RateLimitCheckResult | null> {
+  if (!isRedisConfigured()) {
+    return null;
+  }
+
+  const redis = getRedisClient();
+  if (!redis) {
+    return null;
+  }
+
+  const currentWindow = Math.floor(Date.now() / windowMs);
+  const windowKey = `${key}:${currentWindow}`;
+  const ttlSeconds = Math.max(1, Math.ceil(windowMs / 1000));
+
+  try {
+    const count = await redis.incr(windowKey);
+    if (count === 1) {
+      await redis.expire(windowKey, ttlSeconds);
+    }
+
+    const ttl = await redis.ttl(windowKey);
+    const retryAfterMs = ttl > 0 ? ttl * 1000 : windowMs;
+    const allowed = count <= limit;
+    const remaining = Math.max(0, limit - count);
+
+    return {
+      allowed,
+      remaining,
+      retryAfterMs: allowed ? 0 : retryAfterMs,
+    };
+  } catch (error) {
+    console.warn('[tenant-rate-limit] redis rate-limit check failed, using in-memory fallback', error);
+    return null;
+  }
+}
+
 /**
  * Rate limiting middleware scoped by tenant accountId.
  * Usage: app.use('/v1/verticals/*', tenantRateLimit({ limit: 100, windowMs: 60_000 }))
@@ -67,12 +114,25 @@ export function tenantRateLimit(opts?: { limit?: number; windowMs?: number }) {
       accountId = c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'anonymous';
     }
 
-    const result = checkAndConsume(`tenant:${accountId}`, limit, windowMs);
-    c.header('X-RateLimit-Limit', String(limit));
-    c.header('X-RateLimit-Remaining', String(Math.max(0, result.allowed ? (limit - 1) : 0)));
+    const rateLimitKey = `tenant:${accountId}`;
+    const redisResult = await checkAndConsumeRedis(rateLimitKey, limit, windowMs);
+    const inMemoryResult = redisResult
+      ? null
+      : checkAndConsume(rateLimitKey, limit, windowMs);
 
-    if (!result.allowed) {
-      c.header('Retry-After', String(Math.ceil(result.retryAfterMs / 1000)));
+    const allowed = redisResult ? redisResult.allowed : Boolean(inMemoryResult?.allowed);
+    const remaining = redisResult
+      ? redisResult.remaining
+      : Math.max(0, allowed ? limit - 1 : 0);
+    const retryAfterMs = redisResult
+      ? redisResult.retryAfterMs
+      : (inMemoryResult?.retryAfterMs ?? 0);
+
+    c.header('X-RateLimit-Limit', String(limit));
+    c.header('X-RateLimit-Remaining', String(remaining));
+
+    if (!allowed) {
+      c.header('Retry-After', String(Math.ceil(retryAfterMs / 1000)));
       throw new HTTPException(429, { message: 'Rate limit exceeded. Try again later.' });
     }
 

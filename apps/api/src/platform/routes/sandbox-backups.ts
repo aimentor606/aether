@@ -3,7 +3,7 @@ import { eq, and } from 'drizzle-orm';
 import { sandboxes, type Database } from '@aether/db';
 import { db as defaultDb } from '../../shared/db';
 import { supabaseAuth as authMiddleware } from '../../middleware/auth';
-import { resolveAccountId as defaultResolveAccountId } from '../../shared/resolve-account';
+import { resolveAccountIdStrict as defaultResolveAccountId } from '../../shared/resolve-account';
 import { JustAVPSProvider } from '../providers/justavps';
 import { getProvider as defaultGetProvider, type ProviderName, type SandboxProvider } from '../providers';
 import type { AuthVariables } from '../../types';
@@ -66,7 +66,7 @@ export function createBackupRouter(
     const sandboxId = c.req.param('sandboxId');
 
     try {
-      const accountId = await resolveAccountId(userId);
+    const accountId = await resolveAccountId(userId);
       const result = await requireOwnedJustavpsSandbox(db, accountId, sandboxId, getProvider);
       if ('error' in result) return c.json({ success: false, error: result.error }, result.status);
 
@@ -93,7 +93,7 @@ export function createBackupRouter(
     const sandboxId = c.req.param('sandboxId');
 
     try {
-      const accountId = await resolveAccountId(userId);
+    const accountId = await resolveAccountId(userId);
       const result = await requireOwnedJustavpsSandbox(db, accountId, sandboxId, getProvider);
       if ('error' in result) return c.json({ success: false, error: result.error }, result.status);
 
@@ -118,7 +118,7 @@ export function createBackupRouter(
     const backupId = c.req.param('backupId');
 
     try {
-      const accountId = await resolveAccountId(userId);
+    const accountId = await resolveAccountId(userId);
       const result = await requireOwnedJustavpsSandbox(db, accountId, sandboxId, getProvider);
       if ('error' in result) return c.json({ success: false, error: result.error }, result.status);
 
@@ -140,7 +140,7 @@ export function createBackupRouter(
     const backupId = c.req.param('backupId');
 
     try {
-      const accountId = await resolveAccountId(userId);
+    const accountId = await resolveAccountId(userId);
       const result = await requireOwnedJustavpsSandbox(db, accountId, sandboxId, getProvider);
       if ('error' in result) return c.json({ success: false, error: result.error }, result.status);
 

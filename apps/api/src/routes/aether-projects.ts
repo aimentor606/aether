@@ -1,20 +1,25 @@
 /**
  * Aether API proxy handler — /v1/aether/*
  *
- * In cloud/JustAVPS mode this must proxy through the same preview pipeline as
- * /v1/p/:sandboxId/:port/* so the sandbox service key and auto-wake behavior
- * are applied correctly.
+ * Proxies /v1/aether/* requests to the user's active sandbox.
+ * Local mode hits the sandbox directly via Docker DNS or localhost.
+ * Cloud mode uses the sandbox's base_url from the DB.
  */
 
 import type { Context } from 'hono';
 import { config } from '../config';
 import { db } from '../shared/db';
-import { resolveAccountId } from '../shared/resolve-account';
-import { getSandboxBaseUrl } from '../sandbox-proxy/routes/local-preview';
-import { proxyToDaytona } from '../sandbox-proxy/routes/preview';
+import { resolveAccountIdStrict } from '../shared/resolve-account';
+
+function getSandboxBaseUrl(sandboxId: string): string {
+  if (config.SANDBOX_NETWORK) {
+    return `http://${sandboxId}:8000`;
+  }
+  return `http://localhost:${config.SANDBOX_PORT_BASE}`;
+}
 
 async function resolveActiveSandbox(userId: string): Promise<{ externalId: string | null; baseUrl: string | null; proxyToken: string | null }> {
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
   const safeAccountId = accountId.replace(/'/g, "''");
   const rows = await db.execute(`
     select external_id, base_url, metadata
@@ -64,42 +69,35 @@ export async function aetherProxyHandler(c: Context): Promise<Response> {
     }
   }
 
-  // Cloud/JustAVPS: reuse the preview proxy so auth, service key injection,
-  // preview token handling, and auto-wake all work the same way.
+  // Cloud/JustAVPS: resolve the sandbox's base_url and proxy directly.
   const userId = c.get('userId') as string;
   const { externalId, baseUrl, proxyToken } = await resolveActiveSandbox(userId);
   if (!externalId) {
     return c.json({ error: 'No active sandbox found for account' }, 404);
   }
 
-  // For JustAVPS, talk directly to the machine's proxy URL using its proxy token.
-  if (baseUrl) {
-    const targetUrl = `${baseUrl}${sandboxPath}${new URL(c.req.url).search}`;
-    const headers = new Headers();
-    const ct = c.req.header('content-type');
-    if (ct) headers.set('Content-Type', ct);
-    if (proxyToken) headers.set('X-Proxy-Token', proxyToken);
-    try {
-      const res = await fetch(targetUrl, {
-        method: c.req.method,
-        headers,
-        body: c.req.method !== 'GET' && c.req.method !== 'HEAD' ? await c.req.arrayBuffer() : undefined,
-        signal: AbortSignal.timeout(20_000),
-      });
-      const data = await res.arrayBuffer();
-      return new Response(data, {
-        status: res.status,
-        headers: { 'Content-Type': res.headers.get('Content-Type') || 'application/json' },
-      });
-    } catch (err: any) {
-      return c.json({ error: 'Sandbox unreachable', detail: err?.message }, 502);
-    }
+  if (!baseUrl) {
+    return c.json({ error: 'Sandbox has no reachable URL', external_id: externalId }, 502);
   }
 
-  // Fallback legacy preview flow.
-  const queryString = new URL(c.req.url).search;
-  const body = c.req.method !== 'GET' && c.req.method !== 'HEAD'
-    ? await c.req.raw.clone().arrayBuffer()
-    : undefined;
-  return proxyToDaytona(externalId, 8000, userId, c.req.method, sandboxPath, queryString, c.req.raw.headers, body, c.req.header('Origin') || '');
+  const targetUrl = `${baseUrl}${sandboxPath}${new URL(c.req.url).search}`;
+  const headers = new Headers();
+  const ct = c.req.header('content-type');
+  if (ct) headers.set('Content-Type', ct);
+  if (proxyToken) headers.set('X-Proxy-Token', proxyToken);
+  try {
+    const res = await fetch(targetUrl, {
+      method: c.req.method,
+      headers,
+      body: c.req.method !== 'GET' && c.req.method !== 'HEAD' ? await c.req.arrayBuffer() : undefined,
+      signal: AbortSignal.timeout(20_000),
+    });
+    const data = await res.arrayBuffer();
+    return new Response(data, {
+      status: res.status,
+      headers: { 'Content-Type': res.headers.get('Content-Type') || 'application/json' },
+    });
+  } catch (err: any) {
+    return c.json({ error: 'Sandbox unreachable', detail: err?.message }, 502);
+  }
 }

@@ -20,6 +20,7 @@ mock.module('../shared/db', () => ({
 
 mock.module('../shared/resolve-account', () => ({
   resolveAccountId: async () => mockResolvedAccountId,
+  resolveAccountIdStrict: async () => mockResolvedAccountId,
 }));
 
 mock.module('../repositories/api-keys', () => ({
@@ -66,10 +67,20 @@ mock.module('../config', () => ({ config: {} }));
 const { combinedAuth } = await import('../middleware/auth');
 const { clearPreviewOwnershipCache } = await import('../shared/preview-ownership');
 
+interface PreviewAuthVariables {
+  userId?: string;
+  userEmail?: string;
+  accountId?: string;
+}
+
 function createApp() {
-  const app = new Hono();
+  const app = new Hono<{ Variables: PreviewAuthVariables }>();
   app.use('/v1/p/:sandboxId/:port/*', combinedAuth);
-  app.get('/v1/p/:sandboxId/:port/*', (c) => c.json({ ok: true }));
+  app.get('/v1/p/:sandboxId/:port/*', (c) => c.json({
+    ok: true,
+    userId: c.get('userId') ?? null,
+    accountId: c.get('accountId') ?? null,
+  }));
   app.onError((err, c) => {
     if (err instanceof HTTPException) {
       return c.json({ message: err.message }, err.status);
@@ -140,6 +151,9 @@ describe('preview auth ownership', () => {
       headers: { Authorization: 'Bearer jwt-owner' },
     });
     expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.accountId).toBe('acct-owner');
+    expect(body.userId).toBe('user-owner');
   });
 
   test('rejects jwt user without ownership', async () => {
@@ -168,6 +182,9 @@ describe('preview auth ownership', () => {
       headers: { Authorization: 'Bearer jwt-fallback-owner' },
     });
     expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.accountId).toBe('acct-owner');
+    expect(body.userId).toBe('user-fallback-owner');
   });
 
   test('rejects jwt via Supabase fallback without ownership', async () => {

@@ -18,7 +18,7 @@ import type { AppEnv } from '../types';
 import { db } from '../shared/db';
 import { config } from '../config';
 import { supabaseAuth } from '../middleware/auth';
-import { resolveAccountId } from '../shared/resolve-account';
+import { resolveAccountIdStrict } from '../shared/resolve-account';
 
 export const serversApp = new Hono<AppEnv>();
 
@@ -32,7 +32,7 @@ serversApp.use('/*', supabaseAuth);
 // PUT /v1/servers/sync — bulk upsert from frontend (initial sync)
 serversApp.put('/sync', async (c) => {
   const userId = c.get('userId');
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
 
   const body = await c.req.json<{
     servers: Array<{
@@ -89,7 +89,7 @@ serversApp.put('/sync', async (c) => {
 // GET /v1/servers — list this user's server entries
 serversApp.get('/', async (c) => {
   const userId = c.get('userId');
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
 
   const rows = await db
     .select()
@@ -102,7 +102,7 @@ serversApp.get('/', async (c) => {
 // GET /v1/servers/:id — get a single server entry (scoped to account)
 serversApp.get('/:id', async (c) => {
   const userId = c.get('userId');
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
   const id = c.req.param('id');
 
   const [row] = await db
@@ -116,7 +116,7 @@ serversApp.get('/:id', async (c) => {
 // POST /v1/servers — create/upsert a server entry
 serversApp.post('/', async (c) => {
   const userId = c.get('userId');
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
 
   const body = await c.req.json<{
     id: string;
@@ -164,7 +164,7 @@ serversApp.post('/', async (c) => {
 // PUT /v1/servers/:id — update an existing server entry
 serversApp.put('/:id', async (c) => {
   const userId = c.get('userId');
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
   const id = c.req.param('id');
 
   const body = await c.req.json<{
@@ -197,7 +197,7 @@ serversApp.put('/:id', async (c) => {
 // DELETE /v1/servers/:id — delete a server entry
 serversApp.delete('/:id', async (c) => {
   const userId = c.get('userId');
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
   const id = c.req.param('id');
 
   const [row] = await db

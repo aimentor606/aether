@@ -22,7 +22,7 @@ import {
 } from '../providers/local-docker';
 import { getProvider, type ProviderName } from '../providers';
 import { combinedAuth as authMiddleware } from '../../middleware/auth';
-import { resolveAccountId } from '../../shared/resolve-account';
+import { resolveAccountIdStrict } from '../../shared/resolve-account';
 import { executeUpdate, getUpdateStatus, resetUpdateStatus } from '../../update';
 import type { AuthVariables } from '../../types';
 
@@ -50,7 +50,7 @@ sandboxIdUpdateRouter.post('/', async (c) => {
   }
 
   const userId = c.get('userId');
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
   const sandbox = await findOwnedSandbox(accountId, sandboxId);
 
   if (!sandbox) {
@@ -119,7 +119,7 @@ sandboxIdUpdateRouter.post('/', async (c) => {
 sandboxIdUpdateRouter.get('/status', async (c) => {
   const sandboxId = c.req.param('id') ?? '';
   const userId = c.get('userId');
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
   const sandbox = await findOwnedSandbox(accountId, sandboxId);
 
   if (!sandbox) {
@@ -136,7 +136,7 @@ sandboxIdUpdateRouter.get('/status', async (c) => {
 sandboxIdUpdateRouter.post('/reset', async (c) => {
   const sandboxId = c.req.param('id') ?? '';
   const userId = c.get('userId');
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
   const sandbox = await findOwnedSandbox(accountId, sandboxId);
 
   if (!sandbox) {

@@ -69,7 +69,7 @@ function seedDb(dbPath: string): void {
 		"ses_child", "global", "ses_root", "child", "/tmp/project", "Hermes comparison continued", "1", null, 1, 0, 1, null, null, null, 3000, 4000, null, null, null,
 	)
 	db.query(`INSERT INTO message VALUES (?,?,?,?,?)`).run(
-		"msg_1", "ses_root", 1100, 1100, JSON.stringify({ role: "user", content: "Please compare Hermes Agent vs ether memory systems." }),
+		"msg_1", "ses_root", 1100, 1100, JSON.stringify({ role: "user", content: "Please compare Hermes Agent vs Aether memory systems." }),
 	)
 	db.query(`INSERT INTO part VALUES (?,?,?,?,?,?)`).run(
 		"prt_1", "msg_1", "ses_root", 1200, 1200, JSON.stringify({ type: "text", text: "Session lineage should be resolved before summarization." }),

@@ -22,16 +22,16 @@ services:
       
       # Listener Configuration
       KONG_PROXY_LISTEN: 0.0.0.0:8000, 0.0.0.0:8443 ssl http2
-      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_LISTEN: 127.0.0.1:8001
       KONG_PROXY_ACCESS_LOG: /var/log/kong/access.log
       KONG_PROXY_ERROR_LOG: /var/log/kong/error.log
       KONG_ADMIN_ACCESS_LOG: /var/log/kong/admin_access.log
       KONG_ADMIN_ERROR_LOG: /var/log/kong/admin_error.log
 
-      # SSL Configuration (Uncomment for Production)
-      # KONG_SSL_CERTIFICATE: /app/kong/ssl/fullchain.pem
-      # KONG_SSL_CERTIFICATE_KEY: /app/kong/ssl/privkey.pem
-      # KONG_SSL_PROTOCOLS: TLSv1.2 TLSv1.3
+      # SSL Configuration (enabled when USE_HTTPS=true)
+      KONG_SSL_CERTIFICATE: ${KONG_SSL_CERT:-/var/lib/kong/ssl/fullchain.pem}
+      KONG_SSL_CERTIFICATE_KEY: ${KONG_SSL_KEY:-/var/lib/kong/ssl/privkey.pem}
+      KONG_SSL_PROTOCOLS: TLSv1.2 TLSv1.3
 
       # Plugin Configuration
       KONG_PLUGINS: bundled

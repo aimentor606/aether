@@ -13,7 +13,7 @@ services:
       --maxmemory ${REDIS_MAX_MEMORY:-256mb}
       --maxmemory-policy allkeys-lru
       --logfile /var/log/redis/redis.log
-      ${REDIS_PASSWORD:+--requirepass ${REDIS_PASSWORD}}
+      --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD must be set in ops/.env}
     volumes:
       - /data/redis:/data
       - /data/logs/redis:/var/log/redis

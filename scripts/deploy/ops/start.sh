@@ -3,6 +3,25 @@ set -e
 cd "$(dirname "$0")/.."
 source ops/.env
 
+# Validate that critical secrets are not still placeholder values
+SECRET_VARS="DB_ROOT_PASSWORD REDIS_PASSWORD KONG_PG_PASSWORD SESSION_SECRET NEWAPI_DB_PASSWORD LITELLM_DB_PASSWORD LITELLM_MASTER_KEY LITELLM_SALT_KEY DEFAULT_API_KEY"
+for var in $SECRET_VARS; do
+  if [ "${!var}" = "CHANGE_ME" ] || [ "${!var}" = "sk-CHANGE_ME" ]; then
+    echo "ERROR: $var is still set to a placeholder value. Edit ops/.env before starting." >&2
+    exit 1
+  fi
+done
+
+# Validate SSL certs when HTTPS is enabled
+if [ "${USE_HTTPS}" = "true" ]; then
+  for cert in ../ssl/fullchain.pem ../ssl/privkey.pem; do
+    if [ ! -f "$cert" ]; then
+      echo "ERROR: USE_HTTPS=true but $cert not found. Provide SSL certs or set USE_HTTPS=false." >&2
+      exit 1
+    fi
+  done
+fi
+
 # Auto-derive FORWARDED_PROTO from USE_HTTPS
 # (matches logic in sync-kong.sh — keep in sync)
 FORWARDED_PROTO="http"

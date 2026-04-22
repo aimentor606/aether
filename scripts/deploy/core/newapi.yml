@@ -12,7 +12,7 @@ services:
       - TZ=${TZ:-Asia/Shanghai}
       - PROXY_BASE_URL=${FORWARDED_PROTO:-https}://${PUBLIC_HOST}
       # Trust Kong's X-Forwarded-* headers (fixes trailing-slash redirect URLs)
-      - FORWARDED_ALLOW_IPS=*
+      - FORWARDED_ALLOW_IPS=172.16.0.0/12
       - SESSION_SECRET=${SESSION_SECRET:?SESSION_SECRET is required}
       
       # Database Connection (Use dedicated user)
@@ -27,7 +27,7 @@ services:
       - REDIS_CONN_STRING=redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379
 
       # Rate Limiting
-      - GLOBAL_API_RATE_LIMIT_ENABLE=false
+      - GLOBAL_API_RATE_LIMIT_ENABLE=true
       - GLOBAL_WEB_RATE_LIMIT_ENABLE=false
 
     deploy:

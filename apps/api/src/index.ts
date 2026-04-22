@@ -258,7 +258,7 @@ if (config.RECONCILIATION_ENABLED) {
   }, RECONCILE_INTERVAL_MS);
 }
 
-app.route('/v1/verticals', verticalsApp); // /v1/verticals/finance/*, /v1/verticals/healthcare/*, /v1/verticals/retail/*
+app.route('/v1/verticals', verticalsApp); // /v1/verticals/finance/*, /v1/verticals/insurance/*, /v1/verticals/advisor/*
 
 // All remaining routes require authentication (JWT or aether_ token).
 app.use('/v1/providers/*', combinedAuth);

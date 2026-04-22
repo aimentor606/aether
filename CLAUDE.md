@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Aether is an autonomous company operating system. AI agents run in isolated Linux sandboxes, executing code, managing infrastructure, and operating integrations 24/7. The agent runtime is OpenCode. Revenue model: SaaS with credit-based billing, targeting CTOs at startups who need autonomous agents with vertical domain specialization (finance, healthcare, retail) and enterprise multi-tenancy.
+Aether is an autonomous company operating system. AI agents run in isolated Linux sandboxes, executing code, managing infrastructure, and operating integrations 24/7. The agent runtime is OpenCode. Revenue model: SaaS with credit-based billing, targeting CTOs at startups who need autonomous agents with vertical domain specialization (finance, insurance, advisor) and enterprise multi-tenancy.
 
 ## Architecture
 
@@ -27,8 +27,8 @@ packages/
   sdk/          Client (React) + server SDKs
   ui/           Shared UI primitives (31), chat, A2UI renderer
   finance/      Vertical domain: invoices, expenses, ledger, budgets
-  healthcare/   Vertical domain: patients, appointments, prescriptions
-  retail/       Vertical domain: inventory, sales, loyalty programs
+  insurance/    Vertical domain: policies, claims, leads, compliance
+  advisor/      Vertical domain: portfolios, risk assessments, financial plans
   shared/       Shared utilities
   theme/        Theme system
   voice/        Voice integration
@@ -80,8 +80,8 @@ cd core/kortix-master && bun test                          # Core runtime tests
 
 All vertical routes live under `apps/api/src/verticals/`:
 ```
-routes/         finance.ts, healthcare.ts, retail.ts
-services/       Business logic layer (stubs for healthcare/retail)
+routes/         finance.ts, insurance.ts, advisor.ts
+services/       Business logic layer (adapters to @aether/vertical-* packages)
 schemas/        Zod validation schemas
 middleware/     account-context.ts (getAccountId, formatZodError, pagination)
 index.ts        Mounts all 3 vertical sub-apps
@@ -91,7 +91,7 @@ Mounted at `/v1/verticals/*` in `apps/api/src/index.ts` with `combinedAuth` guar
 
 ### Database (Drizzle ORM)
 
-- Schema files in `packages/db/src/schema/`: `aether.ts` (main, 37K), `finance.ts`, `vertical.ts`, `public.ts`
+- Schema files in `packages/db/src/schema/`: `aether.ts` (main, 37K), `finance.ts`, `insurance.ts`, `advisor.ts`, `shared-vertical.ts`, `public.ts`
 - pgSchema namespace: `aether` (was `aether`, not renamed in DB to preserve drizzle migration history)
 - Migrations in `packages/db/drizzle/`
 - All vertical tables have `accountId` column for multi-tenant isolation
@@ -123,7 +123,6 @@ Mounted at `/v1/verticals/*` in `apps/api/src/index.ts` with `combinedAuth` guar
 
 - `apps/api/src/index.ts` is 1,455 lines. Should be split into modules (cors.ts, routes.ts, sandbox-token.ts, websocket-proxy.ts, server.ts).
 - Web has 231 dependencies including Syncfusion (~15MB). Cleanup needed.
-- Healthcare and retail services are stubs returning empty arrays.
 - RLS migration exists but session variable setter not implemented.
 - Web has pre-existing TypeScript errors (~3,900) unrelated to rebrand.
 

@@ -118,6 +118,90 @@ export type {
   UpdateLedgerInput,
 } from './schema/finance';
 
+// Insurance vertical
+export {
+  policyTypeEnum,
+  policyStatusEnum,
+  policies,
+  policiesRelations,
+  claimTypeEnum,
+  claimStatusEnum,
+  claims,
+  claimsRelations,
+  createPolicySchema,
+  updatePolicySchema,
+  createClaimSchema,
+  updateClaimSchema,
+} from './schema/insurance';
+
+export type {
+  CreatePolicyInput,
+  UpdatePolicyInput,
+  CreateClaimInput,
+  UpdateClaimInput,
+} from './schema/insurance';
+
+// Advisor vertical
+export {
+  riskLevelEnum,
+  portfolioStatusEnum,
+  portfolios,
+  portfoliosRelations,
+  riskCategoryEnum,
+  riskAssessments,
+  riskAssessmentsRelations,
+  planTypeEnum,
+  planStatusEnum,
+  financialPlans,
+  financialPlansRelations,
+  createPortfolioSchema,
+  updatePortfolioSchema,
+  createRiskAssessmentSchema,
+  updateRiskAssessmentSchema,
+  createFinancialPlanSchema,
+  updateFinancialPlanSchema,
+} from './schema/advisor';
+
+export type {
+  CreatePortfolioInput,
+  UpdatePortfolioInput,
+  CreateRiskAssessmentInput,
+  UpdateRiskAssessmentInput,
+  CreateFinancialPlanInput,
+  UpdateFinancialPlanInput,
+} from './schema/advisor';
+
+// Shared vertical entities (leads, documents, compliance)
+export {
+  leadSourceEnum,
+  leadVerticalEnum,
+  leadStatusEnum,
+  leads,
+  leadsRelations,
+  createLeadSchema,
+  updateLeadSchema,
+  documentStatusEnum,
+  documents,
+  documentsRelations,
+  createDocumentSchema,
+  updateDocumentSchema,
+  complianceCheckTypeEnum,
+  complianceStatusEnum,
+  complianceRecords,
+  complianceRecordsRelations,
+  createComplianceSchema,
+  updateComplianceSchema,
+} from './schema/shared-vertical';
+
+export type {
+  CreateLeadInput,
+  UpdateLeadInput,
+  CreateDocumentInput,
+  UpdateDocumentInput,
+  CreateComplianceInput,
+  UpdateComplianceInput,
+} from './schema/shared-vertical';
+
 // Vertical / Multi-tenant tables
 export {
   verticalTables,

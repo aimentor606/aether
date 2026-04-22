@@ -1,7 +1,7 @@
 import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
-  schema: ['./src/schema/aether.ts'],
+  schema: ['./src/schema/aether.ts', './src/schema/finance.ts', './src/schema/insurance.ts', './src/schema/advisor.ts', './src/schema/shared-vertical.ts'],
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {

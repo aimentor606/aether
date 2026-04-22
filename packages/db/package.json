@@ -10,6 +10,9 @@
     "./client": "./src/client.ts",
     "./schema": "./src/schema/index.ts",
     "./schema/finance": "./src/schema/finance.ts",
+    "./schema/insurance": "./src/schema/insurance.ts",
+    "./schema/advisor": "./src/schema/advisor.ts",
+    "./schema/shared-vertical": "./src/schema/shared-vertical.ts",
     "./schema/legacy": "./src/schema/legacy/index.ts",
     "./schema/legacy/schema": "./src/schema/legacy/schema.ts",
     "./types": "./src/types.ts"

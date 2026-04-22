@@ -19,7 +19,7 @@ services:
       - PROXY_BASE_URL=${FORWARDED_PROTO:-https}://${PUBLIC_HOST}
       # Trust Kong's X-Forwarded-* headers (fixes trailing-slash redirect URLs)
       # See: https://github.com/BerriAI/litellm/pull/24956
-      - FORWARDED_ALLOW_IPS=*
+      - FORWARDED_ALLOW_IPS=172.16.0.0/12
       # config.yaml uses os.environ/ to read these at runtime
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
       - QWEN_API_KEY=${QWEN_API_KEY:-}

@@ -25,7 +25,7 @@ HEALTH_INTERVAL=2
 LOCK_FILE="$HOME/.aether-deploy.lock"
 PREBUILT_IMAGE="${PREBUILT_IMAGE:-}"
 
-cd ~/suna
+cd ~/aether
 
 # ── Serialize deploys on-host (defense in depth) ────────────────────────────
 exec 9>"$LOCK_FILE"

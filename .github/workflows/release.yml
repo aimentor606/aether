@@ -86,10 +86,10 @@ jobs:
           timeout: 600s
           script: |
             set -e
-            if [ ! -d ~/suna ]; then
-              git clone https://github.com/aether-ai/suna.git ~/suna
+            if [ ! -d ~/aether ]; then
+              git clone https://github.com/aimentor606/aether.git ~/aether
             fi
-            cd ~/suna
+            cd ~/aether
             git -c fetch.recurseSubmodules=false fetch origin main
             git reset --hard origin/main
             git submodule sync --recursive
@@ -173,7 +173,7 @@ jobs:
           gh release create "v${{ env.VERSION }}" \
             --title "v${{ env.VERSION }} — ${{ env.TITLE }}" \
             --notes-file /tmp/release-notes.md \
-            --repo aether-ai/suna
+            --repo aimentor606/aether
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

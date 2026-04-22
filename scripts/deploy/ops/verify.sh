@@ -40,7 +40,8 @@ check "/v1beta/ CORS" \
 echo ""
 echo "=== Authentication ==="
 source ops/.env
-case "${LLM_PROXY:-newapi}" in
+LLM_PROXY="${LLM_PROXY:-newapi}"
+DEFAULT_API_KEY="${DEFAULT_API_KEY:-}"
   litellm) HEALTH_PATH="/v1beta/models" ;;
   *)       HEALTH_PATH="/api/status" ;;
 esac

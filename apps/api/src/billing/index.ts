@@ -53,9 +53,9 @@ billingApp.post('/setup/initialize', async (c: any) => {
   const { upsertCreditAccount, getCreditAccount } = await import('./repositories/credit-accounts');
   const { resolvePriceId, isPaidTier } = await import('./services/tiers');
   const { getOrCreateStripeCustomer } = await import('./services/subscriptions');
-  const { resolveAccountId } = await import('../shared/resolve-account');
+  const { resolveAccountIdStrict } = await import('../shared/resolve-account');
 
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
 
   // ── Step 1: Create free Stripe subscription ──────────────────────────
   const existing = await getCreditAccount(accountId);

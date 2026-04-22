@@ -27,7 +27,7 @@ jobs:
 
       - name: Add upstream remote
         run: |
-          git remote add upstream https://github.com/aether-ai/suna.git || true
+          git remote add upstream https://github.com/aimentor606/aether.git || true
           git fetch upstream --tags
 
       - name: Perform Merging Rebase

@@ -17,7 +17,7 @@ import { tunnelConnections, tunnelDeviceAuthRequests, tunnelPermissions } from '
 import { db } from '../../shared/db';
 import { generateDeviceCode, generateTunnelToken, hashSecretKey, verifySecretKey, randomAlphanumeric } from '../../shared/crypto';
 import { tunnelRateLimiter } from '../core/rate-limiter';
-import { resolveAccountId } from '../../shared/resolve-account';
+import { resolveAccountIdStrict } from '../../shared/resolve-account';
 import { config } from '../../config';
 
 const DEVICE_AUTH_TTL_MS = 5 * 60_000;
@@ -159,7 +159,7 @@ export function createDeviceAuthRouter(): Hono {
   // POST /:code/approve — approve and create tunnel + token
   router.post('/:code/approve', async (c: any) => {
     const userId = c.get('userId') as string;
-    const accountId = await resolveAccountId(userId);
+    const accountId = await resolveAccountIdStrict(userId);
     const code = c.req.param('code');
     const body = await c.req.json().catch(() => ({}));
 

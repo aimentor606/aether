@@ -62,7 +62,7 @@ jobs:
           STARTUP=$(cat <<'SCRIPT'
           #!/bin/bash
           set -e
-          curl -fsSL https://raw.githubusercontent.com/aether-ai/suna/main/scripts/start-sandbox.sh -o /tmp/start-sandbox.sh
+          curl -fsSL https://raw.githubusercontent.com/aimentor606/aether/main/scripts/start-sandbox.sh -o /tmp/start-sandbox.sh
           chmod +x /tmp/start-sandbox.sh
           /tmp/start-sandbox.sh '${{ steps.v.outputs.image }}'
           SCRIPT

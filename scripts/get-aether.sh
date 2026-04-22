@@ -72,7 +72,7 @@ INSTALL_DIR="${AETHER_HOME:-$HOME/.aether}"
 resolve_latest_version() {
   local gh_version
   gh_version=$(curl -sf --connect-timeout 5 \
-    "https://api.github.com/repos/aether-ai/suna/releases/latest" 2>/dev/null \
+    "https://api.github.com/repos/aimentor606/aether/releases/latest" 2>/dev/null \
     | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"].lstrip("v"))' 2>/dev/null) || true
   if [ -n "$gh_version" ]; then
     printf '%s' "$gh_version"
@@ -1252,7 +1252,7 @@ LOCAL_REPO_ROOT=$(grep -m1 '^AETHER_LOCAL_REPO_ROOT=' "$DIR/.env" 2>/dev/null | 
 _resolve_latest_version() {
   local gh_version
   gh_version=$(curl -sf --connect-timeout 5 \
-    "https://api.github.com/repos/aether-ai/suna/releases/latest" 2>/dev/null \
+    "https://api.github.com/repos/aimentor606/aether/releases/latest" 2>/dev/null \
     | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"].lstrip("v"))' 2>/dev/null) || true
   if [ -n "$gh_version" ]; then
     printf '%s' "$gh_version"
@@ -1323,7 +1323,7 @@ PY
 
 _refresh_installer_and_cli() {
   local tmp_script="$DIR/get-aether.sh.tmp"
-  curl -fsSL "https://raw.githubusercontent.com/aether-ai/suna/main/scripts/get-aether.sh" -o "$tmp_script" || return 0
+  curl -fsSL "https://raw.githubusercontent.com/aimentor606/aether/main/scripts/get-aether.sh" -o "$tmp_script" || return 0
   chmod +x "$tmp_script"
   mv "$tmp_script" "$DIR/get-aether.sh"
   awk '

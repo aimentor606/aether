@@ -2,33 +2,39 @@ _format_version: "3.0"
 _transform: true
 
 upstreams:
+  # ── Aether API (control plane) ─────────────────────────────────────────────
   - name: upstream-aether-api
     algorithm: round-robin
     targets:
-      - target: llm-proxy:${{ env "DECK_LLM_PROXY_PORT" }}
+      - target: aether-api:${{ env "DECK_AETHER_API_PORT" "8008" }}
         weight: 100
 
-  - name: upstream-litellm-ui
+  # ── LiteLLM Proxy (data plane + management) ────────────────────────────────
+  - name: upstream-litellm
     algorithm: round-robin
     targets:
       - target: llm-proxy:${{ env "DECK_LLM_PROXY_PORT" }}
         weight: 100
 
 services:
-  - name: svc-api
+  # ── Control Plane: Aether API ──────────────────────────────────────────────
+  # Auth, billing, credential issuance, sandbox orchestration.
+  # Aether handles auth internally (combinedAuth middleware), no Kong key-auth.
+  - name: svc-control
     url: http://upstream-aether-api
     connect_timeout: 5000
-    read_timeout: 600000
-    write_timeout: 600000
-    retries: 3
+    read_timeout: 60000
+    write_timeout: 60000
+    retries: 2
     tags:
       - backend
       - api
-    
+      - control-plane
+
     routes:
-      - name: route-api
+      - name: route-control
         paths:
-          - /api
+          - /v1/control
         methods:
           - GET
           - POST
@@ -38,11 +44,20 @@ services:
           - OPTIONS
         strip_path: false
         tags:
-          - api-route
+          - control-plane
 
-      - name: route-v1beta
+      - name: route-api-platform
         paths:
-          - /v1beta
+          - /v1/platform
+          - /v1/billing
+          - /v1/aether-projects
+          - /v1/integrations
+          - /v1/servers
+          - /v1/providers
+          - /v1/secrets
+          - /v1/queue
+          - /v1/setup
+          - /v1/verticals
         methods:
           - GET
           - POST
@@ -52,9 +67,10 @@ services:
           - OPTIONS
         strip_path: false
         tags:
-          - api-route
+          - api-routes
 
-      - name: route-v1
+      # Catch-all for other /v1/* routes that Aether handles
+      - name: route-api-v1-catchall
         paths:
           - /v1
         methods:
@@ -68,23 +84,25 @@ services:
         tags:
           - api-route
 
+      # Tunnel and sandbox proxy routes
+      - name: route-api-tunnel
+        paths:
+          - /v1/tunnel
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        strip_path: false
+        tags:
+          - tunnel
+
     plugins:
-      - name: key-auth
-        config:
-          key_names:
-            - apikey
-            - X-API-Key
-          hide_credentials: true
-
-      - name: request-transformer
-        config:
-          add:
-            headers:
-              - "Authorization:Bearer ${{ env "DECK_LITELLM_MASTER_KEY" }}"
-
       - name: rate-limiting
         config:
-          minute: 100000
+          minute: 10000
           policy: local
           fault_tolerant: true
 
@@ -106,8 +124,85 @@ services:
             - X-API-Key
           credentials: true
 
+  # ── Data Plane: LiteLLM LLM Proxy ──────────────────────────────────────────
+  # Virtual key auth. Clients send Authorization: Bearer <virtual_key>.
+  # No master key injection — LiteLLM validates virtual keys directly.
+  - name: svc-llm
+    url: http://upstream-litellm
+    connect_timeout: 5000
+    read_timeout: 600000
+    write_timeout: 600000
+    retries: 3
+    tags:
+      - backend
+      - llm
+      - data-plane
+
+    routes:
+      # Direct LLM endpoint: /llm/v1/chat/completions → LiteLLM /v1/chat/completions
+      - name: route-llm-direct
+        paths:
+          - /llm
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        strip_path: true
+        tags:
+          - llm-direct
+
+      # Backward-compatible: /v1/chat/completions → LiteLLM (virtual key auth)
+      - name: route-v1-chat
+        paths:
+          - /v1/chat/completions
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+        tags:
+          - llm-compat
+
+      # Backward-compatible: /v1/models → LiteLLM
+      - name: route-v1-models
+        paths:
+          - /v1/models
+        methods:
+          - GET
+          - OPTIONS
+        strip_path: false
+        tags:
+          - llm-compat
+
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 1000
+          policy: local
+          fault_tolerant: true
+
+      - name: cors
+        config:
+          origins:
+            - "${{ env "DECK_PUBLIC_ORIGIN" }}"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Content-Type
+            - Authorization
+          credentials: true
+
+  # ── LiteLLM Admin UI + Management ──────────────────────────────────────────
   - name: svc-litellm-ui
-    url: http://upstream-litellm-ui
+    url: http://upstream-litellm
     connect_timeout: 5000
     read_timeout: 60000
     write_timeout: 60000
@@ -137,9 +232,10 @@ services:
 
       # Catch-all: LiteLLM management uses scattered top-level paths (/key/*, /user/*,
       # /model/*, /health/*, /config/*, /guardrails/*, /policies/*, /server/*, /tools/*,
-      # /public/*, /chat/completions, /embeddings, /images/*, etc.) that cannot be
-      # enumerated individually. Kong matches longest path first, so /api, /v1, /v1beta,
-      # and /ui still hit their specific routes above; everything else falls through here.
+      # /public/*, /embeddings, /images/*, etc.) that cannot be enumerated individually.
+      # Kong matches longest path first, so /v1/control, /v1/chat/completions, /v1/models,
+      # /llm, /api, /v1, /v1beta, and /ui hit their specific routes above;
+      # everything else falls through here.
       - name: route-litellm-catchall
         paths:
           - /
@@ -205,7 +301,7 @@ plugins:
       header_name: X-Request-ID
       generator: uuid
       echo_downstream: true
-  
+
   - name: prometheus
     config:
       per_consumer: true

@@ -14,7 +14,7 @@ import { db } from '../../shared/db';
 import { combinedAuth } from '../../middleware/auth';
 import { config } from '../../config';
 import { sandboxEventBus, type SandboxProvisionEvent } from '../services/sandbox-events';
-import { resolveAccountId } from '../../shared/resolve-account';
+import { resolveAccountIdStrict } from '../../shared/resolve-account';
 import type { AuthVariables } from '../../types';
 
 const router = new Hono();
@@ -66,7 +66,7 @@ sseRouter.get('/:id/provision-stream', async (c) => {
   const sandboxId = c.req.param('id');
   const userId = c.get('userId');
 
-  const accountId = await resolveAccountId(userId);
+  const accountId = await resolveAccountIdStrict(userId);
   const [sandbox] = await db
     .select()
     .from(sandboxes)

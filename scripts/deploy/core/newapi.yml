@@ -13,23 +13,28 @@ services:
       - PROXY_BASE_URL=${FORWARDED_PROTO:-https}://${PUBLIC_HOST}
       # Trust Kong's X-Forwarded-* headers (fixes trailing-slash redirect URLs)
       - FORWARDED_ALLOW_IPS=*
-      - SESSION_SECRET=${SESSION_SECRET:-CHANGE_ME}
+      - SESSION_SECRET=${SESSION_SECRET:?SESSION_SECRET is required}
       
       # Database Connection (Use dedicated user)
       - DATABASE_HOST=postgres
       - DATABASE_PORT=5432
       - DATABASE_USER=${NEWAPI_DB_USER:-newapi}
-      - DATABASE_PASSWORD=${NEWAPI_DB_PASSWORD:-aetherai@newapi8864}
+      - DATABASE_PASSWORD=${NEWAPI_DB_PASSWORD:?NEWAPI_DB_PASSWORD is required}
       - DATABASE_NAME=${NEWAPI_DB_DATABASE:-newapi}
-      - SQL_DSN=postgres://${NEWAPI_DB_USER:-newapi}:${NEWAPI_DB_PASSWORD:-aetherai@newapi8864}@postgres:5432/${NEWAPI_DB_DATABASE:-newapi}
+      - SQL_DSN=postgres://${NEWAPI_DB_USER:-newapi}:${NEWAPI_DB_PASSWORD:?NEWAPI_DB_PASSWORD is required}@postgres:5432/${NEWAPI_DB_DATABASE:-newapi}
       
       # Redis Connection
-      - REDIS_CONN_STRING=redis://:${REDIS_PASSWORD:-aetherai@redis8864}@redis:6379
+      - REDIS_CONN_STRING=redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379
 
       # Rate Limiting
       - GLOBAL_API_RATE_LIMIT_ENABLE=false
       - GLOBAL_WEB_RATE_LIMIT_ENABLE=false
 
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "2"
     volumes:
       - ./config/newapi:/app/newapi/config:ro
       - /data/logs/newapi:/app/newapi/logs

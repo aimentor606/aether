@@ -1,10 +1,16 @@
 import { eq, and, ne } from 'drizzle-orm';
 import { sandboxes } from '@aether/db';
 import { db } from '../shared/db';
-import { getSandboxBaseUrl } from '../sandbox-proxy/routes/local-preview';
 import { getDaytona, isDaytonaConfigured } from '../shared/daytona';
 import { config } from '../config';
 import type { TransformedSession, TransformedMessage, TransformedPart } from './types';
+
+function getSandboxBaseUrl(sandboxId: string): string {
+  if (config.SANDBOX_NETWORK) {
+    return `http://${sandboxId}:8000`;
+  }
+  return `http://localhost:${config.SANDBOX_PORT_BASE}`;
+}
 
 export async function writeSessionToSandbox(
   sandboxExternalId: string,

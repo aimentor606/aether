@@ -8,6 +8,12 @@ const envSchema = z.object({
     .refine((v) => /^https?:\/\//.test(v), {
       message: 'LITELLM_URL must be a valid HTTP(S) URL',
     }),
+  LITELLM_PUBLIC_URL: z
+    .string()
+    .optional()
+    .refine((v) => !v || /^https?:\/\//.test(v), {
+      message: 'LITELLM_PUBLIC_URL must be a valid HTTP(S) URL',
+    }),
   LITELLM_MASTER_KEY: z.string().min(1, 'LITELLM_MASTER_KEY is required'),
   LITELLM_TIMEOUT_MS: z
     .string()
@@ -36,4 +42,9 @@ if (!parsed.success) {
   throw new Error(`[LiteLLM] Invalid LiteLLM environment configuration: ${message}`);
 }
 
-export const litellmConfig = parsed.data;
+export const litellmConfig = {
+  ...parsed.data,
+  get LITELLM_PUBLIC_URL(): string {
+    return parsed.data.LITELLM_PUBLIC_URL || parsed.data.LITELLM_URL;
+  },
+};

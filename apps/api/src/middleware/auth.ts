@@ -5,7 +5,7 @@ import { isAetherToken } from '../shared/crypto';
 import { canAccessPreviewSandbox } from '../shared/preview-ownership';
 import { getSupabase } from '../shared/supabase';
 import { verifySupabaseJwt } from '../shared/jwt-verify';
-import { config } from '../config';
+import { resolveAccountIdStrict } from '../shared/resolve-account';
 import { setSentryUser } from '../lib/sentry';
 import { setContextField } from '../lib/request-context';
 
@@ -228,11 +228,14 @@ export async function combinedAuth(c: Context, next: Next) {
     }))) {
       throw new HTTPException(403, { message: 'Not authorized to access this sandbox' });
     }
+    const accountId = await resolveAccountIdStrict(local.userId);
     c.set('userId', local.userId);
     c.set('userEmail', local.email);
+    c.set('accountId', accountId);
     setSentryUser({ id: local.userId, email: local.email });
     setContextField('userId', local.userId);
     setContextField('userEmail', local.email);
+    setContextField('accountId', accountId);
     if (isPreviewRoute) setPreviewSessionCookie(c, token);
     await next();
     return;
@@ -259,11 +262,14 @@ export async function combinedAuth(c: Context, next: Next) {
       throw new HTTPException(403, { message: 'Not authorized to access this sandbox' });
     }
 
+    const accountId = await resolveAccountIdStrict(user.id);
     c.set('userId', user.id);
     c.set('userEmail', user.email || '');
+    c.set('accountId', accountId);
     setSentryUser({ id: user.id, email: user.email || undefined });
     setContextField('userId', user.id);
     setContextField('userEmail', user.email || '');
+    setContextField('accountId', accountId);
     if (isPreviewRoute) setPreviewSessionCookie(c, token);
     await next();
   } catch (err) {

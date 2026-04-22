@@ -15,7 +15,7 @@ if [ "${LLM_PROXY:-newapi}" = "litellm" ]; then
 fi
 
 echo "📦 Backing up Redis..."
-docker exec redis redis-cli ${REDIS_PASSWORD:+-a $REDIS_PASSWORD} SAVE
+docker exec redis sh -c 'REDISCLI_AUTH="$0" redis-cli SAVE' "$REDIS_PASSWORD"
 docker cp redis:/data/dump.rdb "$BACKUP_DIR/redis/dump-${DATE}.rdb"
 
 echo "🗜️  Compressing..."

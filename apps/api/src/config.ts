@@ -78,6 +78,7 @@ const envSchema = z.object({
   INTERNAL_AETHER_ENV:              z.enum(['dev', 'staging', 'prod']).optional().default('dev'),
   AETHER_BILLING_INTERNAL_ENABLED:  optBoolFalse,  // NOTE: overridden by ENV_MODE=cloud below
   AETHER_DEPLOYMENTS_ENABLED:       optBoolFalse,
+  RECONCILIATION_ENABLED:           optBoolFalse,
 
   // ── Search Providers (optional — features degrade gracefully) ────────────
   TAVILY_API_URL:              optUrl('https://api.tavily.com'),
@@ -99,9 +100,13 @@ const envSchema = z.object({
 
   // ── LLM Gateway — LiteLLM Proxy Server (required for LLM features) ────────
   LITELLM_URL:                 optUrl('http://litellm:4000'),
+  LITELLM_PUBLIC_URL:          optStr,
   LITELLM_MASTER_KEY:          optStr,
   LITELLM_TIMEOUT_MS:          optInt(60_000),
   LITELLM_NUM_RETRIES:         optInt(3),
+
+  // ── Redis (optional — enables shared multi-instance state) ───────────────
+  REDIS_URL:                   optStr,
 
   // ── LLM Providers (optional — passed through to LiteLLM via config.yaml) ──
   ANTHROPIC_API_URL:           optUrl('https://api.anthropic.com/v1'),
@@ -393,11 +398,18 @@ export const config = {
   FREESTYLE_API_URL: env.FREESTYLE_API_URL,
   FREESTYLE_API_KEY: env.FREESTYLE_API_KEY,
 
+  // ─── Billing Reconciliation ─────────────────────────────────────────────────
+  RECONCILIATION_ENABLED: env.RECONCILIATION_ENABLED,
+
   // ─── LLM Gateway (LiteLLM) ─────────────────────────────────────────────────
   LITELLM_URL: env.LITELLM_URL,
+  LITELLM_PUBLIC_URL: env.LITELLM_PUBLIC_URL || env.LITELLM_URL,
   LITELLM_MASTER_KEY: env.LITELLM_MASTER_KEY,
   LITELLM_TIMEOUT_MS: env.LITELLM_TIMEOUT_MS,
   LITELLM_NUM_RETRIES: env.LITELLM_NUM_RETRIES,
+
+  // ─── Redis ────────────────────────────────────────────────────────────────
+  REDIS_URL: env.REDIS_URL,
 
   // ─── LLM Providers (passed to LiteLLM via config.yaml) ──────────────────────
   ANTHROPIC_API_URL: env.ANTHROPIC_API_URL,

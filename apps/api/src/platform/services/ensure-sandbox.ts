@@ -153,7 +153,7 @@ async function tryClaimFromPool(
       .set({ config: { serviceKey: sandboxKey.secretKey }, updatedAt: new Date() })
       .where(eq(sandboxes.sandboxId, row.sandboxId));
 
-    await pool.injectEnv(claimed, sandboxKey.secretKey);
+    await pool.injectEnv(claimed, sandboxKey.secretKey, accountId);
 
     console.log(`[ensureSandbox] Claimed from pool: ${row.sandboxId} (ext: ${claimed.externalId})`);
     return { row, created: true };

@@ -29,6 +29,7 @@ mock.module('@aether/vertical-finance', () => ({
 // Mock resolve-account (no DB needed)
 mock.module('../shared/resolve-account', () => ({
   resolveAccountId: async (userId: string) => `resolved_account_for_${userId}`,
+  resolveAccountIdStrict: async (userId: string) => `resolved_account_for_${userId}`,
 }));
 
 // Import routes AFTER mocks are set up

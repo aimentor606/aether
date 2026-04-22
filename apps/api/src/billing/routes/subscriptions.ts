@@ -14,12 +14,12 @@ import {
   confirmCheckoutSession,
   getProrationPreview,
 } from '../services/subscriptions';
-import { resolveAccountId } from '../../shared/resolve-account';
+import { resolveAccountIdStrict } from '../../shared/resolve-account';
 
 export const subscriptionsRouter = new Hono<AppEnv>();
 
 subscriptionsRouter.post('/create-checkout-session', async (c) => {
-  const accountId = await resolveAccountId(c.get('userId'));
+  const accountId = await resolveAccountIdStrict(c.get('userId'));
   const email = c.get('userEmail');
   const body = await c.req.json();
 
@@ -39,7 +39,7 @@ subscriptionsRouter.post('/create-checkout-session', async (c) => {
 });
 
 subscriptionsRouter.post('/create-inline-checkout', async (c) => {
-  const accountId = await resolveAccountId(c.get('userId'));
+  const accountId = await resolveAccountIdStrict(c.get('userId'));
   const email = c.get('userEmail');
   const body = await c.req.json();
 
@@ -55,7 +55,7 @@ subscriptionsRouter.post('/create-inline-checkout', async (c) => {
 });
 
 subscriptionsRouter.post('/confirm-inline-checkout', async (c) => {
-  const accountId = await resolveAccountId(c.get('userId'));
+  const accountId = await resolveAccountIdStrict(c.get('userId'));
   const body = await c.req.json();
 
   const result = await confirmInlineCheckout({
@@ -68,7 +68,7 @@ subscriptionsRouter.post('/confirm-inline-checkout', async (c) => {
 });
 
 subscriptionsRouter.post('/create-portal-session', async (c) => {
-  const accountId = await resolveAccountId(c.get('userId'));
+  const accountId = await resolveAccountIdStrict(c.get('userId'));
   const email = c.get('userEmail');
   const body = await c.req.json();
   const result = await createPortalSession(accountId, body.return_url, email);
@@ -76,39 +76,39 @@ subscriptionsRouter.post('/create-portal-session', async (c) => {
 });
 
 subscriptionsRouter.post('/cancel-subscription', async (c) => {
-  const accountId = await resolveAccountId(c.get('userId'));
+  const accountId = await resolveAccountIdStrict(c.get('userId'));
   const body = await c.req.json().catch(() => ({}));
   const result = await cancelSubscription(accountId, body.feedback);
   return c.json(result);
 });
 
 subscriptionsRouter.post('/reactivate-subscription', async (c) => {
-  const accountId = await resolveAccountId(c.get('userId'));
+  const accountId = await resolveAccountIdStrict(c.get('userId'));
   const result = await reactivateSubscription(accountId);
   return c.json(result);
 });
 
 subscriptionsRouter.post('/schedule-downgrade', async (c) => {
-  const accountId = await resolveAccountId(c.get('userId'));
+  const accountId = await resolveAccountIdStrict(c.get('userId'));
   const body = await c.req.json();
   const result = await scheduleDowngrade(accountId, body.target_tier_key, body.commitment_type);
   return c.json(result);
 });
 
 subscriptionsRouter.post('/cancel-scheduled-change', async (c) => {
-  const accountId = await resolveAccountId(c.get('userId'));
+  const accountId = await resolveAccountIdStrict(c.get('userId'));
   const result = await cancelScheduledChange(accountId);
   return c.json(result);
 });
 
 subscriptionsRouter.post('/sync-subscription', async (c) => {
-  const accountId = await resolveAccountId(c.get('userId'));
+  const accountId = await resolveAccountIdStrict(c.get('userId'));
   const result = await syncSubscription(accountId);
   return c.json(result);
 });
 
 subscriptionsRouter.get('/proration-preview', async (c) => {
-  const accountId = await resolveAccountId(c.get('userId'));
+  const accountId = await resolveAccountIdStrict(c.get('userId'));
   const newPriceId = c.req.query('new_price_id');
   if (!newPriceId) return c.json({ error: 'new_price_id required' }, 400);
 
@@ -123,7 +123,7 @@ subscriptionsRouter.get('/checkout-session/:sessionId', async (c) => {
 });
 
 subscriptionsRouter.post('/confirm-checkout-session', async (c) => {
-  const accountId = await resolveAccountId(c.get('userId'));
+  const accountId = await resolveAccountIdStrict(c.get('userId'));
   const body = await c.req.json<{ session_id?: string }>();
   if (!body.session_id) return c.json({ error: 'session_id required' }, 400);
 

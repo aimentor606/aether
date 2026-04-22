@@ -1,7 +1,7 @@
 import { and, eq, ne, or, sql } from 'drizzle-orm';
 import { sandboxes } from '@aether/db';
 import { db } from './db';
-import { resolveAccountId } from './resolve-account';
+import { resolveAccountIdStrict } from './resolve-account';
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -55,7 +55,7 @@ export async function canAccessPreviewSandbox(input: {
   const sandboxAccountId = await resolvePreviewSandboxAccountId(input.previewSandboxId);
   if (!sandboxAccountId) return false;
 
-  const actorAccountId = input.accountId || (input.userId ? await resolveAccountId(input.userId) : null);
+  const actorAccountId = input.accountId || (input.userId ? await resolveAccountIdStrict(input.userId) : null);
   return !!actorAccountId && actorAccountId === sandboxAccountId;
 }
 

@@ -9,14 +9,14 @@ import { writeAuditLog, buildRequestSummary } from '../core/audit-logger';
 import { notifyPermissionRequest } from './permission-requests';
 import { tunnelRateLimiter } from '../core/rate-limiter';
 import { isValidCapability, validateScope as validateScopeInput } from '../core/scope-validator';
-import { resolveAccountId } from '../../shared/resolve-account';
+import { resolveAccountIdStrict } from '../../shared/resolve-account';
 
 export function createRpcRouter(): Hono {
   const router = new Hono();
 
   router.post('/:tunnelId', async (c: any) => {
     const userId = c.get('userId') as string;
-    const accountId = await resolveAccountId(userId);
+    const accountId = await resolveAccountIdStrict(userId);
     const tunnelId = c.req.param('tunnelId');
 
     const rpcRateCheck = tunnelRateLimiter.check('rpc', tunnelId);

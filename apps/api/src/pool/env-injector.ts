@@ -1,4 +1,6 @@
 import { config, SANDBOX_VERSION } from '../config';
+import { litellmConfig } from '../router/config/litellm-config';
+import { resolveVirtualKey } from '../router/services/litellm-keys';
 import type { PoolSandbox } from './types';
 
 function buildAetherMasterUrl(baseUrl: string): string {
@@ -23,25 +25,40 @@ function buildHeaders(metadata: Record<string, unknown>): Record<string, string>
   return headers;
 }
 
-function buildEnvPayload(serviceKey: string, metadata?: Record<string, unknown>): Record<string, string> {
+function buildEnvPayload(
+  serviceKey: string,
+  metadata?: Record<string, unknown>,
+  litellmKey?: string,
+): Record<string, string> {
   const sandboxApiBase = config.AETHER_URL.replace(/\/v1\/router\/?$/, '');
-  const routerBase = `${sandboxApiBase}/v1/router`;
+
   const payload: Record<string, string> = {
     AETHER_API_URL: sandboxApiBase,
     ENV_MODE: 'cloud',
     INTERNAL_SERVICE_KEY: serviceKey,
     AETHER_TOKEN: serviceKey,
     AETHER_SANDBOX_VERSION: SANDBOX_VERSION,
-    TAVILY_API_URL: `${routerBase}/tavily`,
-    REPLICATE_API_URL: `${routerBase}/replicate`,
-    SERPER_API_URL: `${routerBase}/serper`,
-    FIRECRAWL_API_URL: `${routerBase}/firecrawl`,
+
+    // Direct upstream URLs (sandbox calls tool services directly, no proxy)
+    TAVILY_API_URL: 'https://api.tavily.com',
+    SERPER_API_URL: 'https://google.serper.dev',
+    FIRECRAWL_API_URL: 'https://api.firecrawl.dev',
+    REPLICATE_API_URL: 'https://api.replicate.com',
+
+    // Direct API keys (replaces proxy-based key injection)
+    ...(config.TAVILY_API_KEY ? { TAVILY_API_KEY: config.TAVILY_API_KEY } : {}),
+    ...(config.SERPER_API_KEY ? { SERPER_API_KEY: config.SERPER_API_KEY } : {}),
+    ...(config.FIRECRAWL_API_KEY ? { FIRECRAWL_API_KEY: config.FIRECRAWL_API_KEY } : {}),
+    ...(config.REPLICATE_API_TOKEN ? { REPLICATE_API_TOKEN: config.REPLICATE_API_TOKEN } : {}),
+
+    // LiteLLM credentials (data plane direct connect)
+    LITELLM_BASE_URL: litellmConfig.LITELLM_PUBLIC_URL,
+    ...(litellmKey ? { LITELLM_API_KEY: litellmKey } : {}),
+
     TUNNEL_API_URL: sandboxApiBase,
     TUNNEL_TOKEN: serviceKey,
   };
 
-  // Compute PUBLIC_BASE_URL from JustAVPS metadata so getMasterPublicBaseUrl()
-  // returns a real public URL instead of localhost inside the sandbox.
   if (metadata) {
     const slug = metadata.justavpsSlug as string | undefined;
     const proxyToken = metadata.justavpsProxyToken as string | undefined;
@@ -60,11 +77,21 @@ function buildEnvPayload(serviceKey: string, metadata?: Record<string, unknown>)
  * 2. Update /etc/justavps/env on the host via toolbox (persists across restarts).
  * Throws on failure so callers can handle broken sandboxes.
  */
-export async function inject(poolSandbox: PoolSandbox, serviceKey: string): Promise<void> {
+export async function inject(poolSandbox: PoolSandbox, serviceKey: string, accountId?: string): Promise<void> {
   const meta = (poolSandbox.metadata as Record<string, unknown>) ?? {};
   const url = buildAetherMasterUrl(poolSandbox.baseUrl);
   const headers = buildHeaders(meta);
-  const keys = buildEnvPayload(serviceKey, meta);
+
+  let litellmKey: string | undefined;
+  if (accountId) {
+    try {
+      litellmKey = await resolveVirtualKey(accountId);
+    } catch (err) {
+      console.warn(`[POOL] Failed to resolve LiteLLM key for ${accountId}:`, err);
+    }
+  }
+
+  const keys = buildEnvPayload(serviceKey, meta, litellmKey);
 
   // Step 1: Inject into the running container
   const res = await fetch(url, {

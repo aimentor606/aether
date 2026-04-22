@@ -1,13 +1,12 @@
 /**
  * E2E tests for the Router service.
  *
- * Tests: health, web-search, image-search, models, chat/completions (passthrough proxy).
+ * Tests: health, web-search, image-search.
  *
  * Strategy:
- * - mock.module() replaces external services (Tavily, Serper, LLM proxy, billing)
+ * - mock.module() replaces external services (Tavily, Serper, billing)
  * - apiKeyAuth mock bypasses auth validation, sets accountId from Bearer token
- * - The LLM route is a 1:1 passthrough proxy to LiteLLM — we mock proxyToLiteLLM
- *   to return realistic OpenAI-compatible responses (including tool_calls)
+ * - LLM routes removed — clients now connect directly to LiteLLM via credentials
  */
 import { describe, test, expect, beforeEach, mock } from 'bun:test';
 import { Hono } from 'hono';
@@ -24,56 +23,7 @@ let mockSerperError: Error | null = null;
 let mockCheckCreditsResult = { hasCredits: true, message: 'OK', balance: 100 };
 let mockDeductResult: any = { success: true, cost: 0.01, newBalance: 99, transactionId: 'tx_mock_001' };
 
-// Mock LiteLLM proxy response
-let mockProxyResponse: Response | null = null;
-let mockProxyError: Error | null = null;
-let lastProxyBody: Record<string, unknown> | null = null;
-
 const TEST_ACCOUNT_ID = 'acc_test_e2e_001';
-
-// ─── Helper: create mock OpenAI response ─────────────────────────────────────
-
-function createMockChatResponse(overrides?: Partial<any>) {
-  return {
-    id: 'chatcmpl-mock-001',
-    object: 'chat.completion',
-    created: Math.floor(Date.now() / 1000),
-    model: 'anthropic/claude-sonnet-4-5',
-    choices: [
-      {
-        index: 0,
-        message: {
-          role: 'assistant',
-          content: 'Hello! How can I help you?',
-        },
-        finish_reason: 'stop',
-      },
-    ],
-    usage: {
-      prompt_tokens: 100,
-      completion_tokens: 50,
-      total_tokens: 150,
-    },
-    ...overrides,
-  };
-}
-
-function createMockStreamResponse(): Response {
-  const chunks = [
-    { id: 'chatcmpl-mock-001', object: 'chat.completion.chunk', model: 'anthropic/claude-sonnet-4-5', choices: [{ index: 0, delta: { role: 'assistant', content: '' }, finish_reason: null }] },
-    { id: 'chatcmpl-mock-001', object: 'chat.completion.chunk', model: 'anthropic/claude-sonnet-4-5', choices: [{ index: 0, delta: { content: 'Hello ' }, finish_reason: null }] },
-    { id: 'chatcmpl-mock-001', object: 'chat.completion.chunk', model: 'anthropic/claude-sonnet-4-5', choices: [{ index: 0, delta: { content: 'world!' }, finish_reason: null }] },
-    { id: 'chatcmpl-mock-001', object: 'chat.completion.chunk', model: 'anthropic/claude-sonnet-4-5', choices: [{ index: 0, delta: {}, finish_reason: 'stop' }], usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 } },
-  ];
-
-  const encoder = new TextEncoder();
-  const sseBody = chunks.map(c => `data: ${JSON.stringify(c)}\n\n`).join('') + 'data: [DONE]\n\n';
-
-  return new Response(encoder.encode(sseBody), {
-    status: 200,
-    headers: { 'Content-Type': 'text/event-stream' },
-  });
-}
 
 // ─── Register mocks ──────────────────────────────────────────────────────────
 
@@ -119,65 +69,72 @@ mock.module('../router/services/billing', () => ({
   deductLLMCredits: async (...args: any[]) => mockDeductResult,
 }));
 
-mock.module('../router/services/litellm', () => ({
-  proxyToLiteLLM: async (options: any) => {
-    lastProxyBody = options.body;
-    if (mockProxyError) throw mockProxyError;
-    if (mockProxyResponse) return mockProxyResponse;
-
-    if (options.isStreaming) {
-      return createMockStreamResponse();
-    }
-    return new Response(JSON.stringify(createMockChatResponse()), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+mock.module('../config', () => ({
+  config: {
+    ENV_MODE: 'test',
+    INTERNAL_AETHER_ENV: 'test',
+    PORT: 8008,
+    DATABASE_URL: 'postgres://mock:mock@localhost/mock',
+    SUPABASE_URL: 'http://localhost:54321',
+    SUPABASE_SERVICE_ROLE_KEY: 'test-key',
+    API_KEY_SECRET: 'test-secret',
+    ALLOWED_SANDBOX_PROVIDERS: [],
+    TUNNEL_ENABLED: false,
+    RECONCILIATION_ENABLED: false,
+    AETHER_BILLING_INTERNAL_ENABLED: false,
+    AETHER_DEPLOYMENTS_ENABLED: false,
+    TAVILY_API_URL: 'https://api.tavily.com',
+    TAVILY_API_KEY: 'tvly-test',
+    SERPER_API_URL: 'https://google.serper.dev',
+    SERPER_API_KEY: 'serper-test',
+    FIRECRAWL_API_URL: 'https://api.firecrawl.dev',
+    FIRECRAWL_API_KEY: '',
+    REPLICATE_API_URL: 'https://api.replicate.com',
+    REPLICATE_API_TOKEN: '',
+    CONTEXT7_API_URL: 'https://context7.com',
+    CONTEXT7_API_KEY: '',
+    ANTHROPIC_API_URL: '',
+    ANTHROPIC_API_KEY: '',
+    OPENAI_API_URL: '',
+    OPENAI_API_KEY: '',
+    XAI_API_URL: '',
+    XAI_API_KEY: '',
+    GEMINI_API_URL: '',
+    GEMINI_API_KEY: '',
+    GROQ_API_URL: '',
+    GROQ_API_KEY: '',
+    isCloud: () => false,
+    isLocal: () => true,
+    isLocalDockerEnabled: () => false,
+    isJustAVPSEnabled: () => false,
+    isDaytonaEnabled: () => false,
   },
-  extractUsage: (responseBody: any) => {
-    if (!responseBody?.usage) return null;
-    return {
-      promptTokens: responseBody.usage.prompt_tokens ?? 0,
-      completionTokens: responseBody.usage.completion_tokens ?? 0,
-      cachedTokens: 0,
-      cacheWriteTokens: 0,
-    };
+  SANDBOX_VERSION: 'test-v1',
+  AETHER_MARKUP: 1.2,
+  PLATFORM_FEE_MARKUP: 0.1,
+}));
+
+// Mock DB to prevent real database connections
+mock.module('../shared/db', () => ({
+  hasDatabase: true,
+  db: {
+    select: () => ({ from: () => ({ where: () => ({ limit: () => Promise.resolve([]) }) }) }),
   },
 }));
 
-mock.module('../router/services/litellm-keys', () => ({
-  resolveVirtualKey: async (accountId: string) => 'sk-litellm-test-key',
-  syncKeyBudget: async () => {},
-  createVirtualKey: async () => 'sk-litellm-test-key',
-  findKeyByAlias: async () => null,
+// Mock finance routes to avoid deep DB import chains
+const { Hono: MockHono } = await import('hono');
+const mockFinanceApp = new MockHono();
+mock.module('../router/routes/finance', () => ({
+  invoicesRoutes: mockFinanceApp,
+  expensesRoutes: mockFinanceApp,
+  budgetsRoutes: mockFinanceApp,
+  ledgersRoutes: mockFinanceApp,
 }));
 
-mock.module('../router/services/llm', () => ({
-  calculateCost: (modelConfig: any, prompt: number, completion: number) => {
-    return ((prompt / 1_000_000) * (modelConfig?.inputPer1M || 0) +
-            (completion / 1_000_000) * (modelConfig?.outputPer1M || 0)) * 1.2;
-  },
-  getAllModels: () => [
-    { id: 'minimax/minimax-m2.7', object: 'model', owned_by: 'aether', context_window: 204800, pricing: { input: 0.30, output: 1.20 }, tier: 'free' },
-    { id: 'z-ai/glm-5-turbo', object: 'model', owned_by: 'aether', context_window: 202752, pricing: { input: 1.20, output: 4.00 }, tier: 'free' },
-    { id: 'moonshotai/kimi-k2.5', object: 'model', owned_by: 'aether', context_window: 262144, pricing: { input: 0.45, output: 2.20 }, tier: 'free' },
-    { id: 'minimax/minimax-m2.5', object: 'model', owned_by: 'aether', context_window: 196608, pricing: { input: 0.20, output: 1.17 }, tier: 'free' },
-  ],
-  getModel: (id: string) => ({
-    litellmModel: id,
-    inputPer1M: id === 'minimax/minimax-m2.7' ? 0.30 : id === 'z-ai/glm-5-turbo' ? 1.20 : id === 'moonshotai/kimi-k2.5' ? 0.45 : 0.20,
-    outputPer1M: id === 'minimax/minimax-m2.7' ? 1.20 : id === 'z-ai/glm-5-turbo' ? 4.00 : id === 'moonshotai/kimi-k2.5' ? 2.20 : 1.17,
-    contextWindow: id === 'minimax/minimax-m2.7' ? 204800 : id === 'z-ai/glm-5-turbo' ? 202752 : id === 'moonshotai/kimi-k2.5' ? 262144 : 196608,
-    tier: 'free' as 'free' | 'paid',
-  }),
-  extractUsage: (responseBody: any) => {
-    if (!responseBody?.usage) return null;
-    return {
-      promptTokens: responseBody.usage.prompt_tokens ?? 0,
-      completionTokens: responseBody.usage.completion_tokens ?? 0,
-      cachedTokens: 0,
-      cacheWriteTokens: 0,
-    };
-  },
+// Mock shared/crypto
+mock.module('../shared/crypto', () => ({
+  isAetherToken: (token: string) => token.startsWith('aether_'),
 }));
 
 mock.module('../router/config/litellm-config', () => ({
@@ -231,9 +188,6 @@ beforeEach(() => {
   mockSerperError = null;
   mockCheckCreditsResult = { hasCredits: true, message: 'OK', balance: 100 };
   mockDeductResult = { success: true, cost: 0.01, newBalance: 99, transactionId: 'tx_mock_001' };
-  mockProxyResponse = null;
-  mockProxyError = null;
-  lastProxyBody = null;
 });
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -383,296 +337,6 @@ describe('Router: image-search', () => {
   });
 });
 
-describe('Router: models', () => {
-  test('GET /v1/router/models returns model list', async () => {
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/models', {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-    });
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.object).toBe('list');
-    expect(Array.isArray(body.data)).toBe(true);
-    expect(body.data.length).toBeGreaterThanOrEqual(4);
-
-    const minimax27 = body.data.find((m: any) => m.id === 'minimax/minimax-m2.7');
-    expect(minimax27).toBeDefined();
-    expect(minimax27.tier).toBe('free');
-    expect(minimax27.pricing.input).toBe(0.30);
-
-    const kimi = body.data.find((m: any) => m.id === 'moonshotai/kimi-k2.5');
-    expect(kimi).toBeDefined();
-    expect(kimi.tier).toBe('free');
-  });
-
-  test('GET /v1/router/models/:model returns 404 for unknown model', async () => {
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/models/nonexistent-model', {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-    });
-    expect(res.status).toBe(404);
-  });
-
-  test('GET /v1/router/models/:model works for single-segment model ID', async () => {
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/models/minimax%2Fminimax-m2.7', {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-    });
-    // URL-encoded slash may or may not be decoded by Hono
-    expect([200, 404]).toContain(res.status);
-  });
-});
-
-describe('Router: chat/completions (non-streaming)', () => {
-  test('returns OpenAI-compatible response', async () => {
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({
-        model: 'minimax/minimax-m2.7',
-        messages: [{ role: 'user', content: 'Hello' }],
-      }),
-    });
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.object).toBe('chat.completion');
-    expect(body.choices).toHaveLength(1);
-    expect(body.choices[0].message.role).toBe('assistant');
-    expect(body.choices[0].message.content).toBeDefined();
-    expect(body.choices[0].finish_reason).toBe('stop');
-    expect(body.usage).toBeDefined();
-    expect(body.usage.prompt_tokens).toBe(100);
-    expect(body.usage.completion_tokens).toBe(50);
-  });
-
-  test('returns 400 for missing model', async () => {
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({
-        messages: [{ role: 'user', content: 'Hello' }],
-      }),
-    });
-    expect(res.status).toBe(400);
-  });
-
-  test('returns 400 for missing messages', async () => {
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({ model: 'aether/basic' }),
-    });
-    expect(res.status).toBe(400);
-  });
-
-  test('returns 400 for invalid JSON body', async () => {
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: 'not json',
-    });
-    expect(res.status).toBe(400);
-  });
-
-  test('returns 402 when insufficient credits', async () => {
-    mockCheckCreditsResult = { hasCredits: false, message: 'Insufficient credits', balance: 0 };
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({
-        model: 'minimax/minimax-m2.7',
-        messages: [{ role: 'user', content: 'Hello' }],
-      }),
-    });
-    expect(res.status).toBe(402);
-  });
-
-  test('passes through upstream error responses', async () => {
-    mockProxyResponse = new Response(JSON.stringify({ error: { message: 'Model not found', type: 'invalid_request_error' } }), {
-      status: 404,
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({
-        model: 'nonexistent/model',
-        messages: [{ role: 'user', content: 'Hello' }],
-      }),
-    });
-    expect(res.status).toBe(404);
-    const body = await res.json();
-    expect(body.error.message).toBe('Model not found');
-  });
-
-  test('accepts optional temperature and max_tokens', async () => {
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({
-        model: 'minimax/minimax-m2.7',
-        messages: [{ role: 'user', content: 'Hello' }],
-        temperature: 0.7,
-        max_tokens: 1000,
-      }),
-    });
-    expect(res.status).toBe(200);
-  });
-});
-
-describe('Router: chat/completions (streaming)', () => {
-  test('returns SSE stream with correct format', async () => {
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({
-        model: 'minimax/minimax-m2.7',
-        messages: [{ role: 'user', content: 'Hello' }],
-        stream: true,
-      }),
-    });
-    expect(res.status).toBe(200);
-    expect(res.headers.get('content-type')).toContain('text/event-stream');
-
-    const text = await res.text();
-    expect(text).toContain('data:');
-    expect(text).toContain('[DONE]');
-    // Verify the stream contains actual content chunks
-    expect(text).toContain('Hello ');
-    expect(text).toContain('world!');
-  });
-});
-
-describe('Router: chat/completions (tool support)', () => {
-  test('preserves tools and tool_choice in request to LiteLLM', async () => {
-    const tools = [
-      {
-        type: 'function',
-        function: {
-          name: 'get_weather',
-          description: 'Get the weather for a location',
-          parameters: {
-            type: 'object',
-            properties: { location: { type: 'string' } },
-            required: ['location'],
-          },
-        },
-      },
-    ];
-
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({
-        model: 'minimax/minimax-m2.7',
-        messages: [{ role: 'user', content: 'What is the weather in SF?' }],
-        tools,
-        tool_choice: 'auto',
-      }),
-    });
-    expect(res.status).toBe(200);
-
-    // Verify the tools were passed through to proxyToLiteLLM
-    expect(lastProxyBody).not.toBeNull();
-    expect(lastProxyBody!.tools).toEqual(tools);
-    expect(lastProxyBody!.tool_choice).toBe('auto');
-  });
-
-  test('preserves tool-role messages in request', async () => {
-    const messages = [
-      { role: 'user', content: 'What is the weather?' },
-      { role: 'assistant', content: null, tool_calls: [{ id: 'call_1', type: 'function', function: { name: 'get_weather', arguments: '{"location":"SF"}' } }] },
-      { role: 'tool', tool_call_id: 'call_1', content: '{"temp": 65, "condition": "sunny"}' },
-    ];
-
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({
-        model: 'minimax/minimax-m2.7',
-        messages,
-      }),
-    });
-    expect(res.status).toBe(200);
-
-    // Verify tool-role messages were passed through (not rejected by Zod)
-    expect(lastProxyBody).not.toBeNull();
-    expect(lastProxyBody!.messages).toEqual(messages);
-  });
-
-  test('returns tool_calls in response when model decides to call tools', async () => {
-    // Mock OpenRouter returning a tool_call response
-    const toolCallResponse = createMockChatResponse({
-      choices: [
-        {
-          index: 0,
-          message: {
-            role: 'assistant',
-            content: null,
-            tool_calls: [
-              {
-                id: 'call_abc123',
-                type: 'function',
-                function: { name: 'get_weather', arguments: '{"location":"San Francisco"}' },
-              },
-            ],
-          },
-          finish_reason: 'tool_calls',
-        },
-      ],
-    });
-    mockProxyResponse = new Response(JSON.stringify(toolCallResponse), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    const app = createRouterTestApp();
-    const res = await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({
-        model: 'minimax/minimax-m2.7',
-        messages: [{ role: 'user', content: 'What is the weather in SF?' }],
-        tools: [{ type: 'function', function: { name: 'get_weather', parameters: {} } }],
-      }),
-    });
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.choices[0].message.tool_calls).toHaveLength(1);
-    expect(body.choices[0].message.tool_calls[0].function.name).toBe('get_weather');
-    expect(body.choices[0].finish_reason).toBe('tool_calls');
-  });
-
-  test('preserves response_format in request', async () => {
-    const app = createRouterTestApp();
-    await app.request('/v1/router/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TEST_ACCOUNT_ID}` },
-      body: JSON.stringify({
-        model: 'minimax/minimax-m2.7',
-        messages: [{ role: 'user', content: 'Hello' }],
-        response_format: { type: 'json_object' },
-      }),
-    });
-
-    expect(lastProxyBody).not.toBeNull();
-    expect(lastProxyBody!.response_format).toEqual({ type: 'json_object' });
-  });
-});
-
 describe('Router: auth (mocked apiKeyAuth)', () => {
   test('returns 401 without Authorization header', async () => {
     const app = createRouterTestApp();
@@ -700,7 +364,7 @@ describe('Router: auth (mocked apiKeyAuth)', () => {
     expect(res.status).toBe(200);
   });
 
-  test('search routes require auth, models require auth', async () => {
+  test('search routes require auth', async () => {
     const app = createRouterTestApp();
 
     const searchRes = await app.request('/v1/router/web-search', {
@@ -709,8 +373,5 @@ describe('Router: auth (mocked apiKeyAuth)', () => {
       body: JSON.stringify({ query: 'test' }),
     });
     expect(searchRes.status).toBe(401);
-
-    const modelsRes = await app.request('/v1/router/models', { method: 'GET' });
-    expect(modelsRes.status).toBe(401);
   });
 });

@@ -1,6 +1,6 @@
 ---
 description: "Plan before execution. Writes PRD + test spec artifacts under .kortix/docs/plans/ and stops before implementation."
-agent: kortix
+agent: aether
 ---
 
 # Autowork Plan

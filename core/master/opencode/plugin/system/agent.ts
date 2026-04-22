@@ -175,12 +175,18 @@ export function agentTools(client: any, db: Database, mgr: ProjectManager) {
 						})
 					} catch {}
 
-					// Resolve model from parent
+					// Resolve model: category-aware dispatch or inherit from parent
 					let model: { modelID: string; providerID: string } | undefined
 					try {
 						const msgs = await client.session.messages({ path: { id: ctx.sessionID } })
 						const last = (msgs.data ?? []).filter((m: any) => m.info?.role === "assistant").pop()
 						if (last?.info?.modelID) model = { modelID: last.info.modelID, providerID: last.info.providerID || "anthropic" }
+					} catch {}
+					// Category-aware model dispatch: infer optimal model from prompt content
+					try {
+						const { inferCategoryFromPrompt, resolveModelForCategory } = require("./model-dispatch")
+						const category = inferCategoryFromPrompt(args.prompt)
+						if (category) model = resolveModelForCategory(category, model)
 					} catch {}
 
 					// Auto-link parent's project to child session

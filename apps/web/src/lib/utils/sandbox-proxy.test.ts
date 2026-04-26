@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, test } from 'vitest';
 
 import {
   rewriteLocalhostUrl,
@@ -7,6 +7,25 @@ import {
   isAppRouteUrl,
   type SubdomainUrlOptions,
 } from './sandbox-url';
+
+/**
+ * jsdom sets window.location.hostname to 'localhost', which causes
+ * isBrowserOnLocalhost() to return true. For VPS tests, we need to
+ * simulate a non-localhost hostname so the path-based proxy is used.
+ */
+function setHostname(hostname: string) {
+  Object.defineProperty(window, 'location', {
+    value: { hostname },
+    writable: true,
+  });
+}
+
+function resetHostname() {
+  Object.defineProperty(window, 'location', {
+    value: { hostname: 'localhost' },
+    writable: true,
+  });
+}
 
 // ── Unit tests for rewriteLocalhostUrl ──────────────────────────────────────
 
@@ -28,35 +47,40 @@ describe('rewriteLocalhostUrl', () => {
   });
 
   test('local opts without apiBaseUrl → subdomain URL', () => {
-    // When no apiBaseUrl is set, always uses subdomain (local dev mode)
     expect(rewriteLocalhostUrl(3210, '/viewer.html', '', localOpts))
       .toBe('http://p3210-aether-sandbox.localhost:8008/viewer.html');
   });
 
   test('VPS opts with apiBaseUrl → path-based proxy URL (non-localhost browser)', () => {
-    // In test environment, window is undefined → isBrowserOnLocalhost() returns false
-    // → path-based proxy is used when apiBaseUrl is set
+    setHostname('e2e-test.aether.cloud');
     expect(rewriteLocalhostUrl(6080, '/', '', vpsOpts))
       .toBe('https://e2e-test.aether.cloud/v1/p/aether-sandbox/6080/');
+    resetHostname();
   });
 
   test('VPS opts for desktop port 6080', () => {
+    setHostname('e2e-test.aether.cloud');
     expect(rewriteLocalhostUrl(6080, '/', '', vpsOpts))
       .toBe('https://e2e-test.aether.cloud/v1/p/aether-sandbox/6080/');
+    resetHostname();
   });
 
   test('VPS opts with path', () => {
+    setHostname('e2e-test.aether.cloud');
     expect(rewriteLocalhostUrl(3210, '/api/docs', '', vpsOpts))
       .toBe('https://e2e-test.aether.cloud/v1/p/aether-sandbox/3210/api/docs');
+    resetHostname();
   });
 
   test('VPS opts strips trailing slash from apiBaseUrl', () => {
+    setHostname('example.com');
     const opts: SubdomainUrlOptions = {
       ...vpsOpts,
       apiBaseUrl: 'https://example.com/v1/',
     };
     expect(rewriteLocalhostUrl(8080, '/', '', opts))
       .toBe('https://example.com/v1/p/aether-sandbox/8080/');
+    resetHostname();
   });
 
   test('normalizes empty path to /', () => {

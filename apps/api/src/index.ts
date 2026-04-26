@@ -50,7 +50,11 @@ import { createTenantRlsMiddleware } from './middleware/tenant-rls';
 
 const app = new Hono();
 
-await connectRedis();
+// Non-blocking Redis — server starts even if Redis is slow/unavailable.
+// Routes that need Redis will gracefully fail until it connects.
+connectRedis().catch((err) =>
+  appLogger.error('[startup] Redis connection failed (routes will retry)', err),
+);
 
 // === Global Middleware ===
 
@@ -249,18 +253,21 @@ app.route('/v1/control', credentialsApp);
 
 if (config.RECONCILIATION_ENABLED) {
   const RECONCILE_INTERVAL_MS = 30_000;
-  console.log('[Reconciler] Spend reconciliation enabled, polling every 30s');
-  setInterval(async () => {
-    try {
-      const { reconcileSpend } = await import('./router/services/spend-reconciler');
-      const result = await reconcileSpend();
-      if (result.processed > 0 || result.errors > 0) {
-        console.log(`[Reconciler] processed=${result.processed} skipped=${result.skipped} errors=${result.errors}`);
+  import('./router/services/spend-reconciler').then(({ reconcileSpend }) => {
+    appLogger.info('[Reconciler] Spend reconciliation enabled, polling every 30s');
+    setInterval(async () => {
+      try {
+        const result = await reconcileSpend();
+        if (result.processed > 0 || result.errors > 0) {
+          appLogger.info(`[Reconciler] processed=${result.processed} skipped=${result.skipped} errors=${result.errors}`);
+        }
+      } catch (err) {
+        appLogger.error('[Reconciler] Interval error', { error: String(err) });
       }
-    } catch (err) {
-      console.error('[Reconciler] Interval error:', err);
-    }
-  }, RECONCILE_INTERVAL_MS);
+    }, RECONCILE_INTERVAL_MS);
+  }).catch((err) => {
+    appLogger.error('[Reconciler] Failed to load spend-reconciler module', err);
+  });
 }
 
 app.route('/v1/verticals', verticalsApp); // /v1/verticals/finance/*, /v1/verticals/insurance/*, /v1/verticals/advisor/*
@@ -357,50 +364,35 @@ export function isSchemaReady() { return schemaReady; }
 
 // Ensure DB schema exists before starting services that depend on it.
 // This is idempotent — safe to run on every startup.
+
+function startServices() {
+  startAccessControlCache();
+  startDrainer();
+  startTunnelService();
+  startAutoReplenish();
+
+  if (config.isLocalDockerEnabled() && config.DATABASE_URL) {
+    ensureLocalSandboxRegistered().catch((err) =>
+      appLogger.error('[startup] Failed to register local sandbox', err),
+    );
+    startLocalSandboxSelfHeal();
+    startSandboxHealthMonitor();
+  }
+
+  if (config.isJustAVPSEnabled()) {
+    startProvisionPoller();
+  }
+}
+
 ensureSchema()
-  .then(async () => {
+  .then(() => {
     schemaReady = true;
-    startAccessControlCache();
-    startDrainer();
-    startTunnelService();
-    startAutoReplenish();
-
-    if (config.isLocalDockerEnabled() && config.DATABASE_URL) {
-      // Non-blocking: sandbox registration + token sync runs in background.
-      // Must NOT await — the /env API call can take seconds and would block
-      // all route handlers from being ready. The self-heal timer ensures
-      // convergence even if the first attempt fails.
-      ensureLocalSandboxRegistered().catch((err) =>
-        console.error('[startup] Failed to register local sandbox:', err),
-      );
-      startLocalSandboxSelfHeal();
-      startSandboxHealthMonitor();
-    }
-
-    // Start provision poller for cloud mode (compensates for broken/missing webhooks)
-    if (config.isJustAVPSEnabled()) {
-      startProvisionPoller();
-    }
+    startServices();
   })
-  .catch(async (err) => {
-    console.error('[startup] ensureSchema failed, starting services anyway:', err);
+  .catch((err) => {
+    appLogger.error('[startup] ensureSchema failed, starting services anyway', err);
     schemaReady = true;
-    startAccessControlCache();
-    startDrainer();
-    startTunnelService();
-    startAutoReplenish();
-
-    if (config.isLocalDockerEnabled() && config.DATABASE_URL) {
-      ensureLocalSandboxRegistered().catch((e) =>
-        console.error('[startup] Failed to register local sandbox:', e),
-      );
-      startLocalSandboxSelfHeal();
-      startSandboxHealthMonitor();
-    }
-
-    if (config.isJustAVPSEnabled()) {
-      startProvisionPoller();
-    }
+    startServices();
   });
 
 // Graceful shutdown
@@ -474,7 +466,7 @@ export default {
   },
 
   websocket: {
-    idleTimeout: 0,
+    idleTimeout: 300,
 
     open(ws: { data: any }) {
       if (ws.data?.type === 'tunnel-agent') {

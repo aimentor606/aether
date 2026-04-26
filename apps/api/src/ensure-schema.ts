@@ -38,71 +38,76 @@ export async function ensureSchema(): Promise<void> {
 
   const migrationsDir = join(import.meta.dir, '../../../supabase/migrations');
 
-  // Step 1: Run bootstrap migration (schemas, extensions, grants)
-  console.log('[schema] Running bootstrap migration...');
-  await runSqlFile(join(migrationsDir, '00000000000000_bootstrap.sql'));
+  // Single connection reused for all migration statements
+  const db = postgres(config.DATABASE_URL!, { max: 1 });
 
-  // Step 2: drizzle-kit push (tables, indexes, enums)
-  console.log('[schema] Pushing schema to database...');
-  const dbPkgRoot = join(import.meta.dir, '../../../packages/db');
-  const configPath = join(dbPkgRoot, 'drizzle.config.ts');
+  try {
+    // Step 1: Run bootstrap migration (schemas, extensions, grants)
+    console.log('[schema] Running bootstrap migration...');
+    await runSqlFile(db, join(migrationsDir, '00000000000000_bootstrap.sql'));
 
-  // Use the full path to bun so this works when spawned as a child process
-  // where PATH may not include ~/.bun/bin
-  const bunBin = process.execPath;
-  const proc = Bun.spawn(
-    [bunBin, 'drizzle-kit', 'push', '--force', '--config', configPath],
-    {
-      cwd: dbPkgRoot,
-      env: {
-        ...process.env,
-        DATABASE_URL: config.DATABASE_URL,
+    // Step 2: drizzle-kit push (tables, indexes, enums)
+    console.log('[schema] Pushing schema to database...');
+    const dbPkgRoot = join(import.meta.dir, '../../../packages/db');
+    const configPath = join(dbPkgRoot, 'drizzle.config.ts');
+
+    // Use the full path to bun so this works when spawned as a child process
+    // where PATH may not include ~/.bun/bin
+    const bunBin = process.execPath;
+    const proc = Bun.spawn(
+      [bunBin, 'drizzle-kit', 'push', '--force', '--config', configPath],
+      {
+        cwd: dbPkgRoot,
+        env: {
+          ...process.env,
+          DATABASE_URL: config.DATABASE_URL,
+        },
+        stdout: 'pipe',
+        stderr: 'pipe',
       },
-      stdout: 'pipe',
-      stderr: 'pipe',
-    },
-  );
-
-  const [stdout, stderr] = await Promise.all([
-    new Response(proc.stdout).text(),
-    new Response(proc.stderr).text(),
-  ]);
-  const exitCode = await proc.exited;
-
-  if (exitCode !== 0) {
-    console.error('[schema] Push failed (exit', exitCode + ')');
-    if (stdout.trim()) console.error('[schema] stdout:', stdout.trim());
-    if (stderr.trim()) console.error('[schema] stderr:', stderr.trim());
-    return; // Don't run post-push if push failed
-  }
-
-  console.log('[schema] Schema pushed successfully');
-  if (stdout.trim()) {
-    const summary = stdout.trim().split('\n').filter((l: string) =>
-      l.includes('changes applied') || l.includes('CREATE') || l.includes('ALTER') || l.includes('No changes')
     );
-    if (summary.length) console.log('[schema]', summary.join(' | '));
+
+    const [stdout, stderr] = await Promise.all([
+      new Response(proc.stdout).text(),
+      new Response(proc.stderr).text(),
+    ]);
+    const exitCode = await proc.exited;
+
+    if (exitCode !== 0) {
+      console.error('[schema] Push failed (exit', exitCode + ')');
+      if (stdout.trim()) console.error('[schema] stdout:', stdout.trim());
+      if (stderr.trim()) console.error('[schema] stderr:', stderr.trim());
+      return; // Don't run post-push if push failed
+    }
+
+    console.log('[schema] Schema pushed successfully');
+    if (stdout.trim()) {
+      const summary = stdout.trim().split('\n').filter((l: string) =>
+        l.includes('changes applied') || l.includes('CREATE') || l.includes('ALTER') || l.includes('No changes')
+      );
+      if (summary.length) console.log('[schema]', summary.join(' | '));
+    }
+
+    // Step 3: Run all post-push migrations (table grants, atomic functions)
+    console.log('[schema] Running post-push migrations...');
+    const postPushFiles = readdirSync(migrationsDir)
+      .filter(f => f.endsWith('.sql') && f > '00000000000000_bootstrap.sql')
+      .sort();
+
+    for (const file of postPushFiles) {
+      await runSqlFile(db, join(migrationsDir, file));
+    }
+
+    console.log('[schema] All migrations complete');
+  } finally {
+    await db.end();
   }
-
-  // Step 3: Run all post-push migrations (table grants, atomic functions)
-  // Each file is executed individually to avoid prepared-statement limits.
-  console.log('[schema] Running post-push migrations...');
-  const postPushFiles = readdirSync(migrationsDir)
-    .filter(f => f.endsWith('.sql') && f > '00000000000000_bootstrap.sql')
-    .sort();
-
-  for (const file of postPushFiles) {
-    await runSqlFile(join(migrationsDir, file));
-  }
-
-  console.log('[schema] All migrations complete');
 }
 
 /**
- * Execute a raw SQL file against the database.
- * Uses postgres.js for direct connection (not Supabase client).
+ * Execute a raw SQL file using an existing postgres connection.
  */
-async function runSqlFile(filePath: string): Promise<void> {
+async function runSqlFile(db: ReturnType<typeof postgres>, filePath: string): Promise<void> {
   const fileName = filePath.split('/').pop();
   let sql: string;
   try {
@@ -112,7 +117,6 @@ async function runSqlFile(filePath: string): Promise<void> {
     return;
   }
 
-  const db = postgres(config.DATABASE_URL!, { max: 1 });
   try {
     await db.unsafe(sql);
     console.log(`[schema] ✓ ${fileName}`);
@@ -123,7 +127,5 @@ async function runSqlFile(filePath: string): Promise<void> {
     } else {
       console.error(`[schema] ✗ ${fileName}:`, err.message || err);
     }
-  } finally {
-    await db.end();
   }
 }

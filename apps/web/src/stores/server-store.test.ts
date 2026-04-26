@@ -5,7 +5,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // We replace them with no-ops so the store logic can be tested in isolation.
 
 vi.mock('@/lib/auth-token', () => ({
-  authenticatedFetch: vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve([]) })),
+  authenticatedFetch: vi.fn(() =>
+    Promise.resolve({ ok: true, json: () => Promise.resolve([]) }),
+  ),
   getSupabaseAccessToken: vi.fn(() => Promise.resolve('mock-token')),
 }));
 
@@ -69,7 +71,9 @@ describe('server-store', () => {
 
   describe('addServer', () => {
     it('should add a server with generated id', () => {
-      const server = useServerStore.getState().addServer('My Server', 'http://localhost:3000');
+      const server = useServerStore
+        .getState()
+        .addServer('My Server', 'http://localhost:3000');
 
       expect(server.id).toMatch(/^srv_/);
       expect(server.label).toBe('My Server');
@@ -77,12 +81,16 @@ describe('server-store', () => {
     });
 
     it('should strip trailing slashes from URL', () => {
-      const server = useServerStore.getState().addServer('Test', 'http://localhost:3000///');
+      const server = useServerStore
+        .getState()
+        .addServer('Test', 'http://localhost:3000///');
       expect(server.url).toBe('http://localhost:3000');
     });
 
     it('should derive label from URL when label is empty', () => {
-      const server = useServerStore.getState().addServer('', 'https://my-server.com');
+      const server = useServerStore
+        .getState()
+        .addServer('', 'https://my-server.com');
       expect(server.label).toBe('my-server.com');
     });
 
@@ -92,8 +100,8 @@ describe('server-store', () => {
 
       const servers = useServerStore.getState().servers;
       expect(servers).toHaveLength(2);
-      expect(servers.find(s => s.id === s1.id)).toBeDefined();
-      expect(servers.find(s => s.id === s2.id)).toBeDefined();
+      expect(servers.find((s) => s.id === s1.id)).toBeDefined();
+      expect(servers.find((s) => s.id === s2.id)).toBeDefined();
     });
   });
 
@@ -101,17 +109,21 @@ describe('server-store', () => {
 
   describe('removeServer', () => {
     it('should remove a non-default server', () => {
-      const server = useServerStore.getState().addServer('Removable', 'http://a.com');
+      const server = useServerStore
+        .getState()
+        .addServer('Removable', 'http://a.com');
       useServerStore.getState().removeServer(server.id);
 
       expect(useServerStore.getState().servers).toHaveLength(0);
     });
 
     it('should not remove a server marked as default', () => {
-      const server = useServerStore.getState().addServer('Default', 'http://a.com');
+      const server = useServerStore
+        .getState()
+        .addServer('Default', 'http://a.com');
       useServerStore.setState((s) => ({
-        servers: s.servers.map(srv =>
-          srv.id === server.id ? { ...srv, isDefault: true } : srv
+        servers: s.servers.map((srv) =>
+          srv.id === server.id ? { ...srv, isDefault: true } : srv,
         ),
       }));
 
@@ -121,7 +133,9 @@ describe('server-store', () => {
 
     it('should fallback to remaining server when active server is removed', () => {
       const s1 = useServerStore.getState().addServer('Keep', 'http://keep.com');
-      const s2 = useServerStore.getState().addServer('Remove', 'http://remove.com');
+      const s2 = useServerStore
+        .getState()
+        .addServer('Remove', 'http://remove.com');
 
       useServerStore.getState().setActiveServer(s2.id);
       useServerStore.getState().removeServer(s2.id);
@@ -136,7 +150,9 @@ describe('server-store', () => {
       const versionBefore = useServerStore.getState().serverVersion;
       useServerStore.getState().removeServer(s1.id);
 
-      expect(useServerStore.getState().serverVersion).toBeGreaterThan(versionBefore);
+      expect(useServerStore.getState().serverVersion).toBeGreaterThan(
+        versionBefore,
+      );
       expect(useServerStore.getState().userSelected).toBe(false);
     });
   });
@@ -145,7 +161,9 @@ describe('server-store', () => {
 
   describe('setActiveServer', () => {
     it('should set the active server id', () => {
-      const server = useServerStore.getState().addServer('Test', 'http://a.com');
+      const server = useServerStore
+        .getState()
+        .addServer('Test', 'http://a.com');
       useServerStore.getState().setActiveServer(server.id);
 
       expect(useServerStore.getState().activeServerId).toBe(server.id);
@@ -163,7 +181,9 @@ describe('server-store', () => {
     });
 
     it('should not bump serverVersion when setting same server (no-op)', () => {
-      const server = useServerStore.getState().addServer('Test', 'http://a.com');
+      const server = useServerStore
+        .getState()
+        .addServer('Test', 'http://a.com');
       useServerStore.getState().setActiveServer(server.id);
       const v1 = useServerStore.getState().serverVersion;
 
@@ -172,14 +192,18 @@ describe('server-store', () => {
     });
 
     it('should set userSelected to true for manual switch', () => {
-      const server = useServerStore.getState().addServer('Test', 'http://a.com');
+      const server = useServerStore
+        .getState()
+        .addServer('Test', 'http://a.com');
       useServerStore.getState().setActiveServer(server.id);
 
       expect(useServerStore.getState().userSelected).toBe(true);
     });
 
     it('should not set userSelected for auto switch', () => {
-      const server = useServerStore.getState().addServer('Test', 'http://a.com');
+      const server = useServerStore
+        .getState()
+        .addServer('Test', 'http://a.com');
       useServerStore.getState().setActiveServer(server.id, { auto: true });
 
       expect(useServerStore.getState().userSelected).toBe(false);
@@ -193,24 +217,36 @@ describe('server-store', () => {
       const server = useServerStore.getState().addServer('Old', 'http://a.com');
       useServerStore.getState().updateServer(server.id, { label: 'New' });
 
-      const updated = useServerStore.getState().servers.find(s => s.id === server.id);
+      const updated = useServerStore
+        .getState()
+        .servers.find((s) => s.id === server.id);
       expect(updated?.label).toBe('New');
     });
 
     it('should update server URL and strip trailing slashes', () => {
-      const server = useServerStore.getState().addServer('Test', 'http://a.com');
-      useServerStore.getState().updateServer(server.id, { url: 'http://b.com///' });
+      const server = useServerStore
+        .getState()
+        .addServer('Test', 'http://a.com');
+      useServerStore
+        .getState()
+        .updateServer(server.id, { url: 'http://b.com///' });
 
-      const updated = useServerStore.getState().servers.find(s => s.id === server.id);
+      const updated = useServerStore
+        .getState()
+        .servers.find((s) => s.id === server.id);
       expect(updated?.url).toBe('http://b.com');
     });
 
     it('should bump serverVersion when updating URL of active server', () => {
-      const server = useServerStore.getState().addServer('Test', 'http://a.com');
+      const server = useServerStore
+        .getState()
+        .addServer('Test', 'http://a.com');
       useServerStore.getState().setActiveServer(server.id);
       const v1 = useServerStore.getState().serverVersion;
 
-      useServerStore.getState().updateServer(server.id, { url: 'http://new.com' });
+      useServerStore
+        .getState()
+        .updateServer(server.id, { url: 'http://new.com' });
       expect(useServerStore.getState().serverVersion).toBeGreaterThan(v1);
     });
   });

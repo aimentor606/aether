@@ -65,12 +65,14 @@ describe('tab-store', () => {
 
     it('should reuse existing tab instead of duplicating', () => {
       useTabStore.getState().openTab(makeTab({ id: 'tab-1', title: 'First' }));
-      useTabStore.getState().openTab(makeTab({ id: 'tab-1', title: 'Updated' }));
+      useTabStore
+        .getState()
+        .openTab(makeTab({ id: 'tab-1', title: 'Updated' }));
 
       const state = useTabStore.getState();
       // Should still have only one entry in tabOrder (plus dashboard auto-created)
       expect(state.tabs['tab-1'].title).toBe('Updated');
-      expect(state.tabOrder.filter(id => id === 'tab-1')).toHaveLength(1);
+      expect(state.tabOrder.filter((id) => id === 'tab-1')).toHaveLength(1);
     });
 
     it('should record focus history when switching between different tabs', () => {
@@ -108,14 +110,18 @@ describe('tab-store', () => {
     });
 
     it('should not close a pinned tab', () => {
-      useTabStore.getState().openTab({ ...makeTab({ id: 'tab-1' }), pinned: true });
+      useTabStore
+        .getState()
+        .openTab({ ...makeTab({ id: 'tab-1' }), pinned: true });
       useTabStore.getState().closeTab('tab-1');
 
       expect(useTabStore.getState().tabs['tab-1']).toBeDefined();
     });
 
     it('should push closed tab to recentlyClosedTabs', () => {
-      useTabStore.getState().openTab(makeTab({ id: 'tab-1', title: 'My Session' }));
+      useTabStore
+        .getState()
+        .openTab(makeTab({ id: 'tab-1', title: 'My Session' }));
       useTabStore.getState().closeTab('tab-1');
 
       expect(useTabStore.getState().recentlyClosedTabs).toHaveLength(1);
@@ -134,10 +140,12 @@ describe('tab-store', () => {
 
     it('should activate parent session tab when closing sub-session', () => {
       useTabStore.getState().openTab(makeTab({ id: 'parent-session' }));
-      useTabStore.getState().openTab(makeTab({
-        id: 'child-tab',
-        parentSessionId: 'parent-session',
-      }));
+      useTabStore.getState().openTab(
+        makeTab({
+          id: 'child-tab',
+          parentSessionId: 'parent-session',
+        }),
+      );
 
       useTabStore.getState().closeTab('child-tab');
       expect(useTabStore.getState().activeTabId).toBe('parent-session');
@@ -148,7 +156,9 @@ describe('tab-store', () => {
 
   describe('reopenLastClosedTab', () => {
     it('should reopen the most recently closed tab', () => {
-      useTabStore.getState().openTab(makeTab({ id: 'tab-1', title: 'Reopen Me' }));
+      useTabStore
+        .getState()
+        .openTab(makeTab({ id: 'tab-1', title: 'Reopen Me' }));
       useTabStore.getState().closeTab('tab-1');
 
       const reopened = useTabStore.getState().reopenLastClosedTab();
@@ -304,7 +314,7 @@ describe('tab-store', () => {
 
       const ordered = useTabStore.getState().getOrderedTabs();
       expect(ordered.length).toBeGreaterThanOrEqual(2);
-      expect(ordered.map(t => t.id)).toEqual(
+      expect(ordered.map((t) => t.id)).toEqual(
         expect.arrayContaining([DASHBOARD_TAB_ID, 'tab-1', 'tab-2']),
       );
     });

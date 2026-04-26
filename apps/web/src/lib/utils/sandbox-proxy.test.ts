@@ -42,33 +42,38 @@ describe('rewriteLocalhostUrl', () => {
   };
 
   test('no opts → plain localhost URL', () => {
-    expect(rewriteLocalhostUrl(3210, '/viewer.html', '', undefined))
-      .toBe('http://localhost:3210/viewer.html');
+    expect(rewriteLocalhostUrl(3210, '/viewer.html', '', undefined)).toBe(
+      'http://localhost:3210/viewer.html',
+    );
   });
 
   test('local opts without apiBaseUrl → subdomain URL', () => {
-    expect(rewriteLocalhostUrl(3210, '/viewer.html', '', localOpts))
-      .toBe('http://p3210-aether-sandbox.localhost:8008/viewer.html');
+    expect(rewriteLocalhostUrl(3210, '/viewer.html', '', localOpts)).toBe(
+      'http://p3210-aether-sandbox.localhost:8008/viewer.html',
+    );
   });
 
   test('VPS opts with apiBaseUrl → path-based proxy URL (non-localhost browser)', () => {
     setHostname('e2e-test.aether.cloud');
-    expect(rewriteLocalhostUrl(6080, '/', '', vpsOpts))
-      .toBe('https://e2e-test.aether.cloud/v1/p/aether-sandbox/6080/');
+    expect(rewriteLocalhostUrl(6080, '/', '', vpsOpts)).toBe(
+      'https://e2e-test.aether.cloud/v1/p/aether-sandbox/6080/',
+    );
     resetHostname();
   });
 
   test('VPS opts for desktop port 6080', () => {
     setHostname('e2e-test.aether.cloud');
-    expect(rewriteLocalhostUrl(6080, '/', '', vpsOpts))
-      .toBe('https://e2e-test.aether.cloud/v1/p/aether-sandbox/6080/');
+    expect(rewriteLocalhostUrl(6080, '/', '', vpsOpts)).toBe(
+      'https://e2e-test.aether.cloud/v1/p/aether-sandbox/6080/',
+    );
     resetHostname();
   });
 
   test('VPS opts with path', () => {
     setHostname('e2e-test.aether.cloud');
-    expect(rewriteLocalhostUrl(3210, '/api/docs', '', vpsOpts))
-      .toBe('https://e2e-test.aether.cloud/v1/p/aether-sandbox/3210/api/docs');
+    expect(rewriteLocalhostUrl(3210, '/api/docs', '', vpsOpts)).toBe(
+      'https://e2e-test.aether.cloud/v1/p/aether-sandbox/3210/api/docs',
+    );
     resetHostname();
   });
 
@@ -78,14 +83,16 @@ describe('rewriteLocalhostUrl', () => {
       ...vpsOpts,
       apiBaseUrl: 'https://example.com/v1/',
     };
-    expect(rewriteLocalhostUrl(8080, '/', '', opts))
-      .toBe('https://example.com/v1/p/aether-sandbox/8080/');
+    expect(rewriteLocalhostUrl(8080, '/', '', opts)).toBe(
+      'https://example.com/v1/p/aether-sandbox/8080/',
+    );
     resetHostname();
   });
 
   test('normalizes empty path to /', () => {
-    expect(rewriteLocalhostUrl(3000, '', '', localOpts))
-      .toBe('http://p3000-aether-sandbox.localhost:8008/');
+    expect(rewriteLocalhostUrl(3000, '', '', localOpts)).toBe(
+      'http://p3000-aether-sandbox.localhost:8008/',
+    );
   });
 });
 
@@ -93,7 +100,9 @@ describe('rewriteLocalhostUrl', () => {
 
 describe('parseSubdomainUrl', () => {
   test('parses subdomain format', () => {
-    const result = parseSubdomainUrl('http://p3210-aether-sandbox.localhost:8008/viewer.html');
+    const result = parseSubdomainUrl(
+      'http://p3210-aether-sandbox.localhost:8008/viewer.html',
+    );
     expect(result).toEqual({
       port: 3210,
       sandboxId: 'aether-sandbox',
@@ -103,7 +112,9 @@ describe('parseSubdomainUrl', () => {
   });
 
   test('parses path-based proxy format', () => {
-    const result = parseSubdomainUrl('https://e2e-test.aether.cloud/v1/p/aether-sandbox/6080/');
+    const result = parseSubdomainUrl(
+      'https://e2e-test.aether.cloud/v1/p/aether-sandbox/6080/',
+    );
     expect(result).toEqual({
       port: 6080,
       sandboxId: 'aether-sandbox',
@@ -113,7 +124,9 @@ describe('parseSubdomainUrl', () => {
   });
 
   test('parses path-based proxy with deep path', () => {
-    const result = parseSubdomainUrl('https://my-server.com/v1/p/my-sandbox/3210/api/docs');
+    const result = parseSubdomainUrl(
+      'https://my-server.com/v1/p/my-sandbox/3210/api/docs',
+    );
     expect(result).toEqual({
       port: 3210,
       sandboxId: 'my-sandbox',
@@ -135,11 +148,15 @@ describe('parseSubdomainUrl', () => {
 
 describe('isPreviewUrl', () => {
   test('detects subdomain preview URL', () => {
-    expect(isPreviewUrl('http://p3210-aether-sandbox.localhost:8008/')).toBe(true);
+    expect(isPreviewUrl('http://p3210-aether-sandbox.localhost:8008/')).toBe(
+      true,
+    );
   });
 
   test('detects path-based preview URL', () => {
-    expect(isPreviewUrl('https://e2e-test.aether.cloud/v1/p/aether-sandbox/6080/')).toBe(true);
+    expect(
+      isPreviewUrl('https://e2e-test.aether.cloud/v1/p/aether-sandbox/6080/'),
+    ).toBe(true);
   });
 
   test('rejects plain localhost URL', () => {
@@ -155,7 +172,9 @@ describe('isPreviewUrl', () => {
 
 describe('isAppRouteUrl', () => {
   test('detects connectors route', () => {
-    expect(isAppRouteUrl('http://localhost:3000/connectors?connect=true')).toBe(true);
+    expect(isAppRouteUrl('http://localhost:3000/connectors?connect=true')).toBe(
+      true,
+    );
   });
 
   test('detects settings route', () => {

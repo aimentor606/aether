@@ -18,7 +18,7 @@ import { ToolViewIconTitle } from '../shared/ToolViewIconTitle';
 import { ToolViewFooter } from '../shared/ToolViewFooter';
 import { LoadingState } from '../shared/LoadingState';
 import { UnifiedMarkdown } from '@/components/markdown/unified-markdown';
-import { useOcFileOpen } from './useOcFileOpen';
+import { useOcFileOpen } from '@/hooks/use-oc-file-open';
 
 function getFilename(path: string): string {
   const parts = path.split('/');
@@ -184,12 +184,7 @@ export function OcSearchToolView({
   const resultCount = filePaths?.length ?? grepResult?.matchCount ?? null;
 
   if (isStreaming && !toolResult) {
-    return (
-      <LoadingState
-        title={toolLabel}
-        subtitle={subtitle}
-      />
-    );
+    return <LoadingState title={toolLabel} subtitle={subtitle} />;
   }
 
   return (
@@ -255,10 +250,7 @@ export function OcSearchToolView({
               Failed
             </Badge>
           ) : (
-            <Badge
-              variant="outline"
-              className="h-6 py-0.5 bg-muted"
-            >
+            <Badge variant="outline" className="h-6 py-0.5 bg-muted">
               <CheckCircle className="h-3 w-3 text-emerald-500" />
               Done
             </Badge>

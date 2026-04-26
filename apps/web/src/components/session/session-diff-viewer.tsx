@@ -574,7 +574,62 @@ export function SessionDiffViewer({ sessionId, isFullscreen, onToggleFullscreen 
     [messages],
   );
 
-  const diffs = (apiDiffs && apiDiffs.length > 0) ? apiDiffs : messageDiffs;
+  const normalizedApiDiffs = useMemo<FileDiff[]>(() => {
+    if (!Array.isArray(apiDiffs)) return [];
+
+    return apiDiffs
+      .map((raw) => {
+        const diff = (raw ?? {}) as {
+          file?: unknown;
+          before?: unknown;
+          after?: unknown;
+          patch?: unknown;
+          additions?: unknown;
+          deletions?: unknown;
+          status?: unknown;
+        };
+
+        const file = typeof diff.file === 'string' ? diff.file : '';
+        const before = typeof diff.before === 'string' ? diff.before : '';
+        const after = typeof diff.after === 'string' ? diff.after : '';
+        const patch = typeof diff.patch === 'string' ? diff.patch : '';
+
+        const additions =
+          typeof diff.additions === 'number'
+            ? diff.additions
+            : patch
+                .split('\n')
+                .filter((line) => line.startsWith('+') && !line.startsWith('+++')).length;
+
+        const deletions =
+          typeof diff.deletions === 'number'
+            ? diff.deletions
+            : patch
+                .split('\n')
+                .filter((line) => line.startsWith('-') && !line.startsWith('---')).length;
+
+        const status: FileDiff['status'] =
+          diff.status === 'added' || diff.status === 'deleted' || diff.status === 'modified'
+            ? diff.status
+            : before === '' && after !== ''
+              ? 'added'
+              : before !== '' && after === ''
+                ? 'deleted'
+                : 'modified';
+
+        return {
+          file,
+          before,
+          after,
+          additions,
+          deletions,
+          status,
+        };
+      })
+      .filter((diff) => diff.file.length > 0);
+  }, [apiDiffs]);
+
+  const diffs = normalizedApiDiffs.length > 0 ? normalizedApiDiffs : messageDiffs;
 
   if (isLoading) {
     return (

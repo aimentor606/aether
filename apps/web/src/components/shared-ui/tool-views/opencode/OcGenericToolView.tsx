@@ -25,9 +25,15 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ToolViewIconTitle } from '../shared/ToolViewIconTitle';
 import { ToolViewFooter } from '../shared/ToolViewFooter';
 import { LoadingState } from '../shared/LoadingState';
-import { UnifiedMarkdown, CodeHighlight } from '@/components/markdown/unified-markdown';
-import { useOcFileOpen } from './useOcFileOpen';
-import { PreWithPaths, ClickablePath } from '@/components/common/clickable-path';
+import {
+  UnifiedMarkdown,
+  CodeHighlight,
+} from '@/components/markdown/unified-markdown';
+import { useOcFileOpen } from '@/hooks/use-oc-file-open';
+import {
+  PreWithPaths,
+  ClickablePath,
+} from '@/components/common/clickable-path';
 import {
   type OutputSection as OutputSectionType,
   normalizeToolOutput,
@@ -37,11 +43,13 @@ import {
 
 /** Convert tool names like "apply_patch" or "oc-multi-edit" to "Apply Patch" / "Multi Edit" */
 function humanizeToolName(raw: string): string {
-  return raw
-    .replace(/^oc[-_]?/i, '')
-    .replace(/[-_]+/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase())
-    .trim() || 'Tool';
+  return (
+    raw
+      .replace(/^oc[-_]?/i, '')
+      .replace(/[-_]+/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .trim() || 'Tool'
+  );
 }
 
 /** Check if a string looks like multiline code / patch / diff */
@@ -54,7 +62,12 @@ function isMultilineCode(val: unknown): boolean {
 /** Pick an icon based on tool name patterns */
 function pickToolIcon(name: string) {
   const lower = name.toLowerCase();
-  if (lower.includes('patch') || lower.includes('diff') || lower.includes('edit') || lower.includes('morph')) {
+  if (
+    lower.includes('patch') ||
+    lower.includes('diff') ||
+    lower.includes('edit') ||
+    lower.includes('morph')
+  ) {
     return FileCode2;
   }
   return Wrench;
@@ -69,7 +82,12 @@ function detectLang(key: string, val: string): string {
   if (lower.includes('css')) return 'css';
   if (lower.includes('sql')) return 'sql';
   // Heuristic: if content starts with patch markers
-  if (val.trimStart().startsWith('***') || val.trimStart().startsWith('---') || val.trimStart().startsWith('@@')) return 'diff';
+  if (
+    val.trimStart().startsWith('***') ||
+    val.trimStart().startsWith('---') ||
+    val.trimStart().startsWith('@@')
+  )
+    return 'diff';
   return '';
 }
 
@@ -173,7 +191,7 @@ export function OcGenericToolView({
   const args = toolCall?.arguments || {};
   const ocTool = (args._oc_tool as string) || toolCall?.function_name || 'tool';
   const ocState = args._oc_state as any;
-  const output = toolResult?.output || (ocState?.output) || '';
+  const output = toolResult?.output || ocState?.output || '';
 
   const title = humanizeToolName(ocState?.title || ocTool);
   const ToolIcon = pickToolIcon(ocTool);
@@ -191,7 +209,11 @@ export function OcGenericToolView({
 
   // Separate args into multiline code values vs simple values
   const { codeEntries, simpleEntries } = useMemo(() => {
-    if (!cleanArgs) return { codeEntries: [] as [string, string][], simpleEntries: [] as [string, unknown][] };
+    if (!cleanArgs)
+      return {
+        codeEntries: [] as [string, string][],
+        simpleEntries: [] as [string, unknown][],
+      };
     const code: [string, string][] = [];
     const simple: [string, unknown][] = [];
     for (const [k, v] of Object.entries(cleanArgs)) {
@@ -205,21 +227,14 @@ export function OcGenericToolView({
   }, [cleanArgs]);
 
   if (isStreaming && !toolResult) {
-    return (
-      <LoadingState
-        title={title}
-      />
-    );
+    return <LoadingState title={title} />;
   }
 
   return (
     <Card className="gap-0 flex border-0 shadow-none p-0 py-0 rounded-none flex-col h-full overflow-hidden bg-card">
       <CardHeader className="h-14 bg-muted/50 backdrop-blur-sm border-b p-2 px-4 space-y-2">
         <div className="flex flex-row items-center justify-between">
-          <ToolViewIconTitle
-            icon={ToolIcon}
-            title={title}
-          />
+          <ToolViewIconTitle icon={ToolIcon} title={title} />
         </div>
       </CardHeader>
 
@@ -227,23 +242,27 @@ export function OcGenericToolView({
         <ScrollArea className="h-full w-full">
           <div className="p-3 space-y-2">
             {/* Output first (most important) */}
-            {output && !isError && (
-              <OutputSection output={output} />
-            )}
+            {output && !isError && <OutputSection output={output} />}
 
             {/* Error display */}
-            {isError && output && (
-              <ErrorSection message={String(output)} />
-            )}
+            {isError && output && <ErrorSection message={String(output)} />}
 
             {/* Simple args as key-value pairs */}
             {simpleEntries.length > 0 && (
-              <SimpleArgsSection entries={simpleEntries} toDisplayPath={toDisplayPath} />
+              <SimpleArgsSection
+                entries={simpleEntries}
+                toDisplayPath={toDisplayPath}
+              />
             )}
 
             {/* Code / multiline args as collapsible code blocks */}
             {codeEntries.map(([key, val]) => (
-              <CodeSection key={key} label={key} content={val} lang={detectLang(key, val)} />
+              <CodeSection
+                key={key}
+                label={key}
+                content={val}
+                lang={detectLang(key, val)}
+              />
             ))}
 
             {!cleanArgs && !output && (
@@ -260,9 +279,12 @@ export function OcGenericToolView({
         toolTimestamp={toolTimestamp}
         isStreaming={isStreaming}
       >
-        {!isStreaming && (
-          isError ? (
-            <Badge variant="outline" className="h-6 py-0.5 bg-muted text-muted-foreground">
+        {!isStreaming &&
+          (isError ? (
+            <Badge
+              variant="outline"
+              className="h-6 py-0.5 bg-muted text-muted-foreground"
+            >
               <AlertCircle className="h-3 w-3" />
               Failed
             </Badge>
@@ -271,8 +293,7 @@ export function OcGenericToolView({
               <CheckCircle className="h-3 w-3 text-emerald-500" />
               Completed
             </Badge>
-          )
-        )}
+          ))}
       </ToolViewFooter>
     </Card>
   );
@@ -281,7 +302,11 @@ export function OcGenericToolView({
 /* ---------- Sub-components ---------- */
 
 /** Render parsed structured output sections with semantic styling (for detail panel). */
-function StructuredOutputDisplay({ sections }: { sections: OutputSectionType[] }) {
+function StructuredOutputDisplay({
+  sections,
+}: {
+  sections: OutputSectionType[];
+}) {
   const [showTrace, setShowTrace] = useState(false);
 
   return (
@@ -406,9 +431,13 @@ function StructuredOutputDisplay({ sections }: { sections: OutputSectionType[] }
 }
 
 function OutputSection({ output }: { output: unknown }) {
-  const text = typeof output === 'string' ? output : JSON.stringify(output, null, 2);
+  const text =
+    typeof output === 'string' ? output : JSON.stringify(output, null, 2);
   const isJson = typeof output !== 'string';
-  const observationReport = useMemo(() => (isJson ? null : parseObservationReport(text)), [isJson, text]);
+  const observationReport = useMemo(
+    () => (isJson ? null : parseObservationReport(text)),
+    [isJson, text],
+  );
 
   // Try structured rendering for string output with warnings/tracebacks
   const structuredSections = useMemo(() => {
@@ -427,7 +456,10 @@ function OutputSection({ output }: { output: unknown }) {
   }
 
   return isJson ? (
-    <UnifiedMarkdown content={`\`\`\`json\n${text}\n\`\`\``} isStreaming={false} />
+    <UnifiedMarkdown
+      content={`\`\`\`json\n${text}\n\`\`\``}
+      isStreaming={false}
+    />
   ) : (
     <div className="px-1">
       <UnifiedMarkdown content={text} isStreaming={false} />
@@ -444,7 +476,10 @@ function ObservationReportCard({ report }: { report: ObservationReport }) {
             <Fingerprint className="h-3.5 w-3.5" />
             Observation #{report.id}
           </Badge>
-          <Badge variant="outline" className="h-6 bg-background/80 uppercase tracking-wide text-[10px]">
+          <Badge
+            variant="outline"
+            className="h-6 bg-background/80 uppercase tracking-wide text-[10px]"
+          >
             {report.type}
           </Badge>
           {report.created && (
@@ -454,7 +489,9 @@ function ObservationReportCard({ report }: { report: ObservationReport }) {
             </span>
           )}
         </div>
-        <h3 className="mt-3 text-base font-semibold leading-snug text-foreground">{report.title}</h3>
+        <h3 className="mt-3 text-base font-semibold leading-snug text-foreground">
+          {report.title}
+        </h3>
       </div>
 
       <div className="px-4 py-3 space-y-3">
@@ -463,7 +500,9 @@ function ObservationReportCard({ report }: { report: ObservationReport }) {
             <FileText className="h-3.5 w-3.5" />
             Narrative
           </span>
-          <p className="text-sm leading-relaxed text-foreground/85">{report.narrative}</p>
+          <p className="text-sm leading-relaxed text-foreground/85">
+            {report.narrative}
+          </p>
         </div>
 
         <div className="rounded-lg border border-border/60 bg-background/70 p-3">
@@ -473,7 +512,10 @@ function ObservationReportCard({ report }: { report: ObservationReport }) {
           </span>
           <ul className="space-y-1.5">
             {report.facts.map((fact, idx) => (
-              <li key={`${report.id}-${idx}`} className="flex items-start gap-2 text-sm text-foreground/90 leading-relaxed">
+              <li
+                key={`${report.id}-${idx}`}
+                className="flex items-start gap-2 text-sm text-foreground/90 leading-relaxed"
+              >
                 <span className="mt-[7px] h-1.5 w-1.5 rounded-full bg-primary/70 flex-shrink-0" />
                 <span>{fact}</span>
               </li>
@@ -488,23 +530,44 @@ function ObservationReportCard({ report }: { report: ObservationReport }) {
               Concepts
             </span>
             {report.concepts.map((concept) => (
-              <Badge key={concept} variant="secondary" className="h-6 px-2 text-[11px] font-normal">
+              <Badge
+                key={concept}
+                variant="secondary"
+                className="h-6 px-2 text-[11px] font-normal"
+              >
                 {concept}
               </Badge>
             ))}
           </div>
         )}
 
-        {(report.tool || report.prompt || report.session || report.filesRead.length > 0) && (
+        {(report.tool ||
+          report.prompt ||
+          report.session ||
+          report.filesRead.length > 0) && (
           <div className="rounded-lg border border-border/60 bg-background/70 p-3 space-y-2">
             <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
-              {report.tool && <Badge variant="outline" className="h-5 px-1.5 font-normal">Tool: {report.tool}</Badge>}
-              {report.prompt && <Badge variant="outline" className="h-5 px-1.5 font-normal">Prompt #{report.prompt}</Badge>}
-              {report.session && <Badge variant="outline" className="h-5 px-1.5 font-normal">{report.session}</Badge>}
+              {report.tool && (
+                <Badge variant="outline" className="h-5 px-1.5 font-normal">
+                  Tool: {report.tool}
+                </Badge>
+              )}
+              {report.prompt && (
+                <Badge variant="outline" className="h-5 px-1.5 font-normal">
+                  Prompt #{report.prompt}
+                </Badge>
+              )}
+              {report.session && (
+                <Badge variant="outline" className="h-5 px-1.5 font-normal">
+                  {report.session}
+                </Badge>
+              )}
             </div>
             {report.filesRead.length > 0 && (
               <div className="space-y-1">
-                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Files read</p>
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                  Files read
+                </p>
                 <div className="flex flex-wrap gap-1.5">
                   {report.filesRead.map((file) => (
                     <span
@@ -544,8 +607,12 @@ function ErrorSection({ message }: { message: string }) {
       const traceSection = cleaned.slice(tbIdx);
       const lines = traceSection.split('\n').filter((l) => l.trim());
       const lastLine = lines[lines.length - 1] || '';
-      const typeMatch = lastLine.match(/^([\w._]+(?:Error|Exception|Warning)):\s*/);
-      const errType = typeMatch ? typeMatch[1].split('.').pop() || typeMatch[1] : null;
+      const typeMatch = lastLine.match(
+        /^([\w._]+(?:Error|Exception|Warning)):\s*/,
+      );
+      const errType = typeMatch
+        ? typeMatch[1].split('.').pop() || typeMatch[1]
+        : null;
       const sum = before || (errType ? lastLine : lastLine.slice(0, 150));
       return { summary: sum, traceback: traceSection, errorType: errType };
     }
@@ -553,7 +620,11 @@ function ErrorSection({ message }: { message: string }) {
     // Node.js-style stack trace
     const stackIdx = cleaned.indexOf('\n    at ');
     if (stackIdx >= 0) {
-      return { summary: cleaned.slice(0, stackIdx).trim(), traceback: cleaned.slice(stackIdx), errorType: null };
+      return {
+        summary: cleaned.slice(0, stackIdx).trim(),
+        traceback: cleaned.slice(stackIdx),
+        errorType: null,
+      };
     }
 
     return { summary: cleaned, traceback: null, errorType: null };
@@ -587,7 +658,12 @@ function ErrorSection({ message }: { message: string }) {
             onClick={() => setShowTrace((v) => !v)}
             className="flex items-center gap-1.5 px-3 py-1.5 w-full text-left border-t border-red-500/10 text-muted-foreground/60 hover:text-muted-foreground transition-colors cursor-pointer"
           >
-            <ChevronRight className={cn('h-3 w-3 transition-transform', showTrace ? 'rotate-90' : '')} />
+            <ChevronRight
+              className={cn(
+                'h-3 w-3 transition-transform',
+                showTrace ? 'rotate-90' : '',
+              )}
+            />
             <span className="text-[10px] font-medium">Stack trace</span>
           </button>
           {showTrace && (
@@ -616,14 +692,21 @@ function SimpleArgsSection({
         {entries.map(([key, val]) => {
           // Convert absolute file paths in arg values to relative display paths
           const isPath = isAbsolutePath(val);
-          const displayVal = isPath ? toDisplayPath(val as string) : (typeof val === 'string' ? val : JSON.stringify(val));
+          const displayVal = isPath
+            ? toDisplayPath(val as string)
+            : typeof val === 'string'
+              ? val
+              : JSON.stringify(val);
           return (
             <div key={key} className="flex items-start gap-3 px-3 py-2">
               <span className="text-[11px] font-medium text-muted-foreground min-w-[80px] pt-0.5 flex-shrink-0 font-mono">
                 {key}
               </span>
               {isPath ? (
-                <ClickablePath filePath={val as string} className="text-xs break-all font-mono">
+                <ClickablePath
+                  filePath={val as string}
+                  className="text-xs break-all font-mono"
+                >
                   {displayVal}
                 </ClickablePath>
               ) : (
@@ -639,7 +722,15 @@ function SimpleArgsSection({
   );
 }
 
-function CodeSection({ label, content, lang }: { label: string; content: string; lang: string }) {
+function CodeSection({
+  label,
+  content,
+  lang,
+}: {
+  label: string;
+  content: string;
+  lang: string;
+}) {
   const [expanded, setExpanded] = useState(false);
   const lineCount = content.split('\n').length;
   const humanLabel = label

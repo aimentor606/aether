@@ -1,17 +1,8 @@
 'use client';
 
-import React, {
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
-import {
-  ChevronRight,
-  FileText,
-  ListTree,
-  Search,
-} from 'lucide-react';
-import { useOcFileOpen } from '@/components/thread/tool-views/opencode/useOcFileOpen';
+import React, { useContext, useMemo, useState } from 'react';
+import { ChevronRight, FileText, ListTree, Search } from 'lucide-react';
+import { useOcFileOpen } from '@/hooks/use-oc-file-open';
 import { cn } from '@/lib/utils';
 import { ToolRegistry } from './registry';
 import {
@@ -24,10 +15,7 @@ import {
   ToolOutputFallback,
   BasicTool,
 } from './shared';
-import {
-  getDirectory,
-  getFilename,
-} from '@/ui';
+import { getDirectory, getFilename } from '@/ui';
 
 // ============================================================================
 // Parsing helpers for Glob/Grep/List output

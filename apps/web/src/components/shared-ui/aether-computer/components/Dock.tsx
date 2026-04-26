@@ -2,8 +2,19 @@
 
 import { memo, ReactNode, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Folder, Globe, TerminalSquare, Info, Table } from 'lucide-react';
-import { getUserFriendlyToolName, getToolIcon } from '@/components/thread/utils';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Folder,
+  Globe,
+  TerminalSquare,
+  Info,
+  Table,
+} from 'lucide-react';
+import {
+  getUserFriendlyToolName,
+  getToolIcon,
+} from '@/components/shared-ui/utils';
 import { cn } from '@/lib/utils';
 import { ToolCallInput } from '../AetherComputer';
 import { AppIcon } from '../../tool-views/shared/AppIcon';
@@ -16,15 +27,24 @@ const convertToolName = (toolName: string) => {
   return toolName;
 };
 
-const getToolColorScheme = (_toolName: string): { bg: string; iconColor: string } => {
+const getToolColorScheme = (
+  _toolName: string,
+): { bg: string; iconColor: string } => {
   // All tools use a consistent gray color scheme
-  return { bg: 'bg-gradient-to-br from-zinc-500 to-zinc-600', iconColor: 'text-white' };
+  return {
+    bg: 'bg-gradient-to-br from-zinc-500 to-zinc-600',
+    iconColor: 'text-white',
+  };
 };
 
 const isExternalAppTool = (toolCall: any): boolean => {
   const functionName = toolCall?.function_name?.toLowerCase() || '';
-  return functionName.includes('_app_') ||
-         (toolCall?.arguments && typeof toolCall.arguments === 'string' && toolCall.arguments.includes('app_slug'));
+  return (
+    functionName.includes('_app_') ||
+    (toolCall?.arguments &&
+      typeof toolCall.arguments === 'string' &&
+      toolCall.arguments.includes('app_slug'))
+  );
 };
 
 interface DockProps {
@@ -47,13 +67,21 @@ const ICON_SIZE = 40;
 export function Dock({ children, className }: DockProps) {
   return (
     <div className="relative isolate">
-      <div className="absolute inset-x-0 bottom-0 h-[56px] pointer-events-none" style={{ zIndex: -1 }}>
+      <div
+        className="absolute inset-x-0 bottom-0 h-[56px] pointer-events-none"
+        style={{ zIndex: -1 }}
+      >
         <div
-          className={cn("h-full w-full border bg-background/40 backdrop-blur-2xl rounded-xl", className)}
-        >
-        </div>
+          className={cn(
+            'h-full w-full border bg-background/40 backdrop-blur-2xl rounded-xl',
+            className,
+          )}
+        ></div>
       </div>
-      <div className="relative flex h-[56px] items-end gap-1.5 px-2.5 pb-1.5" style={{ zIndex: 1 }}>
+      <div
+        className="relative flex h-[56px] items-end gap-1.5 px-2.5 pb-1.5"
+        style={{ zIndex: 1 }}
+      >
         {children}
       </div>
     </div>
@@ -80,50 +108,49 @@ export const DockCard = memo(function DockCard({
         onClick={() => onClick?.()}
         style={{ width: ICON_SIZE, height: ICON_SIZE }}
         className={cn(
-          "flex items-center justify-center relative cursor-pointer p-2 rounded-xl",
-          "transition-transform duration-150",
+          'flex items-center justify-center relative cursor-pointer p-2 rounded-xl',
+          'transition-transform duration-150',
           isExternalApp
-            ? "bg-white border border-black/10"
-            : cn(colorScheme.bg, "border border-white/20"),
-          isActive && "ring-2 ring-white/40"
+            ? 'bg-white border border-black/10'
+            : cn(colorScheme.bg, 'border border-white/20'),
+          isActive && 'ring-2 ring-white/40',
         )}
         whileTap={{ scale: 0.95 }}
       >
         {isExternalApp ? (
-          <AppIcon 
-            toolCall={toolCall} 
+          <AppIcon
+            toolCall={toolCall}
             size={64}
             fallbackIcon={FallbackIcon}
             className="w-full h-full object-contain pointer-events-none"
           />
         ) : (
-          <FallbackIcon 
+          <FallbackIcon
             className={cn(
-              "w-3/5 h-3/5 pointer-events-none",
-              colorScheme.iconColor
+              'w-3/5 h-3/5 pointer-events-none',
+              colorScheme.iconColor,
             )}
           />
         )}
       </motion.button>
-      
+
       {isFailed && (
         <div className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full flex items-center justify-center border-2 border-white z-10">
           <span className="text-[10px] text-white font-semibold">!</span>
         </div>
       )}
 
-      <div 
+      <div
         className={cn(
-          "absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-[10px] font-medium rounded-md whitespace-nowrap pointer-events-none z-50",
-          "bg-black/80 backdrop-blur-xl border border-white/10",
-          "opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+          'absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-[10px] font-medium rounded-md whitespace-nowrap pointer-events-none z-50',
+          'bg-black/80 backdrop-blur-xl border border-white/10',
+          'opacity-0 group-hover:opacity-100 transition-opacity duration-150',
         )}
         style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}
       >
         {label}
         <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-black/80" />
       </div>
-
     </div>
   );
 });
@@ -154,28 +181,32 @@ export const SystemDockCard = memo(function SystemDockCard({
         onClick={onClick}
         style={{ width: ICON_SIZE, height: ICON_SIZE }}
         className={cn(
-          "flex items-center justify-center relative cursor-pointer p-2 rounded-xl",
-          "transition-transform duration-150 border border-white/20",
+          'flex items-center justify-center relative cursor-pointer p-2 rounded-xl',
+          'transition-transform duration-150 border border-white/20',
           bgClass,
-          isActive && "ring-2 ring-white/40"
+          isActive && 'ring-2 ring-white/40',
         )}
         whileTap={{ scale: 0.95 }}
       >
-        <Icon className={cn("w-3/5 h-3/5 pointer-events-none drop-shadow-md", iconColor)} />
+        <Icon
+          className={cn(
+            'w-3/5 h-3/5 pointer-events-none drop-shadow-md',
+            iconColor,
+          )}
+        />
       </motion.button>
 
-      <div 
+      <div
         className={cn(
-          "absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-[10px] font-medium rounded-md whitespace-nowrap pointer-events-none z-50",
-          "bg-black/80 backdrop-blur-xl border border-white/10",
-          "opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+          'absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 text-white text-[10px] font-medium rounded-md whitespace-nowrap pointer-events-none z-50',
+          'bg-black/80 backdrop-blur-xl border border-white/10',
+          'opacity-0 group-hover:opacity-100 transition-opacity duration-150',
         )}
         style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}
       >
         {label}
         <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-black/80" />
       </div>
-
     </div>
   );
 });
@@ -195,7 +226,9 @@ interface AppDockProps {
   onJumpToLatest: () => void;
   isMaximized?: boolean;
   currentView?: ViewType;
-  onViewChange?: (view: 'files' | 'browser' | 'terminal' | 'info' | 'spreadsheet') => void;
+  onViewChange?: (
+    view: 'files' | 'browser' | 'terminal' | 'info' | 'spreadsheet',
+  ) => void;
   showFilesTab?: boolean;
   isFilesWindowOpen?: boolean;
   isBrowserWindowOpen?: boolean;
@@ -227,7 +260,7 @@ export const AppDock = memo(function AppDock({
 }: AppDockProps) {
   const [scrollOffset, setScrollOffset] = useState(0);
   const maxVisibleIcons = 12;
-  
+
   useEffect(() => {
     if (currentIndex < scrollOffset) {
       setScrollOffset(currentIndex);
@@ -235,7 +268,7 @@ export const AppDock = memo(function AppDock({
       setScrollOffset(Math.max(0, currentIndex - maxVisibleIcons + 1));
     }
   }, [currentIndex, scrollOffset, maxVisibleIcons]);
-  
+
   if (toolCalls.length === 0) return null;
 
   const isToolRunning = (index: number) => {
@@ -251,7 +284,7 @@ export const AppDock = memo(function AppDock({
 
   const startIndex = scrollOffset;
   const endIndex = Math.min(toolCalls.length, startIndex + maxVisibleIcons);
-  
+
   const visibleTools = toolCalls.slice(startIndex, endIndex);
 
   const canNavigateLeft = currentIndex > 0;
@@ -264,7 +297,7 @@ export const AppDock = memo(function AppDock({
       initial={{ y: 80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 80, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 400, damping: 28, mass: 0.8 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 28, mass: 0.8 }}
       className="absolute bottom-0 left-0 right-0 flex-shrink-0 w-full z-50"
     >
       <div className="relative flex items-center justify-center py-3 px-4 max-w-full">
@@ -274,16 +307,16 @@ export const AppDock = memo(function AppDock({
           whileTap={canNavigateLeft ? { scale: 0.92 } : undefined}
           className="absolute left-4"
         >
-          <div
-            className='border bg-background/30 backdrop-blur-xl rounded-full hover:bg-background/50 transition-colors duration-150'
-          >
+          <div className="border bg-background/30 backdrop-blur-xl rounded-full hover:bg-background/50 transition-colors duration-150">
             <button
               type="button"
               onClick={onPrevious}
               disabled={!canNavigateLeft}
               className={cn(
-                "flex items-center justify-center w-7 h-7",
-                canNavigateLeft ? "cursor-pointer text-white" : "cursor-not-allowed text-white/50"
+                'flex items-center justify-center w-7 h-7',
+                canNavigateLeft
+                  ? 'cursor-pointer text-white'
+                  : 'cursor-not-allowed text-white/50',
               )}
             >
               <ChevronLeft className="w-3.5 h-3.5" />
@@ -360,16 +393,16 @@ export const AppDock = memo(function AppDock({
             animate={{ opacity: canNavigateRight ? 1 : 0.4, scale: 1 }}
             whileTap={canNavigateRight ? { scale: 0.92 } : undefined}
           >
-            <div
-              className='border bg-background/30 backdrop-blur-xl rounded-full hover:bg-background/50 transition-colors duration-150'
-            >
+            <div className="border bg-background/30 backdrop-blur-xl rounded-full hover:bg-background/50 transition-colors duration-150">
               <button
                 type="button"
                 onClick={onNext}
                 disabled={!canNavigateRight}
                 className={cn(
-                  "flex items-center justify-center w-7 h-7",
-                  canNavigateRight ? "cursor-pointer text-white" : "cursor-not-allowed text-white/50"
+                  'flex items-center justify-center w-7 h-7',
+                  canNavigateRight
+                    ? 'cursor-pointer text-white'
+                    : 'cursor-not-allowed text-white/50',
                 )}
               >
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -382,19 +415,27 @@ export const AppDock = memo(function AppDock({
               animate={{ opacity: 1, scale: 1 }}
               whileTap={{ scale: 0.95 }}
             >
-              <div
-                className='border bg-background/30 backdrop-blur-xl rounded-full hover:bg-background/50 transition-colors duration-150'
-              >
+              <div className="border bg-background/30 backdrop-blur-xl rounded-full hover:bg-background/50 transition-colors duration-150">
                 <button
                   type="button"
-                  onClick={agentStatus === 'running' ? onJumpToLive : onJumpToLatest}
+                  onClick={
+                    agentStatus === 'running' ? onJumpToLive : onJumpToLatest
+                  }
                   className="flex items-center gap-1 px-2 py-1 text-[10px] font-medium whitespace-nowrap text-white"
                 >
-                  <div className={cn(
-                    "w-1.5 h-1.5 rounded-full flex-shrink-0",
-                    agentStatus === 'running' ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-zinc-400 shadow-[0_0_8px_rgba(161,161,170,0.6)]"
-                  )} />
-                  <span>{agentStatus === 'running' ? 'Jump to Live' : 'Jump to Latest'}</span>
+                  <div
+                    className={cn(
+                      'w-1.5 h-1.5 rounded-full flex-shrink-0',
+                      agentStatus === 'running'
+                        ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]'
+                        : 'bg-zinc-400 shadow-[0_0_8px_rgba(161,161,170,0.6)]',
+                    )}
+                  />
+                  <span>
+                    {agentStatus === 'running'
+                      ? 'Jump to Live'
+                      : 'Jump to Latest'}
+                  </span>
                 </button>
               </div>
             </motion.div>

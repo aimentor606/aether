@@ -16,12 +16,26 @@ import { HtmlRenderer } from '@/components/file-renderers/html-renderer';
 import { CanvasRenderer } from '@/components/file-renderers/canvas-renderer';
 import { constructHtmlPreviewUrl } from '@/lib/utils/url';
 import { useSandboxProxy } from '@/hooks/use-sandbox-proxy';
-import { processUnicodeContent, getFileTypeFromExtension, getLanguageFromExtension } from './utils';
+import {
+  processUnicodeContent,
+  getFileTypeFromExtension,
+  getLanguageFromExtension,
+} from './utils';
 
 // Lazy load SpreadsheetViewer as it imports Syncfusion (~1-2 MB)
 const SpreadsheetViewer = dynamic(
-  () => import('@/components/thread/tool-views/spreadsheet/SpreadsheetViewer').then((mod) => mod.SpreadsheetViewer),
-  { ssr: false, loading: () => <div className="flex items-center justify-center h-full text-muted-foreground">Loading spreadsheet...</div> }
+  () =>
+    import('@/components/shared-ui/tool-views/spreadsheet/SpreadsheetViewer').then(
+      (mod) => mod.SpreadsheetViewer,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full text-muted-foreground">
+        Loading spreadsheet...
+      </div>
+    ),
+  },
 );
 
 export type EditableFileType =
@@ -82,15 +96,72 @@ export function getEditableFileType(fileName: string): EditableFileType {
   const markdownExtensions = ['md', 'markdown'];
   const htmlExtensions = ['html', 'htm'];
   const codeExtensions = [
-    'js', 'jsx', 'ts', 'tsx', 'css', 'json', 'py', 'python',
-    'java', 'c', 'cpp', 'h', 'hpp', 'cs', 'go', 'rs', 'php',
-    'rb', 'sh', 'bash', 'zsh', 'xml', 'yml', 'yaml', 'toml',
-    'sql', 'graphql', 'swift', 'kotlin', 'kt', 'dart', 'r',
-    'lua', 'scala', 'perl', 'pl', 'haskell', 'hs', 'rust',
-    'dockerfile', 'makefile', 'cmake',
+    'js',
+    'jsx',
+    'ts',
+    'tsx',
+    'css',
+    'json',
+    'py',
+    'python',
+    'java',
+    'c',
+    'cpp',
+    'h',
+    'hpp',
+    'cs',
+    'go',
+    'rs',
+    'php',
+    'rb',
+    'sh',
+    'bash',
+    'zsh',
+    'xml',
+    'yml',
+    'yaml',
+    'toml',
+    'sql',
+    'graphql',
+    'swift',
+    'kotlin',
+    'kt',
+    'dart',
+    'r',
+    'lua',
+    'scala',
+    'perl',
+    'pl',
+    'haskell',
+    'hs',
+    'rust',
+    'dockerfile',
+    'makefile',
+    'cmake',
   ];
-  const textExtensions = ['txt', 'log', 'env', 'ini', 'conf', 'cfg', 'gitignore', 'editorconfig'];
-  const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico', 'heic', 'heif', 'avif'];
+  const textExtensions = [
+    'txt',
+    'log',
+    'env',
+    'ini',
+    'conf',
+    'cfg',
+    'gitignore',
+    'editorconfig',
+  ];
+  const imageExtensions = [
+    'png',
+    'jpg',
+    'jpeg',
+    'gif',
+    'webp',
+    'svg',
+    'bmp',
+    'ico',
+    'heic',
+    'heif',
+    'avif',
+  ];
   const videoExtensions = ['mp4', 'webm', 'mov', 'avi', 'mkv', 'm4v', 'ogg'];
   const pdfExtensions = ['pdf'];
   const csvExtensions = ['csv', 'tsv'];
@@ -104,19 +175,21 @@ export function getEditableFileType(fileName: string): EditableFileType {
   if (codeExtensions.includes(extension)) return 'code';
   if (textExtensions.includes(extension)) return 'text';
   if (canvasExtensions.includes(extension)) return 'canvas';
-  
+
   // Check for common plain text file patterns (e.g., .env.example, .env.local, .gitignore, etc.)
-  if (fileNameLower.includes('.env') || 
-      fileNameLower.startsWith('.env') ||
-      fileNameLower.includes('gitignore') ||
-      fileNameLower.includes('editorconfig') ||
-      fileNameLower.includes('dockerignore') ||
-      fileNameLower.includes('npmignore') ||
-      fileNameLower.includes('prettierignore') ||
-      fileNameLower.includes('eslintignore')) {
+  if (
+    fileNameLower.includes('.env') ||
+    fileNameLower.startsWith('.env') ||
+    fileNameLower.includes('gitignore') ||
+    fileNameLower.includes('editorconfig') ||
+    fileNameLower.includes('dockerignore') ||
+    fileNameLower.includes('npmignore') ||
+    fileNameLower.includes('prettierignore') ||
+    fileNameLower.includes('eslintignore')
+  ) {
     return 'text';
   }
-  
+
   if (imageExtensions.includes(extension)) return 'image';
   if (videoExtensions.includes(extension)) return 'video';
   if (pdfExtensions.includes(extension)) return 'pdf';
@@ -124,7 +197,7 @@ export function getEditableFileType(fileName: string): EditableFileType {
   if (xlsxExtensions.includes(extension)) return 'xlsx';
   if (docxExtensions.includes(extension)) return 'docx';
   if (pptxExtensions.includes(extension)) return 'pptx';
-  
+
   return 'binary';
 }
 
@@ -155,7 +228,9 @@ export function EditableFileRenderer({
 }: EditableFileRendererProps) {
   const { subdomainOpts } = useSandboxProxy();
   const fileType = getEditableFileType(fileName);
-  const isHtmlFile = fileName.toLowerCase().endsWith('.html') || fileName.toLowerCase().endsWith('.htm');
+  const isHtmlFile =
+    fileName.toLowerCase().endsWith('.html') ||
+    fileName.toLowerCase().endsWith('.htm');
 
   // HTML preview URL for HTML files
   const htmlPreviewUrl = React.useMemo(() => {
@@ -164,10 +239,21 @@ export function EditableFileRenderer({
       return URL.createObjectURL(blob);
     }
     if (isHtmlFile && project?.sandbox?.sandbox_url && (filePath || fileName)) {
-      return constructHtmlPreviewUrl(project.sandbox.sandbox_url, filePath || fileName, subdomainOpts);
+      return constructHtmlPreviewUrl(
+        project.sandbox.sandbox_url,
+        filePath || fileName,
+        subdomainOpts,
+      );
     }
     return undefined;
-  }, [isHtmlFile, content, project?.sandbox?.sandbox_url, filePath, fileName, subdomainOpts]);
+  }, [
+    isHtmlFile,
+    content,
+    project?.sandbox?.sandbox_url,
+    filePath,
+    fileName,
+    subdomainOpts,
+  ]);
 
   // Cleanup blob URLs
   React.useEffect(() => {
@@ -181,17 +267,24 @@ export function EditableFileRenderer({
   // Check if we have text content even when fileType is 'binary'
   // This handles cases like .env.example where the extension isn't recognized
   // but we have text content that should be rendered
-  const shouldRenderAsText = fileType === 'binary' && content !== null && !binaryUrl;
+  const shouldRenderAsText =
+    fileType === 'binary' && content !== null && !binaryUrl;
 
   return (
-    <div className={cn('w-full h-full max-w-full max-h-full overflow-hidden min-w-0', className)} style={{ contain: 'strict' }}>
+    <div
+      className={cn(
+        'w-full h-full max-w-full max-h-full overflow-hidden min-w-0',
+        className,
+      )}
+      style={{ contain: 'strict' }}
+    >
       {/* Binary files - not editable, unless we have text content */}
       {fileType === 'binary' && !shouldRenderAsText ? (
-        <BinaryRenderer 
-          url={binaryUrl || ''} 
-          fileName={fileName} 
-          onDownload={onDownload} 
-          isDownloading={isDownloading} 
+        <BinaryRenderer
+          url={binaryUrl || ''}
+          fileName={fileName}
+          onDownload={onDownload}
+          isDownloading={isDownloading}
         />
       ) : shouldRenderAsText ? (
         // Render as plain text with CodeMirror when we have text content but fileType is binary
@@ -223,10 +316,7 @@ export function EditableFileRenderer({
           allowEditing={!readOnly}
         />
       ) : fileType === 'docx' && binaryUrl ? (
-        <DocxRenderer
-          url={binaryUrl}
-          className="h-full w-full"
-        />
+        <DocxRenderer url={binaryUrl} className="h-full w-full" />
       ) : fileType === 'pptx' ? (
         <PptxRenderer
           content={content}
@@ -318,4 +408,8 @@ export { CodeEditor } from './code-editor';
 export { UnifiedMarkdown } from '@/components/markdown';
 
 // Re-export utilities
-export { processUnicodeContent, getFileTypeFromExtension, getLanguageFromExtension } from './utils';
+export {
+  processUnicodeContent,
+  getFileTypeFromExtension,
+  getLanguageFromExtension,
+} from './utils';

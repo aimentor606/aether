@@ -1,15 +1,19 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import React from 'react';
-import { FullScreenPresentationViewer } from '@/components/thread/tool-views/presentation-tools/FullScreenPresentationViewer';
+import { FullScreenPresentationViewer } from '@/components/shared-ui/tool-views/presentation-tools/FullScreenPresentationViewer';
 
 interface PresentationViewerState {
   isOpen: boolean;
   presentationName?: string;
   sandboxUrl?: string;
   initialSlide?: number;
-  
-  openPresentation: (presentationName: string, sandboxUrl: string, initialSlide?: number) => void;
+
+  openPresentation: (
+    presentationName: string,
+    sandboxUrl: string,
+    initialSlide?: number,
+  ) => void;
   closePresentation: () => void;
 }
 
@@ -20,8 +24,12 @@ export const usePresentationViewerStore = create<PresentationViewerState>()(
       presentationName: undefined,
       sandboxUrl: undefined,
       initialSlide: undefined,
-      
-      openPresentation: (presentationName: string, sandboxUrl: string, initialSlide: number = 1) => {
+
+      openPresentation: (
+        presentationName: string,
+        sandboxUrl: string,
+        initialSlide: number = 1,
+      ) => {
         set({
           isOpen: true,
           presentationName,
@@ -29,7 +37,7 @@ export const usePresentationViewerStore = create<PresentationViewerState>()(
           initialSlide,
         });
       },
-      
+
       closePresentation: () => {
         set({
           isOpen: false,
@@ -41,14 +49,14 @@ export const usePresentationViewerStore = create<PresentationViewerState>()(
     }),
     {
       name: 'presentation-viewer-store',
-    }
-  )
+    },
+  ),
 );
 
 // Backward compatibility hook
 export function usePresentationViewerContext() {
   const store = usePresentationViewerStore();
-  
+
   return {
     openPresentation: store.openPresentation,
     closePresentation: store.closePresentation,
@@ -58,7 +66,7 @@ export function usePresentationViewerContext() {
 // Hook for backward compatibility with usePresentationViewer
 export function usePresentationViewer() {
   const store = usePresentationViewerStore();
-  
+
   return {
     viewerState: {
       isOpen: store.isOpen,
@@ -73,8 +81,14 @@ export function usePresentationViewer() {
 
 // Component wrapper to render the FullScreenPresentationViewer
 export function PresentationViewerWrapper() {
-  const { isOpen, presentationName, sandboxUrl, initialSlide, closePresentation } = usePresentationViewerStore();
-  
+  const {
+    isOpen,
+    presentationName,
+    sandboxUrl,
+    initialSlide,
+    closePresentation,
+  } = usePresentationViewerStore();
+
   return (
     <FullScreenPresentationViewer
       isOpen={isOpen}
@@ -85,4 +99,3 @@ export function PresentationViewerWrapper() {
     />
   );
 }
-

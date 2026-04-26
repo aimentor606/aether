@@ -41,7 +41,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { AnimatePresence, motion } from 'framer-motion';
-import { VoiceRecorder } from '@/components/thread/chat-input/voice-recorder';
+import { VoiceRecorder } from '@/components/shared-ui/chat-input/voice-recorder';
 import { ModelSelector } from './model-selector';
 import type {
   MessageWithParts,
@@ -50,7 +50,10 @@ import type {
   ProviderListResponse,
   PromptPart,
 } from '@/hooks/opencode/use-opencode-sessions';
-import { useOpenCodeSessions, useOpenCodeSessionTodo } from '@/hooks/opencode/use-opencode-sessions';
+import {
+  useOpenCodeSessions,
+  useOpenCodeSessionTodo,
+} from '@/hooks/opencode/use-opencode-sessions';
 import { searchWorkspaceFiles } from '@/features/files';
 import { getFileIcon } from '@/features/files/components/file-icon';
 import type { Session } from '@/hooks/opencode/use-opencode-sessions';
@@ -113,10 +116,14 @@ export interface FlatModel {
   providerSource?: string;
 }
 
-export function flattenModels(providers: ProviderListResponse | undefined): FlatModel[] {
+export function flattenModels(
+  providers: ProviderListResponse | undefined,
+): FlatModel[] {
   if (!providers) return [];
   const all = Array.isArray(providers.all) ? providers.all : [];
-  const connected = Array.isArray(providers.connected) ? providers.connected : [];
+  const connected = Array.isArray(providers.connected)
+    ? providers.connected
+    : [];
   const result: FlatModel[] = [];
   for (const p of all) {
     if (!connected.includes(p.id)) continue;
@@ -129,22 +136,26 @@ export function flattenModels(providers: ProviderListResponse | undefined): Flat
         modelID,
         modelName: (model.name || modelID).replace('(latest)', '').trim(),
         variants: model.variants,
-        capabilities: caps ? {
-          reasoning: caps.reasoning ?? false,
-          vision: caps.input?.image ?? false,
-          toolcall: caps.toolcall ?? false,
-        } : {
-          reasoning: (model as any).reasoning ?? false,
-          vision: modalities?.input?.includes('image') ?? false,
-          toolcall: (model as any).tool_call ?? false,
-        },
+        capabilities: caps
+          ? {
+              reasoning: caps.reasoning ?? false,
+              vision: caps.input?.image ?? false,
+              toolcall: caps.toolcall ?? false,
+            }
+          : {
+              reasoning: (model as any).reasoning ?? false,
+              vision: modalities?.input?.includes('image') ?? false,
+              toolcall: (model as any).tool_call ?? false,
+            },
         contextWindow: (model as any).limit?.context,
         releaseDate: (model as any).release_date,
         family: (model as any).family,
-        cost: (model as any).cost ? {
-          input: (model as any).cost.input ?? 0,
-          output: (model as any).cost.output ?? 0,
-        } : undefined,
+        cost: (model as any).cost
+          ? {
+              input: (model as any).cost.input ?? 0,
+              output: (model as any).cost.output ?? 0,
+            }
+          : undefined,
         providerSource: (p as any).source,
       });
     }
@@ -170,12 +181,21 @@ export function AgentSelector({
   const [flash, setFlash] = useState(false);
   const prevAgentRef = useRef(selectedAgent);
 
-  const primaryAgents = useMemo(() => agents.filter((a) => a.mode !== 'subagent'), [agents]);
-  const subAgents = useMemo(() => agents.filter((a) => a.mode === 'subagent'), [agents]);
+  const primaryAgents = useMemo(
+    () => agents.filter((a) => a.mode !== 'subagent'),
+    [agents],
+  );
+  const subAgents = useMemo(
+    () => agents.filter((a) => a.mode === 'subagent'),
+    [agents],
+  );
 
   // Flash highlight when agent changes (e.g. via Tab cycling)
   useEffect(() => {
-    if (prevAgentRef.current !== selectedAgent && prevAgentRef.current !== null) {
+    if (
+      prevAgentRef.current !== selectedAgent &&
+      prevAgentRef.current !== null
+    ) {
       setFlash(true);
       const timer = setTimeout(() => setFlash(false), 400);
       return () => clearTimeout(timer);
@@ -196,20 +216,25 @@ export function AgentSelector({
   const filteredPrimary = useMemo(() => {
     const q = search.toLowerCase().trim();
     if (!q) return primaryAgents;
-    return primaryAgents.filter((a) =>
-      a.name.toLowerCase().includes(q) || (a.description || '').toLowerCase().includes(q),
+    return primaryAgents.filter(
+      (a) =>
+        a.name.toLowerCase().includes(q) ||
+        (a.description || '').toLowerCase().includes(q),
     );
   }, [primaryAgents, search]);
 
   const filteredSub = useMemo(() => {
     const q = search.toLowerCase().trim();
     if (!q) return subAgents;
-    return subAgents.filter((a) =>
-      a.name.toLowerCase().includes(q) || (a.description || '').toLowerCase().includes(q),
+    return subAgents.filter(
+      (a) =>
+        a.name.toLowerCase().includes(q) ||
+        (a.description || '').toLowerCase().includes(q),
     );
   }, [subAgents, search]);
 
-  const currentAgent = agents.find((a) => a.name === selectedAgent) || agents[0];
+  const currentAgent =
+    agents.find((a) => a.name === selectedAgent) || agents[0];
   const displayName = currentAgent?.name || 'Agent';
 
   return (
@@ -226,16 +251,31 @@ export function AgentSelector({
               )}
             >
               <span className="truncate max-w-[100px]">{displayName}</span>
-              <ChevronDown className={cn('size-3 opacity-50 transition-transform duration-200', open && 'rotate-180')} />
+              <ChevronDown
+                className={cn(
+                  'size-3 opacity-50 transition-transform duration-200',
+                  open && 'rotate-180',
+                )}
+              />
             </button>
           </CommandPopoverTrigger>
         </TooltipTrigger>
         <TooltipContent side="top" className="text-xs">
-          <p>Switch agent <kbd className="ml-1 px-1.5 py-0.5 rounded bg-foreground/10 text-[10px] font-mono">Tab</kbd></p>
+          <p>
+            Switch agent{' '}
+            <kbd className="ml-1 px-1.5 py-0.5 rounded bg-foreground/10 text-[10px] font-mono">
+              Tab
+            </kbd>
+          </p>
         </TooltipContent>
       </Tooltip>
 
-      <CommandPopoverContent side="top" align="start" sideOffset={8} className="w-[300px]">
+      <CommandPopoverContent
+        side="top"
+        align="start"
+        sideOffset={8}
+        className="w-[300px]"
+      >
         <CommandInput
           compact
           placeholder="Search agents..."
@@ -248,7 +288,9 @@ export function AgentSelector({
           {filteredPrimary.length > 0 && (
             <CommandGroup heading="Agents" forceMount>
               {filteredPrimary.map((agent) => {
-                const isSelected = selectedAgent === agent.name || (!selectedAgent && agent === agents[0]);
+                const isSelected =
+                  selectedAgent === agent.name ||
+                  (!selectedAgent && agent === agents[0]);
                 return (
                   <CommandItem
                     key={agent.name}
@@ -260,13 +302,19 @@ export function AgentSelector({
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-medium truncate capitalize">{agent.name}</span>
+                        <span className="font-medium truncate capitalize">
+                          {agent.name}
+                        </span>
                       </div>
                       {agent.description && (
-                        <p className="text-[11px] text-muted-foreground/50 leading-snug mt-0.5 line-clamp-1">{agent.description}</p>
+                        <p className="text-[11px] text-muted-foreground/50 leading-snug mt-0.5 line-clamp-1">
+                          {agent.description}
+                        </p>
                       )}
                     </div>
-                    {isSelected && <Check className="size-3.5 text-foreground shrink-0" />}
+                    {isSelected && (
+                      <Check className="size-3.5 text-foreground shrink-0" />
+                    )}
                   </CommandItem>
                 );
               })}
@@ -289,13 +337,19 @@ export function AgentSelector({
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-medium truncate capitalize">{agent.name}</span>
+                        <span className="font-medium truncate capitalize">
+                          {agent.name}
+                        </span>
                       </div>
                       {agent.description && (
-                        <p className="text-[11px] text-muted-foreground/50 leading-snug mt-0.5 line-clamp-1">{agent.description}</p>
+                        <p className="text-[11px] text-muted-foreground/50 leading-snug mt-0.5 line-clamp-1">
+                          {agent.description}
+                        </p>
                       )}
                     </div>
-                    {isSelected && <Check className="size-3.5 text-foreground shrink-0" />}
+                    {isSelected && (
+                      <Check className="size-3.5 text-foreground shrink-0" />
+                    )}
                   </CommandItem>
                 );
               })}
@@ -303,11 +357,13 @@ export function AgentSelector({
           )}
 
           {/* No results */}
-          {filteredPrimary.length === 0 && filteredSub.length === 0 && search.trim() && (
-            <div className="py-8 text-center text-xs text-muted-foreground/50">
-              No agents match &ldquo;{search.trim()}&rdquo;
-            </div>
-          )}
+          {filteredPrimary.length === 0 &&
+            filteredSub.length === 0 &&
+            search.trim() && (
+              <div className="py-8 text-center text-xs text-muted-foreground/50">
+                No agents match &ldquo;{search.trim()}&rdquo;
+              </div>
+            )}
         </CommandList>
 
         <CommandFooter>
@@ -362,8 +418,8 @@ function VariantSelector({
           type="button"
           onClick={cycle}
           className={cn(
-            "inline-flex items-center gap-1 h-8 px-2.5 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer capitalize",
-            selectedVariant && "text-foreground",
+            'inline-flex items-center gap-1 h-8 px-2.5 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer capitalize',
+            selectedVariant && 'text-foreground',
           )}
         >
           {displayName}
@@ -746,39 +802,69 @@ interface TokenProgressProps {
   onContextClick?: () => void;
 }
 
-function getLastAssistantTokenTotal(messages: MessageWithParts[] | undefined): number {
+function getLastAssistantTokenTotal(
+  messages: MessageWithParts[] | undefined,
+): number {
   if (!messages) return 0;
   for (let i = messages.length - 1; i >= 0; i--) {
     const msg = messages[i];
     if (msg.info.role !== 'assistant') continue;
     const t = (msg.info as any).tokens;
     if (!t) continue;
-    const total = (t.input ?? 0) + (t.output ?? 0) + (t.reasoning ?? 0) + (t.cache?.read ?? 0) + (t.cache?.write ?? 0);
+    const total =
+      (t.input ?? 0) +
+      (t.output ?? 0) +
+      (t.reasoning ?? 0) +
+      (t.cache?.read ?? 0) +
+      (t.cache?.write ?? 0);
     if (total > 0) return total;
   }
   return 0;
 }
 
-function getContextLimit(models: FlatModel[] | undefined, selectedModel: { providerID: string; modelID: string } | null | undefined): number {
+function getContextLimit(
+  models: FlatModel[] | undefined,
+  selectedModel: { providerID: string; modelID: string } | null | undefined,
+): number {
   if (selectedModel && models) {
-    const model = models.find(m => m.providerID === selectedModel.providerID && m.modelID === selectedModel.modelID);
-    if (model?.contextWindow && model.contextWindow > 0) return model.contextWindow;
+    const model = models.find(
+      (m) =>
+        m.providerID === selectedModel.providerID &&
+        m.modelID === selectedModel.modelID,
+    );
+    if (model?.contextWindow && model.contextWindow > 0)
+      return model.contextWindow;
   }
   return 200000;
 }
 
-function TokenProgress({ messages, models, selectedModel, onContextClick }: TokenProgressProps) {
-  const contextTokens = useMemo(() => getLastAssistantTokenTotal(messages), [messages]);
-  const contextLimit = useMemo(() => getContextLimit(models, selectedModel), [models, selectedModel]);
-  const ratio = contextTokens > 0 ? Math.min(contextTokens / contextLimit, 1) : 0;
+function TokenProgress({
+  messages,
+  models,
+  selectedModel,
+  onContextClick,
+}: TokenProgressProps) {
+  const contextTokens = useMemo(
+    () => getLastAssistantTokenTotal(messages),
+    [messages],
+  );
+  const contextLimit = useMemo(
+    () => getContextLimit(models, selectedModel),
+    [models, selectedModel],
+  );
+  const ratio =
+    contextTokens > 0 ? Math.min(contextTokens / contextLimit, 1) : 0;
 
   if (contextTokens === 0 && !onContextClick) return null;
 
   const circumference = 2 * Math.PI * 7;
   const offset = circumference * (1 - ratio);
-  const color = ratio >= 0.9 ? 'text-amber-400'
-    : ratio > 0.8 ? 'text-orange-500'
-    : 'text-muted-foreground';
+  const color =
+    ratio >= 0.9
+      ? 'text-amber-400'
+      : ratio > 0.8
+        ? 'text-orange-500'
+        : 'text-muted-foreground';
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -788,21 +874,49 @@ function TokenProgress({ messages, models, selectedModel, onContextClick }: Toke
             <button
               type="button"
               className="size-6 flex items-center justify-center cursor-pointer"
-              onPointerDown={(e) => { e.stopPropagation(); }}
-              onClick={(e) => { e.stopPropagation(); onContextClick?.(); }}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onContextClick?.();
+              }}
             >
               <svg className="size-5 -rotate-90" viewBox="0 0 18 18">
-                <circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted" />
-                <circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" strokeWidth="2"
-                  strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" className={color} />
+                <circle
+                  cx="9"
+                  cy="9"
+                  r="7"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="text-muted"
+                />
+                <circle
+                  cx="9"
+                  cy="9"
+                  r="7"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={offset}
+                  strokeLinecap="round"
+                  className={color}
+                />
               </svg>
             </button>
           </span>
         </TooltipTrigger>
         <TooltipContent side="top">
           <div className="text-xs font-mono space-y-0.5">
-            <div>Context: {(contextTokens / 1000).toFixed(1)}k / {(contextLimit / 1000).toFixed(0)}k tokens</div>
-            <div className="text-muted-foreground">{Math.round(ratio * 100)}% used</div>
+            <div>
+              Context: {(contextTokens / 1000).toFixed(1)}k /{' '}
+              {(contextLimit / 1000).toFixed(0)}k tokens
+            </div>
+            <div className="text-muted-foreground">
+              {Math.round(ratio * 100)}% used
+            </div>
           </div>
         </TooltipContent>
       </Tooltip>
@@ -833,7 +947,19 @@ function isImageFile(file: File): boolean {
   if (file.type.startsWith('image/')) return true;
   // Fallback: check extension for when MIME type is missing (e.g. pasted files)
   const ext = file.name.split('.').pop()?.toLowerCase() || '';
-  return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico', 'heic', 'heif', 'avif'].includes(ext);
+  return [
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+    'webp',
+    'svg',
+    'bmp',
+    'ico',
+    'heic',
+    'heif',
+    'avif',
+  ].includes(ext);
 }
 
 // ============================================================================
@@ -846,9 +972,22 @@ function AttachmentThumbnail({ af, name }: { af: AttachedFile; name: string }) {
   const ext = name.split('.').pop()?.toLowerCase() || '';
 
   // Check if this is an image — be generous with detection
-  const isImg = af.isImage ||
+  const isImg =
+    af.isImage ||
     (af.kind === 'local' && af.file.type.startsWith('image/')) ||
-    ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico', 'heic', 'heif', 'avif'].includes(ext);
+    [
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'webp',
+      'svg',
+      'bmp',
+      'ico',
+      'heic',
+      'heif',
+      'avif',
+    ].includes(ext);
 
   // HEIC: convert to JPEG for preview (browsers can't render HEIC natively)
   const isHeic = ext === 'heic' || ext === 'heif';
@@ -857,38 +996,90 @@ function AttachmentThumbnail({ af, name }: { af: AttachedFile; name: string }) {
     if (!isHeic || !isImg || af.kind !== 'local') return;
     let cancelled = false;
     let u: string | null = null;
-    import('@/lib/utils/heic-convert').then(({ convertHeicBlobToJpeg }) =>
-      convertHeicBlobToJpeg(af.file).then((jpeg) => {
-        if (cancelled) return;
-        u = URL.createObjectURL(jpeg);
-        setHeicUrl(u);
-      }),
-    ).catch(() => {});
-    return () => { cancelled = true; if (u) URL.revokeObjectURL(u); };
+    import('@/lib/utils/heic-convert')
+      .then(({ convertHeicBlobToJpeg }) =>
+        convertHeicBlobToJpeg(af.file).then((jpeg) => {
+          if (cancelled) return;
+          u = URL.createObjectURL(jpeg);
+          setHeicUrl(u);
+        }),
+      )
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+      if (u) URL.revokeObjectURL(u);
+    };
   }, [af, isHeic, isImg]);
 
   // For local text/code files, read first ~12 lines for preview
   useEffect(() => {
     if (af.kind !== 'local' || isImg) return;
     const textExts = [
-      'js', 'jsx', 'ts', 'tsx', 'py', 'rb', 'go', 'rs', 'java', 'c', 'cpp', 'h', 'hpp',
-      'css', 'scss', 'html', 'vue', 'svelte', 'json', 'yaml', 'yml', 'toml', 'xml',
-      'md', 'mdx', 'txt', 'log', 'sh', 'bash', 'zsh', 'sql', 'swift', 'kt', 'scala',
-      'lua', 'r', 'php', 'pl', 'ini', 'conf', 'env', 'gitignore', 'dockerfile',
+      'js',
+      'jsx',
+      'ts',
+      'tsx',
+      'py',
+      'rb',
+      'go',
+      'rs',
+      'java',
+      'c',
+      'cpp',
+      'h',
+      'hpp',
+      'css',
+      'scss',
+      'html',
+      'vue',
+      'svelte',
+      'json',
+      'yaml',
+      'yml',
+      'toml',
+      'xml',
+      'md',
+      'mdx',
+      'txt',
+      'log',
+      'sh',
+      'bash',
+      'zsh',
+      'sql',
+      'swift',
+      'kt',
+      'scala',
+      'lua',
+      'r',
+      'php',
+      'pl',
+      'ini',
+      'conf',
+      'env',
+      'gitignore',
+      'dockerfile',
     ];
     if (!textExts.includes(ext)) return;
     const reader = new FileReader();
-    reader.onload = () => setTextPreview((reader.result as string).split('\n').slice(0, 12).join('\n'));
+    reader.onload = () =>
+      setTextPreview(
+        (reader.result as string).split('\n').slice(0, 12).join('\n'),
+      );
     reader.readAsText(af.file.slice(0, 2048));
   }, [af, ext, isImg]);
 
   // Image thumbnail — HEIC uses converted URL, everything else uses original
   if (isImg) {
-    const src = isHeic ? heicUrl : (af.kind === 'local' ? af.localUrl : af.url);
+    const src = isHeic ? heicUrl : af.kind === 'local' ? af.localUrl : af.url;
     if (!src) return null; // HEIC still converting — show nothing briefly
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={src} alt={name} className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+      <img
+        src={src}
+        alt={name}
+        className="absolute inset-0 w-full h-full object-cover"
+        draggable={false}
+      />
     );
   }
 
@@ -925,11 +1116,13 @@ function AttachmentPreview({
 
         return (
           <div key={i} className="relative group">
-            <div className={cn(
-              'flex flex-col rounded-lg border border-border/50 overflow-hidden',
-              'w-[120px] cursor-default select-none',
-              'bg-card hover:bg-muted/30 hover:border-border transition-colors duration-150',
-            )}>
+            <div
+              className={cn(
+                'flex flex-col rounded-lg border border-border/50 overflow-hidden',
+                'w-[120px] cursor-default select-none',
+                'bg-card hover:bg-muted/30 hover:border-border transition-colors duration-150',
+              )}
+            >
               {/* Thumbnail area */}
               <div className="h-[80px] relative flex items-center justify-center overflow-hidden bg-muted/20">
                 <AttachmentThumbnail af={af} name={name} />
@@ -943,8 +1136,13 @@ function AttachmentPreview({
               {/* Name bar */}
               <div className="px-2 py-1.5 border-t border-border/30 h-[32px] flex items-center">
                 <div className="flex items-center gap-1 min-w-0 w-full">
-                  {getFileIcon(name, { className: 'h-3.5 w-3.5 shrink-0', variant: 'monochrome' })}
-                  <span className="text-[11px] truncate text-foreground">{name}</span>
+                  {getFileIcon(name, {
+                    className: 'h-3.5 w-3.5 shrink-0',
+                    variant: 'monochrome',
+                  })}
+                  <span className="text-[11px] truncate text-foreground">
+                    {name}
+                  </span>
                 </div>
               </div>
             </div>
@@ -1010,7 +1208,11 @@ function SlashCommandPopover({
   return (
     <div
       className="fixed z-[9999] bg-popover border border-border/60 rounded-lg shadow-lg overflow-hidden"
-      style={{ bottom: window.innerHeight - r.top + 4, left: r.left, width: Math.min(r.width, 480) }}
+      style={{
+        bottom: window.innerHeight - r.top + 4,
+        left: r.left,
+        width: Math.min(r.width, 480),
+      }}
     >
       <div ref={scrollRef} className="max-h-64 overflow-y-auto py-1">
         {filtered.map((cmd, i) => (
@@ -1022,12 +1224,18 @@ function SlashCommandPopover({
             }}
             className={cn(
               'w-full flex flex-col gap-0.5 px-3 py-2 text-left transition-colors cursor-pointer',
-              i === selectedIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-muted',
+              i === selectedIndex
+                ? 'bg-accent text-accent-foreground'
+                : 'hover:bg-muted',
             )}
           >
-            <span className="font-mono text-sm text-foreground">/{cmd.name}</span>
+            <span className="font-mono text-sm text-foreground">
+              /{cmd.name}
+            </span>
             {cmd.description && (
-              <span className="text-xs text-muted-foreground/40 line-clamp-2">{cmd.description}</span>
+              <span className="text-xs text-muted-foreground/40 line-clamp-2">
+                {cmd.description}
+              </span>
             )}
           </button>
         ))}
@@ -1070,7 +1278,9 @@ function MentionPopover({
 
   // Scroll selected item into view
   useEffect(() => {
-    const el = listRef.current?.querySelector(`[data-mention-index="${selectedIndex}"]`) as HTMLElement | null;
+    const el = listRef.current?.querySelector(
+      `[data-mention-index="${selectedIndex}"]`,
+    ) as HTMLElement | null;
     el?.scrollIntoView({ block: 'nearest' });
   }, [selectedIndex]);
 
@@ -1090,27 +1300,46 @@ function MentionPopover({
   return (
     <div
       className="fixed z-[9999] bg-popover border border-border/60 rounded-lg shadow-lg overflow-hidden"
-      style={{ bottom: window.innerHeight - r.top + 4, left: r.left, width: Math.min(r.width, 480) }}
+      style={{
+        bottom: window.innerHeight - r.top + 4,
+        left: r.left,
+        width: Math.min(r.width, 480),
+      }}
     >
       <div ref={listRef} className="max-h-72 overflow-y-auto py-1">
         {agents.length > 0 && (
           <>
-            <div className="px-3 py-1 text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">Agents</div>
+            <div className="px-3 py-1 text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">
+              Agents
+            </div>
             {agents.map((item) => {
               const idx = globalIndex++;
               return (
                 <button
                   key={`agent-${item.value}`}
                   data-mention-index={idx}
-                  onMouseDown={(e) => { e.preventDefault(); onSelect(item); }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    onSelect(item);
+                  }}
                   className={cn(
                     'w-full flex items-center gap-2 px-3 py-1.5 text-sm transition-colors cursor-pointer',
-                    idx === selectedIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-muted',
+                    idx === selectedIndex
+                      ? 'bg-accent text-accent-foreground'
+                      : 'hover:bg-muted',
                   )}
                 >
-                  <span className="size-4 rounded flex items-center justify-center bg-purple-500/15 text-purple-500 text-[10px] font-semibold shrink-0">@</span>
-                  <span className="truncate font-medium capitalize">{item.label}</span>
-                  {item.description && <span className="text-muted-foreground/40 truncate text-[10px]">{item.description}</span>}
+                  <span className="size-4 rounded flex items-center justify-center bg-purple-500/15 text-purple-500 text-[10px] font-semibold shrink-0">
+                    @
+                  </span>
+                  <span className="truncate font-medium capitalize">
+                    {item.label}
+                  </span>
+                  {item.description && (
+                    <span className="text-muted-foreground/40 truncate text-[10px]">
+                      {item.description}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -1118,22 +1347,35 @@ function MentionPopover({
         )}
         {sessions.length > 0 && (
           <>
-            <div className="px-3 py-1 text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">Sessions</div>
+            <div className="px-3 py-1 text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">
+              Sessions
+            </div>
             {sessions.map((item) => {
               const idx = globalIndex++;
               return (
                 <button
                   key={`session-${item.value}`}
                   data-mention-index={idx}
-                  onMouseDown={(e) => { e.preventDefault(); onSelect(item); }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    onSelect(item);
+                  }}
                   className={cn(
                     'w-full flex items-center gap-2 px-3 py-1.5 text-sm transition-colors cursor-pointer',
-                    idx === selectedIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-muted',
+                    idx === selectedIndex
+                      ? 'bg-accent text-accent-foreground'
+                      : 'hover:bg-muted',
                   )}
                 >
                   <MessageSquare className="size-4 text-emerald-500 shrink-0" />
-                  <span className="truncate text-sm font-medium">{item.label}</span>
-                  {item.description && <span className="text-[10px] text-muted-foreground/35 truncate ml-auto">{item.description}</span>}
+                  <span className="truncate text-sm font-medium">
+                    {item.label}
+                  </span>
+                  {item.description && (
+                    <span className="text-[10px] text-muted-foreground/35 truncate ml-auto">
+                      {item.description}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -1141,7 +1383,9 @@ function MentionPopover({
         )}
         {files.length > 0 && (
           <>
-            <div className="px-3 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Files</div>
+            <div className="px-3 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+              Files
+            </div>
             {files.map((item) => {
               const idx = globalIndex++;
               const filePath = item.value || item.label;
@@ -1152,10 +1396,15 @@ function MentionPopover({
                 <button
                   key={`file-${item.value}`}
                   data-mention-index={idx}
-                  onMouseDown={(e) => { e.preventDefault(); onSelect(item); }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    onSelect(item);
+                  }}
                   className={cn(
                     'w-full flex items-center gap-2 px-3 py-1.5 text-sm transition-colors cursor-pointer',
-                    idx === selectedIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-muted',
+                    idx === selectedIndex
+                      ? 'bg-accent text-accent-foreground'
+                      : 'hover:bg-muted',
                   )}
                 >
                   {isDir ? (
@@ -1164,7 +1413,9 @@ function MentionPopover({
                     getFileIcon(fileName, { className: 'size-4 shrink-0' })
                   )}
                   <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
-                    <span className="truncate text-sm font-medium">{fileName}</span>
+                    <span className="truncate text-sm font-medium">
+                      {fileName}
+                    </span>
                     <span className="text-[10px] text-muted-foreground/35 font-mono truncate flex-shrink min-w-0">
                       {cleanPath}
                     </span>
@@ -1204,7 +1455,12 @@ function TodoChip({ sessionId }: { sessionId: string }) {
 
   // Sort: in_progress first, then pending, then completed/cancelled
   const sorted = [...todos].sort((a: any, b: any) => {
-    const order: Record<string, number> = { in_progress: 0, pending: 1, completed: 2, cancelled: 3 };
+    const order: Record<string, number> = {
+      in_progress: 0,
+      pending: 1,
+      completed: 2,
+      cancelled: 3,
+    };
     return (order[a.status] ?? 2) - (order[b.status] ?? 2);
   });
 
@@ -1220,10 +1476,18 @@ function TodoChip({ sessionId }: { sessionId: string }) {
         <span className="text-xs text-muted-foreground flex-1 min-w-0 truncate text-left">
           {completed} of {total} tasks done
           {inProgress && (
-            <span className="text-foreground/80 font-medium"> · {inProgress.content}</span>
+            <span className="text-foreground/80 font-medium">
+              {' '}
+              · {inProgress.content}
+            </span>
           )}
         </span>
-        <ChevronDown className={cn('size-3 text-muted-foreground/40 transition-transform', expanded && 'rotate-180')} />
+        <ChevronDown
+          className={cn(
+            'size-3 text-muted-foreground/40 transition-transform',
+            expanded && 'rotate-180',
+          )}
+        />
       </button>
 
       {/* Expanded task list */}
@@ -1235,24 +1499,45 @@ function TodoChip({ sessionId }: { sessionId: string }) {
             const active = todo.status === 'in_progress';
             if (cancelled) return null;
             return (
-              <div key={todo.id || i} className={cn(
-                'flex items-center gap-2 py-0.5',
-                done && 'opacity-40',
-              )}>
-                <span className={cn(
-                  'size-3 rounded-sm flex-shrink-0 flex items-center justify-center border',
-                  done ? 'border-border bg-muted' : active ? 'border-foreground/30' : 'border-border',
-                )}>
-                  {done && (
-                    <svg viewBox="0 0 12 12" fill="none" width="8" height="8"><path d="M3 7.17905L5.02703 8.85135L9 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" className="text-foreground" /></svg>
+              <div
+                key={todo.id || i}
+                className={cn(
+                  'flex items-center gap-2 py-0.5',
+                  done && 'opacity-40',
+                )}
+              >
+                <span
+                  className={cn(
+                    'size-3 rounded-sm flex-shrink-0 flex items-center justify-center border',
+                    done
+                      ? 'border-border bg-muted'
+                      : active
+                        ? 'border-foreground/30'
+                        : 'border-border',
                   )}
-                  {active && <div className="size-1 rounded-full bg-foreground" />}
+                >
+                  {done && (
+                    <svg viewBox="0 0 12 12" fill="none" width="8" height="8">
+                      <path
+                        d="M3 7.17905L5.02703 8.85135L9 3.5"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="square"
+                        className="text-foreground"
+                      />
+                    </svg>
+                  )}
+                  {active && (
+                    <div className="size-1 rounded-full bg-foreground" />
+                  )}
                 </span>
-                <span className={cn(
-                  'text-[11px] leading-tight truncate',
-                  done && 'line-through text-muted-foreground',
-                  !done && 'text-foreground',
-                )}>
+                <span
+                  className={cn(
+                    'text-[11px] leading-tight truncate',
+                    done && 'line-through text-muted-foreground',
+                    !done && 'text-foreground',
+                  )}
+                >
                   {todo.content}
                 </span>
               </div>
@@ -1265,7 +1550,11 @@ function TodoChip({ sessionId }: { sessionId: string }) {
 }
 
 export interface SessionChatInputProps {
-  onSend: (text: string, files?: AttachedFile[], mentions?: TrackedMention[]) => void | Promise<void>;
+  onSend: (
+    text: string,
+    files?: AttachedFile[],
+    mentions?: TrackedMention[],
+  ) => void | Promise<void>;
   isBusy?: boolean;
   onStop?: () => void;
   agents?: Agent[];
@@ -1275,7 +1564,9 @@ export interface SessionChatInputProps {
   onCommand?: (command: Command, args?: string) => void;
   models?: FlatModel[];
   selectedModel?: { providerID: string; modelID: string } | null;
-  onModelChange?: (model: { providerID: string; modelID: string } | null) => void;
+  onModelChange?: (
+    model: { providerID: string; modelID: string } | null,
+  ) => void;
   variants?: string[];
   selectedVariant?: string | null;
   onVariantChange?: (variant: string | null | undefined) => void;
@@ -1423,17 +1714,26 @@ export function SessionChatInput({
   const fileSearchFn = useMemo(() => {
     if (onFileSearch) return onFileSearch;
     return async (query: string): Promise<string[]> => {
-      try { return await searchWorkspaceFiles(query); } catch { return []; }
+      try {
+        return await searchWorkspaceFiles(query);
+      } catch {
+        return [];
+      }
     };
   }, [onFileSearch]);
 
   // @ mention state
-  const [mentionQuery, setMentionQuery] = useState<{ query: string; triggerPos: number } | null>(null);
+  const [mentionQuery, setMentionQuery] = useState<{
+    query: string;
+    triggerPos: number;
+  } | null>(null);
   const [mentionIndex, setMentionIndex] = useState(0);
   const [mentions, setMentions] = useState<TrackedMention[]>([]);
   const [fileResults, setFileResults] = useState<string[]>([]);
   const [fileSearchLoading, setFileSearchLoading] = useState(false);
-  const fileSearchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const fileSearchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const fileSearchSeq = useRef(0); // sequence counter to discard stale results
   // Cache of all file results seen during the current mention session.
   // This survives across query changes so that narrowing a query (e.g. "te" → "test")
@@ -1551,9 +1851,9 @@ export function SessionChatInput({
     return () => window.removeEventListener('focus-session-textarea', handler);
   }, []);
 
-
   // Default autoFocus: true on desktop, false on mobile
-  const shouldAutoFocus = autoFocus ?? (typeof window !== 'undefined' && window.innerWidth >= 640);
+  const shouldAutoFocus =
+    autoFocus ?? (typeof window !== 'undefined' && window.innerWidth >= 640);
 
   // Focus the textarea whenever it becomes visible (handles mount, tab switch,
   // and new-session creation where the component may mount inside a hidden div
@@ -1588,7 +1888,12 @@ export function SessionChatInput({
     const newFiles: AttachedFile[] = [];
     for (const file of files) {
       const localUrl = URL.createObjectURL(file);
-      newFiles.push({ kind: 'local', file, localUrl, isImage: isImageFile(file) });
+      newFiles.push({
+        kind: 'local',
+        file,
+        localUrl,
+        isImage: isImageFile(file),
+      });
     }
     if (newFiles.length === 0) return;
     setAttachedFiles((prev) => [...prev, ...newFiles]);
@@ -1609,37 +1914,49 @@ export function SessionChatInput({
     return Array.from(e.dataTransfer?.types ?? []).includes('Files');
   }, []);
 
-  const handleDragEnter = useCallback((e: React.DragEvent<HTMLElement>) => {
-    if (disabled || lockForQuestion || !dragHasFiles(e)) return;
-    e.preventDefault();
-    dragDepthRef.current += 1;
-    setIsDragOver(true);
-  }, [disabled, lockForQuestion, dragHasFiles]);
+  const handleDragEnter = useCallback(
+    (e: React.DragEvent<HTMLElement>) => {
+      if (disabled || lockForQuestion || !dragHasFiles(e)) return;
+      e.preventDefault();
+      dragDepthRef.current += 1;
+      setIsDragOver(true);
+    },
+    [disabled, lockForQuestion, dragHasFiles],
+  );
 
-  const handleDragOver = useCallback((e: React.DragEvent<HTMLElement>) => {
-    if (disabled || lockForQuestion || !dragHasFiles(e)) return;
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy';
-  }, [disabled, lockForQuestion, dragHasFiles]);
+  const handleDragOver = useCallback(
+    (e: React.DragEvent<HTMLElement>) => {
+      if (disabled || lockForQuestion || !dragHasFiles(e)) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+    },
+    [disabled, lockForQuestion, dragHasFiles],
+  );
 
-  const handleDragLeave = useCallback((e: React.DragEvent<HTMLElement>) => {
-    if (!dragHasFiles(e)) return;
-    e.preventDefault();
-    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
-    if (dragDepthRef.current === 0) {
+  const handleDragLeave = useCallback(
+    (e: React.DragEvent<HTMLElement>) => {
+      if (!dragHasFiles(e)) return;
+      e.preventDefault();
+      dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+      if (dragDepthRef.current === 0) {
+        setIsDragOver(false);
+      }
+    },
+    [dragHasFiles],
+  );
+
+  const handleDropFiles = useCallback(
+    (e: React.DragEvent<HTMLElement>) => {
+      if (disabled || lockForQuestion || !dragHasFiles(e)) return;
+      e.preventDefault();
+      dragDepthRef.current = 0;
       setIsDragOver(false);
-    }
-  }, [dragHasFiles]);
-
-  const handleDropFiles = useCallback((e: React.DragEvent<HTMLElement>) => {
-    if (disabled || lockForQuestion || !dragHasFiles(e)) return;
-    e.preventDefault();
-    dragDepthRef.current = 0;
-    setIsDragOver(false);
-    const dropped = e.dataTransfer.files;
-    if (!dropped || dropped.length === 0) return;
-    appendAttachedFiles(Array.from(dropped));
-  }, [appendAttachedFiles, disabled, lockForQuestion, dragHasFiles]);
+      const dropped = e.dataTransfer.files;
+      if (!dropped || dropped.length === 0) return;
+      appendAttachedFiles(Array.from(dropped));
+    },
+    [appendAttachedFiles, disabled, lockForQuestion, dragHasFiles],
+  );
 
   const removeAttachedFile = (index: number) => {
     setAttachedFiles((prev) => {
@@ -1715,7 +2032,7 @@ export function SessionChatInput({
       }
     }, 150);
     return () => clearTimeout(fileSearchTimer.current);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mentionQuery?.query, fileSearchFn]);
 
   // Build mention popover items: agents (sync) + sessions (sync) + files (async)
@@ -1741,7 +2058,9 @@ export function SessionChatInput({
         // Also match against file paths in summary diffs
         const diffs = s.summary?.diffs;
         if (Array.isArray(diffs)) {
-          return diffs.some((d: any) => (d.file || '').toLowerCase().includes(q));
+          return diffs.some((d: any) =>
+            (d.file || '').toLowerCase().includes(q),
+          );
         }
         return false;
       })
@@ -1749,13 +2068,21 @@ export function SessionChatInput({
       .map((s: Session) => {
         const ago = formatRelativeTime(s.time.updated);
         const files = s.summary?.files;
-        const desc = files ? `${ago} - ${files} file${files === 1 ? '' : 's'} changed` : ago;
-        return { kind: 'session' as const, label: s.title || s.id, value: s.id, description: desc };
+        const desc = files
+          ? `${ago} - ${files} file${files === 1 ? '' : 's'} changed`
+          : ago;
+        return {
+          kind: 'session' as const,
+          label: s.title || s.id,
+          value: s.id,
+          description: desc,
+        };
       });
 
-    const filteredFiles = q.length > 0
-      ? fileResults.filter((f) => f.toLowerCase().includes(q))
-      : fileResults;
+    const filteredFiles =
+      q.length > 0
+        ? fileResults.filter((f) => f.toLowerCase().includes(q))
+        : fileResults;
     const fileItems: MentionItem[] = filteredFiles.map((f) => ({
       kind: 'file' as const,
       label: f,
@@ -1836,7 +2163,8 @@ export function SessionChatInput({
     */
 
     // Snapshot files and mentions before clearing
-    const filesToSend = attachedFiles.length > 0 ? [...attachedFiles] : undefined;
+    const filesToSend =
+      attachedFiles.length > 0 ? [...attachedFiles] : undefined;
     const mentionsToSend = mentions.length > 0 ? [...mentions] : undefined;
 
     // Optimistically clear input
@@ -1867,7 +2195,21 @@ export function SessionChatInput({
       // Restore the text so the user can retry
       setText(trimmed);
     }
-  }, [text, isBusy, disabled, onSend, onCommand, stagedCommand, attachedFiles, mentions, sessionId, enqueue, lockForQuestion, onCustomAnswer, onQuestionAction]);
+  }, [
+    text,
+    isBusy,
+    disabled,
+    onSend,
+    onCommand,
+    stagedCommand,
+    attachedFiles,
+    mentions,
+    sessionId,
+    enqueue,
+    lockForQuestion,
+    onCustomAnswer,
+    onQuestionAction,
+  ]);
 
   const handleSelectCommand = (cmd: Command) => {
     // Stage the command — show an args input instead of executing immediately
@@ -1882,11 +2224,20 @@ export function SessionChatInput({
   const handleSelectMention = (item: MentionItem) => {
     if (!mentionQuery) return;
     const before = text.slice(0, mentionQuery.triggerPos);
-    const after = text.slice(mentionQuery.triggerPos + 1 + mentionQuery.query.length); // +1 for '@'
+    const after = text.slice(
+      mentionQuery.triggerPos + 1 + mentionQuery.query.length,
+    ); // +1 for '@'
     const inserted = `@${item.label} `;
     const newText = before + inserted + after;
     setText(newText);
-    setMentions((prev) => [...prev, { kind: item.kind, label: item.label, ...(item.kind === 'session' ? { value: item.value } : {}) }]);
+    setMentions((prev) => [
+      ...prev,
+      {
+        kind: item.kind,
+        label: item.label,
+        ...(item.kind === 'session' ? { value: item.value } : {}),
+      },
+    ]);
     setMentionQuery(null);
     setMentionIndex(0);
     setFileResults([]);
@@ -1919,15 +2270,22 @@ export function SessionChatInput({
     }
 
     // @ mention popover keyboard navigation
-    if (mentionQuery !== null && (mentionItems.length > 0 || fileSearchLoading)) {
+    if (
+      mentionQuery !== null &&
+      (mentionItems.length > 0 || fileSearchLoading)
+    ) {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        if (mentionItems.length > 0) setMentionIndex((i) => (i + 1) % mentionItems.length);
+        if (mentionItems.length > 0)
+          setMentionIndex((i) => (i + 1) % mentionItems.length);
         return;
       }
       if (e.key === 'ArrowUp') {
         e.preventDefault();
-        if (mentionItems.length > 0) setMentionIndex((i) => (i - 1 + mentionItems.length) % mentionItems.length);
+        if (mentionItems.length > 0)
+          setMentionIndex(
+            (i) => (i - 1 + mentionItems.length) % mentionItems.length,
+          );
         return;
       }
       if (e.key === 'Enter' || e.key === 'Tab') {
@@ -1952,7 +2310,9 @@ export function SessionChatInput({
       }
       if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setSlashIndex((i) => (i - 1 + filteredCommands.length) % filteredCommands.length);
+        setSlashIndex(
+          (i) => (i - 1 + filteredCommands.length) % filteredCommands.length,
+        );
         return;
       }
       if (e.key === 'Enter' || e.key === 'Tab') {
@@ -2044,7 +2404,11 @@ export function SessionChatInput({
   const highlightSegments = useMemo(() => {
     if (mentions.length === 0 || !text) return null;
     // Collect all mention ranges sorted by position
-    const ranges: { start: number; end: number; kind: 'file' | 'agent' | 'session' }[] = [];
+    const ranges: {
+      start: number;
+      end: number;
+      kind: 'file' | 'agent' | 'session';
+    }[] = [];
     for (const m of mentions) {
       const needle = `@${m.label}`;
       const idx = text.indexOf(needle);
@@ -2101,15 +2465,16 @@ export function SessionChatInput({
           )}
 
           {/* @ Mention popover (portalled to body to escape overflow-hidden ancestors) */}
-          {mentionQuery !== null && (mentionItems.length > 0 || fileSearchLoading) && (
-            <MentionPopover
-              items={mentionItems}
-              selectedIndex={mentionIndex}
-              onSelect={handleSelectMention}
-              loading={fileSearchLoading}
-              anchorRef={cardRef}
-            />
-          )}
+          {mentionQuery !== null &&
+            (mentionItems.length > 0 || fileSearchLoading) && (
+              <MentionPopover
+                items={mentionItems}
+                selectedIndex={mentionIndex}
+                onSelect={handleSelectMention}
+                loading={fileSearchLoading}
+                anchorRef={cardRef}
+              />
+            )}
 
           {/* Inline chips: thread context, todos, queue — unified spacing */}
           {(threadContext || sessionId || inputSlot || replyTo) && (
@@ -2118,7 +2483,9 @@ export function SessionChatInput({
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/5 border border-primary/10">
                   <Reply className="size-3 text-primary/60 flex-shrink-0" />
                   <span className="text-xs text-muted-foreground flex-1 min-w-0 truncate">
-                    {replyTo.text.length > 120 ? `${replyTo.text.slice(0, 120)}…` : replyTo.text}
+                    {replyTo.text.length > 120
+                      ? `${replyTo.text.slice(0, 120)}…`
+                      : replyTo.text}
                   </span>
                   {onClearReply && (
                     <button
@@ -2141,9 +2508,12 @@ export function SessionChatInput({
                 >
                   <ArrowUpLeft className="size-3.5 text-muted-foreground group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 transition-transform flex-shrink-0" />
                   <span className="flex-1 min-w-0 truncate text-left">
-                    {threadContext.variant === 'fork' ? 'Fork of' : 'Sub-session of'}
-                    {' '}
-                    <span className="text-foreground/80 font-medium">{threadContext.parentTitle}</span>
+                    {threadContext.variant === 'fork'
+                      ? 'Fork of'
+                      : 'Sub-session of'}{' '}
+                    <span className="text-foreground/80 font-medium">
+                      {threadContext.parentTitle}
+                    </span>
                   </span>
                 </button>
               )}
@@ -2153,30 +2523,40 @@ export function SessionChatInput({
           )}
 
           {/* Attached files preview */}
-          <AttachmentPreview files={attachedFiles} onRemove={removeAttachedFile} />
+          <AttachmentPreview
+            files={attachedFiles}
+            onRemove={removeAttachedFile}
+          />
 
           {/* Staged command badge */}
           {stagedCommand && (
             <div className="flex items-center gap-2 px-4 pt-3 pb-0 min-w-0">
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/60 border border-border/50 shrink-0 max-w-full">
                 <Terminal className="size-3 text-muted-foreground" />
-                <span className="font-mono text-xs font-medium text-foreground whitespace-nowrap max-w-[220px] sm:max-w-[320px] truncate">/{stagedCommand.name}</span>
+                <span className="font-mono text-xs font-medium text-foreground whitespace-nowrap max-w-[220px] sm:max-w-[320px] truncate">
+                  /{stagedCommand.name}
+                </span>
                 <button
                   type="button"
-                  onClick={() => { setStagedCommand(null); setText(''); }}
+                  onClick={() => {
+                    setStagedCommand(null);
+                    setText('');
+                  }}
                   className="ml-0.5 text-muted-foreground hover:text-foreground transition-colors"
                   aria-label="Cancel command"
                 >
                   <X className="size-3" />
                 </button>
               </div>
-              {stagedCommand.description && <span className="text-xs text-muted-foreground truncate min-w-0">{stagedCommand.description}</span>}
+              {stagedCommand.description && (
+                <span className="text-xs text-muted-foreground truncate min-w-0">
+                  {stagedCommand.description}
+                </span>
+              )}
             </div>
           )}
 
-          <div
-            className="flex flex-col gap-1 px-3.5 max-h-[320px] opacity-100 translate-y-0"
-          >
+          <div className="flex flex-col gap-1 px-3.5 max-h-[320px] opacity-100 translate-y-0">
             <div className="relative w-full">
               {/* Add to queue button — floats top-right of textarea when busy and text is typed */}
               {isBusy && canSubmit && (
@@ -2192,7 +2572,9 @@ export function SessionChatInput({
                       <span>Queue</span>
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="top"><p>Add to queue</p></TooltipContent>
+                  <TooltipContent side="top">
+                    <p>Add to queue</p>
+                  </TooltipContent>
                 </Tooltip>
               )}
               {text.trim().length === 0 && !stagedCommand && (
@@ -2202,28 +2584,36 @@ export function SessionChatInput({
                 >
                   {lockForQuestion ? (
                     <div className="absolute inset-0">
-                      {questionButtonLabel ? 'Or type your own answer...' : 'Type your answer...'}
+                      {questionButtonLabel
+                        ? 'Or type your own answer...'
+                        : 'Type your answer...'}
                     </div>
                   ) : (
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                      key={`${placeholderIndex}:${placeholderVariants[placeholderIndex]}`}
-                      className="absolute inset-0"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{
-                        opacity: 1,
-                        y: 0,
-                        transition: { duration: 0.42, ease: [0.22, 1, 0.36, 1] },
-                      }}
-                      exit={{
-                        opacity: 0,
-                        y: -8,
-                        transition: { duration: 0.48, ease: [0.2, 0, 0.1, 1] },
-                      }}
-                    >
-                      {placeholderVariants[placeholderIndex]}
-                    </motion.div>
-                  </AnimatePresence>
+                    <AnimatePresence mode="wait" initial={false}>
+                      <motion.div
+                        key={`${placeholderIndex}:${placeholderVariants[placeholderIndex]}`}
+                        className="absolute inset-0"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{
+                          opacity: 1,
+                          y: 0,
+                          transition: {
+                            duration: 0.42,
+                            ease: [0.22, 1, 0.36, 1],
+                          },
+                        }}
+                        exit={{
+                          opacity: 0,
+                          y: -8,
+                          transition: {
+                            duration: 0.48,
+                            ease: [0.2, 0, 0.1, 1],
+                          },
+                        }}
+                      >
+                        {placeholderVariants[placeholderIndex]}
+                      </motion.div>
+                    </AnimatePresence>
                   )}
                 </div>
               )}
@@ -2248,7 +2638,8 @@ export function SessionChatInput({
                       className={cn(
                         seg.kind === 'file' && 'text-blue-500 font-medium',
                         seg.kind === 'agent' && 'text-purple-500 font-medium',
-                        seg.kind === 'session' && 'text-emerald-500 font-medium',
+                        seg.kind === 'session' &&
+                          'text-emerald-500 font-medium',
                       )}
                     >
                       {seg.text}
@@ -2263,7 +2654,8 @@ export function SessionChatInput({
                 onKeyDown={handleKeyDown}
                 onScroll={() => {
                   if (highlightRef.current && textareaRef.current) {
-                    highlightRef.current.scrollTop = textareaRef.current.scrollTop;
+                    highlightRef.current.scrollTop =
+                      textareaRef.current.scrollTop;
                   }
                 }}
                 placeholder=""
@@ -2290,7 +2682,7 @@ export function SessionChatInput({
                 className="hidden"
                 onChange={handleFileSelect}
               />
-                <Tooltip>
+              <Tooltip>
                 <TooltipTrigger asChild>
                   <button
                     type="button"
@@ -2300,7 +2692,9 @@ export function SessionChatInput({
                     <Paperclip className="h-4 w-4" strokeWidth={2} />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="top"><p>Attach files</p></TooltipContent>
+                <TooltipContent side="top">
+                  <p>Attach files</p>
+                </TooltipContent>
               </Tooltip>
 
               {agents.length > 0 && onAgentChange && (
@@ -2342,7 +2736,12 @@ export function SessionChatInput({
 
             {/* RIGHT: TokenProgress + Voice + Submit/Stop */}
             <div className="flex items-center gap-0 shrink-0">
-              <TokenProgress messages={messages} models={models} selectedModel={selectedModel} onContextClick={onContextClick} />
+              <TokenProgress
+                messages={messages}
+                models={models}
+                selectedModel={selectedModel}
+                onContextClick={onContextClick}
+              />
 
               <VoiceRecorder
                 onTranscription={handleTranscription}
@@ -2353,12 +2752,14 @@ export function SessionChatInput({
                 <div className="relative flex items-center">
                   {/* ESC hint — matches Aether tooltip styling (bg-primary rounded-2xl) */}
                   {escCount > 0 && (
-                    <div
-                      className="absolute bottom-full right-1/2 translate-x-1/2 mb-2 pointer-events-none animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-150"
-                    >
+                    <div className="absolute bottom-full right-1/2 translate-x-1/2 mb-2 pointer-events-none animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-150">
                       <div className="bg-primary text-primary-foreground rounded-2xl px-3 py-1.5 text-xs whitespace-nowrap flex items-center gap-1.5">
-                        <kbd className="bg-background/20 text-primary-foreground inline-flex h-5 min-w-5 items-center justify-center rounded-sm px-1 font-sans text-[11px] font-medium">ESC</kbd>
-                        <span>{escCount === 1 ? '×2 to stop' : '×1 to stop'}</span>
+                        <kbd className="bg-background/20 text-primary-foreground inline-flex h-5 min-w-5 items-center justify-center rounded-sm px-1 font-sans text-[11px] font-medium">
+                          ESC
+                        </kbd>
+                        <span>
+                          {escCount === 1 ? '×2 to stop' : '×1 to stop'}
+                        </span>
                       </div>
                       {/* Arrow matching TooltipContent */}
                       <div className="flex justify-center -mt-px">
@@ -2377,26 +2778,36 @@ export function SessionChatInput({
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="top">
-                      <p>Stop <kbd className="ml-1 bg-background/20 text-primary-foreground inline-flex h-5 min-w-5 items-center justify-center rounded-sm px-1 font-sans text-[10px] font-medium">ESC</kbd> ×3</p>
+                      <p>
+                        Stop{' '}
+                        <kbd className="ml-1 bg-background/20 text-primary-foreground inline-flex h-5 min-w-5 items-center justify-center rounded-sm px-1 font-sans text-[10px] font-medium">
+                          ESC
+                        </kbd>{' '}
+                        ×3
+                      </p>
                     </TooltipContent>
                   </Tooltip>
                 </div>
               )}
               {(!isBusy || lockForQuestion) && (
                 <div className="opacity-100">
-					{lockForQuestion && questionButtonLabel && !text.trim() ? (
-						<Button
-							size="sm"
-							disabled={!questionCanAct || disabled}
-							onClick={handleSubmit}
-							className="flex-shrink-0 h-8 rounded-full px-3.5 text-xs font-medium"
-						>
+                  {lockForQuestion && questionButtonLabel && !text.trim() ? (
+                    <Button
+                      size="sm"
+                      disabled={!questionCanAct || disabled}
+                      onClick={handleSubmit}
+                      className="flex-shrink-0 h-8 rounded-full px-3.5 text-xs font-medium"
+                    >
                       {questionButtonLabel}
                     </Button>
                   ) : (
                     <Button
                       size="sm"
-                      disabled={lockForQuestion ? (!canSubmit && !questionCanAct) || disabled : !canSubmit || disabled}
+                      disabled={
+                        lockForQuestion
+                          ? (!canSubmit && !questionCanAct) || disabled
+                          : !canSubmit || disabled
+                      }
                       onClick={handleSubmit}
                       className="flex-shrink-0 h-8 w-8 rounded-full p-0"
                     >

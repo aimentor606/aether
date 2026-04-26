@@ -1,5 +1,5 @@
 import * as React from "react"
-import { SiGithub } from "react-icons/si"
+import { Github } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ArrowTopRightIcon } from "@radix-ui/react-icons"
@@ -30,7 +30,7 @@ const GithubButton = React.forwardRef<HTMLButtonElement, GithubButtonProps>(
         {...props}
       >
         <Link href={href!} target="_blank" rel="noopener noreferrer">
-          <SiGithub className="size-4" />
+          <Github className="size-4" />
           <span>{children || "View on GitHub"}</span>
           <ArrowTopRightIcon className="size-4 opacity-70" />
         </Link>

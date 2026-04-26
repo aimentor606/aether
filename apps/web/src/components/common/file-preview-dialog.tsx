@@ -2,18 +2,14 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { ExternalLink, FileX, Maximize2, Minimize2 } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useFilePreviewStore } from '@/stores/file-preview-store';
 import { openTabAndNavigate } from '@/stores/tab-store';
 import { FileContentRenderer } from '@/features/files/components/file-content-renderer';
-import { useOcFileOpen } from '@/components/thread/tool-views/opencode/useOcFileOpen';
+import { useOcFileOpen } from '@/hooks/use-oc-file-open';
 
 /**
  * Global file preview dialog.
@@ -143,7 +139,10 @@ export function FilePreviewDialog() {
             readOnly
             className="h-full"
             errorFallback={(error, path) => {
-              const isNotFound = error.includes('404') || error.toLowerCase().includes('not found') || error.toLowerCase().includes('no such file');
+              const isNotFound =
+                error.includes('404') ||
+                error.toLowerCase().includes('not found') ||
+                error.toLowerCase().includes('no such file');
               return (
                 <div className="flex flex-col items-center justify-center h-full gap-3 p-8 text-center">
                   {isNotFound ? (
@@ -156,15 +155,21 @@ export function FilePreviewDialog() {
                         {path}
                       </p>
                       <p className="text-xs text-muted-foreground/40 mt-1">
-                        This path may be relative or from a different session. Files must use absolute paths to be accessible.
+                        This path may be relative or from a different session.
+                        Files must use absolute paths to be accessible.
                       </p>
                     </>
                   ) : (
                     <>
                       <p className="text-sm text-muted-foreground">
-                        Cannot preview <span className="font-mono text-foreground">{path}</span>
+                        Cannot preview{' '}
+                        <span className="font-mono text-foreground">
+                          {path}
+                        </span>
                       </p>
-                      <p className="text-xs text-muted-foreground/60">{error}</p>
+                      <p className="text-xs text-muted-foreground/60">
+                        {error}
+                      </p>
                       <Button
                         variant="outline"
                         size="sm"

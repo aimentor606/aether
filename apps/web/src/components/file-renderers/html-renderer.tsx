@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Monitor, Code, ExternalLink } from 'lucide-react';
 import { constructHtmlPreviewUrl } from '@/lib/utils/url';
-import { IframePreview } from '@/components/thread/iframe-preview';
+import { IframePreview } from '@/components/shared-ui/iframe-preview';
 import { useSandboxProxy } from '@/hooks/use-sandbox-proxy';
 
 interface FileRendererProject {
@@ -75,7 +75,11 @@ export function HtmlRenderer({
 
     // Construct preview URL if we have both sandbox URL and a valid file path
     if (project?.sandbox?.sandbox_url && filePath) {
-      return constructHtmlPreviewUrl(project.sandbox.sandbox_url, filePath, subdomainOpts);
+      return constructHtmlPreviewUrl(
+        project.sandbox.sandbox_url,
+        filePath,
+        subdomainOpts,
+      );
     }
 
     // Fall back to blob URL if available
@@ -90,7 +94,13 @@ export function HtmlRenderer({
 
     // No valid preview URL available
     return '';
-  }, [project?.sandbox?.sandbox_url, filePath, previewUrl, blobHtmlUrl, subdomainOpts]);
+  }, [
+    project?.sandbox?.sandbox_url,
+    filePath,
+    previewUrl,
+    blobHtmlUrl,
+    subdomainOpts,
+  ]);
 
   return (
     <div className={cn('w-full h-full flex flex-col', className)}>

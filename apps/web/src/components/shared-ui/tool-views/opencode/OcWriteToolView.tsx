@@ -10,7 +10,7 @@ import { ToolViewIconTitle } from '../shared/ToolViewIconTitle';
 import { ToolViewFooter } from '../shared/ToolViewFooter';
 import { LoadingState } from '../shared/LoadingState';
 import { CodeHighlight } from '@/components/markdown/unified-markdown';
-import { useOcFileOpen } from './useOcFileOpen';
+import { useOcFileOpen } from '@/hooks/use-oc-file-open';
 
 function getFilename(path: string | undefined): string {
   if (!path) return '';
@@ -47,12 +47,7 @@ export function OcWriteToolView({
   const isError = toolResult?.success === false || !!toolResult?.error;
 
   if (isStreaming && !toolResult) {
-    return (
-      <LoadingState
-        title="Writing File"
-        subtitle={filename}
-      />
-    );
+    return <LoadingState title="Writing File" subtitle={filename} />;
   }
 
   return (
@@ -77,13 +72,11 @@ export function OcWriteToolView({
         <ScrollArea className="h-full w-full">
           <div className="p-3">
             {content ? (
-              <CodeHighlight
-                code={content}
-                language={ext || 'text'}
-              />
+              <CodeHighlight code={content} language={ext || 'text'} />
             ) : (
               <div className="text-sm text-muted-foreground">
-                File written: <span className="font-mono text-foreground">{displayPath}</span>
+                File written:{' '}
+                <span className="font-mono text-foreground">{displayPath}</span>
               </div>
             )}
           </div>
@@ -95,9 +88,12 @@ export function OcWriteToolView({
         toolTimestamp={toolTimestamp}
         isStreaming={isStreaming}
       >
-        {!isStreaming && (
-          isError ? (
-            <Badge variant="outline" className="h-6 py-0.5 bg-muted text-muted-foreground">
+        {!isStreaming &&
+          (isError ? (
+            <Badge
+              variant="outline"
+              className="h-6 py-0.5 bg-muted text-muted-foreground"
+            >
               <AlertCircle className="h-3 w-3" />
               Failed
             </Badge>
@@ -106,8 +102,7 @@ export function OcWriteToolView({
               <CheckCircle className="h-3 w-3 text-emerald-500" />
               Created
             </Badge>
-          )
-        )}
+          ))}
       </ToolViewFooter>
     </Card>
   );

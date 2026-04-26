@@ -1,9 +1,16 @@
 'use client';
 
 import { Project } from '@/types/project';
-import { HIDE_BROWSER_TAB } from '@/components/thread/utils';
+import { HIDE_BROWSER_TAB } from '@/components/shared-ui/utils';
 import { isHiddenTool } from '@aether/shared/tools';
-import React, { memo, useMemo, useCallback, useState, useEffect, useRef } from 'react';
+import React, {
+  memo,
+  useMemo,
+  useCallback,
+  useState,
+  useEffect,
+  useRef,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { useIsMobile } from '@/hooks/utils';
 import { cn } from '@/lib/utils';
@@ -12,7 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useDocumentModalStore } from '@/stores/use-document-modal-store';
-import { 
+import {
   useAetherComputerStore,
   useAetherComputerPendingToolNavIndex,
   useAetherComputerClearPendingToolNav,
@@ -23,7 +30,6 @@ import { NavigationControls } from './components/NavigationControls';
 import { EmptyState } from './components/EmptyState';
 import { LoadingState } from './components/LoadingState';
 import { SandboxDesktop } from './components/Desktop';
-
 
 export interface ToolCallInput {
   toolCall: ToolCallData;
@@ -103,7 +109,9 @@ export const AetherComputer = memo(function AetherComputer({
   const [dots, setDots] = useState('');
   const [internalIndex, setInternalIndex] = useState(0);
   const [navigationMode, setNavigationMode] = useState<NavigationMode>('live');
-  const [toolCallSnapshots, setToolCallSnapshots] = useState<ToolCallSnapshot[]>([]);
+  const [toolCallSnapshots, setToolCallSnapshots] = useState<
+    ToolCallSnapshot[]
+  >([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const [vncRefreshKey, setVncRefreshKey] = useState(0);
   const [isMaximized, setIsMaximized] = useState(false);
@@ -114,13 +122,9 @@ export const AetherComputer = memo(function AetherComputer({
   const { isOpen: isDocumentModalOpen } = useDocumentModalStore();
   const sandbox = project?.sandbox;
 
-  const {
-    activeView,
-    setActiveView,
-    isExpanded,
-    toggleExpanded,
-  } = useAetherComputerStore();
-  
+  const { activeView, setActiveView, isExpanded, toggleExpanded } =
+    useAetherComputerStore();
+
   const pendingToolNavIndex = useAetherComputerPendingToolNavIndex();
   const clearPendingToolNav = useAetherComputerClearPendingToolNav();
 
@@ -133,14 +137,22 @@ export const AetherComputer = memo(function AetherComputer({
   // Track previous projectId and sandboxId to detect project/thread switches
   const prevProjectIdRef = useRef<string | null>(null);
   const prevSandboxIdRef = useRef<string | null>(null);
-  
+
   // Reset local state when switching projects/threads or sandboxes
   useEffect(() => {
-    const projectChanged = prevProjectIdRef.current !== null && prevProjectIdRef.current !== projectId;
-    const sandboxChanged = prevSandboxIdRef.current !== null && prevSandboxIdRef.current !== sandboxId && sandboxId !== null;
-    
+    const projectChanged =
+      prevProjectIdRef.current !== null &&
+      prevProjectIdRef.current !== projectId;
+    const sandboxChanged =
+      prevSandboxIdRef.current !== null &&
+      prevSandboxIdRef.current !== sandboxId &&
+      sandboxId !== null;
+
     if (projectChanged || sandboxChanged) {
-      console.log('[AetherComputer] Project or sandbox changed, resetting local state', { projectId, sandboxId });
+      console.log(
+        '[AetherComputer] Project or sandbox changed, resetting local state',
+        { projectId, sandboxId },
+      );
       // Reset local component state
       setInternalIndex(0);
       setNavigationMode('live');
@@ -161,29 +173,36 @@ export const AetherComputer = memo(function AetherComputer({
       'browser-navigate-to',
       'browser-act',
       'browser-extract-content',
-      'browser-screenshot'
+      'browser-screenshot',
     ].includes(lowerName);
   }, []);
 
   useEffect(() => {
     // Skip browser tab switching if flag is enabled
     if (HIDE_BROWSER_TAB) return;
-    
+
     if (!isInitialized && toolCallSnapshots.length > 0) {
-      const streamingSnapshot = toolCallSnapshots.find(snapshot =>
-        snapshot.toolCall.toolResult === undefined
+      const streamingSnapshot = toolCallSnapshots.find(
+        (snapshot) => snapshot.toolCall.toolResult === undefined,
       );
 
       if (streamingSnapshot) {
-        const toolName = streamingSnapshot.toolCall.toolCall?.function_name?.replace(/_/g, '-');
+        const toolName =
+          streamingSnapshot.toolCall.toolCall?.function_name?.replace(
+            /_/g,
+            '-',
+          );
         const isStreamingBrowserTool = isBrowserTool(toolName);
 
         if (isStreamingBrowserTool) {
           setActiveView('browser');
         }
       } else if (agentStatus === 'running') {
-        const hasBrowserTool = toolCallSnapshots.some(snapshot => {
-          const toolName = snapshot.toolCall.toolCall?.function_name?.replace(/_/g, '-');
+        const hasBrowserTool = toolCallSnapshots.some((snapshot) => {
+          const toolName = snapshot.toolCall.toolCall?.function_name?.replace(
+            /_/g,
+            '-',
+          );
           return isBrowserTool(toolName);
         });
 
@@ -192,29 +211,47 @@ export const AetherComputer = memo(function AetherComputer({
         }
       }
     }
-  }, [toolCallSnapshots, isInitialized, isBrowserTool, agentStatus, setActiveView]);
+  }, [
+    toolCallSnapshots,
+    isInitialized,
+    isBrowserTool,
+    agentStatus,
+    setActiveView,
+  ]);
 
   useEffect(() => {
     // Skip browser tab switching if flag is enabled
     if (HIDE_BROWSER_TAB) return;
-    
+
     if (activeView !== 'tools') return;
-    
-    const safeIndex = Math.min(internalIndex, Math.max(0, toolCallSnapshots.length - 1));
+
+    const safeIndex = Math.min(
+      internalIndex,
+      Math.max(0, toolCallSnapshots.length - 1),
+    );
     const currentSnapshot = toolCallSnapshots[safeIndex];
-    const isCurrentSnapshotBrowserTool = isBrowserTool(currentSnapshot?.toolCall.toolCall?.function_name?.replace(/_/g, '-'));
+    const isCurrentSnapshotBrowserTool = isBrowserTool(
+      currentSnapshot?.toolCall.toolCall?.function_name?.replace(/_/g, '-'),
+    );
 
     if (agentStatus === 'idle') {
-      if (isCurrentSnapshotBrowserTool && safeIndex === toolCallSnapshots.length - 1) {
+      if (
+        isCurrentSnapshotBrowserTool &&
+        safeIndex === toolCallSnapshots.length - 1
+      ) {
         setActiveView('browser');
       }
     } else if (agentStatus === 'running') {
-      const streamingSnapshot = toolCallSnapshots.find(snapshot =>
-        snapshot.toolCall.toolResult === undefined
+      const streamingSnapshot = toolCallSnapshots.find(
+        (snapshot) => snapshot.toolCall.toolResult === undefined,
       );
 
       if (streamingSnapshot) {
-        const toolName = streamingSnapshot.toolCall.toolCall?.function_name?.replace(/_/g, '-');
+        const toolName =
+          streamingSnapshot.toolCall.toolCall?.function_name?.replace(
+            /_/g,
+            '-',
+          );
         const isStreamingBrowserTool = isBrowserTool(toolName);
 
         if (isStreamingBrowserTool) {
@@ -222,7 +259,14 @@ export const AetherComputer = memo(function AetherComputer({
         }
       }
     }
-  }, [toolCallSnapshots, internalIndex, isBrowserTool, agentStatus, activeView, setActiveView]);
+  }, [
+    toolCallSnapshots,
+    internalIndex,
+    isBrowserTool,
+    agentStatus,
+    activeView,
+    setActiveView,
+  ]);
 
   const handleClose = useCallback(() => {
     setIsMaximized(false);
@@ -236,8 +280,9 @@ export const AetherComputer = memo(function AetherComputer({
 
   // Filter out hidden tools (internal/initialization tools) before creating snapshots
   const visibleToolCalls = useMemo(() => {
-    return toolCalls.filter(tc => {
-      const toolName = tc.toolCall?.function_name?.replace(/_/g, '-').toLowerCase() || '';
+    return toolCalls.filter((tc) => {
+      const toolName =
+        tc.toolCall?.function_name?.replace(/_/g, '-').toLowerCase() || '';
       return !isHiddenTool(toolName);
     });
   }, [toolCalls]);
@@ -257,9 +302,17 @@ export const AetherComputer = memo(function AetherComputer({
     setToolCallSnapshots(newSnapshots);
 
     // Skip browser tab switching if flag is enabled
-    if (!HIDE_BROWSER_TAB && hasNewSnapshots && agentStatus === 'running' && activeView === 'tools') {
+    if (
+      !HIDE_BROWSER_TAB &&
+      hasNewSnapshots &&
+      agentStatus === 'running' &&
+      activeView === 'tools'
+    ) {
       const newSnapshot = newSnapshots[newSnapshots.length - 1];
-      const toolName = newSnapshot?.toolCall.toolCall?.function_name?.replace(/_/g, '-');
+      const toolName = newSnapshot?.toolCall.toolCall?.function_name?.replace(
+        /_/g,
+        '-',
+      );
       const isNewBrowserTool = isBrowserTool(toolName);
 
       if (isNewBrowserTool && newSnapshot.toolCall.toolResult === undefined) {
@@ -268,25 +321,37 @@ export const AetherComputer = memo(function AetherComputer({
     }
 
     if (!isInitialized && newSnapshots.length > 0) {
-      const completedCount = newSnapshots.filter(s =>
-        s.toolCall.toolResult !== undefined
+      const completedCount = newSnapshots.filter(
+        (s) => s.toolCall.toolResult !== undefined,
       ).length;
 
       if (completedCount > 0) {
         // File operation tool names that should be prioritized
-        const fileOpTools = ['create-file', 'edit-file', 'full-file-rewrite', 'read-file', 'delete-file'];
-        
+        const fileOpTools = [
+          'create-file',
+          'edit-file',
+          'full-file-rewrite',
+          'read-file',
+          'delete-file',
+        ];
+
         // First, try to find the latest completed file operation
         let targetIndex = -1;
         for (let i = newSnapshots.length - 1; i >= 0; i--) {
           const snapshot = newSnapshots[i];
-          const toolName = snapshot.toolCall.toolCall?.function_name?.replace(/_/g, '-').toLowerCase() || '';
-          if (snapshot.toolCall.toolResult !== undefined && fileOpTools.includes(toolName)) {
+          const toolName =
+            snapshot.toolCall.toolCall?.function_name
+              ?.replace(/_/g, '-')
+              .toLowerCase() || '';
+          if (
+            snapshot.toolCall.toolResult !== undefined &&
+            fileOpTools.includes(toolName)
+          ) {
             targetIndex = i;
             break;
           }
         }
-        
+
         // If no file operation found, fall back to the latest completed tool
         if (targetIndex === -1) {
           for (let i = newSnapshots.length - 1; i >= 0; i--) {
@@ -297,7 +362,7 @@ export const AetherComputer = memo(function AetherComputer({
             }
           }
         }
-        
+
         setInternalIndex(Math.max(0, targetIndex));
       } else {
         setInternalIndex(Math.max(0, newSnapshots.length - 1));
@@ -308,31 +373,66 @@ export const AetherComputer = memo(function AetherComputer({
     } else if (hasNewSnapshots && navigationMode === 'manual') {
       const wasAtLatest = internalIndex === toolCallSnapshots.length - 1;
       const latestSnapshot = newSnapshots[newSnapshots.length - 1];
-      const latestToolName = latestSnapshot?.toolCall.toolCall?.function_name?.replace(/_/g, '-').toLowerCase();
-      const isLatestFileOp = latestToolName && ['create-file', 'edit-file', 'full-file-rewrite', 'read-file', 'delete-file'].includes(latestToolName);
+      const latestToolName = latestSnapshot?.toolCall.toolCall?.function_name
+        ?.replace(/_/g, '-')
+        .toLowerCase();
+      const isLatestFileOp =
+        latestToolName &&
+        [
+          'create-file',
+          'edit-file',
+          'full-file-rewrite',
+          'read-file',
+          'delete-file',
+        ].includes(latestToolName);
 
       if ((wasAtLatest || isLatestFileOp) && agentStatus === 'running') {
         setNavigationMode('live');
         setInternalIndex(newSnapshots.length - 1);
       }
     }
-  }, [toolCalls, navigationMode, toolCallSnapshots.length, isInitialized, internalIndex, agentStatus, newSnapshots, isBrowserTool, activeView, setActiveView]);
+  }, [
+    toolCalls,
+    navigationMode,
+    toolCallSnapshots.length,
+    isInitialized,
+    internalIndex,
+    agentStatus,
+    newSnapshots,
+    isBrowserTool,
+    activeView,
+    setActiveView,
+  ]);
 
   useEffect(() => {
-    if ((!isInitialized || navigationMode === 'manual') && toolCallSnapshots.length > 0) {
+    if (
+      (!isInitialized || navigationMode === 'manual') &&
+      toolCallSnapshots.length > 0
+    ) {
       setInternalIndex(Math.min(currentIndex, toolCallSnapshots.length - 1));
     }
   }, [currentIndex, toolCallSnapshots.length, isInitialized, navigationMode]);
 
-  const { safeInternalIndex, currentSnapshot, currentToolCall, totalCalls, latestIndex, completedToolCalls, totalCompletedCalls } = useMemo(() => {
-    const safeIndex = Math.min(internalIndex, Math.max(0, toolCallSnapshots.length - 1));
+  const {
+    safeInternalIndex,
+    currentSnapshot,
+    currentToolCall,
+    totalCalls,
+    latestIndex,
+    completedToolCalls,
+    totalCompletedCalls,
+  } = useMemo(() => {
+    const safeIndex = Math.min(
+      internalIndex,
+      Math.max(0, toolCallSnapshots.length - 1),
+    );
     const snapshot = toolCallSnapshots[safeIndex];
     const toolCall = snapshot?.toolCall;
     const total = toolCallSnapshots.length;
     const latest = Math.max(0, total - 1);
 
-    const completed = toolCallSnapshots.filter(snapshot =>
-      snapshot.toolCall.toolResult !== undefined
+    const completed = toolCallSnapshots.filter(
+      (snapshot) => snapshot.toolCall.toolResult !== undefined,
     );
     const completedCount = completed.length;
 
@@ -343,7 +443,7 @@ export const AetherComputer = memo(function AetherComputer({
       totalCalls: total,
       latestIndex: latest,
       completedToolCalls: completed,
-      totalCompletedCalls: completedCount
+      totalCompletedCalls: completedCount,
     };
   }, [internalIndex, toolCallSnapshots]);
 
@@ -351,13 +451,16 @@ export const AetherComputer = memo(function AetherComputer({
   const displayIndex = safeInternalIndex;
   const displayTotalCalls = totalCalls;
 
-  const isCurrentToolStreaming = currentToolCall != null && currentToolCall.toolResult === undefined;
+  const isCurrentToolStreaming =
+    currentToolCall != null && currentToolCall.toolResult === undefined;
 
-  const currentToolName = currentToolCall?.toolCall?.function_name?.replace(/_/g, '-').toLowerCase();
-  
+  const currentToolName = currentToolCall?.toolCall?.function_name
+    ?.replace(/_/g, '-')
+    .toLowerCase();
+
   // Track previous displayToolCall for render logging
   const prevDisplayToolCallRef = useRef<ToolCallInput | undefined>(undefined);
-  
+
   // Log when a tool is rendered
   useEffect(() => {
     if (displayToolCall && displayToolCall !== prevDisplayToolCallRef.current) {
@@ -365,7 +468,7 @@ export const AetherComputer = memo(function AetherComputer({
       const functionName = displayToolCall.toolCall?.function_name;
       const hasResult = !!displayToolCall.toolResult;
       const isStreaming = !hasResult;
-      
+
       prevDisplayToolCallRef.current = displayToolCall;
     }
   }, [displayToolCall, displayIndex]);
@@ -373,7 +476,8 @@ export const AetherComputer = memo(function AetherComputer({
   // Always show the current streaming tool - this ensures streaming appears immediately
   // The tool view components handle showing appropriate loading states for their respective tools
 
-  const isStreaming = displayToolCall != null && displayToolCall.toolResult === undefined;
+  const isStreaming =
+    displayToolCall != null && displayToolCall.toolResult === undefined;
 
   const getActualSuccess = (toolCall: ToolCallInput): boolean => {
     if (toolCall?.toolResult?.success !== undefined) {
@@ -384,22 +488,25 @@ export const AetherComputer = memo(function AetherComputer({
 
   const isSuccess = isStreaming ? true : getActualSuccess(displayToolCall);
 
-  const internalNavigate = useCallback((newIndex: number, source: string = 'internal') => {
-    if (newIndex < 0 || newIndex >= totalCalls) return;
+  const internalNavigate = useCallback(
+    (newIndex: number, source: string = 'internal') => {
+      if (newIndex < 0 || newIndex >= totalCalls) return;
 
-    const isNavigatingToLatest = newIndex === totalCalls - 1;
-    setInternalIndex(newIndex);
+      const isNavigatingToLatest = newIndex === totalCalls - 1;
+      setInternalIndex(newIndex);
 
-    if (isNavigatingToLatest) {
-      setNavigationMode('live');
-    } else {
-      setNavigationMode('manual');
-    }
+      if (isNavigatingToLatest) {
+        setNavigationMode('live');
+      } else {
+        setNavigationMode('manual');
+      }
 
-    if (source === 'user_explicit') {
-      onNavigate(newIndex);
-    }
-  }, [totalCalls, onNavigate]);
+      if (source === 'user_explicit') {
+        onNavigate(newIndex);
+      }
+    },
+    [totalCalls, onNavigate],
+  );
 
   const isLiveMode = navigationMode === 'live';
   const pointerIndex = isLiveMode ? latestIndex : safeInternalIndex;
@@ -431,18 +538,24 @@ export const AetherComputer = memo(function AetherComputer({
     internalNavigate(latestIndex, 'user_explicit');
   }, [latestIndex, internalNavigate]);
 
-  const handleSliderChange = useCallback((value: number[]) => {
-    const [newValue] = value;
-    const bounded = Math.max(0, Math.min(newValue, latestIndex));
-    setNavigationMode(bounded === latestIndex ? 'live' : 'manual');
-    internalNavigate(bounded, 'user_explicit');
-  }, [latestIndex, internalNavigate]);
+  const handleSliderChange = useCallback(
+    (value: number[]) => {
+      const [newValue] = value;
+      const bounded = Math.max(0, Math.min(newValue, latestIndex));
+      setNavigationMode(bounded === latestIndex ? 'live' : 'manual');
+      internalNavigate(bounded, 'user_explicit');
+    },
+    [latestIndex, internalNavigate],
+  );
 
-  const handleDockNavigate = useCallback((index: number) => {
-    const bounded = Math.max(0, Math.min(index, latestIndex));
-    setNavigationMode(bounded === latestIndex ? 'live' : 'manual');
-    internalNavigate(bounded, 'user_explicit');
-  }, [latestIndex, internalNavigate]);
+  const handleDockNavigate = useCallback(
+    (index: number) => {
+      const bounded = Math.max(0, Math.min(index, latestIndex));
+      setNavigationMode(bounded === latestIndex ? 'live' : 'manual');
+      internalNavigate(bounded, 'user_explicit');
+    },
+    [latestIndex, internalNavigate],
+  );
 
   useEffect(() => {
     if (!isOpen) return;
@@ -493,19 +606,33 @@ export const AetherComputer = memo(function AetherComputer({
   }, [isOpen, handleClose]);
 
   useEffect(() => {
-    if (externalNavigateToIndex !== undefined && externalNavigateToIndex >= 0 && externalNavigateToIndex < totalCalls) {
+    if (
+      externalNavigateToIndex !== undefined &&
+      externalNavigateToIndex >= 0 &&
+      externalNavigateToIndex < totalCalls
+    ) {
       setActiveView('tools');
       internalNavigate(externalNavigateToIndex, 'external_click');
     }
   }, [externalNavigateToIndex, totalCalls, internalNavigate, setActiveView]);
-  
+
   useEffect(() => {
-    if (pendingToolNavIndex !== null && pendingToolNavIndex >= 0 && pendingToolNavIndex < totalCalls) {
+    if (
+      pendingToolNavIndex !== null &&
+      pendingToolNavIndex >= 0 &&
+      pendingToolNavIndex < totalCalls
+    ) {
       setActiveView('tools');
       internalNavigate(pendingToolNavIndex, 'external_click');
       clearPendingToolNav();
     }
-  }, [pendingToolNavIndex, totalCalls, internalNavigate, setActiveView, clearPendingToolNav]);
+  }, [
+    pendingToolNavIndex,
+    totalCalls,
+    internalNavigate,
+    setActiveView,
+    clearPendingToolNav,
+  ]);
 
   useEffect(() => {
     if (!isStreaming) return;
@@ -519,13 +646,18 @@ export const AetherComputer = memo(function AetherComputer({
     return () => clearInterval(interval);
   }, [isStreaming]);
 
-
   if (!isOpen) {
     return null;
   }
 
   if (isLoading) {
-    return <LoadingState agentName={agentName} onClose={handleClose} isMobile={isMobile} />;
+    return (
+      <LoadingState
+        agentName={agentName}
+        onClose={handleClose}
+        isMobile={isMobile}
+      />
+    );
   }
 
   const effectiveSandboxId = sandboxId || project?.sandbox?.id || '';
@@ -540,10 +672,12 @@ export const AetherComputer = memo(function AetherComputer({
     let toolToShow = displayToolCall;
     let toolIndex = displayIndex;
     let toolIsStreaming = isStreaming;
-    
+
     // If displayToolCall is not available, find any streaming tool to show immediately
     if (!toolToShow && toolCallSnapshots.length > 0) {
-      const streamingSnapshot = toolCallSnapshots.find(s => s.toolCall.toolResult === undefined);
+      const streamingSnapshot = toolCallSnapshots.find(
+        (s) => s.toolCall.toolResult === undefined,
+      );
       if (streamingSnapshot) {
         toolToShow = streamingSnapshot.toolCall;
         toolIndex = streamingSnapshot.index;
@@ -564,7 +698,9 @@ export const AetherComputer = memo(function AetherComputer({
       return <EmptyState t={t} />;
     }
 
-    const toolSuccess = toolIsStreaming ? true : (toolToShow.toolResult?.success ?? toolToShow.isSuccess ?? true);
+    const toolSuccess = toolIsStreaming
+      ? true
+      : (toolToShow.toolResult?.success ?? toolToShow.isSuccess ?? true);
 
     return (
       <ToolView
@@ -586,7 +722,10 @@ export const AetherComputer = memo(function AetherComputer({
   };
 
   const renderContent = () => (
-    <div className="flex flex-col h-full max-h-full max-w-full overflow-hidden min-w-0" style={{ contain: 'strict' }}>
+    <div
+      className="flex flex-col h-full max-h-full max-w-full overflow-hidden min-w-0"
+      style={{ contain: 'strict' }}
+    >
       {!isMobile && !hideTopBar && (
         <PanelHeader
           agentName={agentName}
@@ -619,14 +758,20 @@ export const AetherComputer = memo(function AetherComputer({
           }}
         />
       )}
-      <div className="flex-1 overflow-hidden max-w-full max-h-full min-w-0 min-h-0" style={{ contain: 'strict' }}>
+      <div
+        className="flex-1 overflow-hidden max-w-full max-h-full min-w-0 min-h-0"
+        style={{ contain: 'strict' }}
+      >
         {renderToolsView()}
       </div>
     </div>
   );
 
   // --- Shared navigation element (avoids 3x duplication) ---
-  const showNav = activeView === 'tools' && (displayTotalCalls > 1 || (isCurrentToolStreaming && totalCompletedCalls > 0));
+  const showNav =
+    activeView === 'tools' &&
+    (displayTotalCalls > 1 ||
+      (isCurrentToolStreaming && totalCompletedCalls > 0));
 
   const navElement = showNav ? (
     <NavigationControls
@@ -652,7 +797,7 @@ export const AetherComputer = memo(function AetherComputer({
     return createPortal(
       <div className="fixed inset-0 z-[9999] bg-background">
         <SandboxDesktop
-          toolCalls={toolCallSnapshots.map(s => s.toolCall)}
+          toolCalls={toolCallSnapshots.map((s) => s.toolCall)}
           currentIndex={safeInternalIndex}
           onNavigate={handleDockNavigate}
           onPrevious={navigateToPrevious}
@@ -673,7 +818,7 @@ export const AetherComputer = memo(function AetherComputer({
           project_id={projectId ?? ''}
         />
       </div>,
-      document.body
+      document.body,
     );
   }
 
@@ -703,7 +848,10 @@ export const AetherComputer = memo(function AetherComputer({
             onViewChange={setActiveView}
             showFilesTab={true}
           />
-          <div className="flex-1 overflow-hidden min-w-0 min-h-0" style={{ contain: 'strict' }}>
+          <div
+            className="flex-1 overflow-hidden min-w-0 min-h-0"
+            style={{ contain: 'strict' }}
+          >
             {renderToolsView()}
           </div>
           {navElement && (
@@ -729,7 +877,7 @@ export const AetherComputer = memo(function AetherComputer({
             exit={{ opacity: 0 }}
             transition={{
               opacity: { duration: disableInitialAnimation ? 0 : 0.15 },
-              layout: { type: "spring", stiffness: 400, damping: 35 }
+              layout: { type: 'spring', stiffness: 400, damping: 35 },
             }}
             className="m-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] border rounded-[24px] flex flex-col z-30 overflow-hidden bg-card"
             style={{ contain: 'strict' }}
@@ -748,14 +896,19 @@ export const AetherComputer = memo(function AetherComputer({
   return (
     <div
       className={cn(
-        "h-full w-full flex flex-col bg-card overflow-hidden min-w-0 min-h-0",
-        "transition-[border-radius,border-color] duration-300 ease-out",
-        isExpanded ? "rounded-none border-transparent" : "border rounded-[24px]"
+        'h-full w-full flex flex-col bg-card overflow-hidden min-w-0 min-h-0',
+        'transition-[border-radius,border-color] duration-300 ease-out',
+        isExpanded
+          ? 'rounded-none border-transparent'
+          : 'border rounded-[24px]',
       )}
       style={{ contain: 'strict' }}
     >
       {headerSlot}
-      <div className="flex-1 overflow-hidden min-w-0 min-h-0" style={{ contain: 'strict' }}>
+      <div
+        className="flex-1 overflow-hidden min-w-0 min-h-0"
+        style={{ contain: 'strict' }}
+      >
         {renderContent()}
       </div>
       {navElement}

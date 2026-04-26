@@ -18,9 +18,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ToolViewIconTitle } from '../shared/ToolViewIconTitle';
 import { ToolViewFooter } from '../shared/ToolViewFooter';
 import { LoadingState } from '../shared/LoadingState';
-import { useOcFileOpen } from './useOcFileOpen';
+import { useOcFileOpen } from '@/hooks/use-oc-file-open';
 import { createTwoFilesPatch } from 'diff';
-import { useDiffHighlight, renderHighlightedLine } from '@/hooks/use-diff-highlight';
+import {
+  useDiffHighlight,
+  renderHighlightedLine,
+} from '@/hooks/use-diff-highlight';
 
 function getFilename(path: string | undefined): string {
   if (!path) return '';
@@ -39,7 +42,13 @@ function getDirectory(path: string | undefined): string {
 // Unified diff line renderer
 // ============================================================================
 
-function DiffLinesView({ patch, filename }: { patch: string; filename: string }) {
+function DiffLinesView({
+  patch,
+  filename,
+}: {
+  patch: string;
+  filename: string;
+}) {
   const diffLines = useMemo(() => patch.split('\n').slice(4), [patch]);
 
   // Extract code content (without +/-/space prefix) for highlighting
@@ -116,8 +125,16 @@ function DiffLinesView({ patch, filename }: { patch: string; filename: string })
 // ============================================================================
 
 interface SideBySideLine {
-  left: { num: number | null; content: string; type: 'unchanged' | 'deleted' | 'empty' };
-  right: { num: number | null; content: string; type: 'unchanged' | 'added' | 'empty' };
+  left: {
+    num: number | null;
+    content: string;
+    type: 'unchanged' | 'deleted' | 'empty';
+  };
+  right: {
+    num: number | null;
+    content: string;
+    type: 'unchanged' | 'added' | 'empty';
+  };
 }
 
 function parsePatchToSideBySide(patch: string): SideBySideLine[] {
@@ -189,8 +206,16 @@ function parsePatchToSideBySide(patch: string): SideBySideLine[] {
     leftNum++;
     rightNum++;
     result.push({
-      left: { num: leftNum, content: line.startsWith(' ') ? line.substring(1) : line, type: 'unchanged' },
-      right: { num: rightNum, content: line.startsWith(' ') ? line.substring(1) : line, type: 'unchanged' },
+      left: {
+        num: leftNum,
+        content: line.startsWith(' ') ? line.substring(1) : line,
+        type: 'unchanged',
+      },
+      right: {
+        num: rightNum,
+        content: line.startsWith(' ') ? line.substring(1) : line,
+        type: 'unchanged',
+      },
     });
     i++;
   }
@@ -198,7 +223,13 @@ function parsePatchToSideBySide(patch: string): SideBySideLine[] {
   return result;
 }
 
-function SideBySideDiffView({ patch, filename }: { patch: string; filename: string }) {
+function SideBySideDiffView({
+  patch,
+  filename,
+}: {
+  patch: string;
+  filename: string;
+}) {
   const rows = useMemo(() => parsePatchToSideBySide(patch), [patch]);
 
   const { leftLines, rightLines } = useMemo(() => {
@@ -238,11 +269,25 @@ function SideBySideDiffView({ patch, filename }: { patch: string; filename: stri
                   )}
                 >
                   {isLeftHunk ? (
-                    <span className="text-blue-500/60 text-[10px]">{row.left.content}</span>
+                    <span className="text-blue-500/60 text-[10px]">
+                      {row.left.content}
+                    </span>
                   ) : leftTokens && row.left.content ? (
-                    <span dangerouslySetInnerHTML={{ __html: renderHighlightedLine(leftTokens, row.left.content) }} />
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: renderHighlightedLine(
+                          leftTokens,
+                          row.left.content,
+                        ),
+                      }}
+                    />
                   ) : (
-                    <span className={cn(row.left.type === 'deleted' && 'text-red-600 dark:text-red-400')}>
+                    <span
+                      className={cn(
+                        row.left.type === 'deleted' &&
+                          'text-red-600 dark:text-red-400',
+                      )}
+                    >
                       {row.left.content || ' '}
                     </span>
                   )}
@@ -256,13 +301,26 @@ function SideBySideDiffView({ patch, filename }: { patch: string; filename: stri
                     'px-2 whitespace-pre-wrap break-all w-[calc(50%-2rem)]',
                     row.right.type === 'added' && 'bg-emerald-500/10',
                     row.right.type === 'empty' && 'bg-muted/5',
-                    row.right.type === 'unchanged' && 'text-muted-foreground/60',
+                    row.right.type === 'unchanged' &&
+                      'text-muted-foreground/60',
                   )}
                 >
                   {rightTokens && row.right.content ? (
-                    <span dangerouslySetInnerHTML={{ __html: renderHighlightedLine(rightTokens, row.right.content) }} />
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: renderHighlightedLine(
+                          rightTokens,
+                          row.right.content,
+                        ),
+                      }}
+                    />
                   ) : (
-                    <span className={cn(row.right.type === 'added' && 'text-emerald-600 dark:text-emerald-400')}>
+                    <span
+                      className={cn(
+                        row.right.type === 'added' &&
+                          'text-emerald-600 dark:text-emerald-400',
+                      )}
+                    >
                       {row.right.content || ' '}
                     </span>
                   )}
@@ -289,7 +347,8 @@ export function OcEditToolView({
   isStreaming = false,
 }: ToolViewProps) {
   const args = toolCall?.arguments || {};
-  const filePath = (args.filePath as string) || (args.target_filepath as string) || '';
+  const filePath =
+    (args.filePath as string) || (args.target_filepath as string) || '';
   const ocState = args._oc_state as any;
 
   const { openFile, toDisplayPath } = useOcFileOpen();
@@ -323,19 +382,25 @@ export function OcEditToolView({
         '',
         '',
       );
-      return { patch: patchText, hasDiff: true, before: String(before), after: String(after) };
+      return {
+        patch: patchText,
+        hasDiff: true,
+        before: String(before),
+        after: String(after),
+      };
     }
 
     return { patch: '', hasDiff: false, before: '', after: '' };
-  }, [filediff?.before, filediff?.after, args.oldString, args.newString, displayPath]);
+  }, [
+    filediff?.before,
+    filediff?.after,
+    args.oldString,
+    args.newString,
+    displayPath,
+  ]);
 
   if (isStreaming && !toolResult) {
-    return (
-      <LoadingState
-        title="Editing File"
-        subtitle={filename}
-      />
-    );
+    return <LoadingState title="Editing File" subtitle={filename} />;
   }
 
   return (
@@ -403,7 +468,10 @@ export function OcEditToolView({
           {hasDiff ? (
             <div className="bg-muted/30">
               {viewMode === 'split' ? (
-                <SideBySideDiffView patch={patch} filename={displayPath || 'file'} />
+                <SideBySideDiffView
+                  patch={patch}
+                  filename={displayPath || 'file'}
+                />
               ) : (
                 <DiffLinesView patch={patch} filename={displayPath || 'file'} />
               )}
@@ -411,7 +479,8 @@ export function OcEditToolView({
           ) : (
             <div className="p-3">
               <div className="text-sm text-muted-foreground">
-                File edited: <span className="font-mono text-foreground">{displayPath}</span>
+                File edited:{' '}
+                <span className="font-mono text-foreground">{displayPath}</span>
               </div>
             </div>
           )}
@@ -423,9 +492,12 @@ export function OcEditToolView({
         toolTimestamp={toolTimestamp}
         isStreaming={isStreaming}
       >
-        {!isStreaming && (
-          isError ? (
-            <Badge variant="outline" className="h-6 py-0.5 bg-muted text-muted-foreground">
+        {!isStreaming &&
+          (isError ? (
+            <Badge
+              variant="outline"
+              className="h-6 py-0.5 bg-muted text-muted-foreground"
+            >
               <AlertCircle className="h-3 w-3" />
               Failed
             </Badge>
@@ -434,8 +506,7 @@ export function OcEditToolView({
               <CheckCircle className="h-3 w-3 text-emerald-500" />
               Saved
             </Badge>
-          )
-        )}
+          ))}
       </ToolViewFooter>
     </Card>
   );

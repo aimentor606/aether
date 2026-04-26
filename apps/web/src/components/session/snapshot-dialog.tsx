@@ -24,8 +24,8 @@ import {
 } from '@/hooks/opencode/use-opencode-config';
 import type { Config } from '@/hooks/opencode/use-opencode-config';
 import {
-  type SnapshotTimelineItem,
-  SnapshotTimelineEntry,
+  OcPatchPartView,
+  OcSnapshotPartView,
 } from '@/components/session/snapshot-part-views';
 import { SessionDiffViewer } from '@/components/session/session-diff-viewer';
 import type { MessageWithParts } from '@/ui/types';
@@ -35,46 +35,22 @@ import { toast } from '@/lib/toast';
 // Extract snapshot/patch timeline items from session messages
 // ============================================================================
 
-function extractSnapshotTimeline(messages: MessageWithParts[] | undefined): SnapshotTimelineItem[] {
+type TimelinePart =
+  | { id: string; type: 'snapshot'; part: Extract<MessageWithParts['parts'][number], { type: 'snapshot' }> }
+  | { id: string; type: 'patch'; part: Extract<MessageWithParts['parts'][number], { type: 'patch' }> };
+
+function extractSnapshotTimeline(messages: MessageWithParts[] | undefined): TimelinePart[] {
   if (!messages) return [];
-
-  const items: SnapshotTimelineItem[] = [];
-  let turnIndex = 0;
-
+  const items: TimelinePart[] = [];
   for (const msg of messages) {
-    if (msg.info.role === 'user') {
-      turnIndex++;
-      continue;
-    }
-
-    const timestamp = msg.info.role === 'assistant'
-      ? (msg.info as any).time?.created
-      : undefined;
-
     for (const part of msg.parts) {
       if (part.type === 'snapshot') {
-        items.push({
-          id: part.id,
-          type: 'snapshot',
-          messageId: part.messageID,
-          snapshotHash: (part as any).snapshot,
-          timestamp,
-          turnIndex,
-        });
+        items.push({ id: part.id, type: 'snapshot', part });
       } else if (part.type === 'patch') {
-        items.push({
-          id: part.id,
-          type: 'patch',
-          messageId: part.messageID,
-          patchHash: (part as any).hash,
-          files: (part as any).files,
-          timestamp,
-          turnIndex,
-        });
+        items.push({ id: part.id, type: 'patch', part });
       }
     }
   }
-
   return items;
 }
 
@@ -114,6 +90,7 @@ function SnapshotTimeline({ sessionId, isFullscreen, onToggleFullscreen }: Snaps
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-2 px-5 py-3 pr-12 border-b border-border/40">
           <button
+            type="button"
             onClick={() => setSelectedHash(null)}
             className="text-xs text-blue-500 hover:text-blue-400 transition-colors cursor-pointer"
           >
@@ -123,6 +100,7 @@ function SnapshotTimeline({ sessionId, isFullscreen, onToggleFullscreen }: Snaps
           <span className="font-mono text-[10px] text-muted-foreground">{selectedHash.slice(0, 12)}</span>
           {onToggleFullscreen && (
             <button
+              type="button"
               onClick={onToggleFullscreen}
               className="ml-auto p-1 rounded hover:bg-muted/40 transition-colors cursor-pointer"
               title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
@@ -155,10 +133,10 @@ function SnapshotTimeline({ sessionId, isFullscreen, onToggleFullscreen }: Snaps
         </div>
         <div className="flex-1 flex items-center justify-center">
           <div className="space-y-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-5">
+            {[120, 160, 200, 240].map((width) => (
+              <div key={`skeleton-${width}`} className="flex items-center gap-3 px-5">
                 <div className="h-3 w-3 bg-muted/30 rounded-full animate-pulse" />
-                <div className="h-3 bg-muted/20 rounded animate-pulse" style={{ width: 120 + i * 40 }} />
+                <div className="h-3 bg-muted/20 rounded animate-pulse" style={{ width }} />
               </div>
             ))}
           </div>
@@ -178,6 +156,7 @@ function SnapshotTimeline({ sessionId, isFullscreen, onToggleFullscreen }: Snaps
           </div>
           {onToggleFullscreen && (
             <button
+              type="button"
               onClick={onToggleFullscreen}
               className="p-1 rounded hover:bg-muted/40 transition-colors cursor-pointer"
               title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
@@ -239,6 +218,7 @@ function SnapshotTimeline({ sessionId, isFullscreen, onToggleFullscreen }: Snaps
         </div>
         {onToggleFullscreen && (
           <button
+            type="button"
             onClick={onToggleFullscreen}
             className="p-1 rounded hover:bg-muted/40 transition-colors cursor-pointer"
             title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
@@ -255,13 +235,20 @@ function SnapshotTimeline({ sessionId, isFullscreen, onToggleFullscreen }: Snaps
       {/* Timeline */}
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-5">
-          {timelineItems.map((item, i) => (
-            <SnapshotTimelineEntry
-              key={item.id}
-              item={item}
-              isLast={i === timelineItems.length - 1}
-              onViewDiff={setSelectedHash}
-            />
+          {timelineItems.map((item) => (
+            <div key={item.id} className="mb-2">
+              {item.type === 'snapshot' ? (
+                <button
+                  type="button"
+                  className="cursor-pointer"
+                  onClick={() => setSelectedHash(item.part.snapshot)}
+                >
+                  <OcSnapshotPartView part={item.part} />
+                </button>
+              ) : (
+                <OcPatchPartView part={item.part} />
+              )}
+            </div>
           ))}
         </div>
       </ScrollArea>

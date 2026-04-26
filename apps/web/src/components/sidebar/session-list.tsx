@@ -1,8 +1,19 @@
 'use client';
 
-import { useState, useMemo, useCallback, startTransition, useEffect, useRef } from 'react';
+import {
+  useState,
+  useMemo,
+  useCallback,
+  startTransition,
+  useEffect,
+  useRef,
+} from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { normalizeAppPathname, getActiveInstanceIdFromCookie, buildInstancePath } from '@/lib/instance-routes';
+import {
+  normalizeAppPathname,
+  getActiveInstanceIdFromCookie,
+  buildInstancePath,
+} from '@/lib/instance-routes';
 import {
   MoreHorizontal,
   Trash2,
@@ -43,7 +54,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useSidebar } from '@/components/ui/sidebar';
-import { DeleteConfirmationDialog } from '@/components/thread/DeleteConfirmationDialog';
+import { DeleteConfirmationDialog } from '@/components/shared-ui/DeleteConfirmationDialog';
 import { CompactDialog } from '@/components/session/compact-dialog';
 import {
   useOpenCodeSessions,
@@ -104,7 +115,7 @@ function SessionRow({
 
   const displayTitle = session.title?.includes('@worker')
     ? session.title.replace(/\s*\(@worker\)\s*$/, '')
-    : (session.title || 'Untitled');
+    : session.title || 'Untitled';
 
   return (
     <Link
@@ -125,7 +136,7 @@ function SessionRow({
         onMouseLeave={() => setIsHovering(false)}
       >
         {/* Status dot — busy or pending */}
-        {(isBusy || pendingCount > 0) ? (
+        {isBusy || pendingCount > 0 ? (
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex-shrink-0">
@@ -171,7 +182,8 @@ function SessionRow({
               </button>
             </TooltipTrigger>
             <TooltipContent side="right" className="text-xs">
-              {collapsedChildCount} sub-{collapsedChildCount === 1 ? 'session' : 'sessions'}
+              {collapsedChildCount} sub-
+              {collapsedChildCount === 1 ? 'session' : 'sessions'}
             </TooltipContent>
           </Tooltip>
         )}
@@ -185,7 +197,8 @@ function SessionRow({
               </span>
             </TooltipTrigger>
             <TooltipContent side="right" className="text-xs">
-              {pendingCount} {pendingCount === 1 ? 'question' : 'questions'} waiting for your input
+              {pendingCount} {pendingCount === 1 ? 'question' : 'questions'}{' '}
+              waiting for your input
             </TooltipContent>
           </Tooltip>
         )}
@@ -360,8 +373,12 @@ function SessionGroup({
         isBusy={isBusy}
         pendingCount={pendingCount}
         isChild={false}
-        collapsedChildCount={hasChildren && !isExpanded ? childSessions.length : 0}
-        onToggleExpand={hasChildren ? () => onToggleExpand(session.id) : undefined}
+        collapsedChildCount={
+          hasChildren && !isExpanded ? childSessions.length : 0
+        }
+        onToggleExpand={
+          hasChildren ? () => onToggleExpand(session.id) : undefined
+        }
         onClick={onClick}
         onDelete={onDelete}
         onRename={onRename}
@@ -392,15 +409,22 @@ export function SessionList({ projectId }: SessionListProps = {}) {
   const pathname = normalizeAppPathname(usePathname());
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [sessionToDelete, setSessionToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [sessionToDelete, setSessionToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
-  const [sessionToArchive, setSessionToArchive] = useState<{ id: string; name: string } | null>(null);
+  const [sessionToArchive, setSessionToArchive] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [showArchived, setShowArchived] = useState(false);
   const SESSION_PAGE_SIZE = 50;
   const [displayLimit, setDisplayLimit] = useState(SESSION_PAGE_SIZE);
 
   const { data: sessions, isLoading, error, refetch } = useOpenCodeSessions();
-  const { mutate: deleteSession, isPending: isDeleting } = useDeleteOpenCodeSession();
+  const { mutate: deleteSession, isPending: isDeleting } =
+    useDeleteOpenCodeSession();
   const { mutate: updateSession } = useUpdateOpenCodeSession();
 
   // Auto-refetch sessions when connection recovers from error state
@@ -425,7 +449,9 @@ export function SessionList({ projectId }: SessionListProps = {}) {
   const debouncedBusy = useDebouncedBusySessions(statuses);
 
   // Track which tree nodes are manually expanded/collapsed
-  const [manualExpanded, setManualExpanded] = useState<Record<string, boolean>>({});
+  const [manualExpanded, setManualExpanded] = useState<Record<string, boolean>>(
+    {},
+  );
 
   // Build child map for tree structure (server-side parentID only).
   // Forks are shown as independent top-level sessions — no nesting.
@@ -438,7 +464,9 @@ export function SessionList({ projectId }: SessionListProps = {}) {
   // For questions, count the total number of individual questions across all requests
   const countPendingForSession = useCallback(
     (sid: string) => {
-      const permCount = Object.values(permissions).filter((p) => p.sessionID === sid).length;
+      const permCount = Object.values(permissions).filter(
+        (p) => p.sessionID === sid,
+      ).length;
       const qCount = Object.values(questions)
         .filter((q) => q.sessionID === sid)
         .reduce((sum, q) => sum + (q.questions?.length || 1), 0);
@@ -493,19 +521,30 @@ export function SessionList({ projectId }: SessionListProps = {}) {
         // Auto-expand if any descendant is active (busy/pending)
         // or if the user is currently viewing a descendant session
         const descendants = allDescendantIds(childMap, session.id);
-        const viewingDescendant = !!activeSessionId && descendants.includes(activeSessionId);
-        result[session.id] = hasActiveDescendant(session.id) || viewingDescendant;
+        const viewingDescendant =
+          !!activeSessionId && descendants.includes(activeSessionId);
+        result[session.id] =
+          hasActiveDescendant(session.id) || viewingDescendant;
       }
     }
     return result;
-  }, [sessions, childMap, manualExpanded, hasActiveDescendant, activeSessionId]);
+  }, [
+    sessions,
+    childMap,
+    manualExpanded,
+    hasActiveDescendant,
+    activeSessionId,
+  ]);
 
-  const handleToggleExpand = useCallback((sessionId: string) => {
-    setManualExpanded((prev) => ({
-      ...prev,
-      [sessionId]: !(prev[sessionId] ?? expandedNodes[sessionId] ?? false),
-    }));
-  }, [expandedNodes]);
+  const handleToggleExpand = useCallback(
+    (sessionId: string) => {
+      setManualExpanded((prev) => ({
+        ...prev,
+        [sessionId]: !(prev[sessionId] ?? expandedNodes[sessionId] ?? false),
+      }));
+    },
+    [expandedNodes],
+  );
 
   // Get status for a session (busy + pending)
   const getStatus = useCallback(
@@ -536,20 +575,42 @@ export function SessionList({ projectId }: SessionListProps = {}) {
       const bPending = getPendingCount(b.id);
       if (aPending > 0 && bPending === 0) return -1;
       if (bPending > 0 && aPending === 0) return 1;
-      const aIsBusy = aPending === 0 && (debouncedBusy[a.id] || statuses[a.id]?.type === 'busy' || syncStatuses[a.id]?.type === 'busy') ? 1 : 0;
-      const bIsBusy = bPending === 0 && (debouncedBusy[b.id] || statuses[b.id]?.type === 'busy' || syncStatuses[b.id]?.type === 'busy') ? 1 : 0;
+      const aIsBusy =
+        aPending === 0 &&
+        (debouncedBusy[a.id] ||
+          statuses[a.id]?.type === 'busy' ||
+          syncStatuses[a.id]?.type === 'busy')
+          ? 1
+          : 0;
+      const bIsBusy =
+        bPending === 0 &&
+        (debouncedBusy[b.id] ||
+          statuses[b.id]?.type === 'busy' ||
+          syncStatuses[b.id]?.type === 'busy')
+          ? 1
+          : 0;
       if (aIsBusy > bIsBusy) return -1;
       if (bIsBusy > aIsBusy) return 1;
       return 0;
     });
-  }, [sessions, projectId, debouncedBusy, statuses, syncStatuses, getPendingCount]);
+  }, [
+    sessions,
+    projectId,
+    debouncedBusy,
+    statuses,
+    syncStatuses,
+    getPendingCount,
+  ]);
 
   // Archived sessions
   const archivedSessions = useMemo(() => {
     if (!sessions) return [];
     return sessions
       .filter((s) => !!(s.time as any).archived)
-      .sort((a, b) => ((b.time as any).archived || 0) - ((a.time as any).archived || 0));
+      .sort(
+        (a, b) =>
+          ((b.time as any).archived || 0) - ((a.time as any).archived || 0),
+      );
   }, [sessions]);
 
   const handleSessionClick = (e: React.MouseEvent, sessionId: string) => {
@@ -557,8 +618,9 @@ export function SessionList({ projectId }: SessionListProps = {}) {
     e.preventDefault();
     if (isMobile) setOpenMobile(false);
 
-    const session = rootSessions.find(s => s.id === sessionId) ||
-      sessions?.find(s => s.id === sessionId);
+    const session =
+      rootSessions.find((s) => s.id === sessionId) ||
+      sessions?.find((s) => s.id === sessionId);
     const parentId = session?.parentID;
     openTabAndNavigate({
       id: sessionId,
@@ -585,9 +647,7 @@ export function SessionList({ projectId }: SessionListProps = {}) {
       setRenameSessionId(null);
       return;
     }
-    updateSession(
-      { sessionId: renameSessionId, title: renameValue.trim() },
-    );
+    updateSession({ sessionId: renameSessionId, title: renameValue.trim() });
     setRenameSessionId(null);
   };
 
@@ -613,7 +673,9 @@ export function SessionList({ projectId }: SessionListProps = {}) {
         onSuccess: () => {
           if (isActive) {
             const nextState = useTabStore.getState();
-            const nextTab = nextState.activeTabId ? nextState.tabs[nextState.activeTabId] : null;
+            const nextTab = nextState.activeTabId
+              ? nextState.tabs[nextState.activeTabId]
+              : null;
             router.push(nextTab?.href || '/dashboard');
           }
         },
@@ -636,11 +698,16 @@ export function SessionList({ projectId }: SessionListProps = {}) {
     const isActive = pathname?.includes(sessionToDelete.id);
 
     const tabState = useTabStore.getState();
-    const fallback = buildInstancePath(getActiveInstanceIdFromCookie() || '', '/dashboard');
+    const fallback = buildInstancePath(
+      getActiveInstanceIdFromCookie() || '',
+      '/dashboard',
+    );
     if (tabState.tabs[sessionToDelete.id]) {
       const nextTabId = tabState.closeTab(sessionToDelete.id);
       if (isActive) {
-        const nextTab = nextTabId ? useTabStore.getState().tabs[nextTabId] : null;
+        const nextTab = nextTabId
+          ? useTabStore.getState().tabs[nextTabId]
+          : null;
         router.push(nextTab?.href || fallback);
       }
     } else if (isActive) {
@@ -682,7 +749,9 @@ export function SessionList({ projectId }: SessionListProps = {}) {
           >
             <Archive className="size-3" />
             <span>Archived</span>
-            <span className="ml-auto text-[10px] tabular-nums bg-muted px-1.5 py-0.5 rounded-full">{archivedSessions.length}</span>
+            <span className="ml-auto text-[10px] tabular-nums bg-muted px-1.5 py-0.5 rounded-full">
+              {archivedSessions.length}
+            </span>
             {showArchived ? (
               <ChevronDown className="size-3" />
             ) : (
@@ -715,7 +784,12 @@ export function SessionList({ projectId }: SessionListProps = {}) {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
-                        onClick={() => handleDeleteSession(session.id, session.title || 'Untitled')}
+                        onClick={() =>
+                          handleDeleteSession(
+                            session.id,
+                            session.title || 'Untitled',
+                          )
+                        }
                         className="p-0.5 rounded-md hover:bg-sidebar-accent text-muted-foreground hover:text-sidebar-foreground transition-colors cursor-pointer"
                       >
                         <Trash2 className="size-3.5" />
@@ -737,7 +811,10 @@ export function SessionList({ projectId }: SessionListProps = {}) {
         {isLoading ? (
           <div className="space-y-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-3 py-1.5 rounded-lg">
+              <div
+                key={i}
+                className="flex items-center gap-3 px-3 py-1.5 rounded-lg"
+              >
                 <div className="h-3.5 w-24 bg-muted rounded animate-pulse" />
               </div>
             ))}
@@ -746,7 +823,9 @@ export function SessionList({ projectId }: SessionListProps = {}) {
           <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
             <Frown className="h-8 w-8 text-muted-foreground mb-3" />
             <p className="text-sm text-muted-foreground">Failed to connect</p>
-            <p className="text-xs text-muted-foreground mt-1">Could not reach server</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Could not reach server
+            </p>
             <Button
               onClick={() => refetch()}
               variant="muted"
@@ -760,22 +839,28 @@ export function SessionList({ projectId }: SessionListProps = {}) {
           <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
             <MessageCircle className="h-8 w-8 text-muted-foreground mb-3" />
             <p className="text-sm text-muted-foreground">No sessions yet</p>
-            <p className="text-xs text-muted-foreground mt-1">Start a new session to get going</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Start a new session to get going
+            </p>
           </div>
         ) : (
           <div className="space-y-px">
             {/* Pending sessions — need user input */}
-            {rootSessions.filter((s) => getPendingCount(s.id) > 0).map((session) => (
-              <SessionGroup
-                key={session.id}
-                session={session}
-                {...sharedGroupProps}
-              />
-            ))}
+            {rootSessions
+              .filter((s) => getPendingCount(s.id) > 0)
+              .map((session) => (
+                <SessionGroup
+                  key={session.id}
+                  session={session}
+                  {...sharedGroupProps}
+                />
+              ))}
 
             {/* Remaining sessions (paginated) */}
             {(() => {
-              const remaining = rootSessions.filter((s) => getPendingCount(s.id) === 0);
+              const remaining = rootSessions.filter(
+                (s) => getPendingCount(s.id) === 0,
+              );
               const visible = remaining.slice(0, displayLimit);
               const hasMore = remaining.length > displayLimit;
               return (
@@ -790,7 +875,9 @@ export function SessionList({ projectId }: SessionListProps = {}) {
                   {hasMore && (
                     <Button
                       type="button"
-                      onClick={() => setDisplayLimit((l) => l + SESSION_PAGE_SIZE)}
+                      onClick={() =>
+                        setDisplayLimit((l) => l + SESSION_PAGE_SIZE)
+                      }
                       variant="ghost"
                       className="w-full h-auto py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-sidebar-accent rounded-lg"
                     >
@@ -816,19 +903,27 @@ export function SessionList({ projectId }: SessionListProps = {}) {
       )}
 
       {/* Archive confirmation dialog */}
-      <AlertDialog open={isArchiveDialogOpen} onOpenChange={setIsArchiveDialogOpen}>
+      <AlertDialog
+        open={isArchiveDialogOpen}
+        onOpenChange={setIsArchiveDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Archive session</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to archive{' '}
-              <span className="font-semibold">&ldquo;{sessionToArchive?.name}&rdquo;</span>?
+              <span className="font-semibold">
+                &ldquo;{sessionToArchive?.name}&rdquo;
+              </span>
+              ?
               <br />
               You can restore it later from the archived list.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -847,14 +942,18 @@ export function SessionList({ projectId }: SessionListProps = {}) {
         <CompactDialog
           sessionId={compactSessionId}
           open={!!compactSessionId}
-          onOpenChange={(open) => { if (!open) setCompactSessionId(null); }}
+          onOpenChange={(open) => {
+            if (!open) setCompactSessionId(null);
+          }}
         />
       )}
 
       {/* Rename dialog */}
       <Dialog
         open={!!renameSessionId}
-        onOpenChange={(open) => { if (!open) setRenameSessionId(null); }}
+        onOpenChange={(open) => {
+          if (!open) setRenameSessionId(null);
+        }}
       >
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
@@ -863,7 +962,8 @@ export function SessionList({ projectId }: SessionListProps = {}) {
               Enter a new name for this session.
             </DialogDescription>
           </DialogHeader>
-          <Input type="text"
+          <Input
+            type="text"
             value={renameValue}
             onChange={(e) => setRenameValue(e.target.value)}
             onKeyDown={(e) => {

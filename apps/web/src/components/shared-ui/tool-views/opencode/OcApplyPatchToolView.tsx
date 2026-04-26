@@ -20,9 +20,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ToolViewIconTitle } from '../shared/ToolViewIconTitle';
 import { ToolViewFooter } from '../shared/ToolViewFooter';
 import { LoadingState } from '../shared/LoadingState';
-import { useOcFileOpen } from './useOcFileOpen';
+import { useOcFileOpen } from '@/hooks/use-oc-file-open';
 import { createTwoFilesPatch } from 'diff';
-import { useDiffHighlight, renderHighlightedLine } from '@/hooks/use-diff-highlight';
+import {
+  useDiffHighlight,
+  renderHighlightedLine,
+} from '@/hooks/use-diff-highlight';
 
 interface PatchFile {
   relativePath: string;
@@ -36,15 +39,40 @@ interface PatchFile {
 function getTypeConfig(type: string) {
   switch (type) {
     case 'add':
-      return { label: 'Created', icon: Plus, color: 'text-emerald-500', bg: 'bg-emerald-500/10' };
+      return {
+        label: 'Created',
+        icon: Plus,
+        color: 'text-emerald-500',
+        bg: 'bg-emerald-500/10',
+      };
     case 'update':
-      return { label: 'Patched', icon: PenLine, color: 'text-amber-500', bg: 'bg-amber-500/10' };
+      return {
+        label: 'Patched',
+        icon: PenLine,
+        color: 'text-amber-500',
+        bg: 'bg-amber-500/10',
+      };
     case 'delete':
-      return { label: 'Deleted', icon: Trash2, color: 'text-red-500', bg: 'bg-red-500/10' };
+      return {
+        label: 'Deleted',
+        icon: Trash2,
+        color: 'text-red-500',
+        bg: 'bg-red-500/10',
+      };
     case 'move':
-      return { label: 'Moved', icon: ArrowRight, color: 'text-blue-500', bg: 'bg-blue-500/10' };
+      return {
+        label: 'Moved',
+        icon: ArrowRight,
+        color: 'text-blue-500',
+        bg: 'bg-blue-500/10',
+      };
     default:
-      return { label: type, icon: FileCode2, color: 'text-muted-foreground', bg: 'bg-muted' };
+      return {
+        label: type,
+        icon: FileCode2,
+        color: 'text-muted-foreground',
+        bg: 'bg-muted',
+      };
   }
 }
 
@@ -104,14 +132,22 @@ export function OcApplyPatchToolView({
           <ToolViewIconTitle
             icon={FileCode2}
             title="Apply Patch"
-            subtitle={files.length > 0 ? `${files.length} file${files.length > 1 ? 's' : ''}` : undefined}
+            subtitle={
+              files.length > 0
+                ? `${files.length} file${files.length > 1 ? 's' : ''}`
+                : undefined
+            }
           />
           <div className="flex items-center gap-2 flex-shrink-0 ml-2">
             {totalAdditions > 0 && (
-              <span className="text-xs text-emerald-500 font-mono">+{totalAdditions}</span>
+              <span className="text-xs text-emerald-500 font-mono">
+                +{totalAdditions}
+              </span>
             )}
             {totalDeletions > 0 && (
-              <span className="text-xs text-red-500 font-mono">-{totalDeletions}</span>
+              <span className="text-xs text-red-500 font-mono">
+                -{totalDeletions}
+              </span>
             )}
           </div>
         </div>
@@ -127,10 +163,14 @@ export function OcApplyPatchToolView({
                 const name = getFilename(file.relativePath);
                 const dir = getDirectory(file.relativePath);
                 const isExpanded = expandedFile === i;
-                const hasDiff = file.type !== 'delete' && (file.before || file.after);
+                const hasDiff =
+                  file.type !== 'delete' && (file.before || file.after);
 
                 return (
-                  <div key={i} className={i > 0 ? 'border-t border-border/60' : ''}>
+                  <div
+                    key={i}
+                    className={i > 0 ? 'border-t border-border/60' : ''}
+                  >
                     {/* File header */}
                     <div
                       className="flex items-center gap-2.5 px-4 py-2.5 cursor-pointer hover:bg-muted transition-colors"
@@ -146,7 +186,10 @@ export function OcApplyPatchToolView({
                         <div className="w-3.5" />
                       )}
 
-                      <Badge variant="outline" className={`h-5 py-0 px-1.5 text-[10px] font-semibold uppercase ${config.color} ${config.bg} border-none flex-shrink-0`}>
+                      <Badge
+                        variant="outline"
+                        className={`h-5 py-0 px-1.5 text-[10px] font-semibold uppercase ${config.color} ${config.bg} border-none flex-shrink-0`}
+                      >
                         {config.label}
                       </Badge>
 
@@ -161,19 +204,33 @@ export function OcApplyPatchToolView({
                           {name}
                         </span>
                         {dir && (
-                          <span className="text-muted-foreground/40 truncate text-[10px]">{dir}</span>
+                          <span className="text-muted-foreground/40 truncate text-[10px]">
+                            {dir}
+                          </span>
                         )}
                       </span>
 
                       <div className="flex items-center gap-1.5 text-[10px] flex-shrink-0">
-                        {file.additions > 0 && <span className="text-emerald-500">+{file.additions}</span>}
-                        {file.deletions > 0 && <span className="text-red-500">-{file.deletions}</span>}
+                        {file.additions > 0 && (
+                          <span className="text-emerald-500">
+                            +{file.additions}
+                          </span>
+                        )}
+                        {file.deletions > 0 && (
+                          <span className="text-red-500">
+                            -{file.deletions}
+                          </span>
+                        )}
                       </div>
                     </div>
 
                     {/* Expanded diff */}
                     {isExpanded && hasDiff && (
-                      <PatchFileDiff before={file.before} after={file.after} filePath={file.relativePath} />
+                      <PatchFileDiff
+                        before={file.before}
+                        after={file.after}
+                        filePath={file.relativePath}
+                      />
                     )}
                   </div>
                 );
@@ -186,7 +243,9 @@ export function OcApplyPatchToolView({
             </div>
           ) : rawOutput ? (
             <div className="p-3">
-              <pre className="text-xs text-muted-foreground font-mono whitespace-pre-wrap">{String(rawOutput).slice(0, 2000)}</pre>
+              <pre className="text-xs text-muted-foreground font-mono whitespace-pre-wrap">
+                {String(rawOutput).slice(0, 2000)}
+              </pre>
             </div>
           ) : null}
         </ScrollArea>
@@ -197,9 +256,12 @@ export function OcApplyPatchToolView({
         toolTimestamp={toolTimestamp}
         isStreaming={isStreaming}
       >
-        {!isStreaming && (
-          isError ? (
-            <Badge variant="outline" className="h-6 py-0.5 bg-muted text-muted-foreground">
+        {!isStreaming &&
+          (isError ? (
+            <Badge
+              variant="outline"
+              className="h-6 py-0.5 bg-muted text-muted-foreground"
+            >
               <AlertCircle className="h-3 w-3" />
               Failed
             </Badge>
@@ -208,20 +270,30 @@ export function OcApplyPatchToolView({
               <CheckCircle className="h-3 w-3 text-emerald-500" />
               {files.length} {files.length === 1 ? 'file' : 'files'} patched
             </Badge>
-          )
-        )}
+          ))}
       </ToolViewFooter>
     </Card>
   );
 }
 
 /** Per-file diff display using proper diff algorithm */
-function PatchFileDiff({ before, after, filePath }: { before: string; after: string; filePath: string }) {
+function PatchFileDiff({
+  before,
+  after,
+  filePath,
+}: {
+  before: string;
+  after: string;
+  filePath: string;
+}) {
   const patch = useMemo(() => {
     return createTwoFilesPatch(
-      `a/${filePath}`, `b/${filePath}`,
-      before || '', after || '',
-      '', '',
+      `a/${filePath}`,
+      `b/${filePath}`,
+      before || '',
+      after || '',
+      '',
+      '',
     );
   }, [before, after, filePath]);
 

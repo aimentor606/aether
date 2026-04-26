@@ -9,7 +9,7 @@ import React, {
   memo,
 } from 'react';
 import * as ResizablePrimitive from 'react-resizable-panels';
-import { AetherComputer } from '@/components/thread/aether-computer';
+import { AetherComputer } from '@/components/shared-ui/aether-computer';
 import { useIsMobile } from '@/hooks/utils';
 import { cn } from '@/lib/utils';
 import {

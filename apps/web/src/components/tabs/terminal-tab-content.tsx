@@ -6,18 +6,28 @@ import { CircleDashed, Plus, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAetherComputerStore } from '@/stores/aether-computer-store';
 import { useServerStore } from '@/stores/server-store';
-import { useOpenCodePtyList, useCreatePty, useRemovePty } from '@/hooks/opencode/use-opencode-pty';
+import {
+  useOpenCodePtyList,
+  useCreatePty,
+  useRemovePty,
+} from '@/hooks/opencode/use-opencode-pty';
 import { useTabStore, openTabAndNavigate } from '@/stores/tab-store';
 
 // Lazy-load terminal components to avoid SSR issues with xterm.js
 const SSHTerminal = dynamic(
-  () => import('@/components/thread/aether-computer/components/SSHTerminal').then(mod => ({ default: mod.SSHTerminal })),
-  { ssr: false }
+  () =>
+    import('@/components/shared-ui/aether-computer/components/SSHTerminal').then(
+      (mod) => ({ default: mod.SSHTerminal }),
+    ),
+  { ssr: false },
 );
 
 const PtyTerminal = dynamic(
-  () => import('@/components/session/pty-terminal').then(mod => ({ default: mod.PtyTerminal })),
-  { ssr: false }
+  () =>
+    import('@/components/session/pty-terminal').then((mod) => ({
+      default: mod.PtyTerminal,
+    })),
+  { ssr: false },
 );
 
 interface TerminalTabContentProps {
@@ -35,7 +45,11 @@ interface TerminalTabContentProps {
  *
  * For sandbox mode, renders SSHTerminal instead (shared across all terminal tabs).
  */
-export function TerminalTabContent({ ptyId, tabId, hidden = false }: TerminalTabContentProps) {
+export function TerminalTabContent({
+  ptyId,
+  tabId,
+  hidden = false,
+}: TerminalTabContentProps) {
   const currentSandboxId = useAetherComputerStore((s) => s.currentSandboxId);
   const serverUrl = useServerStore((s) => {
     const server = s.servers.find((srv) => srv.id === s.activeServerId);
@@ -122,7 +136,9 @@ export function TerminalTabContent({ ptyId, tabId, hidden = false }: TerminalTab
     return (
       <div className="h-full w-full flex flex-col items-center justify-center bg-background">
         <CircleDashed className="h-4 w-4 text-muted-foreground animate-spin" />
-        <span className="text-xs text-muted-foreground mt-2">Connecting...</span>
+        <span className="text-xs text-muted-foreground mt-2">
+          Connecting...
+        </span>
       </div>
     );
   }
@@ -132,7 +148,9 @@ export function TerminalTabContent({ ptyId, tabId, hidden = false }: TerminalTab
     return (
       <div className="h-full w-full flex flex-col items-center justify-center bg-background gap-3">
         <Terminal className="h-8 w-8 text-muted-foreground/30" />
-        <span className="text-xs text-muted-foreground">Terminal session ended</span>
+        <span className="text-xs text-muted-foreground">
+          Terminal session ended
+        </span>
         <Button
           variant="outline"
           size="sm"

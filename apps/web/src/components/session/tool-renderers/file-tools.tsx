@@ -1,16 +1,12 @@
 'use client';
 
-import React, {
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useContext, useMemo, useState } from 'react';
+import { FileCode2, Glasses } from 'lucide-react';
 import {
-  FileCode2,
-  Glasses,
-} from 'lucide-react';
-import { HighlightedCode, UnifiedMarkdown } from '@/components/markdown/unified-markdown';
-import { useOcFileOpen } from '@/components/thread/tool-views/opencode/useOcFileOpen';
+  HighlightedCode,
+  UnifiedMarkdown,
+} from '@/components/markdown/unified-markdown';
+import { useOcFileOpen } from '@/hooks/use-oc-file-open';
 import { TextShimmer } from '@/components/ui/text-shimmer';
 import { cn } from '@/lib/utils';
 import { useFilePreviewStore } from '@/stores/file-preview-store';
@@ -29,10 +25,7 @@ import {
   DiagnosticsDisplay,
   DiffChanges,
 } from './shared';
-import {
-  getDirectory,
-  getFilename,
-} from '@/ui';
+import { getDirectory, getFilename } from '@/ui';
 
 function EditTool({ part, defaultOpen, forceOpen, locked }: ToolProps) {
   const input = partInput(part);

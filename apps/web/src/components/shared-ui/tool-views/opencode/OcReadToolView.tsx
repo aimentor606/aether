@@ -1,7 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Eye, CheckCircle, AlertCircle, FileText, ChevronRight, ChevronDown, Hash } from 'lucide-react';
+import {
+  Eye,
+  CheckCircle,
+  AlertCircle,
+  FileText,
+  ChevronRight,
+  ChevronDown,
+  Hash,
+} from 'lucide-react';
 import { ToolViewProps } from '../types';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +18,7 @@ import { ToolViewIconTitle } from '../shared/ToolViewIconTitle';
 import { ToolViewFooter } from '../shared/ToolViewFooter';
 import { LoadingState } from '../shared/LoadingState';
 import { CodeHighlight } from '@/components/markdown/unified-markdown';
-import { useOcFileOpen } from './useOcFileOpen';
+import { useOcFileOpen } from '@/hooks/use-oc-file-open';
 
 function getFilename(path: string | undefined): string {
   if (!path) return '';
@@ -55,10 +63,12 @@ export function OcReadToolView({
 
   // Extract loaded files from metadata
   const metadata = ocState?.metadata || {};
-  const loaded: string[] = Array.isArray(metadata?.loaded) ? metadata.loaded : [];
+  const loaded: string[] = Array.isArray(metadata?.loaded)
+    ? metadata.loaded
+    : [];
 
   // Extract file content from output if available
-  const rawOutput = toolResult?.output || (ocState?.output) || '';
+  const rawOutput = toolResult?.output || ocState?.output || '';
   const output = rawOutput ? cleanReadOutput(String(rawOutput)) : '';
 
   const lineCount = output ? output.split('\n').length : null;
@@ -78,10 +88,7 @@ export function OcReadToolView({
 
   if (isStreaming && !toolResult) {
     return (
-      <LoadingState
-        title="Reading File"
-        subtitle={filename || filePath}
-      />
+      <LoadingState title="Reading File" subtitle={filename || filePath} />
     );
   }
 
@@ -140,9 +147,12 @@ export function OcReadToolView({
         toolTimestamp={toolTimestamp}
         isStreaming={isStreaming}
       >
-        {!isStreaming && (
-          isError ? (
-            <Badge variant="outline" className="h-6 py-0.5 bg-muted text-muted-foreground">
+        {!isStreaming &&
+          (isError ? (
+            <Badge
+              variant="outline"
+              className="h-6 py-0.5 bg-muted text-muted-foreground"
+            >
               <AlertCircle className="h-3 w-3" />
               Failed
             </Badge>
@@ -151,8 +161,7 @@ export function OcReadToolView({
               <CheckCircle className="h-3 w-3 text-emerald-500" />
               Read
             </Badge>
-          )
-        )}
+          ))}
       </ToolViewFooter>
     </Card>
   );
@@ -197,12 +206,19 @@ function SingleFileRow({
         <span className="text-xs min-w-0 flex items-baseline gap-1.5 overflow-hidden flex-1">
           <span
             className="text-foreground font-medium font-mono whitespace-nowrap flex-shrink-0 cursor-pointer hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
-            onClick={(e) => { e.stopPropagation(); onOpenFile(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenFile();
+            }}
             title={displayPath}
           >
             {filename}
           </span>
-          {dir && <span className="text-muted-foreground/40 truncate text-[11px]">{dir}</span>}
+          {dir && (
+            <span className="text-muted-foreground/40 truncate text-[11px]">
+              {dir}
+            </span>
+          )}
         </span>
         {hasContent && (
           <span className="text-[10px] text-muted-foreground flex-shrink-0 uppercase tracking-wider">
@@ -248,8 +264,14 @@ function MultiFileList({
           >
             <FileText className="h-3.5 w-3.5 text-sky-500/70 dark:text-sky-400/70 flex-shrink-0 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors" />
             <span className="text-xs min-w-0 flex items-baseline gap-1.5 overflow-hidden">
-              <span className="text-foreground font-medium font-mono whitespace-nowrap flex-shrink-0">{fname}</span>
-              {dir && <span className="text-muted-foreground/40 truncate text-[11px]">{dir}</span>}
+              <span className="text-foreground font-medium font-mono whitespace-nowrap flex-shrink-0">
+                {fname}
+              </span>
+              {dir && (
+                <span className="text-muted-foreground/40 truncate text-[11px]">
+                  {dir}
+                </span>
+              )}
             </span>
           </div>
         );

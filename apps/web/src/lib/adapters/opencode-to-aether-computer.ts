@@ -7,8 +7,11 @@
  */
 
 import type { MessageWithParts, ToolPart, ToolState } from '@/ui';
-import type { ToolCallInput } from '@/components/thread/aether-computer/AetherComputer';
-import type { ToolCallData, ToolResultData } from '@/components/thread/tool-views/types';
+import type { ToolCallInput } from '@/components/shared-ui/aether-computer/AetherComputer';
+import type {
+  ToolCallData,
+  ToolResultData,
+} from '@/components/shared-ui/tool-views/types';
 
 /**
  * OpenCode tool names are prefixed with "oc-" to avoid collisions with
@@ -24,14 +27,18 @@ function adaptToolState(state: ToolState): ToolResultData | undefined {
       return {
         success: true,
         output: state.output,
-        timestamp: state.time?.end ? new Date(state.time.end).toISOString() : undefined,
+        timestamp: state.time?.end
+          ? new Date(state.time.end).toISOString()
+          : undefined,
       };
     case 'error':
       return {
         success: false,
         output: state.error,
         error: state.error,
-        timestamp: state.time?.end ? new Date(state.time.end).toISOString() : undefined,
+        timestamp: state.time?.end
+          ? new Date(state.time.end).toISOString()
+          : undefined,
       };
     case 'pending': {
       // A "stale pending" tool has empty input — the backend never followed
@@ -73,9 +80,10 @@ function adaptToolPart(part: ToolPart): ToolCallInput {
 
   const toolResult = adaptToolState(part.state);
 
-  const assistantTimestamp = ('time' in part.state && part.state.time)
-    ? new Date((part.state.time as any).start).toISOString()
-    : undefined;
+  const assistantTimestamp =
+    'time' in part.state && part.state.time
+      ? new Date((part.state.time as any).start).toISOString()
+      : undefined;
 
   const toolTimestamp = toolResult?.timestamp;
 
@@ -92,7 +100,9 @@ function adaptToolPart(part: ToolPart): ToolCallInput {
  * Extract all ToolParts from OpenCode messages and convert them to
  * the ToolCallInput[] format used by AetherComputer.
  */
-export function adaptMessagesToToolCalls(messages: MessageWithParts[]): ToolCallInput[] {
+export function adaptMessagesToToolCalls(
+  messages: MessageWithParts[],
+): ToolCallInput[] {
   const toolCalls: ToolCallInput[] = [];
 
   for (const msg of messages) {

@@ -1,6 +1,7 @@
 'use client';
 
 import { createTwoFilesPatch } from 'diff';
+import { ToolError } from './tool-error';
 import { QuestionPrompt } from '@/components/session/question-prompt';
 import { SubSessionModal } from '@/components/session/sub-session-modal';
 import {
@@ -68,7 +69,7 @@ import {
   HighlightedCode,
   UnifiedMarkdown,
 } from '@/components/markdown/unified-markdown';
-import { useOcFileOpen } from '@/components/thread/tool-views/opencode/useOcFileOpen';
+import { useOcFileOpen } from '@/hooks/use-oc-file-open';
 import {
   Collapsible,
   CollapsibleContent,
@@ -195,7 +196,13 @@ export function ensureWorkspacePath(filePath: string): string {
   return '/workspace/' + filePath.replace(/^\/+/, '');
 }
 
-export function InlineServicePreview({ url, label }: { url: string; label?: string }) {
+export function InlineServicePreview({
+  url,
+  label,
+}: {
+  url: string;
+  label?: string;
+}) {
   const proxy = useProxyUrl(url);
   const authenticatedUrl = useAuthenticatedPreviewUrl(proxy?.proxyUrl || url);
   const [isLoading, setIsLoading] = useState(true);
@@ -383,7 +390,6 @@ export interface ToolProps {
 }
 
 export type ToolComponent = ComponentType<ToolProps>;
-
 
 // ============================================================================
 // Helper: parse partial/incomplete JSON from streaming tool input
@@ -1384,4 +1390,3 @@ export function StructuredOutput({ sections }: { sections: OutputSection[] }) {
     </div>
   );
 }
-

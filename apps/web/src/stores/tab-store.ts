@@ -483,6 +483,11 @@ export const useTabStore = create<TabState>()(
     }),
     {
       name: 'aether-tabs',
+      version: 1,
+      migrate: (persisted: unknown, version: number) => {
+        if (version === 0) return persisted; // future migrations go here
+        return persisted;
+      },
       partialize: (state) => ({
         tabs: state.tabs,
         tabOrder: state.tabOrder,

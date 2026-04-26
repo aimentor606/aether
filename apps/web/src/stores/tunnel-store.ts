@@ -25,6 +25,14 @@ interface TunnelStoreState {
   /** Currently selected tunnel ID in the UI */
   activeTunnelId: string | null;
 
+  // ─── SSE reconnect state (avoids stale closures) ──────────────
+
+  /** Last token used for SSE (read by reconnect handler via get()) */
+  sseToken: string | null;
+
+  /** Last API URL used for SSE (read by reconnect handler via get()) */
+  sseApiUrl: string | null;
+
   // ─── Actions ─────────────────────────────────────────────────────
 
   /** Add a new pending request (from SSE stream) */
@@ -60,6 +68,8 @@ export const useTunnelStore = create<TunnelStoreState>()((set, get) => ({
   pendingRequests: [],
   sseConnected: false,
   activeTunnelId: null,
+  sseToken: null,
+  sseApiUrl: null,
 
   addPendingRequest: (request) => {
     set((state) => {
@@ -87,6 +97,9 @@ export const useTunnelStore = create<TunnelStoreState>()((set, get) => ({
     // Close existing connection
     get().stopSseStream();
 
+    // Persist token/URL in state so reconnect handler avoids stale closures
+    set({ sseToken: token, sseApiUrl: apiUrl });
+
     const url = `${apiUrl}/tunnel/permission-requests/stream`;
 
     try {
@@ -99,10 +112,12 @@ export const useTunnelStore = create<TunnelStoreState>()((set, get) => ({
         onError: () => {
           set({ sseConnected: false });
 
-          // Auto-reconnect after 5 seconds
+          // Auto-reconnect after 5 seconds — read fresh state via get()
+          // to avoid stale token/apiUrl from the outer closure.
           if (reconnectTimer) clearTimeout(reconnectTimer);
           reconnectTimer = setTimeout(() => {
-            get().startSseStream(token, apiUrl);
+            const { sseToken, sseApiUrl } = get();
+            if (sseToken && sseApiUrl) get().startSseStream(sseToken, sseApiUrl);
           }, 5_000);
         },
       });
@@ -135,6 +150,6 @@ export const useTunnelStore = create<TunnelStoreState>()((set, get) => ({
       clearTimeout(reconnectTimer);
       reconnectTimer = null;
     }
-    set({ sseConnected: false });
+    set({ sseConnected: false, sseToken: null, sseApiUrl: null });
   },
 }));

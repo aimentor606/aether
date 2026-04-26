@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 import { authenticatedFetch, getSupabaseAccessToken } from '@/lib/auth-token';
 import { isBillingEnabled } from '@/lib/config';
 import { getEnv } from '@/lib/env-config';
+import { logger } from '@/lib/logger';
 
 /**
  * SDK client reset callback — set by opencode-sdk.ts to break the circular
@@ -195,13 +196,21 @@ function syncServerToApi(server: ServerEntry) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(toApiPayload(server)),
-  }, { retryOnAuthError: false }).catch(() => {}); // fire-and-forget
+  }, { retryOnAuthError: false }).catch((error) => {
+    logger.warn('Failed to sync server to API', {
+      serverId: server.id,
+      serverLabel: server.label,
+      error,
+    });
+  }); // fire-and-forget
 }
 
 function deleteServerFromApi(id: string) {
   if (isManagedEntry(id)) return;
   authenticatedFetch(`${getServersApi()}/${id}`, { method: 'DELETE' },
-    { retryOnAuthError: false }).catch(() => {});
+    { retryOnAuthError: false }).catch((error) => {
+      logger.warn('Failed to delete server from API', { serverId: id, error });
+    });
 }
 
 /** Bulk sync all servers to API (used on initial hydration). */
@@ -212,7 +221,12 @@ function syncAllToApi(servers: ServerEntry[]) {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ servers: custom.map(toApiPayload) }),
-  }, { retryOnAuthError: false }).catch(() => {});
+  }, { retryOnAuthError: false }).catch((error) => {
+    logger.warn('Failed to bulk sync servers to API', {
+      customServerCount: custom.length,
+      error,
+    });
+  });
 }
 
 /** Load servers from API, merging authTokens from localStorage entries. */
@@ -534,7 +548,12 @@ export const useServerStore = create<ServerStore>()(
 
     }),
     {
-      name: 'opencode-servers-v6', // v6: sandbox URLs derived at runtime, never persisted
+      name: 'opencode-servers',
+      version: 6,
+      migrate: (persisted: unknown, version: number) => {
+        if (version < 6) return undefined; // discard stale data from old versions
+        return persisted;
+      },
       partialize: (state) => ({
         servers: state.servers,
         activeServerId: state.activeServerId,

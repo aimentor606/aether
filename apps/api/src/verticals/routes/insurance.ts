@@ -16,6 +16,7 @@ import {
   createDocumentSchema,
   createComplianceSchema,
 } from '@aether/db/schema/shared-vertical';
+import { logger } from '../../lib/logger';
 
 const insuranceRoutes = new Hono();
 
@@ -29,6 +30,7 @@ insuranceRoutes.get('/policies', async (c: Context) => {
     return c.json({ success: true, data: policies, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to list policies', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list policies' }, 500);
   }
 });
@@ -43,6 +45,7 @@ insuranceRoutes.post('/policies', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to create policy', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create policy' }, 400);
   }
 });
@@ -56,6 +59,7 @@ insuranceRoutes.get('/policies/:id', async (c: Context) => {
     return c.json({ success: true, data: policy });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to retrieve policy', { error: String(error) });
     return c.json({ success: false, error: 'Failed to retrieve policy' }, 500);
   }
 });
@@ -71,6 +75,7 @@ insuranceRoutes.put('/policies/:id', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to update policy', { error: String(error) });
     return c.json({ success: false, error: 'Failed to update policy' }, 400);
   }
 });
@@ -83,6 +88,7 @@ insuranceRoutes.delete('/policies/:id', async (c: Context) => {
     return c.json({ success: true });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to delete policy', { error: String(error) });
     return c.json({ success: false, error: 'Failed to delete policy' }, 500);
   }
 });
@@ -97,6 +103,7 @@ insuranceRoutes.get('/claims', async (c: Context) => {
     return c.json({ success: true, data: claims, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to list claims', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list claims' }, 500);
   }
 });
@@ -111,6 +118,7 @@ insuranceRoutes.post('/claims', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to create claim', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create claim' }, 400);
   }
 });
@@ -124,6 +132,7 @@ insuranceRoutes.get('/claims/:id', async (c: Context) => {
     return c.json({ success: true, data: claim });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to retrieve claim', { error: String(error) });
     return c.json({ success: false, error: 'Failed to retrieve claim' }, 500);
   }
 });
@@ -139,6 +148,7 @@ insuranceRoutes.put('/claims/:id', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to update claim', { error: String(error) });
     return c.json({ success: false, error: 'Failed to update claim' }, 400);
   }
 });
@@ -151,6 +161,7 @@ insuranceRoutes.delete('/claims/:id', async (c: Context) => {
     return c.json({ success: true });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to delete claim', { error: String(error) });
     return c.json({ success: false, error: 'Failed to delete claim' }, 500);
   }
 });
@@ -165,6 +176,7 @@ insuranceRoutes.get('/leads', async (c: Context) => {
     return c.json({ success: true, data: leads, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to list leads', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list leads' }, 500);
   }
 });
@@ -179,6 +191,7 @@ insuranceRoutes.post('/leads', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to create lead', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create lead' }, 400);
   }
 });
@@ -192,6 +205,7 @@ insuranceRoutes.get('/leads/:id', async (c: Context) => {
     return c.json({ success: true, data: lead });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to retrieve lead', { error: String(error) });
     return c.json({ success: false, error: 'Failed to retrieve lead' }, 500);
   }
 });
@@ -207,6 +221,7 @@ insuranceRoutes.put('/leads/:id', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to update lead', { error: String(error) });
     return c.json({ success: false, error: 'Failed to update lead' }, 400);
   }
 });
@@ -223,6 +238,7 @@ insuranceRoutes.get('/documents', async (c: Context) => {
     return c.json({ success: true, data: docs, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to list documents', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list documents' }, 500);
   }
 });
@@ -237,6 +253,7 @@ insuranceRoutes.post('/documents', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to create document', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create document' }, 400);
   }
 });
@@ -253,6 +270,7 @@ insuranceRoutes.get('/compliance', async (c: Context) => {
     return c.json({ success: true, data: records, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to list compliance records', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list compliance records' }, 500);
   }
 });
@@ -267,6 +285,7 @@ insuranceRoutes.post('/compliance', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/insurance] Failed to create compliance record', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create compliance record' }, 400);
   }
 });

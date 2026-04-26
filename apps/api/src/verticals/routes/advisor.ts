@@ -18,6 +18,7 @@ import {
   createDocumentSchema,
   createComplianceSchema,
 } from '@aether/db/schema/shared-vertical';
+import { logger } from '../../lib/logger';
 
 const advisorRoutes = new Hono();
 
@@ -31,6 +32,7 @@ advisorRoutes.get('/portfolios', async (c: Context) => {
     return c.json({ success: true, data: portfolios, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to list portfolios', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list portfolios' }, 500);
   }
 });
@@ -45,6 +47,7 @@ advisorRoutes.post('/portfolios', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to create portfolio', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create portfolio' }, 400);
   }
 });
@@ -58,6 +61,7 @@ advisorRoutes.get('/portfolios/:id', async (c: Context) => {
     return c.json({ success: true, data: portfolio });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to retrieve portfolio', { error: String(error) });
     return c.json({ success: false, error: 'Failed to retrieve portfolio' }, 500);
   }
 });
@@ -73,6 +77,7 @@ advisorRoutes.put('/portfolios/:id', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to update portfolio', { error: String(error) });
     return c.json({ success: false, error: 'Failed to update portfolio' }, 400);
   }
 });
@@ -85,6 +90,7 @@ advisorRoutes.delete('/portfolios/:id', async (c: Context) => {
     return c.json({ success: true });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to delete portfolio', { error: String(error) });
     return c.json({ success: false, error: 'Failed to delete portfolio' }, 500);
   }
 });
@@ -99,6 +105,7 @@ advisorRoutes.get('/risk-assessments', async (c: Context) => {
     return c.json({ success: true, data: assessments, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to list risk assessments', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list risk assessments' }, 500);
   }
 });
@@ -113,6 +120,7 @@ advisorRoutes.post('/risk-assessments', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to create risk assessment', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create risk assessment' }, 400);
   }
 });
@@ -126,6 +134,7 @@ advisorRoutes.get('/risk-assessments/:id', async (c: Context) => {
     return c.json({ success: true, data: assessment });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to retrieve risk assessment', { error: String(error) });
     return c.json({ success: false, error: 'Failed to retrieve risk assessment' }, 500);
   }
 });
@@ -141,6 +150,7 @@ advisorRoutes.put('/risk-assessments/:id', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to update risk assessment', { error: String(error) });
     return c.json({ success: false, error: 'Failed to update risk assessment' }, 400);
   }
 });
@@ -153,6 +163,7 @@ advisorRoutes.delete('/risk-assessments/:id', async (c: Context) => {
     return c.json({ success: true });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to delete risk assessment', { error: String(error) });
     return c.json({ success: false, error: 'Failed to delete risk assessment' }, 500);
   }
 });
@@ -167,6 +178,7 @@ advisorRoutes.get('/financial-plans', async (c: Context) => {
     return c.json({ success: true, data: plans, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to list financial plans', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list financial plans' }, 500);
   }
 });
@@ -181,6 +193,7 @@ advisorRoutes.post('/financial-plans', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to create financial plan', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create financial plan' }, 400);
   }
 });
@@ -194,6 +207,7 @@ advisorRoutes.get('/financial-plans/:id', async (c: Context) => {
     return c.json({ success: true, data: plan });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to retrieve financial plan', { error: String(error) });
     return c.json({ success: false, error: 'Failed to retrieve financial plan' }, 500);
   }
 });
@@ -209,6 +223,7 @@ advisorRoutes.put('/financial-plans/:id', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to update financial plan', { error: String(error) });
     return c.json({ success: false, error: 'Failed to update financial plan' }, 400);
   }
 });
@@ -221,6 +236,7 @@ advisorRoutes.delete('/financial-plans/:id', async (c: Context) => {
     return c.json({ success: true });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to delete financial plan', { error: String(error) });
     return c.json({ success: false, error: 'Failed to delete financial plan' }, 500);
   }
 });
@@ -235,6 +251,7 @@ advisorRoutes.get('/leads', async (c: Context) => {
     return c.json({ success: true, data: leads, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to list leads', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list leads' }, 500);
   }
 });
@@ -249,6 +266,7 @@ advisorRoutes.post('/leads', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to create lead', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create lead' }, 400);
   }
 });
@@ -262,6 +280,7 @@ advisorRoutes.get('/leads/:id', async (c: Context) => {
     return c.json({ success: true, data: lead });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to retrieve lead', { error: String(error) });
     return c.json({ success: false, error: 'Failed to retrieve lead' }, 500);
   }
 });
@@ -277,6 +296,7 @@ advisorRoutes.put('/leads/:id', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to update lead', { error: String(error) });
     return c.json({ success: false, error: 'Failed to update lead' }, 400);
   }
 });
@@ -293,6 +313,7 @@ advisorRoutes.get('/documents', async (c: Context) => {
     return c.json({ success: true, data: docs, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to list documents', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list documents' }, 500);
   }
 });
@@ -307,6 +328,7 @@ advisorRoutes.post('/documents', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to create document', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create document' }, 400);
   }
 });
@@ -323,6 +345,7 @@ advisorRoutes.get('/compliance', async (c: Context) => {
     return c.json({ success: true, data: records, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to list compliance records', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list compliance records' }, 500);
   }
 });
@@ -337,6 +360,7 @@ advisorRoutes.post('/compliance', async (c: Context) => {
   } catch (error) {
     if (error instanceof ZodError) return c.json(formatZodError(error), 400);
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/advisor] Failed to create compliance record', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create compliance record' }, 400);
   }
 });

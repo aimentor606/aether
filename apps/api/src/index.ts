@@ -153,8 +153,8 @@ app.get('/v1/accounts', supabaseAuth, async (c: any) => {
         is_primary_owner: m.accountRole === 'owner',
       })));
     }
-  } catch {
-    // Table doesn't exist yet — continue to basejump fallback
+  } catch (err) {
+    appLogger.warn('[accounts] aether.account_members query failed, falling back to basejump', { error: String(err) });
   }
 
   // 2. Fall back to basejump.account_user (legacy, cloud prod)
@@ -179,8 +179,8 @@ app.get('/v1/accounts', supabaseAuth, async (c: any) => {
         is_primary_owner: m.accountRole === 'owner',
       })));
     }
-  } catch {
-    // basejump doesn't exist — continue to fallback
+  } catch (err) {
+    appLogger.warn('[accounts] basejump.account_user query failed, returning synthetic account', { error: String(err) });
   }
 
   // 3. No memberships anywhere — return userId as personal account

@@ -11,6 +11,7 @@ import {
   createBudgetSchema,
   createLedgerSchema,
 } from '@aether/db/schema/finance';
+import { logger } from '../../lib/logger';
 
 const financeRoutes = new Hono();
 
@@ -24,6 +25,7 @@ financeRoutes.get('/invoices', async (c: Context) => {
     return c.json({ success: true, data: invoices, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/finance] Failed to list invoices', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list invoices' }, 500);
   }
 });
@@ -40,6 +42,7 @@ financeRoutes.post('/invoices', async (c: Context) => {
       return c.json(formatZodError(error), 400);
     }
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/finance] Failed to create invoice', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create invoice' }, 400);
   }
 });
@@ -55,6 +58,7 @@ financeRoutes.get('/invoices/:id', async (c: Context) => {
     return c.json({ success: true, data: invoice });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/finance] Failed to retrieve invoice', { error: String(error) });
     return c.json({ success: false, error: 'Failed to retrieve invoice' }, 500);
   }
 });
@@ -72,6 +76,7 @@ financeRoutes.put('/invoices/:id', async (c: Context) => {
       return c.json(formatZodError(error), 400);
     }
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/finance] Failed to update invoice', { error: String(error) });
     return c.json({ success: false, error: 'Failed to update invoice' }, 400);
   }
 });
@@ -84,6 +89,7 @@ financeRoutes.delete('/invoices/:id', async (c: Context) => {
     return c.json({ success: true });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/finance] Failed to delete invoice', { error: String(error) });
     return c.json({ success: false, error: 'Failed to delete invoice' }, 500);
   }
 });
@@ -98,6 +104,7 @@ financeRoutes.get('/expenses', async (c: Context) => {
     return c.json({ success: true, data: expenses, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/finance] Failed to list expenses', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list expenses' }, 500);
   }
 });
@@ -114,6 +121,7 @@ financeRoutes.post('/expenses', async (c: Context) => {
       return c.json(formatZodError(error), 400);
     }
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/finance] Failed to create expense', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create expense' }, 400);
   }
 });
@@ -128,6 +136,7 @@ financeRoutes.get('/ledger', async (c: Context) => {
     return c.json({ success: true, data: entries, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/finance] Failed to retrieve ledger', { error: String(error) });
     return c.json({ success: false, error: 'Failed to retrieve ledger' }, 500);
   }
 });
@@ -144,6 +153,7 @@ financeRoutes.post('/ledger', async (c: Context) => {
       return c.json(formatZodError(error), 400);
     }
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/finance] Failed to create ledger entry', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create ledger entry' }, 400);
   }
 });
@@ -158,6 +168,7 @@ financeRoutes.get('/budgets', async (c: Context) => {
     return c.json({ success: true, data: budgets, meta: { limit, offset } });
   } catch (error) {
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/finance] Failed to list budgets', { error: String(error) });
     return c.json({ success: false, error: 'Failed to list budgets' }, 500);
   }
 });
@@ -174,6 +185,7 @@ financeRoutes.post('/budgets', async (c: Context) => {
       return c.json(formatZodError(error), 400);
     }
     if (error instanceof HTTPException) throw error;
+    logger.error('[verticals/finance] Failed to create budget', { error: String(error) });
     return c.json({ success: false, error: 'Failed to create budget' }, 400);
   }
 });

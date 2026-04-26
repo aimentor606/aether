@@ -1,7 +1,6 @@
 "use client";
 
 import type {
-	FileDiff,
 	Message,
 	Event as OpenCodeEvent,
 	Part,
@@ -10,6 +9,7 @@ import type {
 	SessionStatus,
 	Todo,
 } from "@opencode-ai/sdk/v2/client";
+import type { FileDiff } from "@/ui/types";
 import { create } from "zustand";
 
 // ============================================================================
@@ -112,6 +112,7 @@ interface SyncState {
 		msgs: Array<{ info: Message; parts: Part[] }>,
 	) => void;
 	reset: () => void;
+ttclearSession: (sessionID: string) => void;
 
 	// ---- Selector ----
 	getMessages: (sessionID: string) => MessageWithParts[];
@@ -125,18 +126,18 @@ interface SyncState {
 // Store Implementation
 // Track optimistic message IDs so we can remove them when the server sends
 // the real user message (which has a different, server-generated ID).
-const optimisticIds = new Set<string>();
+let optimisticIds = new Set<string>();
 // Track message IDs where optimistic parts were bridged to the real message.
 // When the first real part arrives for a bridged message, the bridged parts
 // are cleared so optimistic and real parts don't co-exist (which would
 // double-render the user's text).
-const bridgedPartIds = new Set<string>();
+let bridgedPartIds = new Set<string>();
 
 // Track part IDs that have received at least one delta.
 // Used by upsertPart to avoid overwriting delta-accumulated text with a
 // stale message.part.updated snapshot that arrives in the same event batch.
 // Entries are cleared when the streaming session goes idle.
-const deltaActiveParts = new Set<string>();
+let deltaActiveParts = new Set<string>();
 
 function writeStreamCache(
 	sessionID: string,
@@ -607,8 +608,11 @@ export const useSyncStore = create<SyncState>()((set, get) => ({
 		}),
 
 	reset: () => {
-		optimisticIds.clear();
-		bridgedPartIds.clear();
+		optimisticIds = new Set();
+		bridgedPartIds = new Set();
+		deltaActiveParts = new Set();
+		lastTs = 0;
+		counter = 0;
 		set({
 			messages: {},
 			parts: {},
@@ -619,6 +623,25 @@ export const useSyncStore = create<SyncState>()((set, get) => ({
 			todos: {},
 		});
 	},
+
+		clearSession: (sessionID) => {
+			const s = get();
+			const newMessages = { ...s.messages };
+			const newParts = { ...s.parts };
+			const newStatus = { ...s.sessionStatus };
+			const newPerms = { ...s.permissions };
+			const newQuestions = { ...s.questions };
+			const newDiffs = { ...s.diffs };
+			const newTodos = { ...s.todos };
+			delete newMessages[sessionID];
+			delete newParts[sessionID];
+			delete newStatus[sessionID];
+			delete newPerms[sessionID];
+			delete newQuestions[sessionID];
+			delete newDiffs[sessionID];
+			delete newTodos[sessionID];
+			set({ messages: newMessages, parts: newParts, sessionStatus: newStatus, permissions: newPerms, questions: newQuestions, diffs: newDiffs, todos: newTodos });
+		},
 
 	// ---- Selector: join messages + parts into MessageWithParts[] ----
 
@@ -900,9 +923,21 @@ export const useSyncStore = create<SyncState>()((set, get) => ({
 			case "session.diff": {
 				const props = event.properties as {
 					sessionID: string;
-					diff: FileDiff[];
+					diff: Array<
+						FileDiff | { file: string; additions: number; deletions: number; status: 'added' | 'deleted' | 'modified' }
+					>;
 				};
-				if (props.sessionID) store.setDiff(props.sessionID, props.diff);
+				if (props.sessionID) {
+					const normalized: FileDiff[] = (props.diff || []).map((d) => ({
+						file: d.file,
+						additions: d.additions,
+						deletions: d.deletions,
+						status: d.status,
+						before: (d as FileDiff).before ?? '',
+						after: (d as FileDiff).after ?? '',
+					}));
+					store.setDiff(props.sessionID, normalized);
+				}
 				return;
 			}
 			case "todo.updated": {

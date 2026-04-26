@@ -43,6 +43,8 @@ import { requestContextMiddleware, requestLoggerMiddleware, observabilityMiddlew
 import { globalErrorHandler, notFoundHandler } from './middleware/error-handler';
 import { ensureLocalSandboxRegistered, startLocalSandboxSelfHeal } from './startup/local-sandbox';
 import { getCacheMetrics } from './middleware/tenant-config-loader';
+import { createDb, withTenantContext } from '@aether/db';
+import { createTenantRlsMiddleware } from './middleware/tenant-rls';
 
 // ─── App Setup ──────────────────────────────────────────────────────────────
 
@@ -57,6 +59,8 @@ app.use('*', requestContextMiddleware);
 app.use('*', requestLoggerMiddleware);
 app.use('*', observabilityMiddleware);
 if (devPrettyJsonMiddleware) app.use('*', devPrettyJsonMiddleware);
+
+const rlsDb = config.DATABASE_URL ? createDb(config.DATABASE_URL) : null;
 
 // === Top-Level Health Check (no auth) ===
 
@@ -233,10 +237,11 @@ app.route('/v1/admin/sandbox-pool', sandboxPoolAdminApp); // /v1/admin/sandbox-p
 // OAuth2 provider — public token endpoint, auth on authorize/consent
 app.route('/v1/oauth', oauthApp);
 
-// Verticals — multi-tenant vertical-specific routes (require auth + tenant context + rate limit)
+// Verticals — multi-tenant vertical-specific routes (require auth + tenant context + rate limit + RLS)
 app.use('/v1/verticals/*', combinedAuth);
 app.use('/v1/verticals/*', tenantConfigLoader);
 app.use('/v1/verticals/*', tenantRateLimit({ limit: 100, windowMs: 60_000 }));
+app.use('/v1/verticals/*', createTenantRlsMiddleware(rlsDb, withTenantContext));
 
 // Control plane — credential issuance and control-only operations
 app.use('/v1/control/*', combinedAuth);

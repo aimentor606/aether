@@ -10,11 +10,12 @@ import { notifyPermissionRequest } from './permission-requests';
 import { tunnelRateLimiter } from '../core/rate-limiter';
 import { isValidCapability, validateScope as validateScopeInput } from '../core/scope-validator';
 import { resolveAccountIdStrict } from '../../shared/resolve-account';
+import type { AppEnv } from '../../types';
 
-export function createRpcRouter(): Hono {
-  const router = new Hono();
+export function createRpcRouter(): Hono<AppEnv> {
+  const router = new Hono<AppEnv>();
 
-  router.post('/:tunnelId', async (c: any) => {
+  router.post('/:tunnelId', async (c) => {
     const userId = c.get('userId') as string;
     const accountId = await resolveAccountIdStrict(userId);
     const tunnelId = c.req.param('tunnelId');

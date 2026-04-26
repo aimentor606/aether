@@ -11,12 +11,13 @@ import { transformThread, transformMessages, createMigrationNotice } from './tra
 import { writeSessionToSandbox } from './sandbox-writer';
 import { transferFiles } from './file-transfer';
 import type { MigrationResult } from './types';
+import type { AppEnv } from '../types';
 
-export const legacyApp = new Hono();
+export const legacyApp = new Hono<AppEnv>();
 
 legacyApp.use('*', supabaseAuth);
 
-legacyApp.get('/threads', async (c: any) => {
+legacyApp.get('/threads', async (c) => {
   const accountId = c.get('userId') as string;
   const limit = parseInt(c.req.query('limit') || '50', 10);
   const offset = parseInt(c.req.query('offset') || '0', 10);
@@ -26,7 +27,7 @@ legacyApp.get('/threads', async (c: any) => {
   return c.json({ threads, total, limit, offset });
 });
 
-legacyApp.get('/threads/:threadId', async (c: any) => {
+legacyApp.get('/threads/:threadId', async (c) => {
   const accountId = c.get('userId') as string;
   const threadId = c.req.param('threadId');
 
@@ -36,7 +37,7 @@ legacyApp.get('/threads/:threadId', async (c: any) => {
   return c.json(thread);
 });
 
-legacyApp.get('/threads/:threadId/messages', async (c: any) => {
+legacyApp.get('/threads/:threadId/messages', async (c) => {
   const accountId = c.get('userId') as string;
   const threadId = c.req.param('threadId');
 
@@ -48,7 +49,7 @@ legacyApp.get('/threads/:threadId/messages', async (c: any) => {
   return c.json({ messages });
 });
 
-legacyApp.post('/threads/:threadId/migrate', async (c: any) => {
+legacyApp.post('/threads/:threadId/migrate', async (c) => {
   const accountId = c.get('userId') as string;
   const threadId = c.req.param('threadId');
   const { sandboxExternalId } = (await c.req.json()) as { sandboxExternalId?: string };
@@ -119,7 +120,7 @@ interface MigrateAllJob {
 
 const migrateAllJobs = new Map<string, MigrateAllJob>();
 
-legacyApp.post('/migrate-all', async (c: any) => {
+legacyApp.post('/migrate-all', async (c) => {
   const accountId = c.get('userId') as string;
   const { sandboxExternalId } = (await c.req.json()) as { sandboxExternalId?: string };
 
@@ -189,7 +190,7 @@ legacyApp.post('/migrate-all', async (c: any) => {
   return c.json(job);
 });
 
-legacyApp.get('/migrate-all/status', async (c: any) => {
+legacyApp.get('/migrate-all/status', async (c) => {
   const accountId = c.get('userId') as string;
   const job = migrateAllJobs.get(accountId);
   if (!job) {

@@ -16,11 +16,12 @@ import { db } from '../../shared/db';
 import { tunnelRelay } from '../core/relay';
 import { generateTunnelToken, hashSecretKey } from '../../shared/crypto';
 import { resolveAccountIdStrict } from '../../shared/resolve-account';
+import type { AppEnv } from '../../types';
 
-export function createConnectionsRouter(): Hono {
-  const router = new Hono();
+export function createConnectionsRouter(): Hono<AppEnv> {
+  const router = new Hono<AppEnv>();
 
-  router.get('/', async (c: any) => {
+  router.get('/', async (c) => {
     const userId = c.get('userId') as string;
     const accountId = await resolveAccountIdStrict(userId);
 
@@ -48,7 +49,7 @@ export function createConnectionsRouter(): Hono {
     return c.json(enriched);
   });
 
-  router.post('/', async (c: any) => {
+  router.post('/', async (c) => {
     const userId = c.get('userId') as string;
     const accountId = await resolveAccountIdStrict(userId);
     const body = await c.req.json();
@@ -77,7 +78,7 @@ export function createConnectionsRouter(): Hono {
     return c.json({ ...connection, setupToken }, 201);
   });
 
-  router.get('/:tunnelId', async (c: any) => {
+  router.get('/:tunnelId', async (c) => {
     const userId = c.get('userId') as string;
     const accountId = await resolveAccountIdStrict(userId);
     const tunnelId = c.req.param('tunnelId');
@@ -110,7 +111,7 @@ export function createConnectionsRouter(): Hono {
     });
   });
 
-  router.patch('/:tunnelId', async (c: any) => {
+  router.patch('/:tunnelId', async (c) => {
     const userId = c.get('userId') as string;
     const accountId = await resolveAccountIdStrict(userId);
     const tunnelId = c.req.param('tunnelId');
@@ -143,7 +144,7 @@ export function createConnectionsRouter(): Hono {
     return c.json(updated);
   });
 
-  router.post('/:tunnelId/rotate-token', async (c: any) => {
+  router.post('/:tunnelId/rotate-token', async (c) => {
     const userId = c.get('userId') as string;
     const accountId = await resolveAccountIdStrict(userId);
     const tunnelId = c.req.param('tunnelId');
@@ -185,7 +186,7 @@ export function createConnectionsRouter(): Hono {
     return c.json({ tunnelId, setupToken: newToken });
   });
 
-  router.delete('/:tunnelId', async (c: any) => {
+  router.delete('/:tunnelId', async (c) => {
     const userId = c.get('userId') as string;
     const accountId = await resolveAccountIdStrict(userId);
     const tunnelId = c.req.param('tunnelId');

@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
-import type { AppEnv } from '../types';
 import { resolveAccountIdStrict } from '../shared/resolve-account';
 import { upsertAccountCreds, getAccountCreds, deleteAccountCreds } from './credential-store';
 
@@ -12,8 +12,16 @@ const schema = z.object({
   environment: z.string().optional().default('production'),
 });
 
-export function createCredentialRoutes(): Hono<AppEnv> {
-  const app = new Hono<AppEnv>();
+type CredentialEnv = {
+  Variables: {
+    userId: string;
+    userEmail: string;
+    accountId?: string;
+  };
+};
+
+export function createCredentialRoutes(): Hono<CredentialEnv> {
+  const app = new Hono<CredentialEnv>();
 
   /**
    * PUT /credentials — save Pipedream creds for the authenticated account.
@@ -65,9 +73,9 @@ export function createCredentialRoutes(): Hono<AppEnv> {
 /**
  * Resolve accountId from either supabase auth (userId) or api key auth (accountId).
  */
-async function resolveAccount(c: any): Promise<string> {
+async function resolveAccount(c: Context<CredentialEnv>): Promise<string> {
   // apiKeyAuth sets accountId directly
-  const direct = c.get('accountId') as string | undefined;
+  const direct = c.get('accountId');
   if (direct) return direct;
 
   // supabaseAuth sets userId — resolve to accountId

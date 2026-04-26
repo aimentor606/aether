@@ -6,11 +6,12 @@ import { tunnelRelay } from '../core/relay';
 import { tunnelRateLimiter } from '../core/rate-limiter';
 import { isValidCapability, validateScope as validateScopeInput } from '../core/scope-validator';
 import { TunnelErrorCode, type TunnelCapability } from 'agent-tunnel';
+import type { AppEnv } from '../../types';
 
-export function createPermissionsRouter(): Hono {
-  const router = new Hono();
+export function createPermissionsRouter(): Hono<AppEnv> {
+  const router = new Hono<AppEnv>();
 
-  router.get('/:tunnelId', async (c: any) => {
+  router.get('/:tunnelId', async (c) => {
     const accountId = c.get('userId') as string;
     const tunnelId = c.req.param('tunnelId');
 
@@ -37,7 +38,7 @@ export function createPermissionsRouter(): Hono {
     return c.json(permissions);
   });
 
-  router.post('/:tunnelId', async (c: any) => {
+  router.post('/:tunnelId', async (c) => {
     const accountId = c.get('userId') as string;
     const tunnelId = c.req.param('tunnelId');
 
@@ -104,7 +105,7 @@ export function createPermissionsRouter(): Hono {
     return c.json(permission, 201);
   });
 
-  router.delete('/:tunnelId/:permissionId', async (c: any) => {
+  router.delete('/:tunnelId/:permissionId', async (c) => {
     const accountId = c.get('userId') as string;
     const tunnelId = c.req.param('tunnelId');
     const permissionId = c.req.param('permissionId');

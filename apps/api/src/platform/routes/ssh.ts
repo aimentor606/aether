@@ -14,6 +14,7 @@
  */
 
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 import { execSync } from 'child_process';
 import { readFileSync, unlinkSync, mkdirSync, rmdirSync } from 'fs';
 import { join } from 'path';
@@ -142,7 +143,7 @@ async function runContainerCommand(container: Docker.Container, cmd: string): Pr
   }
 }
 
-async function setupLocalDockerSSH(containerName: string, c: any) {
+async function setupLocalDockerSSH(containerName: string, c: Context<{ Variables: AuthVariables }>) {
   const docker = getDockerClient();
   const container = docker.getContainer(containerName);
   try {

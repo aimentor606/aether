@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { supabaseAuth } from '../middleware/auth';
 import { config } from '../config';
+import type { AppEnv } from '../types';
 
 import { accountStateRouter } from './routes/account-state';
 import { subscriptionsRouter } from './routes/subscriptions';
@@ -9,7 +10,7 @@ import { creditsRouter } from './routes/credits';
 import { webhooksRouter } from './routes/webhooks';
 import { accountDeletionRouter } from './routes/account-deletion';
 
-const billingApp = new Hono();
+const billingApp = new Hono<AppEnv>();
 
 // Webhooks — NO auth (handlers verify signatures internally)
 billingApp.route('/webhooks', webhooksRouter);
@@ -44,7 +45,7 @@ billingApp.use('*', async (c, next) => {
 // Setup initialize endpoint (requires billing — creates Stripe subscription + sandbox)
 // DESIGN: Returns fast (<2s). Kicks off sandbox provisioning in the background.
 // Sandbox status is polled via GET /platform/sandbox/:id/status.
-billingApp.post('/setup/initialize', async (c: any) => {
+billingApp.post('/setup/initialize', async (c) => {
   const userId = c.get('userId') as string;
   const email = c.get('userEmail') as string;
   const body = await c.req.json().catch(() => ({}));
@@ -123,7 +124,7 @@ billingApp.route('/', creditsRouter);
 billingApp.route('/account', accountDeletionRouter);
 
 // Yearly credit rotation cron endpoint
-billingApp.post('/cron/yearly-rotation', async (c: any) => {
+billingApp.post('/cron/yearly-rotation', async (c) => {
   if (!config.AETHER_BILLING_INTERNAL_ENABLED) {
     return c.json({ skipped: true, reason: 'billing disabled' });
   }

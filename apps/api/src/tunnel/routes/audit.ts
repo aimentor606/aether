@@ -8,11 +8,12 @@ import { Hono } from 'hono';
 import { eq, and, desc, count } from 'drizzle-orm';
 import { tunnelAuditLogs, tunnelConnections } from '@aether/db';
 import { db } from '../../shared/db';
+import type { AppEnv } from '../../types';
 
-export function createAuditRouter(): Hono {
-  const router = new Hono();
+export function createAuditRouter(): Hono<AppEnv> {
+  const router = new Hono<AppEnv>();
 
-  router.get('/:tunnelId', async (c: any) => {
+  router.get('/:tunnelId', async (c) => {
     const accountId = c.get('userId') as string;
     const tunnelId = c.req.param('tunnelId');
     const page = parseInt(c.req.query('page') || '1', 10);

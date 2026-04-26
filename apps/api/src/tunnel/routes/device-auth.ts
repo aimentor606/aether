@@ -19,6 +19,7 @@ import { generateDeviceCode, generateTunnelToken, hashSecretKey, verifySecretKey
 import { tunnelRateLimiter } from '../core/rate-limiter';
 import { resolveAccountIdStrict } from '../../shared/resolve-account';
 import { config } from '../../config';
+import type { AppEnv } from '../../types';
 
 const DEVICE_AUTH_TTL_MS = 5 * 60_000;
 
@@ -127,11 +128,11 @@ export function createDeviceAuthPublicRouter(): Hono {
  * Authenticated router — mounted inside tunnelApp (behind combinedAuth).
  * Handles info, approve, deny.
  */
-export function createDeviceAuthRouter(): Hono {
-  const router = new Hono();
+export function createDeviceAuthRouter(): Hono<AppEnv> {
+  const router = new Hono<AppEnv>();
 
   // GET /:code/info — fetch request details for approval page
-  router.get('/:code/info', async (c: any) => {
+  router.get('/:code/info', async (c) => {
     const code = c.req.param('code');
 
     const [row] = await db
@@ -157,7 +158,7 @@ export function createDeviceAuthRouter(): Hono {
   });
 
   // POST /:code/approve — approve and create tunnel + token
-  router.post('/:code/approve', async (c: any) => {
+  router.post('/:code/approve', async (c) => {
     const userId = c.get('userId') as string;
     const accountId = await resolveAccountIdStrict(userId);
     const code = c.req.param('code');
@@ -225,7 +226,7 @@ export function createDeviceAuthRouter(): Hono {
   });
 
   // POST /:code/deny — deny request
-  router.post('/:code/deny', async (c: any) => {
+  router.post('/:code/deny', async (c) => {
     const code = c.req.param('code');
 
     const [updated] = await db

@@ -4,6 +4,8 @@ import { flushSentry } from './lib/sentry';
 import { logger as appLogger } from './lib/logger';
 
 import { Hono } from 'hono';
+import type { Context } from 'hono';
+import type { AppEnv } from './types';
 import { config } from './config';
 import { connectRedis } from './shared/redis';
 
@@ -118,7 +120,7 @@ app.post('/v1/prewarm', (c) => {
 
 // GET /v1/accounts — returns user's accounts.
 // Dual-read: aether.account_members first, falls back to basejump.account_user.
-app.get('/v1/accounts', supabaseAuth, async (c: any) => {
+app.get('/v1/accounts', supabaseAuth, async (c: Context<AppEnv>) => {
   const userId = c.get('userId') as string;
   const userEmail = c.get('userEmail') as string;
 
@@ -199,7 +201,7 @@ app.get('/v1/accounts', supabaseAuth, async (c: any) => {
 });
 
 
-app.get('/v1/user-roles', supabaseAuth, async (c: any) => {
+app.get('/v1/user-roles', supabaseAuth, async (c: Context<AppEnv>) => {
   const { getPlatformRole } = await import('./shared/platform-roles');
 
   const accountId = c.get('userId') as string;

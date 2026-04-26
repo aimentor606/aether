@@ -305,10 +305,10 @@ export const ledgers = aetherSchema.table('ledgers', {
   ledgerAccount: text('ledger_account').notNull(),
   description: text('description'),
   status: ledgerStatusEnum('status').default('draft').notNull(),
-  entryDate: timestamp('entry_date').notNull(),
+  entryDate: timestamp('entry_date', { withTimezone: true }).notNull(),
   reference: text('reference'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 }, (table) => [
   index('idx_ledgers_account').on(table.accountId),
   index('idx_ledgers_status').on(table.status),

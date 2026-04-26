@@ -52,9 +52,9 @@ export const apiKeys = pgTable(
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
     status: text('status').default('active'),
-    expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' }),
-    lastUsedAt: timestamp('last_used_at', { withTimezone: true, mode: 'string' }),
-    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }),
+    lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
     index('idx_api_keys_account_id').on(table.accountId),

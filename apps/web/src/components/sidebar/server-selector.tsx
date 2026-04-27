@@ -683,8 +683,11 @@ export function InstanceManagerDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { servers, activeServerId, addServer, updateServer, setActiveServer } =
-    useServerStore();
+  const servers = useServerStore((s) => s.servers);
+  const activeServerId = useServerStore((s) => s.activeServerId);
+  const addServer = useServerStore((s) => s.addServer);
+  const updateServer = useServerStore((s) => s.updateServer);
+  const setActiveServer = useServerStore((s) => s.setActiveServer);
   const { user, isLoading: isAuthLoading } = useAuth();
   const accountState = useSubscriptionStore((s) => s.accountState);
   const router = useRouter();
@@ -1740,7 +1743,8 @@ export function InstanceManagerDialog({
 // ============================================================================
 
 export function ServerSelector() {
-  const { servers, activeServerId } = useServerStore();
+  const servers = useServerStore((s) => s.servers);
+  const activeServerId = useServerStore((s) => s.activeServerId);
   const router = useRouter();
 
   const handleSelect = (id: string) => {

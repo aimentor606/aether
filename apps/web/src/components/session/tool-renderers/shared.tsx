@@ -2,57 +2,19 @@
 
 import { createTwoFilesPatch } from 'diff';
 import { ToolError } from './tool-error';
-import { QuestionPrompt } from '@/components/session/question-prompt';
-import { SubSessionModal } from '@/components/session/sub-session-modal';
 import {
   AlertTriangle,
   Ban,
-  StopCircle,
-  Brain,
-  BookOpen,
   Check,
   CheckCircle,
-  Circle,
-  CheckSquare,
-  Clock,
-  ChevronDown,
   ChevronRight,
   CircleAlert,
-  Code2,
-  Cpu,
   ExternalLink,
-  FileCode2,
-  FileIcon,
-  FileText,
-  Fingerprint,
-  Folder,
-  Glasses,
   Globe,
-  Hash,
-  Image as ImageIcon,
-  CalendarClock,
-  Layers,
-  ListTree,
   Loader2,
-  Maximize2,
-  MessageCircle,
-  Minimize2,
   MonitorPlay,
-  Music,
-  Plug,
-  Presentation,
   RefreshCw,
-  Scissors,
   Search,
-  ListTodo,
-  Plus,
-  SquareKanban,
-  Tags,
-  Terminal,
-  Trash2,
-  Type,
-  Video,
-  X,
 } from 'lucide-react';
 import React, {
   type ComponentType,
@@ -65,11 +27,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  HighlightedCode,
-  UnifiedMarkdown,
-} from '@/components/markdown/unified-markdown';
-import { useOcFileOpen } from '@/hooks/use-oc-file-open';
+import { UnifiedMarkdown } from '@/components/markdown/unified-markdown';
 import {
   Collapsible,
   CollapsibleContent,
@@ -82,8 +40,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { useOpenCodeMessages } from '@/hooks/opencode/use-opencode-sessions';
 import {
   renderHighlightedLine,
   useDiffHighlight,
@@ -91,54 +47,24 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
-  hasStructuredContent,
-  normalizeToolOutput,
   type OutputSection,
   parseStructuredOutput,
 } from '@/lib/utils/structured-output';
 import { useAuthenticatedPreviewUrl } from '@/hooks/use-authenticated-preview-url';
 import { useSandboxProxy } from '@/hooks/use-sandbox-proxy';
-import { useFileContent } from '@/features/files/hooks/use-file-content';
 import {
-  isAppRouteUrl,
   isProxiableLocalhostUrl,
   parseLocalhostUrl,
 } from '@/lib/utils/sandbox-url';
-import { useFilePreviewStore } from '@/stores/file-preview-store';
-import { useOpenCodePendingStore } from '@/stores/opencode-pending-store';
-import { useServerStore } from '@/stores/server-store';
 import { openTabAndNavigate } from '@/stores/tab-store';
-import { enrichPreviewMetadata } from '@/lib/utils/session-context';
-import { PreWithPaths } from '@/components/common/clickable-path';
 import {
   parseDiagnosticsFromToolOutput,
   type LspDiagnostic,
 } from '@/stores/diagnostics-store';
-import { parseMemorySearchOutput } from '@/lib/utils/memory-search-output';
-import { parseMemoryEntryOutput } from '@/lib/utils/memory-entry-output';
-import { useIntegrationConnectStore } from '@/stores/integration-connect-store';
-import { useAuth } from '@/components/AuthProvider';
-import { Badge } from '@/components/ui/badge';
 
 import {
-  type ApplyPatchFile,
-  computeStatusFromPart,
   type Diagnostic,
-  getChildSessionId,
-  getChildSessionToolParts,
   getDiagnostics,
-  getDirectory,
-  getFilename,
-  getPermissionForTool,
-  getToolInfo,
-  isToolPart,
-  type MessageWithParts,
-  PERMISSION_LABELS,
-  type PermissionRequest,
-  type QuestionRequest,
-  shouldShowToolPart,
-  stripAnsi,
-  type ToolInfo,
   type ToolPart,
   type TriggerTitle,
 } from '@/ui';

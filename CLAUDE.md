@@ -34,31 +34,32 @@ packages/
   voice/        Voice integration
   agent-tunnel/ SSH tunnel client for sandbox access
 core/
- master/   Sandbox orchestrator (Docker-based)
+  master/          Sandbox orchestrator (Docker-based)
   docker/          Docker compose configs
-  services/        Supporting services
-  tests/           Core runtime tests
-infra/
-  litellm/      LiteLLM proxy config (8 models, fallbacks, Redis)
+scripts/
+  deploy/          Production deployment (core/ compose files + ops/ scripts)
 ```
 
 ## Dev Commands
 
 ```bash
-pnpm dev              # Start frontend + API
+pnpm dev              # Start local Supabase + frontend + API
 pnpm dev:api          # API only (bun --hot on :8008)
 pnpm dev:web          # Web only (next dev --turbopack :3000)
 pnpm dev:core         # Sandbox runtime (Docker Compose)
 pnpm build            # Build all packages
+pnpm run typecheck    # Type check all packages
 ```
 
 ### Testing
 
 ```bash
 cd apps/api && bun test                                    # All API tests
-cd apps/api && bun test src/__tests__/vertical-routes.test.ts  # Vertical routes only
-cd core/kortix-master && bun test                          # Core runtime tests
+cd apps/api && bun test src/__tests__/vertical-routes.test.ts  # Single test file
+cd core/master && bun test                                 # Core runtime tests
 ```
+
+Full development guide: [`docs/development-guide.md`](docs/development-guide.md)
 
 ## Key Conventions
 
@@ -121,10 +122,9 @@ Mounted at `/v1/verticals/*` in `apps/api/src/index.ts` with `combinedAuth` guar
 
 ## Known Issues
 
-- `apps/api/src/index.ts` is 1,455 lines. Should be split into modules (cors.ts, routes.ts, sandbox-token.ts, websocket-proxy.ts, server.ts).
-- Web has 231 dependencies including Syncfusion (~15MB). Cleanup needed.
-- RLS migration exists but session variable setter not implemented.
-- Web has pre-existing TypeScript errors (~3,900) unrelated to rebrand.
+- `apps/api/src/index.ts` was split into 7 modules (routes/health, routes/accounts, routes/user-roles, startup/banner, startup/services, startup/shutdown, server.ts). Now ~200 lines.
+- Web dependencies deduplicated (18 packages removed). TypeScript errors fixed (3,900 → 0).
+- RLS activated: session variable `aether.current_account_id` set per-request via `withTenantContext` (`packages/db/src/rls.ts`). Middleware wired at `/v1/verticals/*`. Migrations 0002, 0005, 0006.
 
 ## Rebrand Status
 

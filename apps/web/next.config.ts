@@ -23,7 +23,6 @@ const nextConfig = (): NextConfig => ({
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
-      '@radix-ui/react-icons',
       'recharts',
       'date-fns',
       '@tanstack/react-query',

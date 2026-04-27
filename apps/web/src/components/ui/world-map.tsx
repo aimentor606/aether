@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import DottedMap from "dotted-map";
 
 import { useTheme } from "next-themes";

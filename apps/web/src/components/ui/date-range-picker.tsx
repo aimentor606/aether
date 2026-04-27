@@ -4,7 +4,7 @@ import React, { type FC, useState, useEffect } from 'react'
 import { Button } from './button'
 import { Popover, PopoverContent, PopoverTrigger } from './popover'
 import { Calendar } from './calendar'
-import { ChevronUpIcon, ChevronDownIcon, CheckIcon } from '@radix-ui/react-icons'
+import { ChevronUp, ChevronDown, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { DateRange } from 'react-day-picker'
 
@@ -203,7 +203,7 @@ export const DateRangePicker: FC<DateRangePickerProps> = ({
     >
       <>
         <span className={cn('pr-2 opacity-0', isSelected && 'opacity-70')}>
-          <CheckIcon width={18} height={18} />
+          <Check size={18} />
         </span>
         {label}
       </>
@@ -226,7 +226,7 @@ export const DateRangePicker: FC<DateRangePickerProps> = ({
             </div>
           </div>
           <div className="pl-1 opacity-60 -mr-2 scale-125">
-            {isOpen ? (<ChevronUpIcon width={24} />) : (<ChevronDownIcon width={24} />)}
+            {isOpen ? (<ChevronUp size={24} />) : (<ChevronDown size={24} />)}
           </div>
         </Button>
       </PopoverTrigger>

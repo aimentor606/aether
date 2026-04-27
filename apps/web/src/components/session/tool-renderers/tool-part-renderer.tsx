@@ -2,9 +2,7 @@
 
 import React, {
   useCallback,
-  useContext,
   useEffect,
-  useMemo,
   useState,
 } from 'react';
 import {
@@ -18,6 +16,8 @@ import {
   ToolRunningContext,
   StalePendingContext,
 } from './shared';
+import { ToolError } from './tool-error';
+import { GenericTool } from './generic-tool';
 import {
   PERMISSION_LABELS,
   type PermissionRequest,

@@ -15,7 +15,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 
-export const aetherSchema = pgSchema('acme');
+export const aetherSchema = pgSchema('aether');
 
 export const sandboxStatusEnum = aetherSchema.enum('sandbox_status', [
   'provisioning',

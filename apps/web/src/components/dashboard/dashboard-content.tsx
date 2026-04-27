@@ -15,7 +15,8 @@ import {
 import { getClient } from '@/lib/opencode-sdk';
 import { openTabAndNavigate } from '@/stores/tab-store';
 import { useServerStore } from '@/stores/server-store';
-import { type AttachedFile, SessionChatInput } from '@/components/session/session-chat-input';
+import { SessionChatInput } from '@/components/session/session-chat-input';
+import type { AttachedFile } from '@/lib/models';
 import { usePendingFilesStore } from '@/stores/pending-files-store';
 import { WallpaperBackground } from '@/components/ui/wallpaper-background';
 import { useOpenCodeLocal, formatModelString } from '@/hooks/opencode/use-opencode-local';

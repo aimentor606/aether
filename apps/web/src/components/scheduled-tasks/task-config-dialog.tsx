@@ -33,7 +33,8 @@ import { ScheduleBuilder } from './schedule-builder';
 import { cn } from '@/lib/utils';
 
 // Shared selectors from ChatInput (same as used in channels)
-import { AgentSelector, flattenModels } from '@/components/session/session-chat-input';
+import { AgentSelector } from '@/components/session/session-chat-input';
+import { flattenModels } from '@/lib/models';
 import { ModelSelector } from '@/components/session/model-selector';
 import { useOpenCodeAgents, useOpenCodeProviders } from '@/hooks/opencode/use-opencode-sessions';
 

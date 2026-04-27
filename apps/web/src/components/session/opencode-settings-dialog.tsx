@@ -57,7 +57,7 @@ import { opencodeKeys } from '@/hooks/opencode/use-opencode-sessions';
 import { ProviderList } from '@/components/providers/provider-list';
 import { useProviderModalStore } from '@/stores/provider-modal-store';
 import { ModelSelector } from '@/components/session/model-selector';
-import { flattenModels } from '@/components/session/session-chat-input';
+import { flattenModels } from '@/lib/models';
 import {
   useOpenCodeMcpStatus,
   useAddMcpServer,

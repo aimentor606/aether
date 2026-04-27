@@ -13,7 +13,7 @@
 
 import { useMemo, useCallback, useRef, useEffect, useState } from 'react';
 import { useModelStore, type ModelKey } from './use-model-store';
-import type { FlatModel } from '@/components/session/session-chat-input';
+import type { FlatModel } from '@/lib/models';
 import type { Agent, ProviderListResponse, Config } from '@opencode-ai/sdk/v2/client';
 
 export type { ModelKey };

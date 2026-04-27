@@ -14,7 +14,8 @@ import {
 import { TelegramIcon } from '@/components/ui/icons/telegram';
 import { toast } from 'sonner';
 import { useTelegramVerifyToken, useTelegramConnect } from '@/hooks/channels/use-telegram-wizard';
-import { AgentSelector, flattenModels } from '@/components/session/session-chat-input';
+import { AgentSelector } from '@/components/session/session-chat-input';
+import { flattenModels } from '@/lib/models';
 import { ModelSelector } from '@/components/session/model-selector';
 import { useOpenCodeAgents, useOpenCodeProviders } from '@/hooks/opencode/use-opencode-sessions';
 

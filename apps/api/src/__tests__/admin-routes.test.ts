@@ -6,31 +6,16 @@
  * before our mock and calls process.exit(1) on missing env vars.
  */
 import { describe, test, expect, mock, beforeEach } from 'bun:test';
+import { createTestConfig } from './billing/mocks';
 
 // ─── Mocks (MUST be before any require() calls) ─────────────────────────────
 
 mock.module('../config', () => ({
-  config: {
-    ENV_MODE: 'test',
-    INTERNAL_AETHER_ENV: 'test',
-    PORT: 8008,
-    SANDBOX_VERSION: 'test',
+  config: createTestConfig({
     ALLOWED_SANDBOX_PROVIDERS: [],
     AETHER_BILLING_INTERNAL_ENABLED: false,
-    isDaytonaEnabled: () => false,
     isLocalDockerEnabled: () => false,
-    isJustAVPSEnabled: () => false,
-    isLocal: () => false,
-    DATABASE_URL: 'postgresql://test:test@localhost/test',
-    SUPABASE_URL: 'http://localhost:54321',
-    SUPABASE_SERVICE_ROLE_KEY: 'test-key',
-    STRIPE_SECRET_KEY: '',
-    SANDBOX_PORT_BASE: 14000,
-    SANDBOX_CONTAINER_NAME: 'aether-sandbox',
-    AETHER_URL: 'http://localhost:8008/v1/router',
-    JUSTAVPS_API_URL: '',
-    JUSTAVPS_API_KEY: '',
-  },
+  }),
   SANDBOX_VERSION: 'test',
 }));
 
@@ -51,6 +36,7 @@ function resetStore() {
 }
 
 mock.module('../shared/db', () => ({
+  hasDatabase: true,
   db: {
     select: () => ({
       from: () => ({
@@ -109,6 +95,19 @@ mock.module('@aether/db', () => ({
     lastUsedAt: 'lastUsedAt', accountId: 'accountId',
   },
   accounts: { accountId: 'accountId', name: 'name' },
+  platformUserRoles: {
+    id: 'id', accountId: 'accountId', userId: 'userId',
+    role: 'role', createdAt: 'createdAt',
+  },
+  creditAccounts: {
+    accountId: 'accountId', balance: 'balance', expiringCredits: 'expiringCredits',
+    nonExpiringCredits: 'nonExpiringCredits', tier: 'tier',
+  },
+  creditLedger: { id: 'id', accountId: 'accountId', amount: 'amount', type: 'type' },
+  creditUsage: { id: 'id', accountId: 'accountId', amount: 'amount' },
+  creditPurchases: { id: 'id', accountId: 'accountId', amount: 'amount' },
+  billingCustomers: { id: 'id', accountId: 'accountId', email: 'email' },
+  accountDeletionRequests: { id: 'id', accountId: 'accountId', status: 'status' },
 }));
 
 mock.module('../providers/registry', () => ({

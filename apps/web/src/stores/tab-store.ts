@@ -455,7 +455,10 @@ export const useTabStore = create<TabState>()(
               activeTabId,
               tabFocusHistory,
             };
-            localStorage.setItem('aether-tabs-per-server', JSON.stringify(cache));
+            localStorage.setItem(
+              'aether-tabs-per-server',
+              JSON.stringify(cache),
+            );
           } catch {}
         }
 

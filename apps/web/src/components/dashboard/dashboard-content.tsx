@@ -19,7 +19,10 @@ import { SessionChatInput } from '@/components/session/session-chat-input';
 import type { AttachedFile } from '@/lib/models';
 import { usePendingFilesStore } from '@/stores/pending-files-store';
 import { WallpaperBackground } from '@/components/ui/wallpaper-background';
-import { useOpenCodeLocal, formatModelString } from '@/hooks/opencode/use-opencode-local';
+import {
+  useOpenCodeLocal,
+  formatModelString,
+} from '@/hooks/opencode/use-opencode-local';
 import { useOpenCodeConfig } from '@/hooks/opencode/use-opencode-config';
 import { Menu } from 'lucide-react';
 import type { Command } from '@/hooks/opencode/use-opencode-sessions';
@@ -52,7 +55,8 @@ export function DashboardContent() {
 
   const handleSend = useCallback(
     async (text: string, files?: AttachedFile[]) => {
-      if ((!text.trim() && (!files || files.length === 0)) || isSubmitting) return;
+      if ((!text.trim() && (!files || files.length === 0)) || isSubmitting)
+        return;
       playSound('send');
       setIsSubmitting(true);
       setIsFadingOutWelcome(true);
@@ -65,7 +69,8 @@ export function DashboardContent() {
         const options: Record<string, unknown> = {};
         if (local.agent.current) options.agent = local.agent.current.name;
         if (local.model.currentKey) options.model = local.model.currentKey;
-        if (local.model.variant.current) options.variant = local.model.variant.current;
+        if (local.model.variant.current)
+          options.variant = local.model.variant.current;
 
         const session = await createSession.mutateAsync();
         await fadeDelay;
@@ -80,7 +85,10 @@ export function DashboardContent() {
           usePendingFilesStore.getState().setPendingFiles(files);
         }
         if (Object.keys(options).length > 0) {
-          sessionStorage.setItem(`opencode_pending_options:${session.id}`, JSON.stringify(options));
+          sessionStorage.setItem(
+            `opencode_pending_options:${session.id}`,
+            JSON.stringify(options),
+          );
         }
 
         // Step 2: Open tab and navigate (optimistic) — AFTER sessionStorage is set
@@ -99,8 +107,12 @@ export function DashboardContent() {
         });
       } catch {
         if (createdSessionId) {
-          sessionStorage.removeItem(`opencode_pending_prompt:${createdSessionId}`);
-          sessionStorage.removeItem(`opencode_pending_options:${createdSessionId}`);
+          sessionStorage.removeItem(
+            `opencode_pending_prompt:${createdSessionId}`,
+          );
+          sessionStorage.removeItem(
+            `opencode_pending_options:${createdSessionId}`,
+          );
         }
         usePendingFilesStore.getState().setPendingFiles([]);
         setIsFadingOutWelcome(false);
@@ -109,7 +121,14 @@ export function DashboardContent() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isSubmitting, createSession, sendMessage, local.agent.current, local.model.currentKey, local.model.variant.current],
+    [
+      isSubmitting,
+      createSession,
+      sendMessage,
+      local.agent.current,
+      local.model.currentKey,
+      local.model.variant.current,
+    ],
   );
 
   const handleCommand = useCallback(
@@ -124,22 +143,33 @@ export function DashboardContent() {
           serverId: useServerStore.getState().activeServerId,
         });
         const client = getClient();
-        void client.session.command({
-          sessionID: session.id,
-          command: cmd.name,
-          arguments: args || '',
-          ...(local.agent.current && { agent: local.agent.current.name }),
-          ...(local.model.currentKey && { model: formatModelString(local.model.currentKey) }),
-          ...(local.model.variant.current && { variant: local.model.variant.current }),
-        } as any).catch(() => {
-          toast.warning('Failed to execute command');
-        });
+        void client.session
+          .command({
+            sessionID: session.id,
+            command: cmd.name,
+            arguments: args || '',
+            ...(local.agent.current && { agent: local.agent.current.name }),
+            ...(local.model.currentKey && {
+              model: formatModelString(local.model.currentKey),
+            }),
+            ...(local.model.variant.current && {
+              variant: local.model.variant.current,
+            }),
+          } as any)
+          .catch(() => {
+            toast.warning('Failed to execute command');
+          });
       } catch {
         toast.warning('Failed to create session');
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [createSession, local.agent.current, local.model.currentKey, local.model.variant.current],
+    [
+      createSession,
+      local.agent.current,
+      local.model.currentKey,
+      local.model.variant.current,
+    ],
   );
 
   return (
@@ -163,10 +193,10 @@ export function DashboardContent() {
       {/* Wallpaper background with brandmark */}
       <div
         className={cn(
-          "flex-1 relative overflow-hidden transition-[opacity,transform] ease-out",
+          'flex-1 relative overflow-hidden transition-[opacity,transform] ease-out',
           isFadingOutWelcome
-            ? "opacity-0 scale-[0.995] duration-700"
-            : "opacity-100 scale-100 duration-300",
+            ? 'opacity-0 scale-[0.995] duration-700'
+            : 'opacity-100 scale-100 duration-300',
         )}
       >
         <WallpaperBackground />

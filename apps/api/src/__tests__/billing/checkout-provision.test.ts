@@ -16,15 +16,14 @@ import {
   createMockStripeCheckoutSession,
   createMockStripeEvent,
   createMockStripeClient,
+  createCreditsRpcTracker,
   mockRegistry,
   registerGlobalMocks,
-  registerCreditsMock,
   resetMockRegistry,
 } from './mocks';
 
 // Register mocks BEFORE importing the module under test
 registerGlobalMocks();
-registerCreditsMock();
 
 // Module under test
 const { processStripeWebhook } = await import('../../billing/services/webhooks');
@@ -61,8 +60,9 @@ beforeEach(() => {
     id: 'cus_test_123', accountId: 'acc_test_123', email: 'test@example.com', provider: 'stripe', active: true,
   });
   mockRegistry.upsertCustomer = async (data: any) => { upsertCustomerCalls.push(data); };
-  mockRegistry.grantCredits = async (...args: any[]) => { grantCreditsCalls.push(args); };
-  mockRegistry.resetExpiringCredits = async () => {};
+  const tracker = createCreditsRpcTracker();
+  grantCreditsCalls = tracker.grantCreditsCalls as any;
+  mockRegistry.supabaseRpc = tracker.supabaseRpc;
   mockRegistry.provisionSandboxFromCheckout = async (...args: any[]) => {
     provisionCalls.push(args);
   };

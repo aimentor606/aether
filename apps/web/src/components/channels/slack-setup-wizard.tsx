@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useId, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,7 +22,10 @@ import { authenticatedFetch } from '@/lib/auth-token';
 import { AgentSelector } from '@/components/session/session-chat-input';
 import { flattenModels } from '@/lib/models';
 import { ModelSelector } from '@/components/session/model-selector';
-import { useOpenCodeAgents, useOpenCodeProviders } from '@/hooks/opencode/use-opencode-sessions';
+import {
+  useOpenCodeAgents,
+  useOpenCodeProviders,
+} from '@/hooks/opencode/use-opencode-sessions';
 
 interface SlackSetupWizardProps {
   onCreated: () => void;
@@ -37,9 +40,30 @@ const STEP_ANIMATION = {
 };
 
 const BOT_NAMES = [
-  'Atlas', 'Nova', 'Sage', 'Echo', 'Bolt', 'Iris', 'Dash', 'Cleo',
-  'Finn', 'Luna', 'Juno', 'Axel', 'Niko', 'Zara', 'Milo', 'Ruby',
-  'Hugo', 'Aria', 'Leo', 'Ivy', 'Rex', 'Mae', 'Kai', 'Pia',
+  'Atlas',
+  'Nova',
+  'Sage',
+  'Echo',
+  'Bolt',
+  'Iris',
+  'Dash',
+  'Cleo',
+  'Finn',
+  'Luna',
+  'Juno',
+  'Axel',
+  'Niko',
+  'Zara',
+  'Milo',
+  'Ruby',
+  'Hugo',
+  'Aria',
+  'Leo',
+  'Ivy',
+  'Rex',
+  'Mae',
+  'Kai',
+  'Pia',
 ];
 
 function defaultBotName(seed: string): string {
@@ -53,8 +77,13 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
   const [step, setStep] = useState(1);
   const [botName, setBotName] = useState(() => defaultBotName(botNameSeed));
   const [agentName, setAgentName] = useState<string | null>('aether');
-  const [selectedModel, setSelectedModel] = useState<{ providerID: string; modelID: string } | null>(null);
-  const [manifest, setManifest] = useState<Record<string, unknown> | null>(null);
+  const [selectedModel, setSelectedModel] = useState<{
+    providerID: string;
+    modelID: string;
+  } | null>(null);
+  const [manifest, setManifest] = useState<Record<string, unknown> | null>(
+    null,
+  );
   const [webhookUrl, setWebhookUrl] = useState('');
   const [manifestChannelId, setManifestChannelId] = useState('');
   const [manifestCopied, setManifestCopied] = useState(false);
@@ -75,14 +104,25 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
         toast.error('No active sandbox');
         return;
       }
-      const res = await authenticatedFetch(`${baseUrl}/aether/channels/slack-manifest`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ publicUrl: '', botName: botName.trim() || undefined }),
-      });
+      const res = await authenticatedFetch(
+        `${baseUrl}/aether/channels/slack-manifest`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            publicUrl: '',
+            botName: botName.trim() || undefined,
+          }),
+        },
+      );
       const text = await res.text();
       let data: any;
-      try { data = JSON.parse(text); } catch { toast.error('Server returned invalid response'); return; }
+      try {
+        data = JSON.parse(text);
+      } catch {
+        toast.error('Server returned invalid response');
+        return;
+      }
       if (data.ok && data.manifest) {
         setManifest(data.manifest);
         setWebhookUrl(data.webhookUrl || '');
@@ -158,7 +198,9 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
         </div>
         <div>
           <h3 className="text-base font-semibold">Slack Setup</h3>
-          <p className="text-xs text-muted-foreground">Connect a Slack bot to your agent</p>
+          <p className="text-xs text-muted-foreground">
+            Connect a Slack bot to your agent
+          </p>
         </div>
       </div>
 
@@ -168,14 +210,20 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
           const s = i + 1;
           return (
             <div key={s} className="flex items-center gap-2">
-              <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-medium transition-colors ${
-                s < step ? 'bg-primary text-primary-foreground' :
-                s === step ? 'bg-primary text-primary-foreground' :
-                'bg-muted text-muted-foreground'
-              }`}>
+              <div
+                className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-medium transition-colors ${
+                  s < step
+                    ? 'bg-primary text-primary-foreground'
+                    : s === step
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                }`}
+              >
                 {s < step ? <CheckCircle2 className="h-3.5 w-3.5" /> : s}
               </div>
-              <span className={`text-xs ${s === step ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+              <span
+                className={`text-xs ${s === step ? 'text-foreground font-medium' : 'text-muted-foreground'}`}
+              >
                 {label}
               </span>
               {s < stepLabels.length && <div className="w-6 h-px bg-border" />}
@@ -197,7 +245,9 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
                 value={botName}
                 onChange={(e) => setBotName(e.target.value)}
               />
-              <p className="text-[11px] text-muted-foreground">Display name in Slack.</p>
+              <p className="text-[11px] text-muted-foreground">
+                Display name in Slack.
+              </p>
             </div>
 
             {/* Agent */}
@@ -256,16 +306,36 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
         {step === 2 && (
           <motion.div key="step2" {...STEP_ANIMATION} className="space-y-3">
             <div className="rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-xs text-muted-foreground space-y-1.5">
-              <p className="font-medium text-foreground text-sm">Create your Slack app</p>
+              <p className="font-medium text-foreground text-sm">
+                Create your Slack app
+              </p>
               <ol className="list-decimal list-inside space-y-1 text-[12px]">
-                <li>Go to{' '}
-                  <a href="https://api.slack.com/apps" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-0.5">
+                <li>
+                  Go to{' '}
+                  <a
+                    href="https://api.slack.com/apps"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline inline-flex items-center gap-0.5"
+                  >
                     api.slack.com/apps <ExternalLink className="h-2.5 w-2.5" />
                   </a>{' '}
-                  → <strong className="text-foreground">Create New App</strong> → <strong className="text-foreground">From an app manifest</strong>
+                  → <strong className="text-foreground">Create New App</strong>{' '}
+                  →{' '}
+                  <strong className="text-foreground">
+                    From an app manifest
+                  </strong>
                 </li>
-                <li>Select your workspace, paste the manifest below (JSON format)</li>
-                <li>After creating, <strong className="text-foreground">Install to Workspace</strong> from OAuth & Permissions</li>
+                <li>
+                  Select your workspace, paste the manifest below (JSON format)
+                </li>
+                <li>
+                  After creating,{' '}
+                  <strong className="text-foreground">
+                    Install to Workspace
+                  </strong>{' '}
+                  from OAuth & Permissions
+                </li>
               </ol>
             </div>
 
@@ -273,8 +343,17 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs">App Manifest</Label>
-                  <Button variant="ghost" size="sm" className="gap-1 h-6 text-[11px] px-2" onClick={handleCopyManifest}>
-                    {manifestCopied ? <ClipboardCheck className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1 h-6 text-[11px] px-2"
+                    onClick={handleCopyManifest}
+                  >
+                    {manifestCopied ? (
+                      <ClipboardCheck className="h-3 w-3" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
                     {manifestCopied ? 'Copied' : 'Copy JSON'}
                   </Button>
                 </div>
@@ -287,22 +366,45 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
             {webhookUrl && (
               <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 space-y-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-[11px] font-medium text-foreground">Event Subscriptions URL</p>
-                  <Button variant="ghost" size="sm" className="h-5 px-1.5 text-[10px] gap-1" onClick={() => { navigator.clipboard.writeText(webhookUrl); toast.success('Copied'); }}>
+                  <p className="text-[11px] font-medium text-foreground">
+                    Event Subscriptions URL
+                  </p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-5 px-1.5 text-[10px] gap-1"
+                    onClick={() => {
+                      navigator.clipboard.writeText(webhookUrl);
+                      toast.success('Copied');
+                    }}
+                  >
                     <Copy className="h-2.5 w-2.5" /> Copy
                   </Button>
                 </div>
-                <code className="block text-[11px] text-muted-foreground break-all">{webhookUrl}</code>
-                <p className="text-[10px] text-muted-foreground">This URL is already in the manifest. Slack will verify it automatically.</p>
+                <code className="block text-[11px] text-muted-foreground break-all">
+                  {webhookUrl}
+                </code>
+                <p className="text-[10px] text-muted-foreground">
+                  This URL is already in the manifest. Slack will verify it
+                  automatically.
+                </p>
               </div>
             )}
 
             <div className="flex items-center justify-between pt-1">
-              <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="h-8 text-xs">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setStep(1)}
+                className="h-8 text-xs"
+              >
                 <ArrowLeft className="h-3.5 w-3.5 mr-1" />
                 Back
               </Button>
-              <Button onClick={() => setStep(3)} className="gap-1.5 h-8 text-xs">
+              <Button
+                onClick={() => setStep(3)}
+                className="gap-1.5 h-8 text-xs"
+              >
                 <ArrowRight className="h-3.5 w-3.5" />
                 Enter Credentials
               </Button>
@@ -313,7 +415,9 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
         {step === 3 && (
           <motion.div key="step3" {...STEP_ANIMATION} className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="slack-token" className="text-xs">Bot User OAuth Token</Label>
+              <Label htmlFor="slack-token" className="text-xs">
+                Bot User OAuth Token
+              </Label>
               <Input
                 id="slack-token"
                 type="password"
@@ -323,13 +427,27 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
               />
               <p className="text-[11px] text-muted-foreground">
                 Find this in your{' '}
-                <a href="https://api.slack.com/apps" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Slack app</a>
-                {' '}→ <strong className="text-foreground">OAuth & Permissions</strong> → <strong className="text-foreground">Bot User OAuth Token</strong>
+                <a
+                  href="https://api.slack.com/apps"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Slack app
+                </a>{' '}
+                →{' '}
+                <strong className="text-foreground">OAuth & Permissions</strong>{' '}
+                →{' '}
+                <strong className="text-foreground">
+                  Bot User OAuth Token
+                </strong>
               </p>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="slack-signing" className="text-xs">Signing Secret (optional)</Label>
+              <Label htmlFor="slack-signing" className="text-xs">
+                Signing Secret (optional)
+              </Label>
               <Input
                 id="slack-signing"
                 type="password"
@@ -340,13 +458,27 @@ export function SlackSetupWizard({ onCreated, onBack }: SlackSetupWizardProps) {
               />
               <p className="text-[11px] text-muted-foreground">
                 Find this in your{' '}
-                <a href="https://api.slack.com/apps" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Slack app</a>
-                {' '}→ <strong className="text-foreground">Basic Information</strong> → <strong className="text-foreground">App Credentials</strong> → Signing Secret
+                <a
+                  href="https://api.slack.com/apps"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Slack app
+                </a>{' '}
+                → <strong className="text-foreground">Basic Information</strong>{' '}
+                → <strong className="text-foreground">App Credentials</strong> →
+                Signing Secret
               </p>
             </div>
 
             <div className="flex items-center justify-between pt-1">
-              <Button variant="ghost" size="sm" onClick={() => setStep(2)} className="h-8 text-xs">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setStep(2)}
+                className="h-8 text-xs"
+              >
                 <ArrowLeft className="h-3.5 w-3.5 mr-1" />
                 Back
               </Button>

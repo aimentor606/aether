@@ -12,12 +12,10 @@ import {
   ChevronLeft, 
   ChevronRight,
 } from 'lucide-react-native';
-import Animated, { 
+import Animated, {
   useAnimatedStyle, 
   useSharedValue, 
-  withTiming,
   withSpring,
-  Easing,
 } from 'react-native-reanimated';
 
 import { API_URL } from '@/api/config';
@@ -161,7 +159,7 @@ function usePlaybackController(messages: any[], enabled: boolean) {
       if (playbackRef.current) clearTimeout(playbackRef.current);
       if (streamRef.current) clearTimeout(streamRef.current);
     };
-  }, [isPlaying]);
+  }, [isPlaying, currentIndex, messages.length, streamAndAdvance]);
 
   const togglePlayback = React.useCallback(() => {
     if (currentIndex >= messages.length) {
@@ -533,7 +531,7 @@ export default function ShareThreadPage() {
         <AetherComputer
           toolMessages={selectedToolData?.toolMessages || []}
           currentIndex={selectedToolData?.initialIndex || 0}
-          onNavigate={(newIndex) => {
+          onNavigate={(newIndex: number) => {
             if (selectedToolData) {
               setSelectedToolData({ ...selectedToolData, initialIndex: newIndex });
             }

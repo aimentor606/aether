@@ -129,7 +129,8 @@ export async function getActiveSandbox(): Promise<SandboxInfo | null> {
     }
 
     return result.data;
-  } catch {
+  } catch (error) {
+    log.warn('[Platform] Failed to fetch active sandbox', { error });
     return null;
   }
 }
@@ -278,7 +279,8 @@ export async function checkInstanceHealth(url: string): Promise<string | null> {
     if (!res.ok) return null;
     const data = await res.json();
     return data?.version ?? null;
-  } catch {
+  } catch (error) {
+    log.warn('[Platform] Instance health check failed', { url, error });
     return null;
   }
 }
@@ -358,7 +360,8 @@ export async function getFullChangelog(): Promise<ChangelogEntry[]> {
     if (data.data && Array.isArray(data.data.changelog)) return data.data.changelog;
     if (data.data && Array.isArray(data.data)) return data.data;
     return [];
-  } catch {
+  } catch (error) {
+    log.warn('[Platform] Failed to fetch changelog', { error });
     return [];
   }
 }
@@ -455,7 +458,8 @@ async function serviceRequest<T = any>(
     if (!res.ok) return null;
     const text = await res.text();
     return text ? JSON.parse(text) : null;
-  } catch {
+  } catch (error) {
+    log.warn('[Platform] Service request failed', { path, sandboxUrl, error });
     return null;
   }
 }
@@ -551,7 +555,8 @@ export async function getPtySessions(sandboxUrl: string): Promise<PtySession[]> 
     if (data?.ptys && Array.isArray(data.ptys)) return data.ptys;
     if (data?.data && Array.isArray(data.data)) return data.data;
     return [];
-  } catch {
+  } catch (error) {
+    log.warn('[Platform] Failed to fetch PTY sessions', { sandboxUrl, error });
     return [];
   }
 }

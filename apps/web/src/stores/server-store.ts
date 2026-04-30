@@ -73,15 +73,26 @@ interface ServerStore {
     instanceId?: string;
     mappedPorts?: Record<string, string>;
   }) => ServerEntry;
-  updateServer: (id: string, updates: Partial<Pick<ServerEntry, 'label' | 'url'>>) => void;
+  updateServer: (
+    id: string,
+    updates: Partial<Pick<ServerEntry, 'label' | 'url'>>,
+  ) => void;
   /**
    * Silently update a server's URL, ports, provider, and/or sandboxId
    * without triggering a full reconnect (no serverVersion bump). Only
    * bumps urlVersion so the connection monitor re-verifies.
    */
-  updateServerSilent: (id: string, updates: Partial<Pick<ServerEntry, 'url' | 'provider' | 'sandboxId' | 'instanceId'>> & { mappedPorts?: Record<string, string>; label?: string }) => void;
+  updateServerSilent: (
+    id: string,
+    updates: Partial<
+      Pick<ServerEntry, 'url' | 'provider' | 'sandboxId' | 'instanceId'>
+    > & { mappedPorts?: Record<string, string>; label?: string },
+  ) => void;
   removeServer: (id: string) => void;
-  setActiveServer: (id: string, options?: { auto?: boolean; force?: boolean }) => void;
+  setActiveServer: (
+    id: string,
+    options?: { auto?: boolean; force?: boolean },
+  ) => void;
   getActiveServerUrl: () => string;
   clearStatuses: () => void;
 
@@ -102,21 +113,23 @@ interface ServerStore {
    *
    * Returns the server ID of the registered entry.
    */
-  registerOrUpdateSandbox: (sandbox: {
-    label: string;
-    provider: SandboxProvider;
-    sandboxId: string;
-    instanceId?: string;
-    mappedPorts?: Record<string, string>;
-  }, options?: {
-    /** If true, auto-switch to this sandbox when user hasn't manually selected */
-    autoSwitch?: boolean;
-    /** If true, this is local mode — update default entry instead of cloud-sandbox */
-    isLocal?: boolean;
-    /** Optional stable ID to use for cloud sandboxes (e.g. "sandbox-<sandboxId>") */
-    stableId?: string;
-  }) => string;
-
+  registerOrUpdateSandbox: (
+    sandbox: {
+      label: string;
+      provider: SandboxProvider;
+      sandboxId: string;
+      instanceId?: string;
+      mappedPorts?: Record<string, string>;
+    },
+    options?: {
+      /** If true, auto-switch to this sandbox when user hasn't manually selected */
+      autoSwitch?: boolean;
+      /** If true, this is local mode — update default entry instead of cloud-sandbox */
+      isLocal?: boolean;
+      /** Optional stable ID to use for cloud sandboxes (e.g. "sandbox-<sandboxId>") */
+      stableId?: string;
+    },
+  ) => string;
 }
 
 /**
@@ -126,7 +139,10 @@ interface ServerStore {
  * Same URL pattern for all providers: /v1/p/{sandboxId}/{port}/*
  */
 function getBackendUrl(): string {
-  return (getEnv().BACKEND_URL || 'http://localhost:8008/v1').replace(/\/+$/, '');
+  return (getEnv().BACKEND_URL || 'http://localhost:8008/v1').replace(
+    /\/+$/,
+    '',
+  );
 }
 
 function getDefaultSandboxUrl(): string {
@@ -192,11 +208,15 @@ function toApiPayload(s: ServerEntry) {
 
 function syncServerToApi(server: ServerEntry) {
   if (isManagedEntry(server)) return; // managed entries are not persisted to API
-  authenticatedFetch(`${getServersApi()}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(toApiPayload(server)),
-  }, { retryOnAuthError: false }).catch((error) => {
+  authenticatedFetch(
+    `${getServersApi()}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(toApiPayload(server)),
+    },
+    { retryOnAuthError: false },
+  ).catch((error) => {
     logger.warn('Failed to sync server to API', {
       serverId: server.id,
       serverLabel: server.label,
@@ -207,21 +227,28 @@ function syncServerToApi(server: ServerEntry) {
 
 function deleteServerFromApi(id: string) {
   if (isManagedEntry(id)) return;
-  authenticatedFetch(`${getServersApi()}/${id}`, { method: 'DELETE' },
-    { retryOnAuthError: false }).catch((error) => {
-      logger.warn('Failed to delete server from API', { serverId: id, error });
-    });
+  authenticatedFetch(
+    `${getServersApi()}/${id}`,
+    { method: 'DELETE' },
+    { retryOnAuthError: false },
+  ).catch((error) => {
+    logger.warn('Failed to delete server from API', { serverId: id, error });
+  });
 }
 
 /** Bulk sync all servers to API (used on initial hydration). */
 function syncAllToApi(servers: ServerEntry[]) {
   const custom = servers.filter((s) => !isManagedEntry(s));
   if (custom.length === 0) return;
-  authenticatedFetch(`${getServersApi()}/sync`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ servers: custom.map(toApiPayload) }),
-  }, { retryOnAuthError: false }).catch((error) => {
+  authenticatedFetch(
+    `${getServersApi()}/sync`,
+    {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ servers: custom.map(toApiPayload) }),
+    },
+    { retryOnAuthError: false },
+  ).catch((error) => {
     logger.warn('Failed to bulk sync servers to API', {
       customServerCount: custom.length,
       error,
@@ -230,10 +257,13 @@ function syncAllToApi(servers: ServerEntry[]) {
 }
 
 /** Load servers from API, merging authTokens from localStorage entries. */
-async function loadFromApi(localServers: ServerEntry[]): Promise<ServerEntry[] | null> {
+async function loadFromApi(
+  localServers: ServerEntry[],
+): Promise<ServerEntry[] | null> {
   try {
-    const res = await authenticatedFetch(getServersApi(), undefined,
-      { retryOnAuthError: false });
+    const res = await authenticatedFetch(getServersApi(), undefined, {
+      retryOnAuthError: false,
+    });
     if (!res.ok) return null;
     const rows: Array<{
       id: string;
@@ -295,13 +325,15 @@ export const useServerStore = create<ServerStore>()(
       addSandboxServer: (entry) => {
         const state = get();
         // Deduplicate: if a server with this sandboxId already exists, return it.
-        const existing = state.servers.find((s) => s.sandboxId === entry.sandboxId);
+        const existing = state.servers.find(
+          (s) => s.sandboxId === entry.sandboxId,
+        );
         if (existing) return existing;
 
         const newServer: ServerEntry = {
           id: generateId(),
           label: entry.label || entry.sandboxId,
-          url: '',  // Sandbox URLs are derived at runtime via getSandboxServerUrl()
+          url: '', // Sandbox URLs are derived at runtime via getSandboxServerUrl()
           provider: entry.provider,
           sandboxId: entry.sandboxId,
           instanceId: entry.instanceId,
@@ -315,7 +347,10 @@ export const useServerStore = create<ServerStore>()(
         return newServer;
       },
 
-      updateServer: (id: string, updates: Partial<Pick<ServerEntry, 'label' | 'url'>>) => {
+      updateServer: (
+        id: string,
+        updates: Partial<Pick<ServerEntry, 'label' | 'url'>>,
+      ) => {
         const state = get();
         const isActive = state.activeServerId === id;
         set((state) => ({
@@ -330,7 +365,9 @@ export const useServerStore = create<ServerStore>()(
           ),
           // Manual updateServer bumps serverVersion (full reconnect) —
           // use updateServerSilent for sandbox URL/port changes.
-          ...(isActive && updates.url ? { serverVersion: state.serverVersion + 1 } : {}),
+          ...(isActive && updates.url
+            ? { serverVersion: state.serverVersion + 1 }
+            : {}),
         }));
         // Sync non-token updates to API
         if (updates.label || updates.url) {
@@ -348,24 +385,47 @@ export const useServerStore = create<ServerStore>()(
         const urlChanged = updates.url != null && updates.url !== existing.url;
         const portsChanged =
           updates.mappedPorts != null &&
-          JSON.stringify(existing.mappedPorts) !== JSON.stringify(updates.mappedPorts);
-        const providerChanged = updates.provider != null && updates.provider !== existing.provider;
-        const sandboxIdChanged = updates.sandboxId != null && updates.sandboxId !== existing.sandboxId;
-        const instanceIdChanged = updates.instanceId != null && updates.instanceId !== existing.instanceId;
+          JSON.stringify(existing.mappedPorts) !==
+            JSON.stringify(updates.mappedPorts);
+        const providerChanged =
+          updates.provider != null && updates.provider !== existing.provider;
+        const sandboxIdChanged =
+          updates.sandboxId != null && updates.sandboxId !== existing.sandboxId;
+        const instanceIdChanged =
+          updates.instanceId != null &&
+          updates.instanceId !== existing.instanceId;
 
-        if (!urlChanged && !portsChanged && !updates.label && !providerChanged && !sandboxIdChanged && !instanceIdChanged) return;
+        if (
+          !urlChanged &&
+          !portsChanged &&
+          !updates.label &&
+          !providerChanged &&
+          !sandboxIdChanged &&
+          !instanceIdChanged
+        )
+          return;
 
         set((state) => ({
           servers: state.servers.map((s) =>
             s.id === id
               ? {
                   ...s,
-                  ...(updates.url ? { url: updates.url.replace(/\/+$/, '') } : {}),
+                  ...(updates.url
+                    ? { url: updates.url.replace(/\/+$/, '') }
+                    : {}),
                   ...(updates.label ? { label: updates.label } : {}),
-                  ...(updates.mappedPorts ? { mappedPorts: updates.mappedPorts } : {}),
-                  ...(updates.provider != null ? { provider: updates.provider } : {}),
-                  ...(updates.sandboxId != null ? { sandboxId: updates.sandboxId } : {}),
-                  ...(updates.instanceId != null ? { instanceId: updates.instanceId } : {}),
+                  ...(updates.mappedPorts
+                    ? { mappedPorts: updates.mappedPorts }
+                    : {}),
+                  ...(updates.provider != null
+                    ? { provider: updates.provider }
+                    : {}),
+                  ...(updates.sandboxId != null
+                    ? { sandboxId: updates.sandboxId }
+                    : {}),
+                  ...(updates.instanceId != null
+                    ? { instanceId: updates.instanceId }
+                    : {}),
                 }
               : s,
           ),
@@ -392,9 +452,9 @@ export const useServerStore = create<ServerStore>()(
 
         // Find a valid fallback — prefer 'default', then first remaining, then empty.
         const fallbackId = wasActive
-          ? (newServers.find((s) => s.id === DEFAULT_SERVER_ID)?.id
-            ?? newServers[0]?.id
-            ?? '')
+          ? (newServers.find((s) => s.id === DEFAULT_SERVER_ID)?.id ??
+            newServers[0]?.id ??
+            '')
           : state.activeServerId;
 
         set({
@@ -402,10 +462,12 @@ export const useServerStore = create<ServerStore>()(
           activeServerId: fallbackId,
           // If we removed the active server, bump version and reset userSelected
           // so the next sandbox creation can auto-switch.
-          ...(wasActive ? {
-            serverVersion: state.serverVersion + 1,
-            userSelected: false,
-          } : {}),
+          ...(wasActive
+            ? {
+                serverVersion: state.serverVersion + 1,
+                userSelected: false,
+              }
+            : {}),
         });
         deleteServerFromApi(id);
       },
@@ -414,7 +476,11 @@ export const useServerStore = create<ServerStore>()(
         const state = get();
         const isSameId = state.activeServerId === id;
 
-        if (isSameId && !(options as { auto?: boolean; force?: boolean } | undefined)?.force) return; // true no-op — same server, no data change
+        if (
+          isSameId &&
+          !(options as { auto?: boolean; force?: boolean } | undefined)?.force
+        )
+          return; // true no-op — same server, no data change
 
         // Force SDK client to recreate for the new server URL
         resetSDKClient();
@@ -434,10 +500,14 @@ export const useServerStore = create<ServerStore>()(
           // In cloud mode, don't fall back to the local Docker URL —
           // useSandbox will register the real sandbox shortly.
           // Returning '' signals callers to wait / skip the request.
-          if (state.activeServerId === CLOUD_SANDBOX_SERVER_ID || isBillingEnabled()) return '';
-           // For local mode (empty activeServerId or 'default'), fall back
-           // to DEFAULT_SANDBOX_URL so the app works during the rehydration gap.
-           return getDefaultSandboxUrl();
+          if (
+            state.activeServerId === CLOUD_SANDBOX_SERVER_ID ||
+            isBillingEnabled()
+          )
+            return '';
+          // For local mode (empty activeServerId or 'default'), fall back
+          // to DEFAULT_SANDBOX_URL so the app works during the rehydration gap.
+          return getDefaultSandboxUrl();
         }
         // Sandbox entries: always derive URL fresh (never stale)
         if (active.sandboxId) return getSandboxServerUrl(active.sandboxId);
@@ -462,7 +532,9 @@ export const useServerStore = create<ServerStore>()(
 
         // In local mode, upsert the default entry (create if missing after rehydration).
         if (isLocal) {
-          const defaultEntry = state.servers.find((s) => s.id === DEFAULT_SERVER_ID);
+          const defaultEntry = state.servers.find(
+            (s) => s.id === DEFAULT_SERVER_ID,
+          );
           if (defaultEntry) {
             get().updateServerSilent(DEFAULT_SERVER_ID, {
               mappedPorts: sandbox.mappedPorts,
@@ -489,7 +561,8 @@ export const useServerStore = create<ServerStore>()(
           if (autoSwitch) {
             const fresh = get();
             const currentId = fresh.activeServerId;
-            const noActiveServer = !currentId || !fresh.servers.some((s) => s.id === currentId);
+            const noActiveServer =
+              !currentId || !fresh.servers.some((s) => s.id === currentId);
             if (!fresh.userSelected && noActiveServer) {
               get().setActiveServer(DEFAULT_SERVER_ID, { auto: true });
             }
@@ -502,10 +575,16 @@ export const useServerStore = create<ServerStore>()(
         // prevents duplicates when different callers derive different stable IDs for
         // the same sandbox (e.g. 'cloud-sandbox' vs 'sandbox-<id>').
         const existingByInstance = sandbox.instanceId
-          ? state.servers.find((s) => s.instanceId === sandbox.instanceId && isManagedEntry(s))
+          ? state.servers.find(
+              (s) => s.instanceId === sandbox.instanceId && isManagedEntry(s),
+            )
           : null;
-        const targetId = existingByInstance?.id ?? options?.stableId ?? CLOUD_SANDBOX_SERVER_ID;
-        const existing = existingByInstance ?? state.servers.find((s) => s.id === targetId);
+        const targetId =
+          existingByInstance?.id ??
+          options?.stableId ??
+          CLOUD_SANDBOX_SERVER_ID;
+        const existing =
+          existingByInstance ?? state.servers.find((s) => s.id === targetId);
 
         if (existing) {
           get().updateServerSilent(existing.id, {
@@ -519,7 +598,7 @@ export const useServerStore = create<ServerStore>()(
           const newEntry: ServerEntry = {
             id: targetId,
             label: sandbox.label,
-            url: '',  // Sandbox URLs are derived at runtime via getSandboxServerUrl()
+            url: '', // Sandbox URLs are derived at runtime via getSandboxServerUrl()
             provider: sandbox.provider,
             sandboxId: sandbox.sandboxId,
             instanceId: sandbox.instanceId,
@@ -537,15 +616,20 @@ export const useServerStore = create<ServerStore>()(
         if (autoSwitch) {
           const fresh = get();
           const currentId = fresh.activeServerId;
-          const noActiveServer = !currentId || !fresh.servers.some((s) => s.id === currentId);
-          if (!fresh.userSelected && (noActiveServer || currentId === DEFAULT_SERVER_ID)) {
-            get().setActiveServer(isLocal ? DEFAULT_SERVER_ID : targetId, { auto: true });
+          const noActiveServer =
+            !currentId || !fresh.servers.some((s) => s.id === currentId);
+          if (
+            !fresh.userSelected &&
+            (noActiveServer || currentId === DEFAULT_SERVER_ID)
+          ) {
+            get().setActiveServer(isLocal ? DEFAULT_SERVER_ID : targetId, {
+              auto: true,
+            });
           }
         }
 
         return targetId;
       },
-
     }),
     {
       name: 'opencode-servers',
@@ -575,7 +659,10 @@ export const useServerStore = create<ServerStore>()(
         // Active server will be set by useSandbox hook once it loads.
         // If current activeServerId was a removed entry, clear it and
         // reset userSelected so useSandbox can auto-switch.
-        if (state.activeServerId && !state.servers.some((s) => s.id === state.activeServerId)) {
+        if (
+          state.activeServerId &&
+          !state.servers.some((s) => s.id === state.activeServerId)
+        ) {
           state.activeServerId = state.servers[0]?.id ?? '';
           state.userSelected = false;
         }
@@ -591,7 +678,9 @@ export const useServerStore = create<ServerStore>()(
             if (apiEntries && apiEntries.length > 0) {
               // Merge: keep sandbox entries from zustand + custom entries from API
               const currentState = useServerStore.getState();
-              const sandboxEntries = currentState.servers.filter((s) => s.provider);
+              const sandboxEntries = currentState.servers.filter(
+                (s) => s.provider,
+              );
               const apiIds = new Set(apiEntries.map((s) => s.id));
               const kept = sandboxEntries.filter((s) => !apiIds.has(s.id));
               useServerStore.setState({ servers: [...kept, ...apiEntries] });
@@ -626,7 +715,9 @@ export function getActiveServer(): ServerEntry | null {
  * Get the host port for a given container port on the active server.
  * Returns null if no mapping exists (e.g. Daytona, default server, or unknown port).
  */
-export function getActiveServerMappedPort(containerPort: string): string | null {
+export function getActiveServerMappedPort(
+  containerPort: string,
+): string | null {
   const server = getActiveServer();
   return server?.mappedPorts?.[containerPort] ?? null;
 }
@@ -654,7 +745,8 @@ export function getBackendPort(): number {
  */
 export function getActiveSandboxId(): string | undefined {
   const state = useServerStore.getState();
-  const server = state.servers.find((s) => s.id === state.activeServerId) ?? null;
+  const server =
+    state.servers.find((s) => s.id === state.activeServerId) ?? null;
   return server?.sandboxId;
 }
 
@@ -674,7 +766,9 @@ export function isCloudMode(): boolean {
  *
  * Use in non-React contexts: call directly (reads from store snapshot).
  */
-export function getSubdomainOpts(): { sandboxId: string; backendPort: number; apiBaseUrl?: string } | undefined {
+export function getSubdomainOpts():
+  | { sandboxId: string; backendPort: number; apiBaseUrl?: string }
+  | undefined {
   return getInstanceSubdomainOpts();
 }
 
@@ -704,12 +798,14 @@ export function deriveSubdomainOpts(
   server: ServerEntry | null | undefined,
 ): { sandboxId: string; backendPort: number; apiBaseUrl?: string } | undefined {
   // Cloud providers use their own URL scheme — no subdomain proxy.
-  if (server?.provider === 'daytona' || server?.provider === 'justavps') return undefined;
+  if (server?.provider === 'daytona' || server?.provider === 'justavps')
+    return undefined;
   // For all local/self-hosted modes (local_docker, null server, unknown provider),
   // fall back to the configured sandbox ID (from runtime env) or 'aether-sandbox'.
   // This ensures proxy rewriting NEVER silently degrades to raw localhost URLs
   // just because the store hasn't hydrated the sandboxId yet.
-  const sandboxId = server?.sandboxId || getEnv().SANDBOX_ID || 'aether-sandbox';
+  const sandboxId =
+    server?.sandboxId || getEnv().SANDBOX_ID || 'aether-sandbox';
   return {
     sandboxId,
     backendPort: getBackendPort(),
@@ -723,7 +819,9 @@ export function getActiveInstanceId(): string | undefined {
   return active?.instanceId;
 }
 
-export function getServerByInstanceId(instanceId: string): ServerEntry | undefined {
+export function getServerByInstanceId(
+  instanceId: string,
+): ServerEntry | undefined {
   const state = useServerStore.getState();
   return state.servers.find((s) => s.instanceId === instanceId);
 }
@@ -753,7 +851,10 @@ function getTabStore() {
  * - Otherwise → 'sandbox-<instanceId>'
  * - Local docker → 'default'
  */
-function stableServerIdForInstance(instanceId: string, provider?: string): string {
+function stableServerIdForInstance(
+  instanceId: string,
+  provider?: string,
+): string {
   if (provider === 'local_docker') return DEFAULT_SERVER_ID;
   // Reuse 'cloud-sandbox' if it's already mapped to this instance
   const state = useServerStore.getState();
@@ -840,7 +941,8 @@ export async function switchToInstanceAsync(
   }
 
   // Not in store or validation requested — fetch from API
-  const { listSandboxes, extractMappedPorts } = await import('@/lib/platform-client');
+  const { listSandboxes, extractMappedPorts } =
+    await import('@/lib/platform-client');
   const sandboxes = await listSandboxes();
   const match = sandboxes.find((s) => s.sandbox_id === instanceId);
 
@@ -854,7 +956,7 @@ export async function switchToInstanceAsync(
   const existing = store.servers.find((s) => s.instanceId === instanceId);
   const stableId = isLocal
     ? undefined
-    : existing?.id ?? stableServerIdForInstance(instanceId, match.provider);
+    : (existing?.id ?? stableServerIdForInstance(instanceId, match.provider));
   const serverId = store.registerOrUpdateSandbox(
     {
       label: match.name || match.sandbox_id,

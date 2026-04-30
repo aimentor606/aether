@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,10 @@ import { authenticatedFetch } from '@/lib/auth-token';
 import { AgentSelector } from '@/components/session/session-chat-input';
 import { flattenModels } from '@/lib/models';
 import { ModelSelector } from '@/components/session/model-selector';
-import { useOpenCodeAgents, useOpenCodeProviders } from '@/hooks/opencode/use-opencode-sessions';
+import {
+  useOpenCodeAgents,
+  useOpenCodeProviders,
+} from '@/hooks/opencode/use-opencode-sessions';
 
 interface Channel {
   id: string;
@@ -53,17 +56,30 @@ function WebhookCopyButton({ value }: { value: string }) {
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <Button variant="ghost" size="sm" onClick={handleCopy} className="h-6 px-2 text-[11px] gap-1">
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleCopy}
+      className="h-6 px-2 text-[11px] gap-1"
+    >
       {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
       {copied ? 'Copied' : 'Copy'}
     </Button>
   );
 }
 
-export function ChannelSettingsDialog({ channel, open, onOpenChange, onUpdated }: ChannelSettingsDialogProps) {
+export function ChannelSettingsDialog({
+  channel,
+  open,
+  onOpenChange,
+  onUpdated,
+}: ChannelSettingsDialogProps) {
   const [name, setName] = useState('');
   const [agentName, setAgentName] = useState<string | null>(null);
-  const [selectedModel, setSelectedModel] = useState<{ providerID: string; modelID: string } | null>(null);
+  const [selectedModel, setSelectedModel] = useState<{
+    providerID: string;
+    modelID: string;
+  } | null>(null);
   const [instructions, setInstructions] = useState('');
   const [enabled, setEnabled] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -84,7 +100,10 @@ export function ChannelSettingsDialog({ channel, open, onOpenChange, onUpdated }
         const [providerID, ...rest] = channel.default_model.split('/');
         setSelectedModel({ providerID, modelID: rest.join('/') });
       } else if (channel.default_model) {
-        setSelectedModel({ providerID: 'aether', modelID: channel.default_model });
+        setSelectedModel({
+          providerID: 'aether',
+          modelID: channel.default_model,
+        });
       } else {
         setSelectedModel(null);
       }
@@ -103,18 +122,21 @@ export function ChannelSettingsDialog({ channel, open, onOpenChange, onUpdated }
         ? `${selectedModel.providerID}/${selectedModel.modelID}`
         : '';
 
-      const res = await authenticatedFetch(`${url}/aether/channels/${channel.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim() || undefined,
-          default_agent: agentName || undefined,
-          default_model: modelStr || undefined,
-          instructions: instructions.trim(),
-          enabled,
-        }),
-      });
-      const data = await res.json() as any;
+      const res = await authenticatedFetch(
+        `${url}/aether/channels/${channel.id}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name.trim() || undefined,
+            default_agent: agentName || undefined,
+            default_model: modelStr || undefined,
+            instructions: instructions.trim(),
+            enabled,
+          }),
+        },
+      );
+      const data = (await res.json()) as any;
       if (data.ok) {
         toast.success('Settings saved');
         onUpdated();
@@ -143,7 +165,9 @@ export function ChannelSettingsDialog({ channel, open, onOpenChange, onUpdated }
             </div>
             <div>
               <DialogTitle>{channel.name}</DialogTitle>
-              <p className="text-xs text-muted-foreground">@{channel.bot_username || '?'} · {channel.platform}</p>
+              <p className="text-xs text-muted-foreground">
+                @{channel.bot_username || '?'} · {channel.platform}
+              </p>
             </div>
           </div>
         </DialogHeader>
@@ -153,7 +177,9 @@ export function ChannelSettingsDialog({ channel, open, onOpenChange, onUpdated }
           <div className="flex items-center justify-between rounded-xl border px-4 py-3">
             <div>
               <p className="text-sm font-medium">Enabled</p>
-              <p className="text-xs text-muted-foreground">Receive and respond to messages</p>
+              <p className="text-xs text-muted-foreground">
+                Receive and respond to messages
+              </p>
             </div>
             <Switch checked={enabled} onCheckedChange={setEnabled} />
           </div>
@@ -161,7 +187,11 @@ export function ChannelSettingsDialog({ channel, open, onOpenChange, onUpdated }
           {/* Name */}
           <div className="space-y-1.5">
             <Label className="text-xs">Channel Name</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="My Bot" />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="My Bot"
+            />
           </div>
 
           {/* Agent */}
@@ -222,14 +252,27 @@ export function ChannelSettingsDialog({ channel, open, onOpenChange, onUpdated }
                 <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
                 <Label className="text-xs font-medium">Webhook URL</Label>
               </div>
-              {channel.webhook_url && <WebhookCopyButton value={channel.webhook_url} />}
+              {channel.webhook_url && (
+                <WebhookCopyButton value={channel.webhook_url} />
+              )}
             </div>
             {channel.webhook_url ? (
-              <Input value={channel.webhook_url} readOnly className="font-mono text-xs" />
+              <Input
+                value={channel.webhook_url}
+                readOnly
+                className="font-mono text-xs"
+              />
             ) : (
               <>
-                <Input value={channel.webhook_path} readOnly className="font-mono text-xs text-muted-foreground" />
-                <p className="text-[11px] text-amber-600">Public URL not resolved. Set PUBLIC_BASE_URL or configure the share system.</p>
+                <Input
+                  value={channel.webhook_path}
+                  readOnly
+                  className="font-mono text-xs text-muted-foreground"
+                />
+                <p className="text-[11px] text-amber-600">
+                  Public URL not resolved. Set PUBLIC_BASE_URL or configure the
+                  share system.
+                </p>
               </>
             )}
             <p className="text-[11px] text-muted-foreground">
@@ -242,7 +285,11 @@ export function ChannelSettingsDialog({ channel, open, onOpenChange, onUpdated }
           {/* Save */}
           <div className="flex justify-end pt-2">
             <Button onClick={handleSave} disabled={saving} className="gap-2">
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
               Save Settings
             </Button>
           </div>

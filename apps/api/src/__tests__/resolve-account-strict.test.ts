@@ -1,4 +1,6 @@
 import { describe, test, expect, mock } from 'bun:test';
+import { registerGlobalMocks } from './billing/mocks';
+registerGlobalMocks();
 
 // Prevent module-mock leakage from other test files in combined runs.
 mock.restore();
@@ -55,6 +57,7 @@ const dbMock = {
 };
 
 mock.module('../shared/db', () => ({
+  hasDatabase: true,
   db: dbMock,
 }));
 
@@ -98,9 +101,8 @@ mock.module('../billing/services/tiers', () => ({
   getTierByPriceId: () => null,
 }));
 
-mock.module('../billing/repositories/credit-accounts', () => ({
-  upsertCreditAccount: async () => {},
-}));
+// credit-accounts mock provided by billing/mocks.ts (delegates to mockRegistry)
+// Removed competing mock to avoid overriding the delegation version
 
 const {
   resolveAccountIdStrict,

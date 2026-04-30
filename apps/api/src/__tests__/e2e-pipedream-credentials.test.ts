@@ -370,7 +370,7 @@ describe.skipIf(!HAS_DB)('Pipedream credential routes (e2e)', () => {
 // UNIT TESTS: provider resolution chain
 // =============================================================================
 
-describe('Provider resolution (unit)', () => {
+describe.skipIf(!HAS_DB)('Provider resolution (unit)', () => {
   it('tier 1: request headers take precedence over everything', async () => {
     const { getProviderFromRequest } = require('../integrations/providers');
 

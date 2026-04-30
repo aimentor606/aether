@@ -1,22 +1,21 @@
 import { describe, test, expect, mock, beforeAll } from 'bun:test';
+import { mockRegistry, registerGlobalMocks } from './billing/mocks';
 
-let mockDeductCredits: (accountId: string, amount: number, desc: string) => Promise<any>;
+registerGlobalMocks();
+
 let supabaseFromResult: Record<string, any>;
 
-mock.module('../shared/supabase', () => {
+function createFromBuilder() {
   const builder: Record<string, any> = {};
-  builder.select = mock(() => builder);
-  builder.eq = mock(() => builder);
-  builder.maybeSingle = mock(() => Promise.resolve({ data: null }));
-  builder.upsert = mock(() => Promise.resolve({ data: null, error: null }));
-  supabaseFromResult = builder;
+  builder.select = () => builder;
+  builder.eq = () => builder;
+  builder.maybeSingle = () => Promise.resolve({ data: null });
+  builder.upsert = () => Promise.resolve({ data: null, error: null });
+  return builder;
+}
 
-  return {
-    getSupabase: mock(() => ({
-      from: mock(() => supabaseFromResult),
-    })),
-  };
-});
+supabaseFromResult = createFromBuilder();
+mockRegistry.supabaseFromBuilder = () => supabaseFromResult;
 
 mock.module('../router/config/litellm-config', () => ({
   litellmConfig: {
@@ -26,14 +25,6 @@ mock.module('../router/config/litellm-config', () => ({
     LITELLM_TIMEOUT_MS: 60000,
     LITELLM_NUM_RETRIES: 3,
   },
-}));
-
-mock.module('../billing/services/credits', () => ({
-  deductCredits: (...args: [string, number, string]) => mockDeductCredits(...args),
-  getBalance: async () => ({ balance: 100, expiring: 0, nonExpiring: 100, daily: 0 }),
-  calculateTokenCost: () => 0,
-  grantCredits: async () => {},
-  resetExpiringCredits: async () => {},
 }));
 
 const { reconcileSpend } = await import('../router/services/spend-reconciler');
@@ -54,7 +45,7 @@ function mockKeyListResponse(keys: Array<{ key_alias: string; spend: number }>) 
 
 describe('reconcileSpend (key/info delta)', () => {
   beforeAll(() => {
-    mockDeductCredits = mock(async (_a: string, _amt: number, _d: string) => ({
+    mockRegistry.deductCredits = mock(async (_a: string, _amt: number, _d: string) => ({
       success: true,
       cost: _amt,
       newBalance: 100,
@@ -146,7 +137,7 @@ describe('reconcileSpend (key/info delta)', () => {
       return { data: null };
     });
 
-    mockDeductCredits = mock(async () => { throw new Error('Credits RPC failed'); });
+    mockRegistry.deductCredits = mock(async () => { throw new Error('Credits RPC failed'); });
 
     mockKeyListResponse([
       { key_alias: 'aether-account-fail', spend: 1.0 },
@@ -157,7 +148,7 @@ describe('reconcileSpend (key/info delta)', () => {
     expect(result.errors).toBeGreaterThanOrEqual(1);
 
     supabaseFromResult.maybeSingle = originalMaybeSingle;
-    mockDeductCredits = mock(async (_a: string, _amt: number, _d: string) => ({
+    mockRegistry.deductCredits = mock(async (_a: string, _amt: number, _d: string) => ({
       success: true, cost: _amt, newBalance: 100,
     }));
   });

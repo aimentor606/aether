@@ -577,8 +577,9 @@ export function formatDuration(ms: number): string {
 export function getChildSessionId(part: ToolPart): string | undefined {
   // Native task tool or agent_spawn
   if (part.tool === 'task' || part.tool === 'agent_spawn' || part.tool === 'agent-spawn' || part.tool === 'agent_message' || part.tool === 'agent-message') {
+    const stateWithMeta = part.state as { metadata?: { sessionId?: string } };
     // 1. Try metadata (ctx.metadata — available immediately for built-in tools)
-    const metaSessionId = (part.state.metadata as any)?.sessionId;
+    const metaSessionId = stateWithMeta.metadata?.sessionId;
     if (metaSessionId) return metaSessionId;
 
     // 2. Try title (plugin tools embed session ID in title via ctx.metadata)

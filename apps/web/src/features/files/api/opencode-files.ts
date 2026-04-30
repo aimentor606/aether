@@ -12,6 +12,7 @@
 import { getClient } from '@/lib/opencode-sdk';
 import { getActiveOpenCodeUrl } from '@/stores/server-store';
 import { getAuthToken, authenticatedFetch } from '@/lib/auth-token';
+import { logger } from '@/lib/logger';
 import JSZip from 'jszip';
 import type {
   FileContent,
@@ -38,6 +39,20 @@ function unwrap<T>(result: { data?: T; error?: unknown }): T {
     throw new Error(message);
   }
   return result.data as T;
+}
+
+async function safeResponseText(response: Response, context: string): Promise<string> {
+  try {
+    return await response.text();
+  } catch (error) {
+    logger.warn('Failed to read response text in file API', {
+      context,
+      status: response.status,
+      statusText: response.statusText,
+      error,
+    });
+    return '';
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -75,7 +90,7 @@ export async function readFile(filePath: string): Promise<FileContent> {
   const response = await authenticatedFetch(url);
 
   if (!response.ok) {
-    const text = await response.text().catch(() => '');
+    const text = await safeResponseText(response, 'readFile');
     let parsed: any = null;
     try {
       parsed = JSON.parse(text);
@@ -122,7 +137,7 @@ export async function readFileAsBlob(filePath: string): Promise<Blob> {
     // 404 — could be "file not found" (JSON body) or "route not found" (old server).
     // Distinguish by checking if the response is JSON with an `error` field.
     if (response.status === 404) {
-      const text = await response.text().catch(() => '');
+      const text = await safeResponseText(response, 'readFileAsBlob:notFound');
       let parsed: any = null;
       try {
         parsed = JSON.parse(text);
@@ -137,7 +152,7 @@ export async function readFileAsBlob(filePath: string): Promise<Blob> {
       fallThroughToSdk = true;
     } else {
       // Non-404 HTTP error (403, 500, etc.) — throw with details
-      const text = await response.text().catch(() => '');
+      const text = await safeResponseText(response, 'readFileAsBlob:httpError');
       throw new Error(
         `Failed to fetch file (${response.status}): ${text || response.statusText}`,
       );
@@ -306,7 +321,7 @@ export async function uploadFile(
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
+    const text = await safeResponseText(res, 'uploadFile');
     throw new Error(`Upload failed (${res.status}): ${text || res.statusText}`);
   }
 
@@ -325,7 +340,7 @@ export async function deleteFile(filePath: string): Promise<boolean> {
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
+    const text = await safeResponseText(res, 'deleteFile');
     throw new Error(`Delete failed (${res.status}): ${text || res.statusText}`);
   }
 
@@ -344,7 +359,7 @@ export async function mkdirFile(dirPath: string): Promise<boolean> {
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
+    const text = await safeResponseText(res, 'mkdirFile');
     throw new Error(`Mkdir failed (${res.status}): ${text || res.statusText}`);
   }
 
@@ -380,7 +395,7 @@ async function uploadToPath(
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
+    const text = await safeResponseText(res, 'uploadToPath');
     throw new Error(`Upload failed (${res.status}): ${text || res.statusText}`);
   }
 
@@ -427,7 +442,7 @@ export async function renameFile(from: string, to: string): Promise<boolean> {
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
+    const text = await safeResponseText(res, 'renameFile');
     throw new Error(`Rename failed (${res.status}): ${text || res.statusText}`);
   }
 
@@ -467,7 +482,13 @@ export async function findFiles(
       limit: options?.limit,
     });
     return unwrap(result);
-  } catch {
+  } catch (error) {
+    logger.warn('findFiles fallback to empty result', {
+      query,
+      type: options?.type,
+      limit: options?.limit,
+      error,
+    });
     return [];
   }
 }
@@ -522,7 +543,8 @@ export async function isServerReachable(): Promise<boolean> {
   try {
     const health = await getServerHealth();
     return health.healthy === true;
-  } catch {
+  } catch (error) {
+    logger.warn('Server health check failed', { error });
     return false;
   }
 }

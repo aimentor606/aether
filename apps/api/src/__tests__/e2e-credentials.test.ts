@@ -1,11 +1,11 @@
 import { describe, test, expect, mock, beforeEach } from 'bun:test';
 import { Hono } from 'hono';
+import { mockRegistry, registerGlobalMocks } from './billing/mocks';
 
 const TEST_ACCOUNT_ID = 'test-account-123';
 
 let mockResolveVirtualKey: (accountId: string) => Promise<string>;
 let mockSyncKeyBudget: (accountId: string, budgetUsd: number) => Promise<void>;
-let mockGetBalance: (accountId: string) => Promise<{ balance: number; expiring: number; nonExpiring: number; daily: number }>;
 
 mock.module('../config', () => ({
   config: {
@@ -43,10 +43,6 @@ mock.module('../router/services/litellm-keys', () => ({
   syncKeyBudget: (...args: [string, number]) => mockSyncKeyBudget(...args),
 }));
 
-mock.module('../billing/services/credits', () => ({
-  getBalance: (...args: [string]) => mockGetBalance(...args),
-}));
-
 mock.module('../router/config/litellm-config', () => ({
   litellmConfig: {
     LITELLM_URL: 'http://litellm:4000',
@@ -56,6 +52,12 @@ mock.module('../router/config/litellm-config', () => ({
     LITELLM_NUM_RETRIES: 3,
   },
 }));
+
+// Register billing dependency mocks (supabase, repos) so the real credits
+// service works with mocked deps. Idempotent — no-op if billing tests already
+// registered these mocks (first-registration-wins for overlapping paths like
+// config, where our mock above takes priority).
+registerGlobalMocks();
 
 const { credentialsApp } = await import('../router/routes/credentials');
 
@@ -77,7 +79,9 @@ describe('GET /v1/control/credentials', () => {
   beforeEach(() => {
     mockResolveVirtualKey = async () => 'sk-virtual-test-key';
     mockSyncKeyBudget = async () => {};
-    mockGetBalance = async () => ({ balance: 50.0, expiring: 0, nonExpiring: 50.0, daily: 0 });
+    mockRegistry.getCreditBalance = async () => ({
+      balance: '50', expiringCredits: '0', nonExpiringCredits: '50', dailyCreditsBalance: '0', tier: 'free',
+    });
   });
 
   test('happy path — returns credentials', async () => {
@@ -96,7 +100,9 @@ describe('GET /v1/control/credentials', () => {
   test('syncs budget with current balance', async () => {
     let syncedBudget = 0;
     mockSyncKeyBudget = async (_id: string, budget: number) => { syncedBudget = budget; };
-    mockGetBalance = async () => ({ balance: 25.5, expiring: 5, nonExpiring: 20.5, daily: 0 });
+    mockRegistry.getCreditBalance = async () => ({
+      balance: '25.5', expiringCredits: '5', nonExpiringCredits: '20.5', dailyCreditsBalance: '0', tier: 'free',
+    });
 
     const app = createTestApp();
     await app.request('/v1/control/credentials', {

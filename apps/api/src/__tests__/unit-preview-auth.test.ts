@@ -7,6 +7,7 @@ let mockResolvedAccountId = 'acct-owner';
 let mockSupabaseUser: { id: string; email?: string } | null = null;
 
 mock.module('../shared/db', () => ({
+  hasDatabase: true,
   db: {
     select: () => ({
       from: () => ({

@@ -14,7 +14,9 @@
     "android:emulator": "emulator -avd Aether_Dev",
     "ios": "expo start -c --ios",
     "web": "expo start -c --web",
-    "clean": "rm -rf .expo node_modules"
+    "clean": "rm -rf .expo node_modules",
+    "typecheck": "tsc --noEmit",
+    "verify": "pnpm run typecheck"
   },
   "dependencies": {
     "@agentpress/shared": "file:./lib/agentpress-shared",

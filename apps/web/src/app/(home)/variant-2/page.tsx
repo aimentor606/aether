@@ -24,14 +24,20 @@ import { GithubButton } from '@/components/home/github-button';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 
+type AetherBoxSceneProps = {
+  scrollProgressRef: React.MutableRefObject<number>;
+  isOn: boolean;
+  setIsOn: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
 // 3D scene removed (three.js dependency deleted). CSS fallback used instead.
-const AetherBoxScene = dynamic(
+const AetherBoxScene = dynamic<AetherBoxSceneProps>(
   () =>
     Promise.resolve(function FallbackScene() {
       return (
         <div className="w-full h-full rounded-full bg-gradient-to-br from-foreground/5 to-transparent blur-3xl" />
       );
-    } as any),
+    }),
   { ssr: false },
 );
 

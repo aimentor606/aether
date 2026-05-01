@@ -38,6 +38,7 @@ export const mockRegistry = {
   getScheduledDeletions: null as (() => Promise<any[]>) | null,
 
   deductCredits: null as ((...args: any[]) => Promise<any>) | null,
+  getTransactionsSummary: null as ((...args: any[]) => Promise<any>) | null,
   supabaseFromBuilder: null as ((table: string) => Record<string, any>) | null,
 };
 
@@ -505,7 +506,10 @@ mock.module('../../billing/repositories/transactions', () => ({
   insertLedgerEntry: async (data: any) =>
     mockRegistry.insertLedgerEntry ? mockRegistry.insertLedgerEntry(data) : { id: 'ledger_test', ...data },
   getTransactions: async () => ({ rows: [], total: 0 }),
-  getTransactionsSummary: async () => ({ totalCredits: 0, totalDebits: 0, count: 0 }),
+  getTransactionsSummary: async (...args: any[]) =>
+    mockRegistry.getTransactionsSummary ? mockRegistry.getTransactionsSummary(...args) : { totalCredits: 0, totalDebits: 0, count: 0 },
+  getUsageRecords: async () => ({ rows: [], total: 0 }),
+  insertPurchase: async () => null,
   getPurchaseByPaymentIntent: async (id: string) =>
     mockRegistry.getPurchaseByPaymentIntent ? mockRegistry.getPurchaseByPaymentIntent(id) : null,
   updatePurchaseStatus: async (...args: any[]) =>

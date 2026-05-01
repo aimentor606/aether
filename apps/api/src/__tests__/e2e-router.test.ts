@@ -74,7 +74,7 @@ mock.module('../config', () => ({
     ENV_MODE: 'test',
     INTERNAL_AETHER_ENV: 'test',
     PORT: 8008,
-    DATABASE_URL: 'postgres://mock:mock@localhost/mock',
+    DATABASE_URL: process.env.DATABASE_URL || 'postgres://mock:mock@localhost/mock',
     SUPABASE_URL: 'http://localhost:54321',
     SUPABASE_SERVICE_ROLE_KEY: 'test-key',
     API_KEY_SECRET: 'test-secret',

@@ -88,15 +88,23 @@ export function TunnelTabPage({
     <View style={{ flex: 1, backgroundColor: isDark ? '#121215' : '#F8F8F8' }}>
       <View style={{ paddingTop: insets.top, paddingHorizontal: 16, paddingBottom: 12 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={onOpenDrawer} style={{ marginRight: 12, padding: 4 }} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <TouchableOpacity
+            onPress={onOpenDrawer}
+            style={{ marginRight: 12, padding: 4 }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Ionicons name="menu" size={24} color={fgColor} />
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
-            <RNText style={{ fontSize: 18, fontFamily: 'Roobert-SemiBold', color: fgColor }} numberOfLines={1}>
+            <RNText
+              style={{ fontSize: 18, fontFamily: 'Roobert-SemiBold', color: fgColor }}
+              numberOfLines={1}>
               {page.label}
             </RNText>
           </View>
-          <TouchableOpacity onPress={onOpenRightDrawer} style={{ marginLeft: 12, padding: 4 }} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <TouchableOpacity
+            onPress={onOpenRightDrawer}
+            style={{ marginLeft: 12, padding: 4 }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Ionicons name="apps-outline" size={20} color={fgColor} />
           </TouchableOpacity>
         </View>
@@ -144,8 +152,10 @@ function TunnelContent() {
   const accentBg = theme.primaryLight;
 
   const renderBackdrop = useCallback(
-    (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.5} />,
-    [],
+    (props: any) => (
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.5} />
+    ),
+    []
   );
 
   const handleOpenCreate = useCallback(() => {
@@ -161,28 +171,31 @@ function TunnelContent() {
     });
   }, []);
 
-  const handleDelete = useCallback((tunnel: TunnelConnection) => {
-    Alert.alert(
-      'Delete Connection',
-      `Delete "${tunnel.name}"? This will remove all permissions and audit logs.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteMutation.mutateAsync(tunnel.tunnelId);
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              detailSheetRef.current?.dismiss();
-            } catch (err) {
-              Alert.alert('Error', err instanceof Error ? err.message : 'Failed to delete');
-            }
+  const handleDelete = useCallback(
+    (tunnel: TunnelConnection) => {
+      Alert.alert(
+        'Delete Connection',
+        `Delete "${tunnel.name}"? This will remove all permissions and audit logs.`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await deleteMutation.mutateAsync(tunnel.tunnelId);
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                detailSheetRef.current?.dismiss();
+              } catch (err) {
+                Alert.alert('Error', err instanceof Error ? err.message : 'Failed to delete');
+              }
+            },
           },
-        },
-      ],
-    );
-  }, [deleteMutation]);
+        ]
+      );
+    },
+    [deleteMutation]
+  );
 
   const sorted = useMemo(() => {
     return [...connections].sort((a, b) => {
@@ -220,15 +233,25 @@ function TunnelContent() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: 16,
-              }}
-            >
+              }}>
               <Cable size={28} color={muted} />
             </View>
-            <RNText style={{ fontSize: 17, fontFamily: 'Roobert-Medium', color: fg, marginBottom: 6 }}>
+            <RNText
+              style={{ fontSize: 17, fontFamily: 'Roobert-Medium', color: fg, marginBottom: 6 }}>
               Connect your machine
             </RNText>
-            <RNText style={{ fontSize: 13, fontFamily: 'Roobert', color: muted, textAlign: 'center', lineHeight: 20, paddingHorizontal: 20, marginBottom: 20 }}>
-              Run this command on any machine to connect it to Aether. You'll approve the connection in your browser.
+            <RNText
+              style={{
+                fontSize: 13,
+                fontFamily: 'Roobert',
+                color: muted,
+                textAlign: 'center',
+                lineHeight: 20,
+                paddingHorizontal: 20,
+                marginBottom: 20,
+              }}>
+              Run this command on any machine to connect it to Aether. You'll approve the connection
+              in your browser.
             </RNText>
             <Pressable
               onPress={() => createSheetRef.current?.present()}
@@ -241,10 +264,16 @@ function TunnelContent() {
                 paddingVertical: 12,
                 borderRadius: 12,
                 backgroundColor: theme.primary,
-              }}
-            >
+              }}>
               <Plus size={16} color={theme.primaryForeground} />
-              <RNText style={{ fontSize: 14, fontFamily: 'Roobert-Medium', color: theme.primaryForeground }}>Add Connection</RNText>
+              <RNText
+                style={{
+                  fontSize: 14,
+                  fontFamily: 'Roobert-Medium',
+                  color: theme.primaryForeground,
+                }}>
+                Add Connection
+              </RNText>
             </Pressable>
           </View>
         }
@@ -258,24 +287,32 @@ function TunnelContent() {
               borderRadius: 16,
               padding: 16,
               marginBottom: 12,
-            }}
-          >
+            }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
               <View
                 style={{
                   width: 36,
                   height: 36,
                   borderRadius: 10,
-                  backgroundColor: (item.isLive ?? item.status === 'online') ? accentBg : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'),
+                  backgroundColor:
+                    (item.isLive ?? item.status === 'online')
+                      ? accentBg
+                      : isDark
+                        ? 'rgba(255,255,255,0.06)'
+                        : 'rgba(0,0,0,0.04)',
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginRight: 12,
-                }}
-              >
-                <Monitor size={18} color={(item.isLive ?? item.status === 'online') ? accent : muted} />
+                }}>
+                <Monitor
+                  size={18}
+                  color={(item.isLive ?? item.status === 'online') ? accent : muted}
+                />
               </View>
               <View style={{ flex: 1 }}>
-                <RNText style={{ fontSize: 15, fontFamily: 'Roobert-SemiBold', color: fg }} numberOfLines={1}>
+                <RNText
+                  style={{ fontSize: 15, fontFamily: 'Roobert-SemiBold', color: fg }}
+                  numberOfLines={1}>
                   {item.name}
                 </RNText>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
@@ -288,7 +325,12 @@ function TunnelContent() {
                       marginRight: 6,
                     }}
                   />
-                  <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: (item.isLive ?? item.status === 'online') ? accent : muted }}>
+                  <RNText
+                    style={{
+                      fontSize: 12,
+                      fontFamily: 'Roobert',
+                      color: (item.isLive ?? item.status === 'online') ? accent : muted,
+                    }}>
                     {(item.isLive ?? item.status === 'online') ? 'Online' : 'Offline'}
                   </RNText>
                 </View>
@@ -298,23 +340,42 @@ function TunnelContent() {
 
             {/* Machine info */}
             {item.machineInfo && (
+              // @ts-expect-error gap is valid in RN but not in types
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                 {item.machineInfo.hostname && (
-                  <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
+                  <View
+                    style={{
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                      borderRadius: 6,
+                      paddingHorizontal: 8,
+                      paddingVertical: 3,
+                    }}>
                     <RNText style={{ fontSize: 11, fontFamily: 'Roobert', color: muted }}>
                       {String(item.machineInfo.hostname)}
                     </RNText>
                   </View>
                 )}
                 {item.machineInfo.platform && (
-                  <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
+                  <View
+                    style={{
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                      borderRadius: 6,
+                      paddingHorizontal: 8,
+                      paddingVertical: 3,
+                    }}>
                     <RNText style={{ fontSize: 11, fontFamily: 'Roobert', color: muted }}>
                       {String(item.machineInfo.platform)}
                     </RNText>
                   </View>
                 )}
                 {item.lastHeartbeatAt && (
-                  <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
+                  <View
+                    style={{
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                      borderRadius: 6,
+                      paddingHorizontal: 8,
+                      paddingVertical: 3,
+                    }}>
                     <RNText style={{ fontSize: 11, fontFamily: 'Roobert', color: muted }}>
                       {formatRelativeTime(item.lastHeartbeatAt)}
                     </RNText>
@@ -344,8 +405,7 @@ function TunnelContent() {
           shadowOpacity: 0.2,
           shadowRadius: 8,
           elevation: 6,
-        }}
-      >
+        }}>
         <Plus size={24} color={theme.primaryForeground} />
       </Pressable>
 
@@ -399,18 +459,44 @@ const CreateTunnelSheet = React.forwardRef<
       enablePanDownToClose
       backdropComponent={renderBackdrop}
       onDismiss={() => setCopied(false)}
-      backgroundStyle={{ backgroundColor: sheetBg, borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
-      handleIndicatorStyle={{ backgroundColor: isDark ? '#3F3F46' : '#D4D4D8', width: 36, height: 5, borderRadius: 3 }}
-    >
-      <BottomSheetView style={{ paddingHorizontal: 24, paddingTop: 8, paddingBottom: Math.max(insets.bottom, 20) + 16 }}>
+      backgroundStyle={{
+        backgroundColor: sheetBg,
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+      }}
+      handleIndicatorStyle={{
+        backgroundColor: isDark ? '#3F3F46' : '#D4D4D8',
+        width: 36,
+        height: 5,
+        borderRadius: 3,
+      }}>
+      <BottomSheetView
+        style={{
+          paddingHorizontal: 24,
+          paddingTop: 8,
+          paddingBottom: Math.max(insets.bottom, 20) + 16,
+        }}>
         {/* Header */}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-          <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: 12,
+            }}>
             <Terminal size={20} color={fg} />
           </View>
           <View style={{ flex: 1 }}>
-            <RNText style={{ fontSize: 18, fontFamily: 'Roobert-Semibold', color: fg }}>Connect a machine</RNText>
-            <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: muted, marginTop: 2 }}>Run this command on the machine you want to connect.</RNText>
+            <RNText style={{ fontSize: 18, fontFamily: 'Roobert-Semibold', color: fg }}>
+              Connect a machine
+            </RNText>
+            <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: muted, marginTop: 2 }}>
+              Run this command on the machine you want to connect.
+            </RNText>
           </View>
         </View>
 
@@ -427,25 +513,47 @@ const CreateTunnelSheet = React.forwardRef<
             padding: 14,
             marginBottom: 16,
             gap: 10,
-          }}
-        >
-          <RNText style={{ flex: 1, fontSize: 11, fontFamily: 'monospace', color: isDark ? 'rgba(248,248,248,0.8)' : 'rgba(18,18,21,0.8)', lineHeight: 16 }} selectable>
+          }}>
+          <RNText
+            style={{
+              flex: 1,
+              fontSize: 11,
+              fontFamily: 'monospace',
+              color: isDark ? 'rgba(248,248,248,0.8)' : 'rgba(18,18,21,0.8)',
+              lineHeight: 16,
+            }}
+            selectable>
             {command}
           </RNText>
-          {copied ? (
-            <Check size={16} color="#34d399" />
-          ) : (
-            <Copy size={16} color={muted} />
-          )}
+          {copied ? <Check size={16} color="#34d399" /> : <Copy size={16} color={muted} />}
         </Pressable>
 
         {/* Steps */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 20 }}>
-          <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: muted }}>1. Run the command</RNText>
-          <RNText style={{ fontSize: 12, color: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>|</RNText>
-          <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: muted }}>2. Approve in browser</RNText>
-          <RNText style={{ fontSize: 12, color: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>|</RNText>
-          <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: muted }}>3. Connected</RNText>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 16,
+            marginBottom: 20,
+          }}>
+          <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: muted }}>
+            1. Run the command
+          </RNText>
+          <RNText
+            style={{ fontSize: 12, color: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+            |
+          </RNText>
+          <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: muted }}>
+            2. Approve in browser
+          </RNText>
+          <RNText
+            style={{ fontSize: 12, color: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+            |
+          </RNText>
+          <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: muted }}>
+            3. Connected
+          </RNText>
         </View>
 
         {/* Copy button */}
@@ -459,17 +567,30 @@ const CreateTunnelSheet = React.forwardRef<
             borderRadius: 14,
             backgroundColor: theme.primary,
             gap: 8,
-          }}
-        >
+          }}>
           {copied ? (
             <>
               <Check size={16} color={theme.primaryForeground} />
-              <RNText style={{ fontSize: 16, fontFamily: 'Roobert-Medium', color: theme.primaryForeground }}>Copied!</RNText>
+              <RNText
+                style={{
+                  fontSize: 16,
+                  fontFamily: 'Roobert-Medium',
+                  color: theme.primaryForeground,
+                }}>
+                Copied!
+              </RNText>
             </>
           ) : (
             <>
               <Copy size={16} color={theme.primaryForeground} />
-              <RNText style={{ fontSize: 16, fontFamily: 'Roobert-Medium', color: theme.primaryForeground }}>Copy Command</RNText>
+              <RNText
+                style={{
+                  fontSize: 16,
+                  fontFamily: 'Roobert-Medium',
+                  color: theme.primaryForeground,
+                }}>
+                Copy Command
+              </RNText>
             </>
           )}
         </Pressable>
@@ -531,20 +652,23 @@ const TunnelDetailSheet = React.forwardRef<BottomSheetModal, TunnelDetailSheetPr
       return map;
     }, [permissions]);
 
-    const handleToggleScope = useCallback(async (scope: ScopeInfo) => {
-      if (!conn) return;
-      const permissionId = activeScopeMap.get(scope.key);
-      if (permissionId) {
-        await revokeMutation.mutateAsync({ tunnelId: conn.tunnelId, permissionId });
-      } else {
-        await grantMutation.mutateAsync({
-          tunnelId: conn.tunnelId,
-          capability: scope.capability,
-          scope: { scope: scope.key },
-        });
-      }
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }, [conn, activeScopeMap, grantMutation, revokeMutation]);
+    const handleToggleScope = useCallback(
+      async (scope: ScopeInfo) => {
+        if (!conn) return;
+        const permissionId = activeScopeMap.get(scope.key);
+        if (permissionId) {
+          await revokeMutation.mutateAsync({ tunnelId: conn.tunnelId, permissionId });
+        } else {
+          await grantMutation.mutateAsync({
+            tunnelId: conn.tunnelId,
+            capability: scope.capability,
+            scope: { scope: scope.key },
+          });
+        }
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      },
+      [conn, activeScopeMap, grantMutation, revokeMutation]
+    );
 
     const handleCopyId = useCallback(async () => {
       if (!conn) return;
@@ -571,69 +695,137 @@ const TunnelDetailSheet = React.forwardRef<BottomSheetModal, TunnelDetailSheetPr
         snapPoints={['85%']}
         enablePanDownToClose
         backdropComponent={renderBackdrop}
-        onDismiss={() => { setActiveTab('permissions'); setAuditPage(1); onDismiss(); }}
-        backgroundStyle={{ backgroundColor: sheetBg, borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
-        handleIndicatorStyle={{ backgroundColor: isDark ? '#3F3F46' : '#D4D4D8', width: 36, height: 5, borderRadius: 3 }}
-      >
+        onDismiss={() => {
+          setActiveTab('permissions');
+          setAuditPage(1);
+          onDismiss();
+        }}
+        backgroundStyle={{
+          backgroundColor: sheetBg,
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+        }}
+        handleIndicatorStyle={{
+          backgroundColor: isDark ? '#3F3F46' : '#D4D4D8',
+          width: 36,
+          height: 5,
+          borderRadius: 3,
+        }}>
         <View style={{ paddingHorizontal: 24, paddingTop: 4 }}>
           {/* Header */}
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
             <View
               style={{
-                width: 44, height: 44, borderRadius: 14, marginRight: 14,
-                backgroundColor: isOnline ? accentBg : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'),
-                borderWidth: 1, borderColor: isOnline ? accent + '30' : borderColor,
-                alignItems: 'center', justifyContent: 'center',
-              }}
-            >
+                width: 44,
+                height: 44,
+                borderRadius: 14,
+                marginRight: 14,
+                backgroundColor: isOnline
+                  ? accentBg
+                  : isDark
+                    ? 'rgba(255,255,255,0.06)'
+                    : 'rgba(0,0,0,0.04)',
+                borderWidth: 1,
+                borderColor: isOnline ? accent + '30' : borderColor,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
               <Monitor size={22} color={isOnline ? accent : muted} />
             </View>
             <View style={{ flex: 1 }}>
-              <RNText style={{ fontSize: 17, fontFamily: 'Roobert-SemiBold', color: fg }}>{conn.name}</RNText>
+              <RNText style={{ fontSize: 17, fontFamily: 'Roobert-SemiBold', color: fg }}>
+                {conn.name}
+              </RNText>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 3 }}>
                 {isOnline ? <Wifi size={12} color={accent} /> : <WifiOff size={12} color={muted} />}
-                <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: isOnline ? accent : muted, marginLeft: 4 }}>
+                <RNText
+                  style={{
+                    fontSize: 12,
+                    fontFamily: 'Roobert',
+                    color: isOnline ? accent : muted,
+                    marginLeft: 4,
+                  }}>
                   {isOnline ? 'Online' : 'Offline'}
                 </RNText>
                 {machineInfo?.hostname && (
-                  <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: muted }}> · {machineInfo.hostname}</RNText>
+                  <RNText style={{ fontSize: 12, fontFamily: 'Roobert', color: muted }}>
+                    {' '}
+                    · {machineInfo.hostname}
+                  </RNText>
                 )}
               </View>
             </View>
             {/* Online badge */}
-            <View style={{
-              flexDirection: 'row', alignItems: 'center', gap: 5,
-              paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8,
-              borderWidth: 1,
-              backgroundColor: isOnline ? accentBg : (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)'),
-              borderColor: isOnline ? accent + '40' : borderColor,
-            }}>
-              <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: isOnline ? accent : muted }} />
-              <RNText style={{ fontSize: 11, fontFamily: 'Roobert-Medium', color: isOnline ? accent : muted }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 5,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                borderRadius: 8,
+                borderWidth: 1,
+                backgroundColor: isOnline
+                  ? accentBg
+                  : isDark
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'rgba(0,0,0,0.02)',
+                borderColor: isOnline ? accent + '40' : borderColor,
+              }}>
+              <View
+                style={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: 3,
+                  backgroundColor: isOnline ? accent : muted,
+                }}
+              />
+              <RNText
+                style={{
+                  fontSize: 11,
+                  fontFamily: 'Roobert-Medium',
+                  color: isOnline ? accent : muted,
+                }}>
                 {isOnline ? 'Online' : 'Offline'}
               </RNText>
             </View>
           </View>
 
           {/* Tab bar */}
-          <View style={{
-            flexDirection: 'row', backgroundColor: tabBg,
-            borderRadius: 10, padding: 3, marginBottom: 16,
-          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              backgroundColor: tabBg,
+              borderRadius: 10,
+              padding: 3,
+              marginBottom: 16,
+            }}>
             {TABS.map(({ key, label, icon: TabIcon }) => {
               const active = activeTab === key;
               return (
                 <Pressable
                   key={key}
-                  onPress={() => { setActiveTab(key); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
-                  style={{
-                    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5,
-                    paddingVertical: 8, borderRadius: 8,
-                    backgroundColor: active ? tabActiveBg : 'transparent',
+                  onPress={() => {
+                    setActiveTab(key);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }}
-                >
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 5,
+                    paddingVertical: 8,
+                    borderRadius: 8,
+                    backgroundColor: active ? tabActiveBg : 'transparent',
+                  }}>
                   <TabIcon size={13} color={active ? fg : muted} />
-                  <RNText style={{ fontSize: 12, fontFamily: active ? 'Roobert-Medium' : 'Roobert', color: active ? fg : muted }}>
+                  <RNText
+                    style={{
+                      fontSize: 12,
+                      fontFamily: active ? 'Roobert-Medium' : 'Roobert',
+                      color: active ? fg : muted,
+                    }}>
                     {label}
                   </RNText>
                 </Pressable>
@@ -642,14 +834,25 @@ const TunnelDetailSheet = React.forwardRef<BottomSheetModal, TunnelDetailSheetPr
           </View>
         </View>
 
-        <BottomSheetScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: Math.max(insets.bottom, 20) + 16 }}>
-
+        <BottomSheetScrollView
+          contentContainerStyle={{
+            paddingHorizontal: 24,
+            paddingBottom: Math.max(insets.bottom, 20) + 16,
+          }}>
           {/* ─── Permissions Tab ──────────────────────────────────── */}
           {activeTab === 'permissions' && (
             <View>
               {Object.entries(SCOPE_GROUPS).map(([category, scopes]) => (
                 <View key={category} style={{ marginBottom: 16 }}>
-                  <RNText style={{ fontSize: 11, fontFamily: 'Roobert-SemiBold', color: muted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+                  <RNText
+                    style={{
+                      fontSize: 11,
+                      fontFamily: 'Roobert-SemiBold',
+                      color: muted,
+                      textTransform: 'uppercase',
+                      letterSpacing: 1,
+                      marginBottom: 8,
+                    }}>
                     {category}
                   </RNText>
                   {scopes.map((scope) => {
@@ -661,30 +864,59 @@ const TunnelDetailSheet = React.forwardRef<BottomSheetModal, TunnelDetailSheetPr
                         onPress={() => handleToggleScope(scope)}
                         disabled={isPending}
                         style={{
-                          flexDirection: 'row', alignItems: 'center',
-                          paddingVertical: 12, paddingHorizontal: 14, borderRadius: 12, marginBottom: 4,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          paddingVertical: 12,
+                          paddingHorizontal: 14,
+                          borderRadius: 12,
+                          marginBottom: 4,
                           backgroundColor: isActive ? accentBg : rowBg,
                           borderWidth: 1,
                           borderColor: isActive ? accent + '25' : borderColor,
                           opacity: isPending ? 0.5 : 1,
-                        }}
-                      >
-                        {/* Toggle circle */}
-                        <View style={{
-                          width: 22, height: 22, borderRadius: 11, marginRight: 12,
-                          backgroundColor: isActive ? accent : 'transparent',
-                          borderWidth: 2,
-                          borderColor: isActive ? accent : (isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'),
-                          alignItems: 'center', justifyContent: 'center',
                         }}>
+                        {/* Toggle circle */}
+                        <View
+                          style={{
+                            width: 22,
+                            height: 22,
+                            borderRadius: 11,
+                            marginRight: 12,
+                            backgroundColor: isActive ? accent : 'transparent',
+                            borderWidth: 2,
+                            borderColor: isActive
+                              ? accent
+                              : isDark
+                                ? 'rgba(255,255,255,0.2)'
+                                : 'rgba(0,0,0,0.15)',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
                           {isActive && <Check size={12} color={theme.primaryForeground} />}
                         </View>
                         <View style={{ flex: 1 }}>
-                          <RNText style={{ fontSize: 13, fontFamily: 'monospace', color: fg }}>{scope.key}</RNText>
-                          <RNText style={{ fontSize: 11, fontFamily: 'Roobert', color: muted, marginTop: 1 }}>{scope.description}</RNText>
+                          <RNText style={{ fontSize: 13, fontFamily: 'monospace', color: fg }}>
+                            {scope.key}
+                          </RNText>
+                          <RNText
+                            style={{
+                              fontSize: 11,
+                              fontFamily: 'Roobert',
+                              color: muted,
+                              marginTop: 1,
+                            }}>
+                            {scope.description}
+                          </RNText>
                         </View>
                         {isActive && (
-                          <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: accent }} />
+                          <View
+                            style={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: 3,
+                              backgroundColor: accent,
+                            }}
+                          />
                         )}
                       </Pressable>
                     );
@@ -693,21 +925,36 @@ const TunnelDetailSheet = React.forwardRef<BottomSheetModal, TunnelDetailSheetPr
               ))}
 
               {/* Delete in permissions tab */}
-              <View style={{ backgroundColor: dangerBg, borderWidth: 1, borderColor: dangerBorder, borderRadius: 14, padding: 14, marginTop: 8 }}>
+              <View
+                style={{
+                  backgroundColor: dangerBg,
+                  borderWidth: 1,
+                  borderColor: dangerBorder,
+                  borderRadius: 14,
+                  padding: 14,
+                  marginTop: 8,
+                }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                   <AlertTriangle size={14} color="#ef4444" style={{ marginRight: 8 }} />
-                  <RNText style={{ fontSize: 13, fontFamily: 'Roobert-SemiBold', color: '#ef4444' }}>Danger Zone</RNText>
+                  <RNText
+                    style={{ fontSize: 13, fontFamily: 'Roobert-SemiBold', color: '#ef4444' }}>
+                    Danger Zone
+                  </RNText>
                 </View>
                 <Pressable
                   onPress={() => onDelete(conn)}
                   style={{
-                    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-                    paddingVertical: 10, borderRadius: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingVertical: 10,
+                    borderRadius: 10,
                     backgroundColor: isDark ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.1)',
-                  }}
-                >
+                  }}>
                   <Trash2 size={14} color="#ef4444" style={{ marginRight: 6 }} />
-                  <RNText style={{ fontSize: 14, fontFamily: 'Roobert-Medium', color: '#ef4444' }}>Delete Connection</RNText>
+                  <RNText style={{ fontSize: 14, fontFamily: 'Roobert-Medium', color: '#ef4444' }}>
+                    Delete Connection
+                  </RNText>
                 </Pressable>
               </View>
             </View>
@@ -717,7 +964,14 @@ const TunnelDetailSheet = React.forwardRef<BottomSheetModal, TunnelDetailSheetPr
           {activeTab === 'audit' && (
             <View>
               {!auditData || auditData.data.length === 0 ? (
-                <RNText style={{ fontSize: 13, fontFamily: 'Roobert', color: muted, textAlign: 'center', paddingVertical: 24 }}>
+                <RNText
+                  style={{
+                    fontSize: 13,
+                    fontFamily: 'Roobert',
+                    color: muted,
+                    textAlign: 'center',
+                    paddingVertical: 24,
+                  }}>
                   No audit logs yet.
                 </RNText>
               ) : (
@@ -726,26 +980,55 @@ const TunnelDetailSheet = React.forwardRef<BottomSheetModal, TunnelDetailSheetPr
                     <View
                       key={log.logId}
                       style={{
-                        flexDirection: 'row', alignItems: 'center', gap: 10,
-                        paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10, marginBottom: 4,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 10,
+                        paddingVertical: 10,
+                        paddingHorizontal: 12,
+                        borderRadius: 10,
+                        marginBottom: 4,
                         borderWidth: 1,
-                        borderColor: log.success ? borderColor : (isDark ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.15)'),
+                        borderColor: log.success
+                          ? borderColor
+                          : isDark
+                            ? 'rgba(239,68,68,0.2)'
+                            : 'rgba(239,68,68,0.15)',
                         backgroundColor: log.success ? rowBg : dangerBg,
-                      }}
-                    >
+                      }}>
                       {log.success ? (
                         <Check size={14} color={accent} />
                       ) : (
                         <AlertTriangle size={14} color="#ef4444" />
                       )}
                       <View style={{ flex: 1 }}>
-                        <RNText style={{ fontSize: 12, fontFamily: 'monospace', color: fg }} numberOfLines={1}>{log.operation}</RNText>
+                        <RNText
+                          style={{ fontSize: 12, fontFamily: 'monospace', color: fg }}
+                          numberOfLines={1}>
+                          {log.operation}
+                        </RNText>
                         {log.durationMs != null && (
-                          <RNText style={{ fontSize: 11, fontFamily: 'Roobert', color: muted, marginTop: 2 }}>{log.durationMs}ms</RNText>
+                          <RNText
+                            style={{
+                              fontSize: 11,
+                              fontFamily: 'Roobert',
+                              color: muted,
+                              marginTop: 2,
+                            }}>
+                            {log.durationMs}ms
+                          </RNText>
                         )}
                       </View>
-                      <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 }}>
-                        <RNText style={{ fontSize: 10, fontFamily: 'Roobert-Medium', color: muted }}>{log.capability}</RNText>
+                      <View
+                        style={{
+                          backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                          borderRadius: 6,
+                          paddingHorizontal: 6,
+                          paddingVertical: 2,
+                        }}>
+                        <RNText
+                          style={{ fontSize: 10, fontFamily: 'Roobert-Medium', color: muted }}>
+                          {log.capability}
+                        </RNText>
                       </View>
                       <RNText style={{ fontSize: 10, fontFamily: 'Roobert', color: muted }}>
                         {new Date(log.createdAt).toLocaleTimeString()}
@@ -754,7 +1037,13 @@ const TunnelDetailSheet = React.forwardRef<BottomSheetModal, TunnelDetailSheetPr
                   ))}
                   {/* Pagination */}
                   {auditData.pagination.totalPages > 1 && (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginTop: 12,
+                      }}>
                       <RNText style={{ fontSize: 11, fontFamily: 'Roobert', color: muted }}>
                         Page {auditData.pagination.page} of {auditData.pagination.totalPages}
                       </RNText>
@@ -762,16 +1051,34 @@ const TunnelDetailSheet = React.forwardRef<BottomSheetModal, TunnelDetailSheetPr
                         <Pressable
                           onPress={() => setAuditPage((p) => Math.max(1, p - 1))}
                           disabled={auditPage <= 1}
-                          style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor, opacity: auditPage <= 1 ? 0.3 : 1 }}
-                        >
-                          <RNText style={{ fontSize: 12, fontFamily: 'Roobert-Medium', color: fg }}>Prev</RNText>
+                          style={{
+                            paddingHorizontal: 12,
+                            paddingVertical: 6,
+                            borderRadius: 8,
+                            borderWidth: 1,
+                            borderColor,
+                            opacity: auditPage <= 1 ? 0.3 : 1,
+                          }}>
+                          <RNText style={{ fontSize: 12, fontFamily: 'Roobert-Medium', color: fg }}>
+                            Prev
+                          </RNText>
                         </Pressable>
                         <Pressable
-                          onPress={() => setAuditPage((p) => Math.min(auditData.pagination.totalPages, p + 1))}
+                          onPress={() =>
+                            setAuditPage((p) => Math.min(auditData.pagination.totalPages, p + 1))
+                          }
                           disabled={auditPage >= auditData.pagination.totalPages}
-                          style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor, opacity: auditPage >= auditData.pagination.totalPages ? 0.3 : 1 }}
-                        >
-                          <RNText style={{ fontSize: 12, fontFamily: 'Roobert-Medium', color: fg }}>Next</RNText>
+                          style={{
+                            paddingHorizontal: 12,
+                            paddingVertical: 6,
+                            borderRadius: 8,
+                            borderWidth: 1,
+                            borderColor,
+                            opacity: auditPage >= auditData.pagination.totalPages ? 0.3 : 1,
+                          }}>
+                          <RNText style={{ fontSize: 12, fontFamily: 'Roobert-Medium', color: fg }}>
+                            Next
+                          </RNText>
                         </Pressable>
                       </View>
                     </View>
@@ -782,100 +1089,185 @@ const TunnelDetailSheet = React.forwardRef<BottomSheetModal, TunnelDetailSheetPr
           )}
 
           {/* ─── Connection Tab ────────────────────────────────────── */}
-          {activeTab === 'connection' && (() => {
-            const rows: { label: string; value: string; mono?: boolean; copyable?: boolean; status?: boolean; caps?: boolean }[] = [
-              { label: 'Tunnel ID', value: conn.tunnelId, mono: true, copyable: true },
-              { label: 'Status', value: isOnline ? 'Online' : 'Offline', status: true },
-              { label: 'Hostname', value: machineInfo?.hostname || 'Unknown' },
-              { label: 'Platform', value: machineInfo?.platform ? `${machineInfo.platform} ${machineInfo.arch || ''}`.trim() : 'Unknown' },
-              { label: 'OS Version', value: machineInfo?.osVersion || 'Unknown' },
-              { label: 'Agent Version', value: machineInfo?.agentVersion || 'Unknown' },
-              { label: 'Capabilities', value: conn.capabilities?.join(', ') || 'None', caps: true },
-              { label: 'Created', value: new Date(conn.createdAt).toLocaleString() },
-              ...(conn.lastHeartbeatAt ? [{ label: 'Last Heartbeat', value: new Date(conn.lastHeartbeatAt).toLocaleString() }] : []),
-            ];
+          {activeTab === 'connection' &&
+            (() => {
+              const rows: {
+                label: string;
+                value: string;
+                mono?: boolean;
+                copyable?: boolean;
+                status?: boolean;
+                caps?: boolean;
+              }[] = [
+                { label: 'Tunnel ID', value: conn.tunnelId, mono: true, copyable: true },
+                { label: 'Status', value: isOnline ? 'Online' : 'Offline', status: true },
+                { label: 'Hostname', value: machineInfo?.hostname || 'Unknown' },
+                {
+                  label: 'Platform',
+                  value: machineInfo?.platform
+                    ? `${machineInfo.platform} ${machineInfo.arch || ''}`.trim()
+                    : 'Unknown',
+                },
+                { label: 'OS Version', value: machineInfo?.osVersion || 'Unknown' },
+                { label: 'Agent Version', value: machineInfo?.agentVersion || 'Unknown' },
+                {
+                  label: 'Capabilities',
+                  value: conn.capabilities?.join(', ') || 'None',
+                  caps: true,
+                },
+                { label: 'Created', value: new Date(conn.createdAt).toLocaleString() },
+                ...(conn.lastHeartbeatAt
+                  ? [
+                      {
+                        label: 'Last Heartbeat',
+                        value: new Date(conn.lastHeartbeatAt).toLocaleString(),
+                      },
+                    ]
+                  : []),
+              ];
 
-            return (
-              <View style={{
-                borderRadius: 16, overflow: 'hidden',
-                borderWidth: 1, borderColor,
-                backgroundColor: isDark ? '#1a1a1c' : '#FFFFFF',
-              }}>
-                {rows.map((row, i) => (
-                  <View key={row.label}>
-                    {i > 0 && (
-                      <View style={{ height: 1, backgroundColor: borderColor, marginLeft: 16 }} />
-                    )}
-                    <View
-                      style={{
-                        flexDirection: 'row', alignItems: 'center',
-                        paddingVertical: 14, paddingHorizontal: 16,
-                        minHeight: 48,
-                      }}
-                    >
-                      <RNText style={{ fontSize: 14, fontFamily: 'Roobert', color: fg, width: 120 }}>
-                        {row.label}
-                      </RNText>
-                      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
-                        {row.status ? (
-                          <View style={{
-                            flexDirection: 'row', alignItems: 'center', gap: 6,
-                            paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8,
-                            backgroundColor: isOnline ? accentBg : (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)'),
+              return (
+                <View
+                  style={{
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                    borderWidth: 1,
+                    borderColor,
+                    backgroundColor: isDark ? '#1a1a1c' : '#FFFFFF',
+                  }}>
+                  {rows.map((row, i) => (
+                    <View key={row.label}>
+                      {i > 0 && (
+                        <View style={{ height: 1, backgroundColor: borderColor, marginLeft: 16 }} />
+                      )}
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          paddingVertical: 14,
+                          paddingHorizontal: 16,
+                          minHeight: 48,
+                        }}>
+                        <RNText
+                          style={{ fontSize: 14, fontFamily: 'Roobert', color: fg, width: 120 }}>
+                          {row.label}
+                        </RNText>
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            gap: 8,
                           }}>
-                            {isOnline ? <Wifi size={12} color={accent} /> : <WifiOff size={12} color={muted} />}
-                            <RNText style={{ fontSize: 13, fontFamily: 'Roobert-SemiBold', color: isOnline ? accent : muted }}>
+                          {row.status ? (
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 6,
+                                paddingHorizontal: 10,
+                                paddingVertical: 4,
+                                borderRadius: 8,
+                                backgroundColor: isOnline
+                                  ? accentBg
+                                  : isDark
+                                    ? 'rgba(255,255,255,0.04)'
+                                    : 'rgba(0,0,0,0.02)',
+                              }}>
+                              {isOnline ? (
+                                <Wifi size={12} color={accent} />
+                              ) : (
+                                <WifiOff size={12} color={muted} />
+                              )}
+                              <RNText
+                                style={{
+                                  fontSize: 13,
+                                  fontFamily: 'Roobert-SemiBold',
+                                  color: isOnline ? accent : muted,
+                                }}>
+                                {row.value}
+                              </RNText>
+                            </View>
+                          ) : row.caps ? (
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                flexWrap: 'wrap',
+                                justifyContent: 'flex-end',
+                                gap: 6,
+                              }}>
+                              {conn.capabilities.length > 0 ? (
+                                conn.capabilities.map((cap) => (
+                                  <View
+                                    key={cap}
+                                    style={{
+                                      backgroundColor: isDark
+                                        ? 'rgba(255,255,255,0.08)'
+                                        : 'rgba(0,0,0,0.05)',
+                                      borderRadius: 8,
+                                      paddingHorizontal: 10,
+                                      paddingVertical: 4,
+                                    }}>
+                                    <RNText
+                                      style={{
+                                        fontSize: 12,
+                                        fontFamily: 'Roobert-Medium',
+                                        color: fg,
+                                      }}>
+                                      {cap}
+                                    </RNText>
+                                  </View>
+                                ))
+                              ) : (
+                                <RNText
+                                  style={{ fontSize: 14, fontFamily: 'Roobert', color: muted }}>
+                                  None
+                                </RNText>
+                              )}
+                            </View>
+                          ) : (
+                            <RNText
+                              style={{
+                                fontSize: 14,
+                                fontFamily: row.mono ? 'monospace' : 'Roobert-SemiBold',
+                                color: fg,
+                                flexShrink: 1,
+                              }}
+                              numberOfLines={1}>
                               {row.value}
                             </RNText>
-                          </View>
-                        ) : row.caps ? (
-                          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 6 }}>
-                            {conn.capabilities.length > 0 ? conn.capabilities.map((cap) => (
-                              <View key={cap} style={{
-                                backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
-                                borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4,
+                          )}
+                          {row.copyable && (
+                            <Pressable
+                              onPress={handleCopyId}
+                              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                              style={{
+                                width: 30,
+                                height: 30,
+                                borderRadius: 8,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: isDark
+                                  ? 'rgba(255,255,255,0.06)'
+                                  : 'rgba(0,0,0,0.04)',
                               }}>
-                                <RNText style={{ fontSize: 12, fontFamily: 'Roobert-Medium', color: fg }}>{cap}</RNText>
-                              </View>
-                            )) : (
-                              <RNText style={{ fontSize: 14, fontFamily: 'Roobert', color: muted }}>None</RNText>
-                            )}
-                          </View>
-                        ) : (
-                          <RNText
-                            style={{
-                              fontSize: 14,
-                              fontFamily: row.mono ? 'monospace' : 'Roobert-SemiBold',
-                              color: fg,
-                              flexShrink: 1,
-                            }}
-                            numberOfLines={1}
-                          >
-                            {row.value}
-                          </RNText>
-                        )}
-                        {row.copyable && (
-                          <Pressable
-                            onPress={handleCopyId}
-                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                            style={{
-                              width: 30, height: 30, borderRadius: 8,
-                              alignItems: 'center', justifyContent: 'center',
-                              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-                            }}
-                          >
-                            {copiedId ? <Check size={14} color={accent} /> : <Copy size={14} color={muted} />}
-                          </Pressable>
-                        )}
+                              {copiedId ? (
+                                <Check size={14} color={accent} />
+                              ) : (
+                                <Copy size={14} color={muted} />
+                              )}
+                            </Pressable>
+                          )}
+                        </View>
                       </View>
                     </View>
-                  </View>
-                ))}
-              </View>
-            );
-          })()}
+                  ))}
+                </View>
+              );
+            })()}
         </BottomSheetScrollView>
       </BottomSheetModal>
     );
-  },
+  }
 );

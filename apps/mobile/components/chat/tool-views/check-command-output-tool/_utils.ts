@@ -26,9 +26,10 @@ export function extractCheckCommandOutputData(
   assistantTimestamp?: string
 ): CheckCommandOutputData {
   // Extract session_name from toolCall.arguments (from metadata)
-  const args = toolCall.arguments || {};
+  const rawArgs = toolCall.arguments || {};
+  const args = typeof rawArgs === 'string' ? (JSON.parse(rawArgs) as Record<string, any>) : rawArgs;
   const sessionName: string | null = args.session_name || args.sessionName || null;
-  
+
   // Extract output from toolResult.output (from metadata)
   let output: string | null = null;
   let status: string | null = null;
@@ -43,7 +44,7 @@ export function extractCheckCommandOutputData(
     } else if (typeof toolResult.output === 'string') {
       output = toolResult.output;
     }
-    
+
     if (toolResult.success !== undefined) {
       actualIsSuccess = toolResult.success;
     }
@@ -56,4 +57,3 @@ export function extractCheckCommandOutputData(
     success: actualIsSuccess,
   };
 }
-

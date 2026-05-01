@@ -8,6 +8,13 @@ export interface PeopleSearchResult {
   person_position: string;
   person_picture_url: string;
   description: string;
+  // Aliases used by the view component
+  person_id?: string;
+  profile_image_url?: string;
+  name?: string;
+  title?: string;
+  company?: string;
+  location?: string;
 }
 
 export interface PeopleSearchData {
@@ -28,41 +35,52 @@ const parseContent = (content: any): any => {
   return content;
 };
 
-export function extractPeopleSearchData({ toolCall, toolResult }: { toolCall: ToolCallData; toolResult?: ToolResultData }): PeopleSearchData {
-  const args = typeof toolCall.arguments === 'object' ? toolCall.arguments : JSON.parse(toolCall.arguments);
-  
+export function extractPeopleSearchData({
+  toolCall,
+  toolResult,
+}: {
+  toolCall: ToolCallData;
+  toolResult?: ToolResultData;
+}): PeopleSearchData {
+  const args =
+    typeof toolCall.arguments === 'object' ? toolCall.arguments : JSON.parse(toolCall.arguments);
+
   let query = args?.query || null;
   let results: PeopleSearchResult[] = [];
   let total_results = 0;
-  
+
   if (toolResult?.output) {
-    const output = typeof toolResult.output === 'string' 
-      ? parseContent(toolResult.output) 
-      : toolResult.output;
-    
+    const output =
+      typeof toolResult.output === 'string' ? parseContent(toolResult.output) : toolResult.output;
+
     if (output && typeof output === 'object') {
       query = query || output.query || null;
       total_results = output.total_results || 0;
-      
+
       if (Array.isArray(output.results)) {
         results = output.results.map((r: any) => ({
           id: r.id || '',
           url: r.url || '',
-          person_name: r.person_name || 'Unknown',
-          person_location: r.person_location || '',
-          person_position: r.person_position || '',
-          person_picture_url: r.person_picture_url || '',
-          description: r.description || ''
+          person_name: r.person_name || r.name || 'Unknown',
+          person_location: r.person_location || r.location || '',
+          person_position: r.person_position || r.title || '',
+          person_picture_url: r.person_picture_url || r.profile_image_url || '',
+          description: r.description || '',
+          person_id: r.person_id || r.id || '',
+          profile_image_url: r.profile_image_url || r.person_picture_url || '',
+          name: r.name || r.person_name || 'Unknown',
+          title: r.title || r.person_position || '',
+          company: r.company || '',
+          location: r.location || r.person_location || '',
         }));
       }
     }
   }
-  
+
   return {
     query,
     total_results,
     results,
-    success: toolResult?.success ?? true
+    success: toolResult?.success ?? true,
   };
 }
-

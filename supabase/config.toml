@@ -1,15 +1,11 @@
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Supabase Local Development Configuration                                  ║
+# ║  DEPRECATED — This file is preserved for reference only.                   ║
 # ║                                                                             ║
-# ║  Used by `supabase start` to spin up the local Supabase stack.             ║
-# ║  pg_cron and pg_net are built into Supabase's local postgres image —       ║
-# ║  no custom compilation needed (replaces services/postgres/Dockerfile).     ║
+# ║  The project now uses a self-hosted Supabase stack via Docker Compose:     ║
+# ║    scripts/supabase/docker-compose.yml                                     ║
 # ║                                                                             ║
-# ║  Usage:                                                                     ║
-# ║    supabase start          (first time — pulls images, ~2 min)             ║
-# ║    supabase status         (show URLs, keys, ports)                        ║
-# ║    supabase db reset       (re-run migrations from scratch)                ║
-# ║    supabase stop           (stop all containers)                           ║
+# ║  Use ./scripts/dev-local.sh (dev) or ./scripts/start-local.sh (prod)       ║
+# ║  instead of `supabase start`.                                              ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 project_id = "aether-local"

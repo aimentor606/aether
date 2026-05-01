@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-SUPABASE_DIR="$ROOT_DIR/supabase"
+SELFHOSTED_DIR="$ROOT_DIR/scripts/supabase"
 
 FRONTEND_PID=""
 
@@ -26,25 +26,27 @@ if ! docker info >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! (cd "$SUPABASE_DIR" && supabase status >/dev/null 2>&1); then
-  (cd "$SUPABASE_DIR" && supabase start)
+# Start self-hosted Supabase stack if not already running
+if ! docker compose -f "$SELFHOSTED_DIR/docker-compose.yml" --env-file "$SELFHOSTED_DIR/.env" ps --status running 2>/dev/null | grep -q "supabase-kong"; then
+  echo "[start] Starting self-hosted Supabase stack..."
+  docker compose -f "$SELFHOSTED_DIR/docker-compose.yml" --env-file "$SELFHOSTED_DIR/.env" up -d
 fi
 
-echo "[start] Waiting for Postgres on 127.0.0.1:54322..."
+echo "[start] Waiting for Postgres on 127.0.0.1:5434..."
 python3 - <<'PY'
 import socket
 import sys
 import time
 
-deadline = time.time() + 60
+deadline = time.time() + 120
 while time.time() < deadline:
     try:
-        with socket.create_connection(("127.0.0.1", 54322), timeout=1):
+        with socket.create_connection(("127.0.0.1", 5434), timeout=1):
             sys.exit(0)
     except OSError:
         time.sleep(1)
 
-print("[start] ERROR: Timed out waiting for Supabase Postgres on 127.0.0.1:54322", file=sys.stderr)
+print("[start] ERROR: Timed out waiting for Supabase Postgres on 127.0.0.1:5434", file=sys.stderr)
 sys.exit(1)
 PY
 

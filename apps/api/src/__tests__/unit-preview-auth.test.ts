@@ -22,6 +22,7 @@ mock.module('../shared/db', () => ({
 mock.module('../shared/resolve-account', () => ({
   resolveAccountId: async () => mockResolvedAccountId,
   resolveAccountIdStrict: async () => mockResolvedAccountId,
+  reconcileResolvedAccount: async () => {},
 }));
 
 mock.module('../repositories/api-keys', () => ({

@@ -6,6 +6,7 @@ import { HTTPException } from 'hono/http-exception';
 mock.module('../shared/resolve-account', () => ({
   resolveAccountId: async (userId: string) => `resolved_account_for_${userId}`,
   resolveAccountIdStrict: async (userId: string) => `resolved_account_for_${userId}`,
+  reconcileResolvedAccount: async () => {},
 }));
 
 class MockRedisClient {

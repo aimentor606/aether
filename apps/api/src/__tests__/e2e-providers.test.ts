@@ -16,31 +16,13 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, mock } from 'bun
 import { Hono } from 'hono';
 import { mkdirSync, writeFileSync, existsSync, rmSync, readFileSync } from 'fs';
 import { resolve } from 'path';
-import { registerGlobalMocks } from './billing/mocks';
+import { dbMockState } from './db-mock-state';
+import './billing/mocks';
 
-registerGlobalMocks();
-
-mock.module('../shared/db', () => ({
-  hasDatabase: false,
-  db: {},
-}));
-
-mock.module('@aether/db', () => ({
-  featureFlags: {
-    id: 'id', accountId: 'accountId', verticalId: 'verticalId',
-    featureName: 'featureName', enabled: 'enabled', config: 'config',
-    createdAt: 'createdAt', updatedAt: 'updatedAt',
-  },
-  accounts: { accountId: 'accountId', name: 'name' },
-  platformUserRoles: {
-    id: 'id', accountId: 'accountId', userId: 'userId',
-    role: 'role', createdAt: 'createdAt',
-  },
-  accountMembers: { userId: 'userId', accountId: 'accountId', accountRole: 'accountRole' },
-  accountUser: { userId: 'userId', accountId: 'accountId' },
-  billingCustomers: { id: 'id', accountId: 'accountId', email: 'email' },
-  creditAccounts: { accountId: 'accountId', tier: 'tier' },
-}));
+// Triggers billing/mocks top-level mock.module() calls for config, supabase, stripe, etc.
+// In full suite, admin-routes.test.ts already registered these (first-registration-wins = no-op).
+// ../shared/db and @aether/db mocks provided by admin-routes.test.ts (first-registration-wins).
+// hasDatabase toggled per-suite via dbMockState.
 
 mock.module('../middleware/auth', () => ({
   supabaseAuth: async (c: any, next: any) => {
@@ -70,6 +52,7 @@ function createTestApp() {
 // ─── Setup / Teardown ───────────────────────────────────────────────────────
 
 beforeAll(() => {
+  dbMockState.hasDatabase = false;
   mkdirSync(TEST_DIR, { recursive: true });
   mkdirSync(resolve(TEST_DIR, 'scripts'), { recursive: true });
   mkdirSync(resolve(TEST_DIR, 'deploy', 'docker', 'sandbox'), { recursive: true });
@@ -88,6 +71,7 @@ beforeAll(() => {
 });
 
 afterAll(() => {
+  dbMockState.hasDatabase = true;
   process.chdir(ORIGINAL_CWD);
   rmSync(TEST_DIR, { recursive: true, force: true });
 });

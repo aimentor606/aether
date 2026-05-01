@@ -482,6 +482,7 @@ mock.module('../../shared/stripe', () => ({
 
 mock.module('../../config', () => ({
   config: createTestConfig(),
+  SANDBOX_VERSION: 'test',
 }));
 
 mock.module('../../billing/repositories/credit-accounts', () => ({

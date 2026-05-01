@@ -32,7 +32,7 @@ if ! docker compose -f "$SELFHOSTED_DIR/docker-compose.yml" --env-file "$SELFHOS
   docker compose -f "$SELFHOSTED_DIR/docker-compose.yml" --env-file "$SELFHOSTED_DIR/.env" up -d
 fi
 
-echo "[dev] Waiting for Postgres on 127.0.0.1:5432..."
+echo "[dev] Waiting for Postgres on 127.0.0.1:5433..."
 python3 - <<'PY'
 import socket
 import sys
@@ -41,12 +41,12 @@ import time
 deadline = time.time() + 120
 while time.time() < deadline:
     try:
-        with socket.create_connection(("127.0.0.1", 5432), timeout=1):
+        with socket.create_connection(("127.0.0.1", 5433), timeout=1):
             sys.exit(0)
     except OSError:
         time.sleep(1)
 
-print("[dev] ERROR: Timed out waiting for Supabase Postgres on 127.0.0.1:5432", file=sys.stderr)
+print("[dev] ERROR: Timed out waiting for Supabase Postgres on 127.0.0.1:5433", file=sys.stderr)
 sys.exit(1)
 PY
 

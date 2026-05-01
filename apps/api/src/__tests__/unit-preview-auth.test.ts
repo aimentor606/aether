@@ -2,21 +2,16 @@ import { beforeEach, describe, expect, mock, test } from 'bun:test';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-let mockSandboxAccountId: string | null = 'acct-owner';
+let mockCanAccess = true;
 let mockResolvedAccountId = 'acct-owner';
 let mockSupabaseUser: { id: string; email?: string } | null = null;
+let mockSandboxAccountId: string | null = 'acct-owner';
 
-mock.module('../shared/db', () => ({
-  hasDatabase: true,
-  db: {
-    select: () => ({
-      from: () => ({
-        where: () => ({
-          limit: async () => (mockSandboxAccountId ? [{ accountId: mockSandboxAccountId }] : []),
-        }),
-      }),
-    }),
-  },
+// Mock preview-ownership directly instead of mocking shared/db.
+// This avoids contaminating other tests that need the real DB connection.
+mock.module('../shared/preview-ownership', () => ({
+  canAccessPreviewSandbox: async (_actorAccountId: string, _input: any) => mockCanAccess,
+  clearPreviewOwnershipCache: () => {},
 }));
 
 mock.module('../shared/resolve-account', () => ({
@@ -38,7 +33,26 @@ mock.module('../repositories/api-keys', () => ({
 }));
 
 mock.module('../shared/crypto', () => ({
+  KEY_PREFIX: 'aether_',
+  KEY_PREFIX_SANDBOX: 'aether_sb_',
+  KEY_PREFIX_TUNNEL: 'aether_tnl_',
+  KEY_PREFIX_PUBLIC: 'pk_',
+  randomAlphanumeric: (length: number) => 'x'.repeat(length),
   isAetherToken: (token: string) => token.startsWith('aether_'),
+  generateApiKeyPair: () => ({ publicKey: 'pk_testkey', secretKey: 'aether_testkey' }),
+  generateSandboxKeyPair: () => ({ publicKey: 'pk_testkey', secretKey: 'aether_sb_testkey' }),
+  generateTunnelToken: () => 'aether_tnl_testtoken',
+  generateDeviceCode: () => 'ABCD-1234',
+  isTunnelToken: (token: string) => token.startsWith('aether_tnl_'),
+  hashSecretKey: (key: string) => 'testhash_' + key,
+  verifySecretKey: (_key: string, _hash: string) => true,
+  isApiKeySecretConfigured: () => true,
+  timingSafeStringEqual: (_a: string, _b: string) => _a === _b,
+  deriveSigningKey: (_token: string, _secret: string) => 'testsigningkey',
+  signMessage: (_key: string, _payload: string, _nonce: number) => 'testsig',
+  verifyMessageSignature: (_key: string, _payload: string, _nonce: number, _sig: string) => true,
+  encryptCredential: (plaintext: string) => plaintext,
+  decryptCredential: (encrypted: string) => encrypted,
 }));
 
 mock.module('../shared/jwt-verify', () => ({
@@ -64,10 +78,16 @@ mock.module('../shared/supabase', () => ({
   }),
 }));
 
-mock.module('../config', () => ({ config: {} }));
+mock.module('../config', () => ({
+  config: {
+    DATABASE_URL: process.env.DATABASE_URL,
+    API_KEY_SECRET: 'test-secret',
+    SUPABASE_URL: 'http://localhost:54321',
+    SUPABASE_SERVICE_ROLE_KEY: 'test-key',
+  },
+}));
 
 const { combinedAuth } = await import('../middleware/auth');
-const { clearPreviewOwnershipCache } = await import('../shared/preview-ownership');
 
 interface PreviewAuthVariables {
   userId?: string;
@@ -93,10 +113,10 @@ function createApp() {
 }
 
 beforeEach(() => {
+  mockCanAccess = true;
   mockSandboxAccountId = 'acct-owner';
   mockResolvedAccountId = 'acct-owner';
   mockSupabaseUser = null;
-  clearPreviewOwnershipCache();
 });
 
 describe('preview auth ownership', () => {
@@ -132,6 +152,7 @@ describe('preview auth ownership', () => {
 
   test('rejects non-owner aether token', async () => {
     const app = createApp();
+    mockCanAccess = false;
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
       headers: { Authorization: 'Bearer aether_other' },
     });
@@ -161,6 +182,7 @@ describe('preview auth ownership', () => {
   test('rejects jwt user without ownership', async () => {
     const app = createApp();
     mockResolvedAccountId = 'acct-other';
+    mockCanAccess = false;
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
       headers: { Authorization: 'Bearer jwt-other' },
     });
@@ -192,6 +214,7 @@ describe('preview auth ownership', () => {
   test('rejects jwt via Supabase fallback without ownership', async () => {
     const app = createApp();
     mockResolvedAccountId = 'acct-other';
+    mockCanAccess = false;
     mockSupabaseUser = { id: 'user-fallback-other', email: 'other@aether.dev' };
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
       headers: { Authorization: 'Bearer jwt-fallback-other' },
@@ -201,7 +224,7 @@ describe('preview auth ownership', () => {
 
   test('rejects access when sandbox cannot be resolved', async () => {
     const app = createApp();
-    mockSandboxAccountId = null;
+    mockCanAccess = false;
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
       headers: { Authorization: 'Bearer aether_owner' },
     });

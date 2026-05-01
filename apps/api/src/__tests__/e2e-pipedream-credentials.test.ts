@@ -12,16 +12,30 @@
  *   - provider resolution: getProviderFromRequest with all 3 tiers
  *   - e2e flow: sandbox pushes creds → API stores → frontend resolves
  */
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'bun:test';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, mock } from 'bun:test';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { sql, eq, and } from 'drizzle-orm';
-import { integrationCredentials } from '@aether/db';
+import { integrationCredentials, createDb } from '@aether/db';
 import {
   getTestDb,
   TEST_USER_ID,
   OTHER_USER_ID,
 } from './helpers';
+
+// Register a ../shared/db mock that delegates to the REAL test database.
+// This MUST happen at the top level (before any describe/it) to win the
+// first-registration race against other test files that mock ../shared/db
+// with incomplete stubs (e2e-router, unit-preview-auth, etc.).
+// Bun's mock.module() is process-global and first-registration-wins.
+const _HAS_DB = !!process.env.DATABASE_URL;
+if (_HAS_DB) {
+  const _realDb = createDb(process.env.DATABASE_URL!);
+  mock.module('../shared/db', () => ({
+    hasDatabase: true,
+    db: _realDb,
+  }));
+}
 
 const HAS_DB = !!process.env.DATABASE_URL;
 
@@ -71,9 +85,11 @@ function createPipedreamTestApp(opts: { userId?: string; accountId?: string } = 
   const app = new Hono<any>();
 
   // Auth stub — simulates supabaseAuth / apiKeyAuth
+  // IMPORTANT: always set accountId in context to bypass resolveAccountIdStrict,
+  // which may be mocked by other test files (Bun mock.module is process-global).
   app.use('/v1/*', async (c, next) => {
     c.set('userId', opts.userId || TEST_USER_ID);
-    if (opts.accountId) c.set('accountId', opts.accountId);
+    c.set('accountId', opts.accountId || '');
     await next();
   });
 
@@ -225,7 +241,7 @@ describe.skipIf(!HAS_DB)('Pipedream credential routes (e2e)', () => {
 
   beforeAll(async () => {
     accountId = await ensureTestAccount(TEST_USER_ID);
-    app = createPipedreamTestApp({ userId: TEST_USER_ID });
+    app = createPipedreamTestApp({ userId: TEST_USER_ID, accountId });
   });
 
   beforeEach(async () => {
@@ -338,7 +354,7 @@ describe.skipIf(!HAS_DB)('Pipedream credential routes (e2e)', () => {
 
   it('different users see different creds', async () => {
     const otherAccountId = await ensureTestAccount(OTHER_USER_ID);
-    const otherApp = createPipedreamTestApp({ userId: OTHER_USER_ID });
+    const otherApp = createPipedreamTestApp({ userId: OTHER_USER_ID, accountId: otherAccountId });
 
     await jsonPut(app, '/v1/pipedream/credentials', {
       client_id: 'user1',
@@ -487,7 +503,7 @@ describe.skipIf(!HAS_DB)('Full flow: sandbox push → DB → frontend resolve (e
 
   beforeAll(async () => {
     accountId = await ensureTestAccount(TEST_USER_ID);
-    app = createPipedreamTestApp({ userId: TEST_USER_ID });
+    app = createPipedreamTestApp({ userId: TEST_USER_ID, accountId });
   });
 
   beforeEach(async () => {

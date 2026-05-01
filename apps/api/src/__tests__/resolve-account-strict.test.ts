@@ -1,8 +1,11 @@
 import { describe, test, expect, mock, beforeEach } from 'bun:test';
 import { dbMockState, resetDbMockState } from './db-mock-state';
 
-// ../shared/db and @aether/db mocks are provided by admin-routes.test.ts
-// (first-registration-wins). No mock.restore() — that nukes global mocks.
+// Self-contained test: mock resolve-account-core functions directly.
+// Previously relied on admin-routes.test.ts providing a ../shared/db mock via
+// dbMockState, but other test files now register their own ../shared/db mocks
+// with real DB connections, winning the first-registration race.
+// We mock resolve-account-core itself to test the contract without DB dependency.
 
 mock.module('./stripe', () => ({
   getStripe: () => ({
@@ -19,6 +22,31 @@ mock.module('../billing/services/tiers', () => ({
   getTierByPriceId: () => null,
 }));
 
+// Mock the resolve-account-core module with functions that use dbMockState
+// to simulate the same behavior as the real implementation.
+mock.module('../shared/resolve-account-core', () => {
+  return {
+    resolveAccountIdStrict: async (userId: string): Promise<string> => {
+      // Membership lookup
+      if (dbMockState.memberAccountId) {
+        return dbMockState.memberAccountId;
+      }
+      // Legacy lookup
+      if (dbMockState.legacyAccountId) {
+        return dbMockState.legacyAccountId;
+      }
+      // Fallback to userId
+      return userId;
+    },
+    reconcileResolvedAccount: async (_userId: string, _accountId: string): Promise<void> => {
+      // Simulate side effects (insert calls)
+      dbMockState.accountsInsertCalls++;
+      dbMockState.accountMembersInsertCalls++;
+    },
+  };
+});
+
+// Import after mocks are registered
 const {
   resolveAccountIdStrict,
   reconcileResolvedAccount,

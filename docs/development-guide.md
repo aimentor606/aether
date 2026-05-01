@@ -172,18 +172,18 @@ pnpm db:migrate:mark-baseline
 pnpm db:studio
 ```
 
-### Local Supabase
+### Local Supabase (Self-Hosted)
 
-`pnpm dev` starts Supabase automatically. Manual control:
+`pnpm dev` starts the self-hosted Supabase stack automatically. Manual control:
 
 ```bash
-cd supabase
-supabase start     # Start
-supabase stop      # Stop
-supabase status    # Check status, show credentials
+cd scripts/supabase
+docker compose --env-file .env up -d     # Start all 13 services
+docker compose --env-file .env down      # Stop
+docker compose --env-file .env ps        # Check status
 ```
 
-Default Postgres: `127.0.0.1:54322`, Studio: `http://127.0.0.1:54323`
+Ports: Postgres `127.0.0.1:5434` (direct) / `5433` (pooler), Kong API `:8000`, Studio `:3000`, Auth `:9999`
 
 ### Remote Database (Supabase Cloud)
 
@@ -448,9 +448,9 @@ Key env vars used by API (set by dev-local.sh or Supabase):
 
 | Variable | Purpose | Default (local) |
 |----------|---------|-----------------|
-| `SUPABASE_URL` | Supabase endpoint | `http://127.0.0.1:54321` |
-| `SUPABASE_ANON_KEY` | Supabase anon key | From `supabase status` |
-| `DATABASE_URL` | Postgres connection | `http://127.0.0.1:54322` |
+| `SUPABASE_URL` | Supabase endpoint | `http://127.0.0.1:8000` |
+| `SUPABASE_ANON_KEY` | Supabase anon key | From `scripts/supabase/.env` |
+| `DATABASE_URL` | Postgres connection | `postgresql://postgres:...@127.0.0.1:5434/postgres` |
 
 ### VPS Deployment
 

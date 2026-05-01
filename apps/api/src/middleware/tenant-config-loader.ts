@@ -39,10 +39,6 @@ export function getCacheMetrics() {
   return { ...metrics, size: cache.size };
 }
 
-export function resetCacheMetrics() {
-  metrics = { hits: 0, misses: 0, evictions: 0, expirations: 0, size: 0 };
-}
-
 function getCacheKey(accountId: string): string {
   return `tenant:${accountId}`;
 }

@@ -36,13 +36,6 @@ const optInt = (def: number) =>
     return Number.isNaN(n) ? def : n;
   });
 
-/** Optional float with a default. */
-const optFloat = (def: number) =>
-  z.string().optional().default(String(def)).transform((v) => {
-    const n = parseFloat(v);
-    return Number.isNaN(n) ? def : n;
-  });
-
 /** Optional boolean — 'true' → true, anything else → false. */
 const optBoolTrue = z.string().optional().default('true').transform((v) => v !== 'false');
 const optBoolFalse = z.string().optional().default('false').transform((v) => v === 'true');
@@ -590,9 +583,6 @@ export const config = {
 /** Markup when Aether provides the API key. */
 export const AETHER_MARKUP = 1.2;
 
-/** Platform fee when user provides their own API key. */
-export const PLATFORM_FEE_MARKUP = 0.1;
-
 // ─── Tool Pricing (Router) ──────────────────────────────────────────────────
 
 export interface ToolPricing {
@@ -668,62 +658,4 @@ export function getToolCost(toolName: string, resultCount: number = 0): number {
   const base = pricing.baseCost * pricing.markupMultiplier;
   const perResult = pricing.perResultCost * pricing.markupMultiplier * resultCount;
   return base + perResult;
-}
-
-// ─── LLM Pricing (Router) ───────────────────────────────────────────────────
-
-export interface LLMPricing {
-  inputCostPer1M: number;
-  outputCostPer1M: number;
-  markupMultiplier: number;
-}
-
-export const LLM_PRICING: Record<string, LLMPricing> = {
-  litellm: {
-    inputCostPer1M: 0,
-    outputCostPer1M: 0,
-    markupMultiplier: 1.2,
-  },
-  anthropic: {
-    inputCostPer1M: 3.0,
-    outputCostPer1M: 15.0,
-    markupMultiplier: 1.2,
-  },
-  openai: {
-    inputCostPer1M: 2.5,
-    outputCostPer1M: 10.0,
-    markupMultiplier: 1.2,
-  },
-  xai: {
-    inputCostPer1M: 2.0,
-    outputCostPer1M: 10.0,
-    markupMultiplier: 1.2,
-  },
-  groq: {
-    inputCostPer1M: 0.05,
-    outputCostPer1M: 0.08,
-    markupMultiplier: 1.2,
-  },
-  gemini: {
-    inputCostPer1M: 1.25,
-    outputCostPer1M: 5.0,
-    markupMultiplier: 1.2,
-  },
-};
-
-export function calculateLLMCost(
-  provider: string,
-  inputTokens: number,
-  outputTokens: number,
-  providerReportedCost?: number
-): number {
-  const pricing = LLM_PRICING[provider] || LLM_PRICING['litellm'];
-
-  if (provider === 'litellm' && providerReportedCost !== undefined) {
-    return providerReportedCost * pricing.markupMultiplier;
-  }
-
-  const inputCost = (inputTokens / 1_000_000) * pricing.inputCostPer1M;
-  const outputCost = (outputTokens / 1_000_000) * pricing.outputCostPer1M;
-  return (inputCost + outputCost) * pricing.markupMultiplier;
 }

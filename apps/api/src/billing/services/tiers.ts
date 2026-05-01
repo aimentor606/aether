@@ -3,7 +3,6 @@ import { config } from '../../config';
 
 export const TOKEN_PRICE_MULTIPLIER = 1.2;
 export const MINIMUM_CREDIT_FOR_RUN = 0.01;
-export const DEFAULT_TOKEN_COST = 0.000002;
 export const CREDITS_PER_DOLLAR = 100;
 
 /** One-time credit grant per machine provisioned ($5 = 500 display credits). */
@@ -168,10 +167,6 @@ function getStripePrices(): StripePriceConfig {
   return config.INTERNAL_AETHER_ENV === 'prod' ? STRIPE_PRICES_PROD : STRIPE_PRICES_STAGING;
 }
 
-export function getProductId(): string {
-  return getStripePrices().productId;
-}
-
 export function getComputeProductId(): string {
   return getStripePrices().computeProductId;
 }
@@ -189,10 +184,6 @@ export function resolvePriceId(tierKey: string, billingPeriod?: string): string 
 export function resolveCreditPriceId(amountDollars: number): string | null {
   const prices = getStripePrices();
   return prices.credits[amountDollars] ?? null;
-}
-
-export function getCreditPackageAmounts(): number[] {
-  return Object.keys(getStripePrices().credits).map(Number).sort((a, b) => a - b);
 }
 
 // ─── Price ID ↔ Tier reverse lookup ─────────────────────────────────────────
@@ -225,16 +216,8 @@ export function getTierByPriceId(priceId: string): TierConfig | null {
   return name ? TIERS[name] ?? null : null;
 }
 
-export function getAllTiers(): TierConfig[] {
-  return Object.values(TIERS);
-}
-
 export function getVisibleTiers(): TierConfig[] {
   return Object.values(TIERS).filter((t) => !t.hidden && t.name !== 'none');
-}
-
-export function isValidTier(name: string): boolean {
-  return name in TIERS;
 }
 
 export function getMonthlyCredits(tierName: string): number {

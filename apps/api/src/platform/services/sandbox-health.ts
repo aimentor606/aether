@@ -41,10 +41,6 @@ const SYNC_BACKOFF_MS = [2_000, 5_000, 10_000]; // progressive backoff
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
-export function getSandboxHealthState(): SandboxHealthState {
-  return { ...state };
-}
-
 /**
  * Start the periodic health monitor.
  * Safe to call multiple times — only one interval runs.

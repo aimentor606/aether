@@ -43,22 +43,3 @@ export function getTenantContext(): TenantConfig | undefined {
     return undefined;
   }
 }
-
-/**
- * Check if a feature flag is enabled for the current tenant.
- * Returns `defaultValue` (default false) if tenant context or flag is not set.
- */
-export function isFeatureEnabled(flagName: string, defaultValue = false): boolean {
-  const tenant = getTenantContext();
-  if (!tenant) return defaultValue;
-  return tenant.flags[flagName] ?? defaultValue;
-}
-
-/**
- * Get a config value for the current tenant.
- */
-export function getTenantConfigValue<T = unknown>(key: string): T | undefined {
-  const tenant = getTenantContext();
-  if (!tenant) return undefined;
-  return tenant.config[key] as T | undefined;
-}

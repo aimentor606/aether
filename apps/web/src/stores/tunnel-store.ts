@@ -74,7 +74,9 @@ export const useTunnelStore = create<TunnelStoreState>()((set, get) => ({
   addPendingRequest: (request) => {
     set((state) => {
       // Deduplicate by requestId
-      if (state.pendingRequests.some((r) => r.requestId === request.requestId)) {
+      if (
+        state.pendingRequests.some((r) => r.requestId === request.requestId)
+      ) {
         return state;
       }
       return { pendingRequests: [...state.pendingRequests, request] };
@@ -83,7 +85,9 @@ export const useTunnelStore = create<TunnelStoreState>()((set, get) => ({
 
   removePendingRequest: (requestId) => {
     set((state) => ({
-      pendingRequests: state.pendingRequests.filter((r) => r.requestId !== requestId),
+      pendingRequests: state.pendingRequests.filter(
+        (r) => r.requestId !== requestId,
+      ),
     }));
   },
 
@@ -117,7 +121,8 @@ export const useTunnelStore = create<TunnelStoreState>()((set, get) => ({
           if (reconnectTimer) clearTimeout(reconnectTimer);
           reconnectTimer = setTimeout(() => {
             const { sseToken, sseApiUrl } = get();
-            if (sseToken && sseApiUrl) get().startSseStream(sseToken, sseApiUrl);
+            if (sseToken && sseApiUrl)
+              get().startSseStream(sseToken, sseApiUrl);
           }, 5_000);
         },
       });

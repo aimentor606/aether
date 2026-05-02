@@ -1,7 +1,6 @@
 "use client";
 
 import type {
-	FileDiff,
 	Message,
 	Part,
 	PermissionRequest,
@@ -9,6 +8,7 @@ import type {
 	SessionStatus,
 	Todo,
 } from "@opencode-ai/sdk/v2/client";
+import type { FileDiff } from "@/ui/types";
 import { useEffect, useRef } from "react";
 import { getClient } from "@/lib/opencode-sdk";
 import {

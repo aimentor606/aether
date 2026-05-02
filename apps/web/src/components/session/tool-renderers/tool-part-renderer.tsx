@@ -1,23 +1,13 @@
 'use client';
 
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-import {
-  CircleAlert,
-} from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { CircleAlert } from 'lucide-react';
 import { QuestionPrompt } from '@/components/session/question-prompt';
 import { Button } from '@/components/ui/button';
 import { ToolRegistry } from './registry';
-import {
-  BasicTool,
-  ToolRunningContext,
-  StalePendingContext,
-} from './shared';
+import { BasicTool, ToolRunningContext, StalePendingContext } from './shared';
+import { ToolError } from './tool-error';
+import { GenericTool } from './generic-tool';
 import {
   PERMISSION_LABELS,
   type PermissionRequest,

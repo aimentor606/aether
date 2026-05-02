@@ -46,8 +46,16 @@ export type {
   Model,
   Provider,
   Todo,
-  FileDiff,
 } from '@opencode-ai/sdk/v2/client';
+
+export interface FileDiff {
+  file: string;
+  before: string;
+  after: string;
+  additions: number;
+  deletions: number;
+  status: 'added' | 'deleted' | 'modified';
+}
 
 // ---------------------------------------------------------------------------
 // View-model types

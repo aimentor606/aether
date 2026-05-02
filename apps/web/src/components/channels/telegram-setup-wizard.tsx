@@ -1,33 +1,45 @@
-"use client";
+'use client';
 
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import {
-  ArrowLeft,
-  CheckCircle2,
-  Loader2,
-  ExternalLink,
-} from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Loader2, ExternalLink } from 'lucide-react';
 import { TelegramIcon } from '@/components/ui/icons/telegram';
 import { toast } from 'sonner';
-import { useTelegramVerifyToken, useTelegramConnect } from '@/hooks/channels/use-telegram-wizard';
-import { AgentSelector, flattenModels } from '@/components/session/session-chat-input';
+import {
+  useTelegramVerifyToken,
+  useTelegramConnect,
+} from '@/hooks/channels/use-telegram-wizard';
+import { AgentSelector } from '@/components/session/session-chat-input';
+import { flattenModels } from '@/lib/models';
 import { ModelSelector } from '@/components/session/model-selector';
-import { useOpenCodeAgents, useOpenCodeProviders } from '@/hooks/opencode/use-opencode-sessions';
+import {
+  useOpenCodeAgents,
+  useOpenCodeProviders,
+} from '@/hooks/opencode/use-opencode-sessions';
 
 interface TelegramSetupWizardProps {
   onCreated: () => void;
   onBack: () => void;
 }
 
-export function TelegramSetupWizard({ onCreated, onBack }: TelegramSetupWizardProps) {
+export function TelegramSetupWizard({
+  onCreated,
+  onBack,
+}: TelegramSetupWizardProps) {
   const [botToken, setBotToken] = useState('');
-  const [botInfo, setBotInfo] = useState<{ id: number; username: string; firstName: string } | null>(null);
+  const [botInfo, setBotInfo] = useState<{
+    id: number;
+    username: string;
+    firstName: string;
+  } | null>(null);
   const [agentName, setAgentName] = useState<string | null>('aether');
-  const [selectedModel, setSelectedModel] = useState<{ providerID: string; modelID: string } | null>(null);
+  const [selectedModel, setSelectedModel] = useState<{
+    providerID: string;
+    modelID: string;
+  } | null>(null);
 
   const verifyToken = useTelegramVerifyToken();
   const connect = useTelegramConnect();
@@ -98,7 +110,9 @@ export function TelegramSetupWizard({ onCreated, onBack }: TelegramSetupWizardPr
         </div>
         <div>
           <h3 className="text-base font-semibold">Telegram Setup</h3>
-          <p className="text-xs text-muted-foreground">Connect a Telegram bot to your agent</p>
+          <p className="text-xs text-muted-foreground">
+            Connect a Telegram bot to your agent
+          </p>
         </div>
       </div>
 
@@ -106,20 +120,27 @@ export function TelegramSetupWizard({ onCreated, onBack }: TelegramSetupWizardPr
         {/* Instructions */}
         <div className="rounded-xl border border-border/50 bg-muted/30 p-4 text-sm text-muted-foreground space-y-2">
           <p>
-            <span className="font-medium text-foreground">1.</span>{' '}
-            Open{' '}
-            <a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
+            <span className="font-medium text-foreground">1.</span> Open{' '}
+            <a
+              href="https://t.me/BotFather"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline inline-flex items-center gap-1"
+            >
               @BotFather <ExternalLink className="h-3 w-3" />
             </a>{' '}
             in Telegram
           </p>
           <p>
-            <span className="font-medium text-foreground">2.</span>{' '}
-            Send <code className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs">/newbot</code> and follow the prompts
+            <span className="font-medium text-foreground">2.</span> Send{' '}
+            <code className="px-1.5 py-0.5 rounded bg-muted text-foreground text-xs">
+              /newbot
+            </code>{' '}
+            and follow the prompts
           </p>
           <p>
-            <span className="font-medium text-foreground">3.</span>{' '}
-            Copy the bot token and paste it below
+            <span className="font-medium text-foreground">3.</span> Copy the bot
+            token and paste it below
           </p>
         </div>
 
@@ -141,10 +162,16 @@ export function TelegramSetupWizard({ onCreated, onBack }: TelegramSetupWizardPr
           <div className="flex items-center gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
             <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">@{botInfo.username}</p>
-              <p className="text-[11px] text-muted-foreground">{botInfo.firstName}</p>
+              <p className="text-sm font-medium text-foreground">
+                @{botInfo.username}
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                {botInfo.firstName}
+              </p>
             </div>
-            <Badge variant="highlight" className="text-[11px]">Verified</Badge>
+            <Badge variant="highlight" className="text-[11px]">
+              Verified
+            </Badge>
           </div>
         )}
 

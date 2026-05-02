@@ -19,6 +19,18 @@
       }
     ],
     "paths": {
+      "@aether/ui": [
+        "../../packages/ui/src"
+      ],
+      "@aether/ui/*": [
+        "../../packages/ui/src/*"
+      ],
+      "@aether/sdk": [
+        "../../packages/sdk/src"
+      ],
+      "@aether/sdk/*": [
+        "../../packages/sdk/src/*"
+      ],
       "@/*": [
         "./src/*"
       ],

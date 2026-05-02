@@ -155,22 +155,8 @@ export const PROVIDER_REGISTRY: ProviderDef[] = [
 
 // ─── Derived Helpers ──────────────────────────────────────────
 
-/** LLM providers only */
-export const LLM_PROVIDERS = PROVIDER_REGISTRY.filter((p) => p.category === 'llm');
-
-/** Tool providers only */
-export const TOOL_PROVIDERS = PROVIDER_REGISTRY.filter((p) => p.category === 'tool');
-
 /** All env key names that should be synced to the sandbox */
 export const ALL_SANDBOX_ENV_KEYS = new Set(PROVIDER_REGISTRY.flatMap((p) => p.envKeys));
-
-/** All LLM env key names (for the "at least one required" check) */
-export const LLM_ENV_KEYS = LLM_PROVIDERS.flatMap((p) => p.envKeys);
-
-/** Lookup: env key name → ProviderDef */
-export const PROVIDER_BY_ENV_KEY = new Map(
-  PROVIDER_REGISTRY.flatMap((p) => p.envKeys.map((k) => [k, p] as const)),
-);
 
 /** Lookup: provider ID → ProviderDef */
 export const PROVIDER_BY_ID = new Map(PROVIDER_REGISTRY.map((p) => [p.id, p] as const));

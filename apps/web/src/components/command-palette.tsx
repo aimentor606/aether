@@ -63,7 +63,7 @@ import { isBillingEnabled } from '@/lib/config';
 import { useTheme } from 'next-themes';
 import { clearUserLocalStorage } from '@/lib/utils/clear-local-storage';
 import { useAdminRole } from '@/hooks/admin';
-import { flattenModels } from '@/components/session/session-chat-input';
+import { flattenModels } from '@/lib/models';
 import { useModelStore } from '@/hooks/opencode/use-model-store';
 import {
   PROVIDER_LABELS,

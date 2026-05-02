@@ -14,7 +14,7 @@
  */
 
 import { useMemo, useCallback, useSyncExternalStore } from 'react';
-import type { FlatModel } from '@/components/session/session-chat-input';
+import type { FlatModel } from '@/lib/models';
 
 // ============================================================================
 // Types

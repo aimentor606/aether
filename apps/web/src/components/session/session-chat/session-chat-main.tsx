@@ -12,10 +12,10 @@ import {
   X,
 } from 'lucide-react';
 import {
-  type AttachedFile,
   SessionChatInput,
   type TrackedMention,
 } from '@/components/session/session-chat-input';
+import type { AttachedFile } from '@/lib/models';
 import { SessionContextModal } from '@/components/session/session-context-modal';
 import { SessionSiteHeader } from '@/components/session/session-site-header';
 import {

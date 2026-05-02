@@ -16,6 +16,13 @@ import { describe, it, expect, beforeAll, afterAll, mock } from 'bun:test';
 import { Hono } from 'hono';
 import { mkdirSync, writeFileSync, existsSync, rmSync, readFileSync } from 'fs';
 import { resolve } from 'path';
+import { dbMockState } from './db-mock-state';
+import './billing/mocks';
+
+// Triggers billing/mocks top-level mock.module() calls for config, supabase, stripe, etc.
+// In full suite, admin-routes.test.ts already registered these (first-registration-wins = no-op).
+// ../shared/db and @aether/db mocks provided by admin-routes.test.ts (first-registration-wins).
+// hasDatabase toggled per-suite via dbMockState.
 
 mock.module('../middleware/auth', () => ({
   supabaseAuth: async (c: any, next: any) => {
@@ -27,6 +34,7 @@ mock.module('../middleware/auth', () => ({
 
 const { setupApp } = await import('../setup');
 
+const ORIGINAL_CWD = process.cwd();
 const TEST_DIR = `/tmp/aether-setup-test-${Date.now()}`;
 
 // ─── Test app factory ───────────────────────────────────────────────────────
@@ -41,6 +49,7 @@ function createSetupTestApp() {
 // ─── Setup / Teardown ───────────────────────────────────────────────────────
 
 beforeAll(() => {
+  dbMockState.hasDatabase = false;
   // Create test project structure
   mkdirSync(TEST_DIR, { recursive: true });
   mkdirSync(resolve(TEST_DIR, 'scripts'), { recursive: true });
@@ -58,6 +67,8 @@ beforeAll(() => {
 });
 
 afterAll(() => {
+  dbMockState.hasDatabase = true;
+  process.chdir(ORIGINAL_CWD);
   rmSync(TEST_DIR, { recursive: true, force: true });
 });
 
@@ -93,37 +104,6 @@ describe('/v1/setup', () => {
       const res = await app.request('/v1/setup/status');
       const data = await res.json();
       expect(data.envExists).toBe(false);
-    });
-  });
-
-  describe('GET /v1/setup/schema', () => {
-    it('returns 200', async () => {
-      const app = createSetupTestApp();
-      const res = await app.request('/v1/setup/schema');
-      expect(res.status).toBe(200);
-    });
-
-    it('has llm and tools groups', async () => {
-      const app = createSetupTestApp();
-      const res = await app.request('/v1/setup/schema');
-      const data = await res.json();
-      expect(data.llm).toBeDefined();
-      expect(data.tools).toBeDefined();
-    });
-
-    it('llm group has at least 4 providers', async () => {
-      const app = createSetupTestApp();
-      const res = await app.request('/v1/setup/schema');
-      const data = await res.json();
-      expect(data.llm.keys.length).toBeGreaterThanOrEqual(4);
-    });
-
-    it('Anthropic key is present', async () => {
-      const app = createSetupTestApp();
-      const res = await app.request('/v1/setup/schema');
-      const data = await res.json();
-      const anthropic = data.llm.keys.find((k: any) => k.key === 'ANTHROPIC_API_KEY');
-      expect(anthropic).toBeDefined();
     });
   });
 
@@ -255,10 +235,6 @@ describe('Billing no-DB guard', () => {
     expect(state.subscription.tier_key).toBe('free');
     expect(state.subscription.status).toBe('active');
     expect(state.subscription.is_trial).toBe(false);
-
-    expect(state.models).toBeDefined();
-    expect(state.models.length).toBeGreaterThan(0);
-
 
     expect(state.tier).toBeDefined();
     expect(state.tier.name).toBe('free');

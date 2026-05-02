@@ -6,7 +6,13 @@
  */
 
 import { log } from '@/lib/logger';
-import { useMutation, useQuery, useQueryClient, type UseMutationOptions, type UseQueryOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type UseMutationOptions,
+  type UseQueryOptions,
+} from '@tanstack/react-query';
 import { API_URL, getAuthHeaders } from '@/api/config';
 import type {
   Agent,
@@ -48,9 +54,12 @@ export function useAgents(
       if (params.search) queryParams.append('search', params.search);
       if (params.sort_by) queryParams.append('sort_by', params.sort_by);
       if (params.sort_order) queryParams.append('sort_order', params.sort_order);
-      if (params.has_default !== undefined) queryParams.append('has_default', params.has_default.toString());
-      if (params.has_mcp_tools !== undefined) queryParams.append('has_mcp_tools', params.has_mcp_tools.toString());
-      if (params.has_agentpress_tools !== undefined) queryParams.append('has_agentpress_tools', params.has_agentpress_tools.toString());
+      if (params.has_default !== undefined)
+        queryParams.append('has_default', params.has_default.toString());
+      if (params.has_mcp_tools !== undefined)
+        queryParams.append('has_mcp_tools', params.has_mcp_tools.toString());
+      if (params.has_agentpress_tools !== undefined)
+        queryParams.append('has_agentpress_tools', params.has_agentpress_tools.toString());
       if (params.tools) queryParams.append('tools', params.tools);
       if (params.content_type) queryParams.append('content_type', params.content_type);
 
@@ -73,9 +82,10 @@ export function useAgents(
     gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
     retry: (failureCount, error) => {
       // Don't retry on client errors (4xx) - these won't resolve on retry
-      const is4xxError = error.message.includes('401') ||
-                         error.message.includes('403') ||
-                         error.message.includes('429');
+      const is4xxError =
+        error.message.includes('401') ||
+        error.message.includes('403') ||
+        error.message.includes('429');
       if (is4xxError) {
         log.log('🚫 Not retrying due to client error:', error.message);
         return false;
@@ -115,9 +125,7 @@ export function useAgent(
 // Agent Mutation Hooks
 // ============================================================================
 
-export function useCreateAgent(
-  options?: UseMutationOptions<Agent, Error, AgentCreateRequest>
-) {
+export function useCreateAgent(options?: UseMutationOptions<Agent, Error, AgentCreateRequest>) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -164,9 +172,7 @@ export function useUpdateAgent(
   });
 }
 
-export function useDeleteAgent(
-  options?: UseMutationOptions<void, Error, string>
-) {
+export function useDeleteAgent(options?: UseMutationOptions<void, Error, string>) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -186,14 +192,12 @@ export function useDeleteAgent(
   });
 }
 
-export function useCreateNewAgent(
-  options?: UseMutationOptions<Agent, Error, AgentCreateRequest>
-) {
+export function useCreateNewAgent(options?: UseMutationOptions<Agent, Error, AgentCreateRequest>) {
   const createAgentMutation = useCreateAgent();
 
   return useMutation({
     mutationFn: async (agentData: AgentCreateRequest) => {
-      const defaultAgentData: AgentCreateRequest = {
+      const defaults: Partial<AgentCreateRequest> = {
         name: 'New Worker',
         description: 'A newly created worker, open for configuration',
         configured_mcps: [],
@@ -202,14 +206,10 @@ export function useCreateNewAgent(
         icon_name: 'brain',
         icon_color: '#000000',
         icon_background: '#F3F4F6',
-        ...agentData,
       };
+      const defaultAgentData: AgentCreateRequest = { ...defaults, ...agentData };
       return createAgentMutation.mutateAsync(defaultAgentData);
     },
     ...options,
   });
 }
-
-
-
-

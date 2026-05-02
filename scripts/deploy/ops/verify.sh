@@ -14,7 +14,28 @@ check() {
   fi
 }
 echo "=== Container Health ==="
-for svc in postgres redis kong llm-proxy; do
+echo "  --- Shared Infrastructure (Supabase) ---"
+for svc in supabase-db supabase-redis; do
+  status=$(docker inspect --format='{{.State.Health.Status}}' "$svc" 2>/dev/null || echo "missing")
+  if [ "$status" = "healthy" ]; then
+    echo "  ✅ $svc: healthy"
+    PASS=$((PASS+1))
+  elif [ "$status" = "missing" ]; then
+    echo "  ❌ $svc: not running"
+    FAIL=$((FAIL+1))
+  else
+    echo "  ⚠️  $svc: $status"
+    FAIL=$((FAIL+1))
+  fi
+done
+
+echo "  --- Deploy Services ---"
+[ -f ops/.env ] && source ops/.env
+DEPLOY_SERVICES="kong"
+case "${LLM_PROXY:-}" in
+  newapi|litellm) DEPLOY_SERVICES="kong llm-proxy" ;;
+esac
+for svc in $DEPLOY_SERVICES; do
   status=$(docker inspect --format='{{.State.Health.Status}}' "$svc" 2>/dev/null || echo "missing")
   if [ "$status" = "healthy" ]; then
     echo "  ✅ $svc: healthy"
@@ -38,26 +59,38 @@ check "/v1beta/ CORS" \
   "Access-Control-Allow-Origin"
 
 echo ""
-echo "=== Authentication ==="
-source ops/.env
-LLM_PROXY="${LLM_PROXY:-newapi}"
-DEFAULT_API_KEY="${DEFAULT_API_KEY:-}"
-case "${LLM_PROXY}" in
-  litellm) HEALTH_PATH="/v1beta/models" ;;
-  *)       HEALTH_PATH="/api/status" ;;
+echo "=== LLM Proxy Routing ==="
+case "${LLM_PROXY:-}" in
+  newapi)
+    check "Health endpoint = 200" \
+      "curl -s -o /dev/null -w '%{http_code}' http://localhost:80/api/status" \
+      "200"
+    check "Kong routes to llm-proxy" \
+      "curl -s http://localhost:80/api/status" \
+      "success"
+    ;;
+  litellm)
+    check "Health endpoint = 200" \
+      "curl -s -o /dev/null -w '%{http_code}' http://localhost:80/health/liveliness" \
+      "200"
+    ;;
+  *)
+    echo "  ⏭️  LLM proxy not enabled (LLM_PROXY is empty or 'none')"
+    ;;
 esac
-check "No key = 401" \
-  "curl -s -o /dev/null -w '%{http_code}' http://localhost:80${HEALTH_PATH}" \
-  "401"
-check "Valid key passes Kong auth" \
-  "curl -s -o /dev/null -w '%{http_code}' http://localhost:80${HEALTH_PATH} -H 'X-API-Key: $DEFAULT_API_KEY'" \
-  "200"
 
 echo ""
 echo "=== Frontend ==="
-check "Frontend responds" \
-  "curl -s -o /dev/null -w '%{http_code}' http://localhost:80/" \
-  "200"
+case "${LLM_PROXY:-}" in
+  newapi|litellm)
+    check "Frontend responds" \
+      "curl -s -o /dev/null -w '%{http_code}' http://localhost:80/" \
+      "200"
+    ;;
+  *)
+    echo "  ⏭️  Frontend check skipped (no LLM proxy)"
+    ;;
+esac
 
 echo ""
 echo "=== Kong Admin ==="

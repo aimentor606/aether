@@ -10,31 +10,32 @@ interface AgentAvatarProps extends ViewProps {
 
 /**
  * AgentAvatar Component - Agent-specific wrapper around unified Avatar
- * 
+ *
  * Uses the unified Avatar component with agent-specific configuration.
  * Automatically handles:
  * - Agent icon from backend (icon_name)
  * - Agent colors (icon_color, icon_background)
  * - SUNA/aether SUPER WORKER special case (Aether symbol)
  * - Fallback to agent name initial
- * 
+ *
  * @example
  * <AgentAvatar agent={agent} size={48} />
  */
 export function AgentAvatar({ agent, size = 48, style, ...props }: AgentAvatarProps) {
   // Check if this is the SUNA/aether SUPER WORKER
-  const isSunaAgent = agent?.metadata?.is_suna_default || 
-                      agent?.name?.toLowerCase() === 'suna' ||
-                      agent?.name?.toLowerCase() === 'superworker' ||
-                      agent?.name?.toLowerCase() === 'aether super worker';
+  const isSunaAgent =
+    agent?.metadata?.is_suna_default ||
+    agent?.name?.toLowerCase() === 'suna' ||
+    agent?.name?.toLowerCase() === 'superworker' ||
+    agent?.name?.toLowerCase() === 'aether super worker';
 
   return (
     <Avatar
       variant="agent"
       size={size}
       icon={agent?.icon_name || undefined}
-      iconColor={isSunaAgent ? undefined : agent?.icon_color}
-      backgroundColor={isSunaAgent ? undefined : agent?.icon_background}
+      iconColor={isSunaAgent ? undefined : (agent?.icon_color ?? undefined)}
+      backgroundColor={isSunaAgent ? undefined : (agent?.icon_background ?? undefined)}
       useAetherSymbol={isSunaAgent}
       fallbackText={agent?.name}
       style={style}
@@ -42,4 +43,3 @@ export function AgentAvatar({ agent, size = 48, style, ...props }: AgentAvatarPr
     />
   );
 }
-

@@ -240,6 +240,8 @@ export function createTestApp(opts: TestAppOptions = {}) {
         providerMap.set('local_docker', createMockProvider('local_docker'));
       }
 
+      const createdSandboxIds = new Set<string>();
+
       const deps = {
         db,
         getProvider: (name: ProviderName) => {
@@ -252,6 +254,30 @@ export function createTestApp(opts: TestAppOptions = {}) {
           opts.availableProviders || Array.from(providerMap.keys()),
         resolveAccountId: async (uid: string) => uid,
         useAuth: false,
+        ensureSandbox: async ({ accountId, userId, provider }: { accountId: string; userId: string; provider?: ProviderName }) => {
+          const providerName = provider || (opts.defaultProvider || 'local_docker');
+          const prov = providerMap.get(providerName);
+          if (!prov) throw new Error(`Mock provider not configured for: ${providerName}`);
+
+          if (createdSandboxIds.has(accountId)) {
+            const rows = await db.select().from(sandboxes).where(sql`account_id = ${accountId}`).limit(1);
+            return { row: rows[0], created: false };
+          }
+
+          const result = await prov.create({ accountId, userId, name: `sandbox-${accountId.slice(0, 8)}` });
+          const [row] = await db.insert(sandboxes).values({
+            externalId: result.externalId,
+            name: `sandbox-${accountId.slice(0, 8)}`,
+            provider: providerName,
+            baseUrl: result.baseUrl,
+            status: 'active',
+            metadata: result.metadata,
+            accountId,
+          }).returning();
+          createdSandboxIds.add(accountId);
+          return { row, created: true };
+        },
+        generateSandboxName: async (accountId: string) => `sandbox-${accountId.slice(0, 8)}`,
       };
 
       const accountRouter = createAccountRouter(deps);

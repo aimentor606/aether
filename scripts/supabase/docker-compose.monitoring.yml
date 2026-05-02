@@ -1,0 +1,39 @@
+# Monitoring overlay for self-hosted Supabase stack
+# Usage: docker compose -f docker-compose.yml -f docker-compose.monitoring.yml --env-file .env up -d
+#
+# Exposes:
+#   Prometheus  http://localhost:9090
+#   Grafana     http://localhost:3001  (admin / ${GRAFANA_PASSWORD:-admin})
+
+services:
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: supabase-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./volumes/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - default
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: supabase-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    volumes:
+      - ./volumes/monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./volumes/monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus-data:
+  grafana-data:

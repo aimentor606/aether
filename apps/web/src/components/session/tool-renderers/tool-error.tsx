@@ -1,19 +1,14 @@
 'use client';
 
-import React, {
-  useState,
-  useMemo,
-} from 'react';
-import {
-  Ban,
-  ChevronRight,
-  CircleAlert,
-} from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Ban, ChevronRight, CircleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { hasStructuredContent, normalizeToolOutput, parseStructuredOutput } from '@/lib/utils/structured-output';
 import {
-  StructuredOutput,
-} from './shared';
+  hasStructuredContent,
+  normalizeToolOutput,
+  parseStructuredOutput,
+} from '@/lib/utils/structured-output';
+import { StructuredOutput } from './shared';
 
 // ============================================================================
 // ToolError

@@ -1,44 +1,51 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
+import type { RGBColor } from 'colorthief';
+import * as ColorThiefModule from 'colorthief';
 import { motion, useScroll } from 'framer-motion';
-import { backendApi } from '@/lib/api-client';
-import { getEnv } from '@/lib/env-config';
 import {
+  ArrowLeft,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  Code,
   Download,
+  FileText,
+  GitBranch,
+  Globe,
+  Moon,
+  Plug,
   Share2,
   Sparkles,
-  Calendar,
-  User,
-  Tag,
-  Wrench,
-  Plug,
-  Code,
-  Globe,
-  Terminal,
-  GitBranch,
-  ArrowLeft,
-  Moon,
   Sun,
-  FileText,
-  ChevronDown,
-  ChevronUp
+  Tag,
+  Terminal,
+  User,
+  Wrench,
 } from 'lucide-react';
-import { AetherLoader } from '@/components/ui/aether-loader';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
+import React, { useEffect, useRef, useState } from 'react';
 import { UnifiedMarkdown } from '@/components/markdown';
+import { AetherLogo } from '@/components/sidebar/aether-logo';
+import { AgentAvatar } from '@/components/shared-ui/content/agent-avatar';
+import { AetherLoader } from '@/components/ui/aether-loader';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { backendApi } from '@/lib/api-client';
+import { getEnv } from '@/lib/env-config';
 import { toast } from '@/lib/toast';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useTheme } from 'next-themes';
-import ColorThief from 'colorthief';
-import { AgentAvatar } from '@/components/thread/content/agent-avatar';
-import { AetherLogo } from '@/components/sidebar/aether-logo';
 
 interface MarketplaceTemplate {
   template_id: string;
@@ -70,6 +77,28 @@ interface MarketplaceTemplate {
   }>;
 }
 
+type ColorThiefLike = {
+  getPalette: (image: HTMLImageElement, colorCount?: number) => RGBColor[];
+};
+
+type ColorThiefCtor = new () => ColorThiefLike;
+
+function resolveColorThiefCtor(): ColorThiefCtor | null {
+  const moduleCandidate = ColorThiefModule as unknown as {
+    default?: unknown;
+  };
+
+  if (typeof moduleCandidate.default === 'function') {
+    return moduleCandidate.default as ColorThiefCtor;
+  }
+
+  if (typeof (ColorThiefModule as unknown) === 'function') {
+    return ColorThiefModule as unknown as ColorThiefCtor;
+  }
+
+  return null;
+}
+
 const IntegrationIcon: React.FC<{
   qualifiedName: string;
   displayName: string;
@@ -80,13 +109,14 @@ const IntegrationIcon: React.FC<{
   const firstLetter = displayName.charAt(0).toUpperCase();
 
   const iconMap: Record<string, React.JSX.Element> = {
-    'github': <GitBranch size={size} />,
-    'browser': <Globe size={size} />,
-    'terminal': <Terminal size={size} />,
-    'code': <Code size={size} />,
+    github: <GitBranch size={size} />,
+    browser: <Globe size={size} />,
+    terminal: <Terminal size={size} />,
+    code: <Code size={size} />,
   };
 
-  const fallbackIcon = iconMap[qualifiedName.toLowerCase()] ||
+  const fallbackIcon =
+    iconMap[qualifiedName.toLowerCase()] ||
     iconMap[customType?.toLowerCase() || ''];
 
   if (fallbackIcon) {
@@ -102,8 +132,6 @@ const IntegrationIcon: React.FC<{
     </div>
   );
 };
-
-
 
 export default function TemplateSharePage() {
   const params = useParams();
@@ -123,7 +151,8 @@ export default function TemplateSharePage() {
     const element = document.getElementById(sectionId);
     if (element) {
       const yOffset = -100;
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
@@ -180,11 +209,17 @@ export default function TemplateSharePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [activeSection]);
 
-  const { data: template, isLoading, error } = useQuery({
+  const {
+    data: template,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['template-public', templateId],
     queryFn: async () => {
       const backendUrl = getEnv().BACKEND_URL || 'http://localhost:8008/v1';
-      const response = await fetch(`${backendUrl}/templates/public/${templateId}`);
+      const response = await fetch(
+        `${backendUrl}/templates/public/${templateId}`,
+      );
       if (!response.ok) {
         throw new Error('Template not found');
       }
@@ -193,12 +228,17 @@ export default function TemplateSharePage() {
     enabled: !!templateId,
   });
 
-  const rgbToHex = (r: number, g: number, b: number) => {
-    return '#' + [r, g, b].map(x => {
-      const hex = x.toString(16);
-      return hex.length === 1 ? '0' + hex : hex;
-    }).join('');
-  };
+  const rgbToHex = React.useCallback((r: number, g: number, b: number) => {
+    return (
+      '#' +
+      [r, g, b]
+        .map((x) => {
+          const hex = x.toString(16);
+          return hex.length === 1 ? '0' + hex : hex;
+        })
+        .join('')
+    );
+  }, []);
 
   useEffect(() => {
     if (template?.icon_name && template?.icon_background) {
@@ -212,30 +252,60 @@ export default function TemplateSharePage() {
         '#6366f1',
         '#8b5cf6',
         '#ec4899',
-        '#f43f5e'
+        '#f43f5e',
       ]);
       if (imageRef.current && imageLoaded) {
-        const colorThief = new ColorThief();
+        const ColorThiefCtor = resolveColorThiefCtor();
+        if (!ColorThiefCtor) {
+          setColorPalette([
+            '#6366f1',
+            '#8b5cf6',
+            '#ec4899',
+            '#f43f5e',
+            '#f97316',
+            '#facc15',
+          ]);
+          return;
+        }
+
+        const colorThief = new ColorThiefCtor();
         try {
           const palette = colorThief.getPalette(imageRef.current, 6);
-          const colors = palette.map((rgb: number[]) => rgbToHex(rgb[0], rgb[1], rgb[2]));
-          console.log('Extracted colors (hex):', colors);
-          setColorPalette(colors);
+          if (palette) {
+            const colors = palette.map((rgb: RGBColor) =>
+              rgbToHex(rgb[0], rgb[1], rgb[2]),
+            );
+            setColorPalette(colors);
+          }
         } catch (error) {
           console.error('Error extracting colors:', error);
           setColorPalette([
-            '#6366f1', '#8b5cf6', '#ec4899',
-            '#f43f5e', '#f97316', '#facc15'
+            '#6366f1',
+            '#8b5cf6',
+            '#ec4899',
+            '#f43f5e',
+            '#f97316',
+            '#facc15',
           ]);
         }
       }
     } else {
       setColorPalette([
-        '#6366f1', '#8b5cf6', '#ec4899',
-        '#f43f5e', '#f97316', '#facc15'
+        '#6366f1',
+        '#8b5cf6',
+        '#ec4899',
+        '#f43f5e',
+        '#f97316',
+        '#facc15',
       ]);
     }
-  }, [template?.icon_name, template?.icon_background, template?.icon_color, imageLoaded]);
+  }, [
+    template?.icon_name,
+    template?.icon_background,
+    template?.icon_color,
+    imageLoaded,
+    rgbToHex,
+  ]);
 
   const handleInstall = () => {
     if (!template) return;
@@ -256,7 +326,7 @@ export default function TemplateSharePage() {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -276,7 +346,9 @@ export default function TemplateSharePage() {
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
             <h2 className="text-2xl font-semibold mb-2">Template not found</h2>
-            <p className="text-muted-foreground mb-4">The template you're looking for doesn't exist or has been removed.</p>
+            <p className="text-muted-foreground mb-4">
+              The template you're looking for doesn't exist or has been removed.
+            </p>
             <Button onClick={() => router.push('/agents?tab=my-agents')}>
               Browse Agents
             </Button>
@@ -288,8 +360,12 @@ export default function TemplateSharePage() {
 
   const tools = template.mcp_requirements || [];
   const toolRequirements = tools.filter((req: any) => req.source === 'tool');
-  const integrations = toolRequirements.filter((tool: any) => !tool.custom_type || tool.custom_type !== 'sse');
-  const customTools = toolRequirements.filter((tool: any) => tool.custom_type === 'sse');
+  const integrations = toolRequirements.filter(
+    (tool: any) => !tool.custom_type || tool.custom_type !== 'sse',
+  );
+  const customTools = toolRequirements.filter(
+    (tool: any) => tool.custom_type === 'sse',
+  );
   const agentpressTools = Object.entries(template.agentpress_tools || {})
     .filter(([_, enabled]) => enabled)
     .map(([toolName]) => toolName);
@@ -310,9 +386,10 @@ export default function TemplateSharePage() {
     );
   };
 
-  const [color1, color2, color3, color4, color5, color6] = colorPalette.length >= 6
-    ? colorPalette
-    : ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#facc15'];
+  const [color1, color2, color3, color4, color5, color6] =
+    colorPalette.length >= 6
+      ? colorPalette
+      : ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#facc15'];
 
   const gradientStyle = {
     background: `radial-gradient(circle at 30% 20%, ${color2}90 0%, transparent 35%), radial-gradient(circle at 70% 80%, ${color3}80 0%, transparent 35%), radial-gradient(circle at 10% 60%, ${color1}85 0%, transparent 40%), radial-gradient(circle at 50% 50%, ${color4}70 0%, transparent 50%)`,
@@ -409,7 +486,7 @@ export default function TemplateSharePage() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     ref={imageRef}
-                    src={""}
+                    src={''}
                     alt={template.name}
                     className="w-full h-full object-cover"
                     crossOrigin="anonymous"
@@ -419,9 +496,14 @@ export default function TemplateSharePage() {
               </div>
               <div className="space-y-4">
                 <div>
-                  <h1 className="text-3xl font-medium tracking-tight">{template.name}</h1>
+                  <h1 className="text-3xl font-medium tracking-tight">
+                    {template.name}
+                  </h1>
                   {template.is_aether_team && (
-                    <Badge variant="secondary" className="mt-2 bg-primary/10 text-primary">
+                    <Badge
+                      variant="secondary"
+                      className="mt-2 bg-primary/10 text-primary"
+                    >
                       <Sparkles className="w-3 h-3 mr-1" />
                       Official Template
                     </Badge>
@@ -429,16 +511,27 @@ export default function TemplateSharePage() {
                 </div>
 
                 <p className="text-muted-foreground">
-                  {template.description || 'An AI agent template ready to be customized for your needs.'}
+                  {template.description ||
+                    'An AI agent template ready to be customized for your needs.'}
                 </p>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <User className="w-4 h-4" />
-                    <span>Created by <span className="text-foreground font-medium">{template.creator_name || 'Anonymous'}</span></span>
+                    <span>
+                      Created by{' '}
+                      <span className="text-foreground font-medium">
+                        {template.creator_name || 'Anonymous'}
+                      </span>
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Download className="w-4 h-4" />
-                    <span><span className="text-foreground font-medium">{template.download_count}</span> installs</span>
+                    <span>
+                      <span className="text-foreground font-medium">
+                        {template.download_count}
+                      </span>{' '}
+                      installs
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="w-4 h-4" />
@@ -447,21 +540,23 @@ export default function TemplateSharePage() {
                 </div>
                 {template.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
-                    {template.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary">
+                    {template.tags.map((tag) => (
+                      <Badge key={tag} variant="secondary">
                         {tag}
                       </Badge>
                     ))}
                   </div>
                 )}
-
               </div>
 
               {/* Content Navigation */}
               <div className="space-y-2">
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">Sections</h3>
+                <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                  Sections
+                </h3>
                 <nav className="space-y-1">
                   <button
+                    type="button"
                     onClick={() => scrollToSection('system-prompt')}
                     className="w-full px-3 py-2 text-sm rounded-lg transition-colors text-left flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   >
@@ -470,6 +565,7 @@ export default function TemplateSharePage() {
                   </button>
                   {hasIntegrations && (
                     <button
+                      type="button"
                       onClick={() => scrollToSection('integrations')}
                       className="w-full px-3 py-2 text-sm rounded-lg transition-colors text-left flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     >
@@ -483,7 +579,10 @@ export default function TemplateSharePage() {
           </div>
 
           <div className="lg:col-span-8 space-y-6">
-            <Card id="system-prompt" className="bg-transparent border-0 shadow-none">
+            <Card
+              id="system-prompt"
+              className="bg-transparent border-0 shadow-none"
+            >
               <CardHeader className="px-0">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <FileText className="w-5 h-5" />
@@ -496,42 +595,54 @@ export default function TemplateSharePage() {
               <CardContent className="px-0">
                 <div className="rounded-lg border bg-muted/10 p-6">
                   <div className="relative">
-                    <div className={cn(
-                      "transition-colors duration-300 overflow-hidden",
-                      !isPromptExpanded && "max-h-[600px]"
-                    )}>
-                      <UnifiedMarkdown 
-                        content={template.system_prompt || 'No system prompt available'} 
-                        className="prose prose-sm dark:prose-invert max-w-none" 
-                      />
-                      {!isPromptExpanded && template.system_prompt && template.system_prompt.length > 10000 && (
-                        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-muted/10 to-transparent pointer-events-none" />
+                    <div
+                      className={cn(
+                        'transition-colors duration-300 overflow-hidden',
+                        !isPromptExpanded && 'max-h-[600px]',
                       )}
-                    </div>
-                    {template.system_prompt && template.system_prompt.length > 10000 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsPromptExpanded(!isPromptExpanded)}
-                        className="mt-4 w-full justify-between text-muted-foreground hover:text-foreground"
-                      >
-                        <span>
-                          {isPromptExpanded ? 'Show less' : `Show more (${template.system_prompt.length.toLocaleString()} characters)`}
-                        </span>
-                        {isPromptExpanded ? (
-                          <ChevronUp className="h-4 w-4 ml-2" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4 ml-2" />
+                    >
+                      <UnifiedMarkdown
+                        content={
+                          template.system_prompt || 'No system prompt available'
+                        }
+                        className="prose prose-sm dark:prose-invert max-w-none"
+                      />
+                      {!isPromptExpanded &&
+                        template.system_prompt &&
+                        template.system_prompt.length > 10000 && (
+                          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-muted/10 to-transparent pointer-events-none" />
                         )}
-                      </Button>
-                    )}
+                    </div>
+                    {template.system_prompt &&
+                      template.system_prompt.length > 10000 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setIsPromptExpanded(!isPromptExpanded)}
+                          className="mt-4 w-full justify-between text-muted-foreground hover:text-foreground"
+                        >
+                          <span>
+                            {isPromptExpanded
+                              ? 'Show less'
+                              : `Show more (${template.system_prompt.length.toLocaleString()} characters)`}
+                          </span>
+                          {isPromptExpanded ? (
+                            <ChevronUp className="h-4 w-4 ml-2" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 ml-2" />
+                          )}
+                        </Button>
+                      )}
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {integrations.length > 0 && (
-              <Card id="integrations" className="bg-transparent border-0 shadow-none">
+              <Card
+                id="integrations"
+                className="bg-transparent border-0 shadow-none"
+              >
                 <CardHeader className="px-0">
                   <CardTitle className="text-xl flex items-center gap-2">
                     <Plug className="w-5 h-5" />
@@ -543,20 +654,24 @@ export default function TemplateSharePage() {
                 </CardHeader>
                 <CardContent className="px-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {integrations.map((integration: any, index: number) => (
+                    {integrations.map((integration: any) => (
                       <div
-                        key={index}
+                        key={integration.qualified_name}
                         className="flex items-center gap-3 p-3 rounded-lg border bg-background"
                       >
                         <IntegrationIcon
                           qualifiedName={integration.qualified_name}
-                          displayName={integration.display_name || integration.qualified_name}
+                          displayName={
+                            integration.display_name ||
+                            integration.qualified_name
+                          }
                           customType={integration.custom_type}
                           toolkitSlug={integration.toolkit_slug}
                         />
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate">
-                            {integration.display_name || integration.qualified_name}
+                            {integration.display_name ||
+                              integration.qualified_name}
                           </p>
                           {integration.enabled_tools?.length > 0 && (
                             <p className="text-xs text-muted-foreground">
@@ -583,9 +698,9 @@ export default function TemplateSharePage() {
                 </CardHeader>
                 <CardContent className="px-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {customTools.map((tool: any, index: number) => (
+                    {customTools.map((tool: any) => (
                       <div
-                        key={index}
+                        key={tool.qualified_name}
                         className="flex items-center gap-3 p-3 rounded-lg border bg-background"
                       >
                         <IntegrationIcon
@@ -641,4 +756,4 @@ export default function TemplateSharePage() {
       </div>
     </div>
   );
-} 
+}

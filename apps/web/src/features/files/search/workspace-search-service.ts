@@ -1,6 +1,7 @@
 import { getActiveOpenCodeUrl } from '@/stores/server-store';
 import { findFiles, listFiles } from '../api/opencode-files';
 import type { FileNode } from '../types';
+import { logger } from '@/lib/logger';
 import {
   type WorkspaceSearchEntry,
   type WorkspaceSearchOptions,
@@ -65,7 +66,11 @@ async function readDirectoryEntries(dirPath: string): Promise<WorkspaceSearchEnt
   try {
     const nodes = await listFiles(dirPath);
     return dedupeWorkspaceSearchEntries(nodes.map(nodeToWorkspaceEntry));
-  } catch {
+  } catch (error) {
+    logger.warn('Workspace search failed to read directory entries', {
+      dirPath,
+      error,
+    });
     return [];
   }
 }
@@ -76,20 +81,38 @@ async function getBackendEntries(
 ): Promise<WorkspaceSearchEntry[]> {
   const limit = options.apiLimit ?? Math.max(options.limit ?? 50, 100);
 
+  const findFilesSafe = async (
+    reason: string,
+    args: Parameters<typeof findFiles>[1],
+  ): Promise<string[]> => {
+    try {
+      return await findFiles(query, args);
+    } catch (error) {
+      logger.warn('Workspace backend search fallback to empty result', {
+        reason,
+        query,
+        type: args?.type,
+        limit: args?.limit,
+        error,
+      });
+      return [];
+    }
+  };
+
   if (options.type === 'file') {
-    const fileOnly = await findFiles(query, { type: 'file', limit }).catch(() => []);
+    const fileOnly = await findFilesSafe('file-only', { type: 'file', limit });
     return parseWorkspacePaths(fileOnly);
   }
 
   if (options.type === 'directory') {
-    const dirsOnly = await findFiles(query, { type: 'directory', limit }).catch(() => []);
+    const dirsOnly = await findFilesSafe('directory-only', { type: 'directory', limit });
     return parseWorkspacePaths(dirsOnly.map((path) => `${path.replace(/\/+$/, '')}/`));
   }
 
   const [fileOnly, broad, dirsOnly] = await Promise.all([
-    findFiles(query, { type: 'file', limit }).catch(() => []),
-    findFiles(query, { limit }).catch(() => []),
-    findFiles(query, { type: 'directory', limit }).catch(() => []),
+    findFilesSafe('mixed:file', { type: 'file', limit }),
+    findFilesSafe('mixed:broad', { limit }),
+    findFilesSafe('mixed:directory', { type: 'directory', limit }),
   ]);
 
   const normalizedDirs = dirsOnly.map((path) => path.replace(/\/+$/, ''));
@@ -235,8 +258,13 @@ async function getWorkspaceIndexEntries(): Promise<WorkspaceSearchEntry[]> {
       });
       return entries;
     })
-    .catch(() => {
+    .catch((error) => {
       const fallback = current?.entries ?? [];
+      logger.warn('Workspace index build failed, using cached fallback', {
+        serverUrl,
+        fallbackCount: fallback.length,
+        error,
+      });
       setCacheForServer(serverUrl, {
         entries: fallback,
         fetchedAt: current?.fetchedAt ?? 0,

@@ -1,6 +1,6 @@
 /**
  * Pricing Tier Badge Component
- * 
+ *
  * Matches frontend TierBadge component exactly
  * Shows icon badges for pricing cards (24px height for lg size)
  */
@@ -11,6 +11,10 @@ import PlusSvg from '@/assets/brand/tiers/plus.svg';
 import ProSvg from '@/assets/brand/tiers/pro.svg';
 import UltraSvg from '@/assets/brand/tiers/ultra.svg';
 import BasicSvg from '@/assets/brand/tiers/basic.svg';
+
+// react-native-svg SvgProps has width/height as NumberProp | undefined,
+// so we cast to a narrower type to satisfy our component signature.
+type TierIconComponent = React.ComponentType<{ width: number; height: number }>;
 
 interface PricingTierBadgeProps {
   /** Plan name (e.g., 'Basic', 'Plus', 'Pro', 'Ultra') */
@@ -30,28 +34,31 @@ const sizeConfig = {
 
 /**
  * PricingTierBadge Component
- * 
+ *
  * Displays tier icon badge for pricing cards.
  * Matches frontend TierBadge behavior exactly.
  */
-export function PricingTierBadge({
-  planName,
-  size = 'lg',
-}: PricingTierBadgeProps) {
+export function PricingTierBadge({ planName, size = 'lg' }: PricingTierBadgeProps) {
   const plan = planName?.toLowerCase();
   const config = sizeConfig[size];
 
   // Select appropriate SVG component - matches frontend plan-utils.ts logic
-  let TierIcon: React.ComponentType<{ width: number; height: number }> | null = null;
-  
+  let TierIcon: TierIconComponent | null = null;
+
   if (plan?.includes('ultra')) {
-    TierIcon = UltraSvg;
-  } else if (plan?.includes('pro') || plan?.includes('business') || plan?.includes('enterprise') || plan?.includes('scale') || plan?.includes('max')) {
-    TierIcon = ProSvg;
+    TierIcon = UltraSvg as TierIconComponent;
+  } else if (
+    plan?.includes('pro') ||
+    plan?.includes('business') ||
+    plan?.includes('enterprise') ||
+    plan?.includes('scale') ||
+    plan?.includes('max')
+  ) {
+    TierIcon = ProSvg as TierIconComponent;
   } else if (plan?.includes('plus')) {
-    TierIcon = PlusSvg;
+    TierIcon = PlusSvg as TierIconComponent;
   } else if (plan?.includes('free') || plan?.includes('basic')) {
-    TierIcon = BasicSvg;
+    TierIcon = BasicSvg as TierIconComponent;
   }
 
   if (!TierIcon) {
@@ -64,11 +71,10 @@ export function PricingTierBadge({
   // Typical SVG aspect ratio is ~2.5:1 (width:height), so we'll use a multiplier
   const aspectRatio = 2.5; // Approximate aspect ratio for tier badges
   const calculatedWidth = config.height * aspectRatio;
-  
+
   return (
     <View style={{ height: config.height, width: calculatedWidth }}>
       <TierIcon width={calculatedWidth} height={config.height} />
     </View>
   );
 }
-

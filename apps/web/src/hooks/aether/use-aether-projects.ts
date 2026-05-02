@@ -21,6 +21,13 @@ export interface AetherProject {
   description: string;
   created_at: string;
   opencode_id: string | null;
+  worktree?: string;
+  time?: {
+    updated?: number;
+    created?: number;
+  };
+  taskCount?: number;
+  tasksDone?: number;
   sessionCount?: number;
   delegationStats?: Record<string, number>;
 }

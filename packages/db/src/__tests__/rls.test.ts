@@ -16,7 +16,7 @@ describe('withTenantContext', () => {
         'test-account-id',
         async (tx) => {
           const result = await tx.execute<{ current_account: string | null }>(
-            sql`SELECT current_setting('acme.current_account_id', true) AS current_account`,
+            sql`SELECT current_setting('aether.current_account_id', true) AS current_account`,
           );
           return result[0]?.current_account ?? null;
         },

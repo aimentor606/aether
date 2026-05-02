@@ -34,7 +34,7 @@ export async function withTenantContext<TTx extends TxWithExecute, TResult>(
   return database.transaction(async (tx) => {
     return runWithTenantTransaction(tx, async () => {
       await tx.execute(
-        sql`SELECT set_config('acme.current_account_id', ${accountId}, true)`,
+        sql`SELECT set_config('aether.current_account_id', ${accountId}, true)`,
       );
       return callback(tx);
     });

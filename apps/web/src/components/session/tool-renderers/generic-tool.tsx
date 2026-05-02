@@ -1,14 +1,12 @@
 'use client';
 
-import React, {
-  useContext,
-  useMemo,
-} from 'react';
+import React, { useContext, useMemo } from 'react';
+import { Cpu, Loader2 } from 'lucide-react';
 import {
-  Cpu,
-  Loader2,
-} from 'lucide-react';
-import { hasStructuredContent, normalizeToolOutput, parseStructuredOutput } from '@/lib/utils/structured-output';
+  hasStructuredContent,
+  normalizeToolOutput,
+  parseStructuredOutput,
+} from '@/lib/utils/structured-output';
 import {
   type ToolProps,
   partOutput,
@@ -17,9 +15,7 @@ import {
   ToolRunningContext,
   StructuredOutput,
 } from './shared';
-import {
-  stripAnsi,
-} from '@/ui';
+import { stripAnsi } from '@/ui';
 
 // ============================================================================
 // GenericTool (fallback)

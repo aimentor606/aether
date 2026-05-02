@@ -30,3 +30,9 @@ export type {
   ServiceOps,
 } from './types';
 export { DEFAULT_LIMIT, DEFAULT_OFFSET } from './types';
+
+// Shared Repositories - leads, documents, compliance (shared-vertical tables)
+export { createLeadsRepository, createDocumentsRepository, createComplianceRepository } from './shared-repositories';
+
+// Shared Services - leads, documents, compliance
+export { createLeadsService, createDocumentsService, createComplianceService } from './shared-services';

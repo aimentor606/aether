@@ -17,7 +17,8 @@
     "./layout": "./src/layout/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify": "pnpm run typecheck"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

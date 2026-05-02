@@ -42,9 +42,12 @@ import { AetherLoader } from '@/components/ui/aether-loader';
 import { AetherLogo } from '@/components/sidebar/aether-logo';
 import { useProviderModalStore } from '@/stores/provider-modal-store';
 import { useOpenCodeProviders } from '@/hooks/opencode/use-opencode-sessions';
-import { ProviderLogo, PROVIDER_LABELS } from '@/components/providers/provider-branding';
-import { flattenModels } from '@/components/session/session-chat-input';
-import type { FlatModel } from '@/components/session/session-chat-input';
+import {
+  ProviderLogo,
+  PROVIDER_LABELS,
+} from '@/components/providers/provider-branding';
+import { flattenModels } from '@/lib/models';
+import type { FlatModel } from '@/lib/models';
 import { useModelStore } from '@/hooks/opencode/use-model-store';
 import { getActiveOpenCodeUrl } from '@/stores/server-store';
 import { authenticatedFetch } from '@/lib/auth-token';
@@ -55,11 +58,20 @@ import { AutoTopupCard } from '@/components/billing/auto-topup-card';
 
 // ─── Step definitions ───────────────────────────────────────────────────────
 
-type StepDef = { label: string; icon: React.ComponentType<{ className?: string }> };
+type StepDef = {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
 
 // ─── Step indicator (dots + label) ──────────────────────────────────────────
 
-function StepIndicator({ current, steps }: { current: number; steps: StepDef[] }) {
+function StepIndicator({
+  current,
+  steps,
+}: {
+  current: number;
+  steps: StepDef[];
+}) {
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="flex items-center justify-center gap-1.5">
@@ -131,9 +143,7 @@ function ConfigureModal({
           </Button>
         </div>
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-5 pb-5">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto px-5 pb-5">{children}</div>
       </motion.div>
     </div>
   );
@@ -180,7 +190,8 @@ function WelcomePane({ onNext }: { onNext: () => void }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
         >
-          Let&apos;s get you set up. This takes about a minute — you can change everything later in Settings.
+          Let&apos;s get you set up. This takes about a minute — you can change
+          everything later in Settings.
         </motion.p>
       </div>
 
@@ -191,11 +202,7 @@ function WelcomePane({ onNext }: { onNext: () => void }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
       >
-        <Button
-          onClick={onNext}
-          size="lg"
-          className="w-full shadow-none"
-        >
+        <Button onClick={onNext} size="lg" className="w-full shadow-none">
           Get started <ChevronRight className="h-4 w-4" />
         </Button>
       </motion.div>
@@ -205,7 +212,13 @@ function WelcomePane({ onNext }: { onNext: () => void }) {
 
 // ─── Step: How It Works ──────────────────────────────────────────────────────
 
-function HowItWorksPane({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+function HowItWorksPane({
+  onNext,
+  onBack,
+}: {
+  onNext: () => void;
+  onBack: () => void;
+}) {
   return (
     <div className="w-full max-w-sm space-y-6 mx-auto">
       <div className="text-center space-y-3">
@@ -215,9 +228,12 @@ function HowItWorksPane({ onNext, onBack }: { onNext: () => void; onBack: () => 
           </div>
         </div>
         <div className="space-y-1.5">
-          <h2 className="text-lg font-medium text-foreground/90">Connect Your AI</h2>
+          <h2 className="text-lg font-medium text-foreground/90">
+            Connect Your AI
+          </h2>
           <p className="text-sm text-muted-foreground/50 leading-relaxed max-w-xs mx-auto">
-            Aether is designed to work with your own AI subscriptions. Here&apos;s how most people connect.
+            Aether is designed to work with your own AI subscriptions.
+            Here&apos;s how most people connect.
           </p>
         </div>
       </div>
@@ -229,9 +245,12 @@ function HowItWorksPane({ onNext, onBack }: { onNext: () => void; onBack: () => 
             <Sparkles className="h-3.5 w-3.5 text-emerald-500" />
           </div>
           <div className="text-left">
-            <p className="text-[13px] font-medium text-foreground/80">Coding subscriptions</p>
+            <p className="text-[13px] font-medium text-foreground/80">
+              Coding subscriptions
+            </p>
             <p className="text-[11px] text-foreground/40 leading-relaxed">
-              ChatGPT Max, Claude Pro / Code, or similar. Best value at scale — we strongly recommend this.
+              ChatGPT Max, Claude Pro / Code, or similar. Best value at scale —
+              we strongly recommend this.
             </p>
           </div>
         </div>
@@ -241,9 +260,12 @@ function HowItWorksPane({ onNext, onBack }: { onNext: () => void; onBack: () => 
             <Key className="h-3.5 w-3.5 text-foreground/40" />
           </div>
           <div className="text-left">
-            <p className="text-[13px] font-medium text-foreground/80">Your own API keys</p>
+            <p className="text-[13px] font-medium text-foreground/80">
+              Your own API keys
+            </p>
             <p className="text-[11px] text-foreground/40 leading-relaxed">
-              OpenAI, Anthropic, Google, OpenRouter — bring any key you already have.
+              OpenAI, Anthropic, Google, OpenRouter — bring any key you already
+              have.
             </p>
           </div>
         </div>
@@ -254,9 +276,12 @@ function HowItWorksPane({ onNext, onBack }: { onNext: () => void; onBack: () => 
               <CreditCard className="h-3.5 w-3.5 text-foreground/40" />
             </div>
             <div className="text-left">
-              <p className="text-[13px] font-medium text-foreground/80">Aether credits</p>
+              <p className="text-[13px] font-medium text-foreground/80">
+                Aether credits
+              </p>
               <p className="text-[11px] text-foreground/40 leading-relaxed">
-                Don&apos;t have a key yet? We include a few free credits to get you started.
+                Don&apos;t have a key yet? We include a few free credits to get
+                you started.
               </p>
             </div>
           </div>
@@ -264,15 +289,17 @@ function HowItWorksPane({ onNext, onBack }: { onNext: () => void; onBack: () => 
       </div>
 
       <div className="space-y-2">
-        <Button
-          onClick={onNext}
-          size="lg" className="w-full shadow-none"
-        >
+        <Button onClick={onNext} size="lg" className="w-full shadow-none">
           Connect a provider <ChevronRight className="h-4 w-4" />
         </Button>
 
         <div className="flex justify-center pt-1">
-          <Button onClick={onBack} variant="muted" size="xs" className="mx-auto">
+          <Button
+            onClick={onBack}
+            variant="muted"
+            size="xs"
+            className="mx-auto"
+          >
             <ArrowLeft className="h-3 w-3" /> Back
           </Button>
         </div>
@@ -283,13 +310,26 @@ function HowItWorksPane({ onNext, onBack }: { onNext: () => void; onBack: () => 
 
 /// ─── Step 1: Auto Top-up ────────────────────────────────────────────────────
 
-function AutoTopupPane({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+function AutoTopupPane({
+  onNext,
+  onBack,
+}: {
+  onNext: () => void;
+  onBack: () => void;
+}) {
   const [saving, setSaving] = useState(false);
-  const configRef = useRef<{ enabled: boolean; threshold: number; amount: number } | null>(null);
+  const configRef = useRef<{
+    enabled: boolean;
+    threshold: number;
+    amount: number;
+  } | null>(null);
 
   const handleContinue = async () => {
     const config = configRef.current;
-    if (!config) { onNext(); return; }
+    if (!config) {
+      onNext();
+      return;
+    }
     setSaving(true);
     try {
       await backendApi.post('/billing/auto-topup/configure', config);
@@ -312,15 +352,19 @@ function AutoTopupPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
       </div>
 
       <div className="space-y-1.5">
-        <h2 className="text-lg font-medium text-foreground/90">Aether Credits</h2>
+        <h2 className="text-lg font-medium text-foreground/90">
+          Aether Credits
+        </h2>
         <p className="text-sm text-muted-foreground/50 leading-relaxed max-w-xs mx-auto">
-          You start with a few free credits to try things out. Your agent can use these when no provider API key is available.
+          You start with a few free credits to try things out. Your agent can
+          use these when no provider API key is available.
         </p>
       </div>
 
       <div className="rounded-xl border border-foreground/[0.06] bg-foreground/[0.02] p-3.5 text-[12.5px] text-muted-foreground/60 leading-relaxed">
-        Credits are used when your agent runs on Aether-managed models instead of your own API keys.
-        Most users connect their own provider and rarely use credits.
+        Credits are used when your agent runs on Aether-managed models instead
+        of your own API keys. Most users connect their own provider and rarely
+        use credits.
       </div>
 
       {/* Shared auto top-up card */}
@@ -333,7 +377,12 @@ function AutoTopupPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
         />
       </div>
 
-      <Button onClick={handleContinue} disabled={saving} size="lg" className="w-full shadow-none">
+      <Button
+        onClick={handleContinue}
+        disabled={saving}
+        size="lg"
+        className="w-full shadow-none"
+      >
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
         Continue
         <ChevronRight className="h-4 w-4" />
@@ -348,7 +397,13 @@ function AutoTopupPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
   );
 }
 
-function ProvidersPane({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+function ProvidersPane({
+  onNext,
+  onBack,
+}: {
+  onNext: () => void;
+  onBack: () => void;
+}) {
   const { data: providersData, isLoading } = useOpenCodeProviders();
   const openProviderModal = useProviderModalStore((s) => s.openProviderModal);
 
@@ -359,7 +414,9 @@ function ProvidersPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
   }, [providersData]);
 
   const hasLLM = connectedProviders.some((p) =>
-    ['anthropic', 'openai', 'openrouter', 'google', 'groq', 'xai'].includes(p.id),
+    ['anthropic', 'openai', 'openrouter', 'google', 'groq', 'xai'].includes(
+      p.id,
+    ),
   );
 
   if (isLoading) {
@@ -422,7 +479,8 @@ function ProvidersPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
         <Button
           onClick={() => openProviderModal('providers')}
           variant={hasLLM ? 'outline' : 'default'}
-          size="lg" className="w-full shadow-none"
+          size="lg"
+          className="w-full shadow-none"
         >
           <Settings2 className="h-4 w-4" />
           {hasLLM ? 'Manage providers' : 'Connect a provider'}
@@ -438,14 +496,21 @@ function ProvidersPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
           )}
         >
           {hasLLM ? (
-            <>Continue <ChevronRight className="h-4 w-4" /></>
+            <>
+              Continue <ChevronRight className="h-4 w-4" />
+            </>
           ) : (
             'Skip for now'
           )}
         </Button>
 
         <div className="flex justify-center pt-1">
-          <Button onClick={onBack} variant="muted" size="xs" className="mx-auto">
+          <Button
+            onClick={onBack}
+            variant="muted"
+            size="xs"
+            className="mx-auto"
+          >
             <ArrowLeft className="h-3 w-3" /> Back
           </Button>
         </div>
@@ -456,9 +521,18 @@ function ProvidersPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
 
 // ─── Step 2: Default Model ──────────────────────────────────────────────────
 
-function DefaultModelPane({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+function DefaultModelPane({
+  onNext,
+  onBack,
+}: {
+  onNext: () => void;
+  onBack: () => void;
+}) {
   const { data: providersData, isLoading } = useOpenCodeProviders();
-  const allModels = useMemo(() => flattenModels(providersData), [providersData]);
+  const allModels = useMemo(
+    () => flattenModels(providersData),
+    [providersData],
+  );
   const modelStore = useModelStore(allModels);
 
   // Resolve initial selection from global default or recent list
@@ -469,9 +543,10 @@ function DefaultModelPane({ onNext, onBack }: { onNext: () => void; onBack: () =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [selected, setSelected] = useState<{ providerID: string; modelID: string } | null>(
-    initialModel ?? null,
-  );
+  const [selected, setSelected] = useState<{
+    providerID: string;
+    modelID: string;
+  } | null>(initialModel ?? null);
 
   // Group visible models by provider
   const grouped = useMemo(() => {
@@ -507,7 +582,9 @@ function DefaultModelPane({ onNext, onBack }: { onNext: () => void; onBack: () =
         authenticatedFetch(`${base}/aether/preferences/model`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: `${model.providerID}/${model.modelID}` }),
+          body: JSON.stringify({
+            model: `${model.providerID}/${model.modelID}`,
+          }),
         }).catch(() => {});
       }
     },
@@ -538,7 +615,9 @@ function DefaultModelPane({ onNext, onBack }: { onNext: () => void; onBack: () =
           </div>
         </div>
         <div className="space-y-1.5">
-          <h2 className="text-lg font-medium text-foreground/90">Default Model</h2>
+          <h2 className="text-lg font-medium text-foreground/90">
+            Default Model
+          </h2>
           <p className="text-sm text-muted-foreground/50 leading-relaxed max-w-xs mx-auto">
             {hasModels
               ? 'Choose which model your agent uses by default. You can switch models anytime in chat.'
@@ -553,7 +632,11 @@ function DefaultModelPane({ onNext, onBack }: { onNext: () => void; onBack: () =
           {grouped.map(([providerID, models]) => (
             <div key={providerID} className="space-y-1">
               <div className="flex items-center gap-2 px-1 pb-1">
-                <ProviderLogo providerID={providerID} name={models[0]?.providerName} size="small" />
+                <ProviderLogo
+                  providerID={providerID}
+                  name={models[0]?.providerName}
+                  size="small"
+                />
                 <span className="text-[11px] font-medium text-foreground/40 uppercase tracking-wider">
                   {PROVIDER_LABELS[providerID] || providerID}
                 </span>
@@ -577,7 +660,9 @@ function DefaultModelPane({ onNext, onBack }: { onNext: () => void; onBack: () =
                       <div className="text-[13px] font-medium text-foreground/80 truncate">
                         {model.modelName}
                       </div>
-                      <div className="text-[11px] text-foreground/30 truncate">{model.modelID}</div>
+                      <div className="text-[11px] text-foreground/30 truncate">
+                        {model.modelID}
+                      </div>
                     </div>
                     {isSelected && (
                       <Check className="h-4 w-4 text-emerald-500 shrink-0" />
@@ -594,13 +679,20 @@ function DefaultModelPane({ onNext, onBack }: { onNext: () => void; onBack: () =
       <div className="space-y-2">
         <Button
           onClick={handleContinue}
-          size="lg" className="w-full shadow-none"
+          size="lg"
+          className="w-full shadow-none"
         >
-          {selected ? 'Continue' : 'Skip for now'} <ChevronRight className="h-4 w-4" />
+          {selected ? 'Continue' : 'Skip for now'}{' '}
+          <ChevronRight className="h-4 w-4" />
         </Button>
 
         <div className="flex justify-center pt-1">
-          <Button onClick={onBack} variant="muted" size="xs" className="mx-auto">
+          <Button
+            onClick={onBack}
+            variant="muted"
+            size="xs"
+            className="mx-auto"
+          >
             <ArrowLeft className="h-3 w-3" /> Back
           </Button>
         </div>
@@ -612,15 +704,57 @@ function DefaultModelPane({ onNext, onBack }: { onNext: () => void; onBack: () =
 // ─── Step 3: Tool secrets ───────────────────────────────────────────────────
 
 const TOOL_SECRETS = [
-  { key: 'TAVILY_API_KEY', label: 'Tavily', description: 'Web search', icon: Search, url: 'https://tavily.com' },
-  { key: 'FIRECRAWL_API_KEY', label: 'Firecrawl', description: 'Web scraping', icon: Flame, url: 'https://firecrawl.dev' },
-  { key: 'SERPER_API_KEY', label: 'Serper', description: 'Image search', icon: ImageIcon, url: 'https://serper.dev' },
-  { key: 'REPLICATE_API_TOKEN', label: 'Replicate', description: 'AI media generation', icon: ImageIcon, url: 'https://replicate.com' },
-  { key: 'CONTEXT7_API_KEY', label: 'Context7', description: 'Library docs search', icon: BookOpen, url: 'https://context7.com' },
-  { key: 'ELEVENLABS_API_KEY', label: 'ElevenLabs', description: 'Voice generation', icon: Mic, url: 'https://elevenlabs.io' },
+  {
+    key: 'TAVILY_API_KEY',
+    label: 'Tavily',
+    description: 'Web search',
+    icon: Search,
+    url: 'https://tavily.com',
+  },
+  {
+    key: 'FIRECRAWL_API_KEY',
+    label: 'Firecrawl',
+    description: 'Web scraping',
+    icon: Flame,
+    url: 'https://firecrawl.dev',
+  },
+  {
+    key: 'SERPER_API_KEY',
+    label: 'Serper',
+    description: 'Image search',
+    icon: ImageIcon,
+    url: 'https://serper.dev',
+  },
+  {
+    key: 'REPLICATE_API_TOKEN',
+    label: 'Replicate',
+    description: 'AI media generation',
+    icon: ImageIcon,
+    url: 'https://replicate.com',
+  },
+  {
+    key: 'CONTEXT7_API_KEY',
+    label: 'Context7',
+    description: 'Library docs search',
+    icon: BookOpen,
+    url: 'https://context7.com',
+  },
+  {
+    key: 'ELEVENLABS_API_KEY',
+    label: 'ElevenLabs',
+    description: 'Voice generation',
+    icon: Mic,
+    url: 'https://elevenlabs.io',
+  },
 ] as const;
 
-function ToolKeysPane({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+function ToolKeysPane({
+  onNext,
+  onBack,
+}: {
+  onNext: () => void;
+  onBack: () => void;
+}) {
   const isCloud = isBillingEnabled();
   const [modalOpen, setModalOpen] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
@@ -631,7 +765,10 @@ function ToolKeysPane({ onNext, onBack }: { onNext: () => void; onBack: () => vo
 
   const handleSave = useCallback(async () => {
     const toSave = Object.entries(values).filter(([, v]) => v.trim());
-    if (toSave.length === 0) { setModalOpen(false); return; }
+    if (toSave.length === 0) {
+      setModalOpen(false);
+      return;
+    }
 
     setSaving(true);
     const base = getActiveOpenCodeUrl();
@@ -643,7 +780,9 @@ function ToolKeysPane({ onNext, onBack }: { onNext: () => void; onBack: () => vo
           body: JSON.stringify({ value: value.trim() }),
         }).catch(() => {});
       }
-    } catch { /* continue */ }
+    } catch {
+      /* continue */
+    }
     setSaving(false);
     setSaved(true);
     setModalOpen(false);
@@ -660,9 +799,12 @@ function ToolKeysPane({ onNext, onBack }: { onNext: () => void; onBack: () => vo
             </div>
           </div>
           <div className="space-y-1.5">
-            <h2 className="text-lg font-medium text-foreground/90">Tool API Keys</h2>
+            <h2 className="text-lg font-medium text-foreground/90">
+              Tool API Keys
+            </h2>
             <p className="text-sm text-muted-foreground/50 leading-relaxed max-w-xs mx-auto">
-              Your agent uses tools like web search, scraping, and image generation to complete tasks.
+              Your agent uses tools like web search, scraping, and image
+              generation to complete tasks.
             </p>
           </div>
           {isCloud && <CloudBadge text="Included with your Aether credits" />}
@@ -672,13 +814,18 @@ function ToolKeysPane({ onNext, onBack }: { onNext: () => void; onBack: () => vo
         <div className="rounded-xl border border-foreground/[0.06] bg-foreground/[0.02] p-3.5 text-[12.5px] text-muted-foreground/60 leading-relaxed">
           {isCloud ? (
             <>
-              All tool keys are <span className="text-foreground/80 font-medium">pre-configured</span> and
-              usage is billed through your credits. You can optionally use your own API keys if you prefer.
+              All tool keys are{' '}
+              <span className="text-foreground/80 font-medium">
+                pre-configured
+              </span>{' '}
+              and usage is billed through your credits. You can optionally use
+              your own API keys if you prefer.
             </>
           ) : (
             <>
-              Add API keys to enable agent capabilities like web search, image generation, and more.
-              All keys are optional — you can add them later in Settings.
+              Add API keys to enable agent capabilities like web search, image
+              generation, and more. All keys are optional — you can add them
+              later in Settings.
             </>
           )}
         </div>
@@ -703,15 +850,17 @@ function ToolKeysPane({ onNext, onBack }: { onNext: () => void; onBack: () => vo
             {isCloud ? 'Use my own API keys' : 'Configure tool keys'}
           </Button>
 
-          <Button
-            onClick={onNext}
-            size="lg" className="w-full shadow-none"
-          >
+          <Button onClick={onNext} size="lg" className="w-full shadow-none">
             Continue <ChevronRight className="h-4 w-4" />
           </Button>
 
           <div className="flex justify-center pt-1">
-            <Button onClick={onBack} variant="muted" size="xs" className="mx-auto">
+            <Button
+              onClick={onBack}
+              variant="muted"
+              size="xs"
+              className="mx-auto"
+            >
               <ArrowLeft className="h-3 w-3" /> Back
             </Button>
           </div>
@@ -719,7 +868,11 @@ function ToolKeysPane({ onNext, onBack }: { onNext: () => void; onBack: () => vo
       </div>
 
       {/* Configure modal */}
-      <ConfigureModal open={modalOpen} onClose={() => setModalOpen(false)} title="Tool API Keys">
+      <ConfigureModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="Tool API Keys"
+      >
         <div className="space-y-4">
           <p className="text-xs text-muted-foreground/50 leading-relaxed">
             {isCloud
@@ -739,8 +892,12 @@ function ToolKeysPane({ onNext, onBack }: { onNext: () => void; onBack: () => vo
                   </div>
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[13px] font-medium text-foreground/80">{s.label}</span>
-                      <span className="text-[11px] text-foreground/30">{s.description}</span>
+                      <span className="text-[13px] font-medium text-foreground/80">
+                        {s.label}
+                      </span>
+                      <span className="text-[11px] text-foreground/30">
+                        {s.description}
+                      </span>
                       <a
                         href={s.url}
                         target="_blank"
@@ -754,7 +911,9 @@ function ToolKeysPane({ onNext, onBack }: { onNext: () => void; onBack: () => vo
                       type="password"
                       placeholder={s.key}
                       value={values[s.key] || ''}
-                      onChange={(e) => setValues((p) => ({ ...p, [s.key]: e.target.value }))}
+                      onChange={(e) =>
+                        setValues((p) => ({ ...p, [s.key]: e.target.value }))
+                      }
                       className="h-8 text-xs font-mono shadow-none bg-foreground/[0.04] border-foreground/[0.08] rounded-lg"
                       autoComplete="off"
                     />
@@ -764,12 +923,22 @@ function ToolKeysPane({ onNext, onBack }: { onNext: () => void; onBack: () => vo
             })}
           </div>
           <div className="flex gap-2 pt-1">
-            <Button variant="ghost" onClick={() => setModalOpen(false)} className="flex-1 h-10 text-sm shadow-none">
+            <Button
+              variant="ghost"
+              onClick={() => setModalOpen(false)}
+              className="flex-1 h-10 text-sm shadow-none"
+            >
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={saving} className="flex-1 h-10 text-sm shadow-none">
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-1 h-10 text-sm shadow-none"
+            >
               {saving ? (
-                <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Saving…
+                </>
               ) : filled > 0 ? (
                 `Save ${filled} key${filled > 1 ? 's' : ''}`
               ) : (
@@ -786,12 +955,33 @@ function ToolKeysPane({ onNext, onBack }: { onNext: () => void; onBack: () => vo
 // ─── Step 4: Pipedream ──────────────────────────────────────────────────────
 
 const PD_KEYS = [
-  { key: 'PIPEDREAM_CLIENT_ID', label: 'Client ID', placeholder: 'e.g. z8PKSGuQdorPj4UErE…', secret: false },
-  { key: 'PIPEDREAM_CLIENT_SECRET', label: 'Client Secret', placeholder: 'e.g. UeZCz2PeNdOeHJfw…', secret: true },
-  { key: 'PIPEDREAM_PROJECT_ID', label: 'Project ID', placeholder: 'e.g. proj_x9s97z5', secret: false },
+  {
+    key: 'PIPEDREAM_CLIENT_ID',
+    label: 'Client ID',
+    placeholder: 'e.g. z8PKSGuQdorPj4UErE…',
+    secret: false,
+  },
+  {
+    key: 'PIPEDREAM_CLIENT_SECRET',
+    label: 'Client Secret',
+    placeholder: 'e.g. UeZCz2PeNdOeHJfw…',
+    secret: true,
+  },
+  {
+    key: 'PIPEDREAM_PROJECT_ID',
+    label: 'Project ID',
+    placeholder: 'e.g. proj_x9s97z5',
+    secret: false,
+  },
 ] as const;
 
-function PipedreamPane({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+function PipedreamPane({
+  onNext,
+  onBack,
+}: {
+  onNext: () => void;
+  onBack: () => void;
+}) {
   const isCloud = isBillingEnabled();
   const [modalOpen, setModalOpen] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
@@ -801,7 +991,10 @@ function PipedreamPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
   const allFilled = PD_KEYS.every((k) => (values[k.key] || '').trim());
 
   const handleSave = useCallback(async () => {
-    if (!allFilled) { setModalOpen(false); return; }
+    if (!allFilled) {
+      setModalOpen(false);
+      return;
+    }
 
     setSaving(true);
     const base = getActiveOpenCodeUrl();
@@ -818,7 +1011,9 @@ function PipedreamPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
           body: JSON.stringify({ value }),
         }).catch(() => {});
       }
-    } catch { /* continue */ }
+    } catch {
+      /* continue */
+    }
     setSaving(false);
     setSaved(true);
     setModalOpen(false);
@@ -835,12 +1030,21 @@ function PipedreamPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
             </div>
           </div>
           <div className="space-y-1.5">
-            <h2 className="text-lg font-medium text-foreground/90">Third-Party Integrations</h2>
+            <h2 className="text-lg font-medium text-foreground/90">
+              Third-Party Integrations
+            </h2>
             <p className="text-sm text-muted-foreground/50 leading-relaxed max-w-xs mx-auto">
-              Connect your agent to Gmail, Slack, Notion, and 3,000+ other apps via{' '}
-              <a href="https://pipedream.com/connect" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground/70">
+              Connect your agent to Gmail, Slack, Notion, and 3,000+ other apps
+              via{' '}
+              <a
+                href="https://pipedream.com/connect"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-muted-foreground/70"
+              >
                 Pipedream Connect
-              </a>.
+              </a>
+              .
             </p>
           </div>
           {isCloud && <CloudBadge text="Included with your Aether credits" />}
@@ -850,13 +1054,18 @@ function PipedreamPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
         <div className="rounded-xl border border-foreground/[0.06] bg-foreground/[0.02] p-3.5 text-[12.5px] text-muted-foreground/60 leading-relaxed">
           {isCloud ? (
             <>
-              Pipedream integrations are <span className="text-foreground/80 font-medium">pre-configured</span> on
-              your plan. You can optionally bring your own Pipedream project credentials if you prefer full control.
+              Pipedream integrations are{' '}
+              <span className="text-foreground/80 font-medium">
+                pre-configured
+              </span>{' '}
+              on your plan. You can optionally bring your own Pipedream project
+              credentials if you prefer full control.
             </>
           ) : (
             <>
-              Add your Pipedream Connect credentials to enable 3,000+ app integrations.
-              This is optional — you can set it up later in Settings.
+              Add your Pipedream Connect credentials to enable 3,000+ app
+              integrations. This is optional — you can set it up later in
+              Settings.
             </>
           )}
         </div>
@@ -878,18 +1087,22 @@ function PipedreamPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
             className="w-full shadow-none"
           >
             <Settings2 className="h-4 w-4" />
-            {isCloud ? 'Use my own Pipedream credentials' : 'Configure Pipedream'}
+            {isCloud
+              ? 'Use my own Pipedream credentials'
+              : 'Configure Pipedream'}
           </Button>
 
-          <Button
-            onClick={onNext}
-            size="lg" className="w-full shadow-none"
-          >
+          <Button onClick={onNext} size="lg" className="w-full shadow-none">
             Continue <ChevronRight className="h-4 w-4" />
           </Button>
 
           <div className="flex justify-center pt-1">
-            <Button onClick={onBack} variant="muted" size="xs" className="mx-auto">
+            <Button
+              onClick={onBack}
+              variant="muted"
+              size="xs"
+              className="mx-auto"
+            >
               <ArrowLeft className="h-3 w-3" /> Back
             </Button>
           </div>
@@ -897,23 +1110,37 @@ function PipedreamPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
       </div>
 
       {/* Configure modal */}
-      <ConfigureModal open={modalOpen} onClose={() => setModalOpen(false)} title="Pipedream Credentials">
+      <ConfigureModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="Pipedream Credentials"
+      >
         <div className="space-y-4">
           <p className="text-xs text-muted-foreground/50 leading-relaxed">
             Enter your Pipedream Connect project credentials. Get them at{' '}
-            <a href="https://pipedream.com/connect" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground/70">
+            <a
+              href="https://pipedream.com/connect"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-muted-foreground/70"
+            >
               pipedream.com/connect
-            </a>.
+            </a>
+            .
           </p>
           <div className="space-y-3">
             {PD_KEYS.map((f) => (
               <div key={f.key} className="space-y-1">
-                <label className="text-xs font-medium text-foreground/60">{f.label}</label>
+                <label className="text-xs font-medium text-foreground/60">
+                  {f.label}
+                </label>
                 <Input
                   type={f.secret ? 'password' : 'text'}
                   placeholder={f.placeholder}
                   value={values[f.key] || ''}
-                  onChange={(e) => setValues((p) => ({ ...p, [f.key]: e.target.value }))}
+                  onChange={(e) =>
+                    setValues((p) => ({ ...p, [f.key]: e.target.value }))
+                  }
                   className="h-9 text-xs font-mono shadow-none bg-foreground/[0.04] border-foreground/[0.08] rounded-lg"
                   autoComplete="off"
                 />
@@ -921,12 +1148,22 @@ function PipedreamPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
             ))}
           </div>
           <div className="flex gap-2 pt-1">
-            <Button variant="ghost" onClick={() => setModalOpen(false)} className="flex-1 h-10 text-sm shadow-none">
+            <Button
+              variant="ghost"
+              onClick={() => setModalOpen(false)}
+              className="flex-1 h-10 text-sm shadow-none"
+            >
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={saving} className="flex-1 h-10 text-sm shadow-none">
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-1 h-10 text-sm shadow-none"
+            >
               {saving ? (
-                <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Saving…
+                </>
               ) : allFilled ? (
                 'Save credentials'
               ) : (
@@ -942,7 +1179,13 @@ function PipedreamPane({ onNext, onBack }: { onNext: () => void; onBack: () => v
 
 // ─── Step 5: Get Started ────────────────────────────────────────────────────
 
-function GetStartedPane({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+function GetStartedPane({
+  onNext,
+  onBack,
+}: {
+  onNext: () => void;
+  onBack: () => void;
+}) {
   return (
     <div className="w-full max-w-sm space-y-6 mx-auto">
       <div className="text-center space-y-3">
@@ -952,23 +1195,28 @@ function GetStartedPane({ onNext, onBack }: { onNext: () => void; onBack: () => 
           </div>
         </div>
         <div className="space-y-1.5">
-          <h2 className="text-lg font-medium text-foreground/90">You&apos;re all set</h2>
+          <h2 className="text-lg font-medium text-foreground/90">
+            You&apos;re all set
+          </h2>
           <p className="text-sm text-muted-foreground/50 leading-relaxed max-w-xs mx-auto">
-            Your Aether agent is configured and ready. We&apos;ll walk you through the basics in a quick guided conversation.
+            Your Aether agent is configured and ready. We&apos;ll walk you
+            through the basics in a quick guided conversation.
           </p>
         </div>
       </div>
 
       <div className="space-y-2">
-        <Button
-          onClick={onNext}
-          size="lg" className="w-full shadow-none"
-        >
+        <Button onClick={onNext} size="lg" className="w-full shadow-none">
           Start onboarding <ChevronRight className="h-4 w-4" />
         </Button>
 
         <div className="flex justify-center pt-1">
-          <Button onClick={onBack} variant="muted" size="xs" className="mx-auto">
+          <Button
+            onClick={onBack}
+            variant="muted"
+            size="xs"
+            className="mx-auto"
+          >
             <ArrowLeft className="h-3 w-3" /> Back
           </Button>
         </div>
@@ -982,15 +1230,18 @@ function GetStartedPane({ onNext, onBack }: { onNext: () => void; onBack: () => 
 export function SetupWizard({ onComplete }: { onComplete: () => void }) {
   const showBilling = isBillingEnabled();
 
-  const steps = useMemo<StepDef[]>(() => [
-    { label: 'How It Works', icon: Key },
-    { label: 'Providers', icon: Sparkles },
-    ...(showBilling ? [{ label: 'Aether Credits', icon: CreditCard }] : []),
-    { label: 'Default Model', icon: Bot },
-    { label: 'Tools', icon: Wrench },
-    { label: 'Integrations', icon: Link },
-    { label: 'Get Started', icon: MessageSquare },
-  ], [showBilling]);
+  const steps = useMemo<StepDef[]>(
+    () => [
+      { label: 'How It Works', icon: Key },
+      { label: 'Providers', icon: Sparkles },
+      ...(showBilling ? [{ label: 'Aether Credits', icon: CreditCard }] : []),
+      { label: 'Default Model', icon: Bot },
+      { label: 'Tools', icon: Wrench },
+      { label: 'Integrations', icon: Link },
+      { label: 'Get Started', icon: MessageSquare },
+    ],
+    [showBilling],
+  );
 
   const totalSteps = steps.length + 1; // +1 for Welcome
 
@@ -1013,21 +1264,27 @@ export function SetupWizard({ onComplete }: { onComplete: () => void }) {
     // Offset by 1 for the Welcome step
     const configStep = step - 1;
     let idx = 0;
-    if (configStep === idx) return <HowItWorksPane onNext={next} onBack={back} />;
+    if (configStep === idx)
+      return <HowItWorksPane onNext={next} onBack={back} />;
     idx++;
-    if (configStep === idx) return <ProvidersPane onNext={next} onBack={back} />;
+    if (configStep === idx)
+      return <ProvidersPane onNext={next} onBack={back} />;
     idx++;
     if (showBilling) {
-      if (configStep === idx) return <AutoTopupPane onNext={next} onBack={back} />;
+      if (configStep === idx)
+        return <AutoTopupPane onNext={next} onBack={back} />;
       idx++;
     }
-    if (configStep === idx) return <DefaultModelPane onNext={next} onBack={back} />;
+    if (configStep === idx)
+      return <DefaultModelPane onNext={next} onBack={back} />;
     idx++;
     if (configStep === idx) return <ToolKeysPane onNext={next} onBack={back} />;
     idx++;
-    if (configStep === idx) return <PipedreamPane onNext={next} onBack={back} />;
+    if (configStep === idx)
+      return <PipedreamPane onNext={next} onBack={back} />;
     idx++;
-    if (configStep === idx) return <GetStartedPane onNext={next} onBack={back} />;
+    if (configStep === idx)
+      return <GetStartedPane onNext={next} onBack={back} />;
     return null;
   }, [showBilling, step, next, back]);
 

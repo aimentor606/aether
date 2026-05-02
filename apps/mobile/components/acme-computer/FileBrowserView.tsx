@@ -35,7 +35,7 @@ import {
   type CommitInfo,
 } from '@/lib/files/hooks';
 import type { SandboxFile } from '@/api/types';
-import { AetherComputerHeader, type BreadcrumbSegment } from './AetherComputerHeader';
+import { AetherComputerHeader, type BreadcrumbSegment } from './KortixComputerHeader';
 import { VersionBanner } from './VersionBanner';
 
 interface FileBrowserViewProps {
@@ -57,9 +57,7 @@ function normalizePath(path: string | null | undefined): string {
   if (!path || typeof path !== 'string') return '/workspace';
   const trimmed = path.trim();
   if (trimmed === '' || trimmed === '/') return '/workspace';
-  return trimmed.startsWith('/workspace')
-    ? trimmed
-    : `/workspace/${trimmed.replace(/^\//, '')}`;
+  return trimmed.startsWith('/workspace') ? trimmed : `/workspace/${trimmed.replace(/^\//, '')}`;
 }
 
 function getBreadcrumbSegments(path: string): BreadcrumbSegment[] {
@@ -81,11 +79,7 @@ function getBreadcrumbSegments(path: string): BreadcrumbSegment[] {
   });
 }
 
-export function FileBrowserView({
-  sandboxId,
-  projectId,
-  project,
-}: FileBrowserViewProps) {
+export function FileBrowserView({ sandboxId, projectId, project }: FileBrowserViewProps) {
   const insets = useSafeAreaInsets();
   const {
     currentPath,
@@ -106,7 +100,9 @@ export function FileBrowserView({
   const [isReverting, setIsReverting] = useState(false);
 
   // Track validated presentation folders (folders that have metadata.json)
-  const [validatedPresentationFolders, setValidatedPresentationFolders] = useState<Set<string>>(new Set());
+  const [validatedPresentationFolders, setValidatedPresentationFolders] = useState<Set<string>>(
+    new Set()
+  );
 
   // Get the effective project ID
   const effectiveProjectId = projectId || project?.id;
@@ -160,12 +156,14 @@ export function FileBrowserView({
   });
 
   // Files at version query
-  const {
-    data: versionFiles = [],
-    isLoading: isLoadingVersionFiles,
-  } = useFilesAtCommit(sandboxId, currentPath, selectedVersion || undefined, {
-    enabled: !!selectedVersion,
-  });
+  const { data: versionFiles = [], isLoading: isLoadingVersionFiles } = useFilesAtCommit(
+    sandboxId,
+    currentPath,
+    selectedVersion || undefined,
+    {
+      enabled: !!selectedVersion,
+    }
+  );
 
   // Revert mutation
   const revertMutation = useRevertToCommit();
@@ -181,8 +179,8 @@ export function FileBrowserView({
     if (!displayFiles || !Array.isArray(displayFiles)) {
       return { folders: [], regularFiles: [] };
     }
-    const folders = displayFiles.filter(f => f.type === 'directory');
-    const regularFiles = displayFiles.filter(f => f.type === 'file');
+    const folders = displayFiles.filter((f) => f.type === 'directory');
+    const regularFiles = displayFiles.filter((f) => f.type === 'file');
     return { folders, regularFiles };
   }, [displayFiles]);
 
@@ -194,7 +192,7 @@ export function FileBrowserView({
     (path: string) => {
       navigateToPath(path);
     },
-    [navigateToPath],
+    [navigateToPath]
   );
 
   // Helper to check if a path is a direct child of /presentations/ folder
@@ -212,48 +210,56 @@ export function FileBrowserView({
   }, []);
 
   // Validate presentation folders by checking for metadata.json
-  const validatePresentationFolders = useCallback(async (folders: SandboxFile[]) => {
-    if (!project?.sandbox?.sandbox_url) return;
-    
-    const sandboxUrl = project.sandbox.sandbox_url;
-    const foldersToValidate = folders.filter(f => f.type === 'directory' && isDirectChildOfPresentations(f.path));
-    
-    if (foldersToValidate.length === 0) return;
-    
-    const newValidated = new Set(validatedPresentationFolders);
-    
-    // Validate each folder in parallel
-    await Promise.all(foldersToValidate.map(async (folder) => {
-      // Skip if already validated
-      if (newValidated.has(folder.path)) return;
-      
-      try {
-        const folderName = folder.path.split('/').pop() || '';
-        const sanitizedName = folderName.replace(/[^a-zA-Z0-9\-_]/g, '').toLowerCase();
-        const metadataUrl = `${sandboxUrl}/workspace/presentations/${sanitizedName}/metadata.json?t=${Date.now()}`;
-        
-        const response = await fetch(metadataUrl, {
-          method: 'HEAD', // Just check if it exists
-          cache: 'no-cache',
-        });
-        
-        if (response.ok) {
-          newValidated.add(folder.path);
-        }
-      } catch {
-        // Folder doesn't have valid metadata.json - not a presentation
-      }
-    }));
-    
-    setValidatedPresentationFolders(newValidated);
-  }, [project?.sandbox?.sandbox_url, validatedPresentationFolders, isDirectChildOfPresentations]);
+  const validatePresentationFolders = useCallback(
+    async (folders: SandboxFile[]) => {
+      if (!project?.sandbox?.sandbox_url) return;
+
+      const sandboxUrl = project.sandbox.sandbox_url;
+      const foldersToValidate = folders.filter(
+        (f) => f.type === 'directory' && isDirectChildOfPresentations(f.path)
+      );
+
+      if (foldersToValidate.length === 0) return;
+
+      const newValidated = new Set(validatedPresentationFolders);
+
+      // Validate each folder in parallel
+      await Promise.all(
+        foldersToValidate.map(async (folder) => {
+          // Skip if already validated
+          if (newValidated.has(folder.path)) return;
+
+          try {
+            const folderName = folder.path.split('/').pop() || '';
+            const sanitizedName = folderName.replace(/[^a-zA-Z0-9\-_]/g, '').toLowerCase();
+            const metadataUrl = `${sandboxUrl}/workspace/presentations/${sanitizedName}/metadata.json?t=${Date.now()}`;
+
+            const response = await fetch(metadataUrl, {
+              method: 'HEAD', // Just check if it exists
+              cache: 'no-cache',
+            });
+
+            if (response.ok) {
+              newValidated.add(folder.path);
+            }
+          } catch {
+            // Folder doesn't have valid metadata.json - not a presentation
+          }
+        })
+      );
+
+      setValidatedPresentationFolders(newValidated);
+    },
+    [project?.sandbox?.sandbox_url, validatedPresentationFolders, isDirectChildOfPresentations]
+  );
 
   // Trigger validation when viewing presentations folder
   useEffect(() => {
-    const isInPresentationsFolder = currentPath === '/workspace/presentations' || 
-                                    currentPath === '/presentations' ||
-                                    currentPath.endsWith('/presentations');
-    
+    const isInPresentationsFolder =
+      currentPath === '/workspace/presentations' ||
+      currentPath === '/presentations' ||
+      currentPath.endsWith('/presentations');
+
     if (isInPresentationsFolder && displayFiles.length > 0 && project?.sandbox?.sandbox_url) {
       validatePresentationFolders(displayFiles);
     }
@@ -263,15 +269,18 @@ export function FileBrowserView({
   // A presentation folder must be:
   // 1. A direct child of /workspace/presentations/ or /presentations/
   // 2. Have a metadata.json file (validated)
-  const isPresentationFolder = useCallback((file: SandboxFile): boolean => {
-    if (file.type !== 'directory') return false;
-    
-    // Must be a direct child of /presentations/
-    if (!isDirectChildOfPresentations(file.path)) return false;
-    
-    // Must have been validated (has metadata.json)
-    return validatedPresentationFolders.has(file.path);
-  }, [isDirectChildOfPresentations, validatedPresentationFolders]);
+  const isPresentationFolder = useCallback(
+    (file: SandboxFile): boolean => {
+      if (file.type !== 'directory') return false;
+
+      // Must be a direct child of /presentations/
+      if (!isDirectChildOfPresentations(file.path)) return false;
+
+      // Must have been validated (has metadata.json)
+      return validatedPresentationFolders.has(file.path);
+    },
+    [isDirectChildOfPresentations, validatedPresentationFolders]
+  );
 
   const handleItemClick = useCallback(
     (file: SandboxFile) => {
@@ -290,7 +299,7 @@ export function FileBrowserView({
         openFile(file.path);
       }
     },
-    [navigateToPath, openFile, isDirectChildOfPresentations, selectedVersion],
+    [navigateToPath, openFile, isDirectChildOfPresentations, selectedVersion]
   );
 
   const handleUploadImage = async () => {
@@ -383,22 +392,25 @@ export function FileBrowserView({
     }
   };
 
-  const getFileIcon = useCallback((file: SandboxFile) => {
-    if (file.type === 'directory') {
-      if (isPresentationFolder(file)) {
-        return <Presentation size={36} className="text-primary" />;
+  const getFileIcon = useCallback(
+    (file: SandboxFile) => {
+      if (file.type === 'directory') {
+        if (isPresentationFolder(file)) {
+          return <Presentation size={36} className="text-primary" />;
+        }
+        return <Folder size={36} className="text-primary" />;
       }
-      return <Folder size={36} className="text-primary" />;
-    }
 
-    const extension = file.name.split('.').pop()?.toLowerCase();
+      const extension = file.name.split('.').pop()?.toLowerCase();
 
-    if (['md', 'txt', 'doc'].includes(extension || '')) {
-      return <FileText size={32} className="text-primary opacity-50" />;
-    }
+      if (['md', 'txt', 'doc'].includes(extension || '')) {
+        return <FileText size={32} className="text-primary opacity-50" />;
+      }
 
-    return <File size={32} className="text-primary opacity-50" />;
-  }, [isPresentationFolder]);
+      return <File size={32} className="text-primary opacity-50" />;
+    },
+    [isPresentationFolder]
+  );
 
   const hasSandbox = !!(project?.sandbox?.id || sandboxId);
   // Use sandbox status for accurate "started" check instead of just URL existence
@@ -415,27 +427,31 @@ export function FileBrowserView({
     return (
       <Pressable
         onPress={() => handleSelectVersion(isCurrent ? null : item)}
-        className={`px-4 py-3 active:opacity-70 ${isSelected ? 'bg-card' : 'bg-transparent'}`}
-      >
+        className={`px-4 py-3 active:opacity-70 ${isSelected ? 'bg-card' : 'bg-transparent'}`}>
         <View className="flex-row items-start justify-between">
-          <View className="flex-1 min-w-0 mr-2">
-            <Text className="text-sm font-roobert-medium text-primary" numberOfLines={1}>
+          <View className="mr-2 min-w-0 flex-1">
+            <Text className="font-roobert-medium text-sm text-primary" numberOfLines={1}>
               {parts[0]}
             </Text>
             {parts.length > 1 && (
-              <Text className="text-xs text-primary opacity-50 mt-0.5" numberOfLines={1}>
+              <Text className="mt-0.5 text-xs text-primary opacity-50" numberOfLines={1}>
                 {parts.slice(1).join(':').trim()}
               </Text>
             )}
-            <Text className="text-xs text-primary opacity-50 mt-1">
+            <Text className="mt-1 text-xs text-primary opacity-50">
               {new Date(item.date).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
-                year: new Date(item.date).getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
-              })} at {new Date(item.date).toLocaleTimeString('en-US', {
+                year:
+                  new Date(item.date).getFullYear() !== new Date().getFullYear()
+                    ? 'numeric'
+                    : undefined,
+              })}{' '}
+              at{' '}
+              {new Date(item.date).toLocaleTimeString('en-US', {
                 hour: 'numeric',
                 minute: '2-digit',
-                hour12: true
+                hour12: true,
               })}
             </Text>
           </View>
@@ -446,11 +462,8 @@ export function FileBrowserView({
                 e.stopPropagation?.();
                 handleOpenRevertModal(item.commit);
               }}
-              className="px-2 py-1 rounded-full bg-card border border-border active:opacity-70"
-            >
-              <Text className="text-[11px] font-roobert-medium text-primary">
-                Restore
-              </Text>
+              className="rounded-full border border-border bg-card px-2 py-1 active:opacity-70">
+              <Text className="font-roobert-medium text-[11px] text-primary">Restore</Text>
             </Pressable>
           )}
         </View>
@@ -474,17 +487,11 @@ export function FileBrowserView({
             <Pressable
               onPress={handleUploadImage}
               disabled={isUploading || !!selectedVersion}
-              className={`h-9 w-9 items-center justify-center rounded-xl bg-card border border-border active:opacity-70 ${selectedVersion ? 'opacity-50' : ''}`}
-            >
+              className={`h-9 w-9 items-center justify-center rounded-xl border border-border bg-card active:opacity-70 ${selectedVersion ? 'opacity-50' : ''}`}>
               {isUploading ? (
                 <AetherLoader size="small" customSize={17} />
               ) : (
-                <Icon
-                  as={Upload}
-                  size={17}
-                  className="text-primary"
-                  strokeWidth={2}
-                />
+                <Icon as={Upload} size={17} className="text-primary" strokeWidth={2} />
               )}
             </Pressable>
 
@@ -495,30 +502,17 @@ export function FileBrowserView({
                 setShowVersionModal(true);
                 refetchVersions();
               }}
-              className="flex-row items-center gap-1.5 h-9 px-3 rounded-xl bg-card border border-border active:opacity-70"
-            >
-              <Icon
-                as={Clock}
-                size={17}
-                className="text-primary"
-                strokeWidth={2}
-              />
-              <Text className="text-xs font-roobert-medium text-primary">
-                {selectedVersion && selectedVersionDate ? (
-                  new Date(selectedVersionDate).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric'
-                  })
-                ) : (
-                  'History'
-                )}
+              className="h-9 flex-row items-center gap-1.5 rounded-xl border border-border bg-card px-3 active:opacity-70">
+              <Icon as={Clock} size={17} className="text-primary" strokeWidth={2} />
+              <Text className="font-roobert-medium text-xs text-primary">
+                {selectedVersion && selectedVersionDate
+                  ? new Date(selectedVersionDate).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  : 'History'}
               </Text>
-              <Icon
-                as={ChevronDown}
-                size={12}
-                className="text-primary"
-                strokeWidth={2}
-              />
+              <Icon as={ChevronDown} size={12} className="text-primary" strokeWidth={2} />
             </Pressable>
           </View>
         }
@@ -538,23 +532,18 @@ export function FileBrowserView({
         {hasSandbox && isLoadingStatus && !sandboxStatus ? (
           <View className="flex-1 items-center justify-center gap-2 p-8">
             <AetherLoader size="large" />
-            <Text className="text-sm font-roobert-medium text-center">
+            <Text className="text-center font-roobert-medium text-sm">
               Checking computer status...
             </Text>
           </View>
         ) : hasSandbox && isSandboxStatusError ? (
           /* Show error when status check failed */
           <View className="flex-1 items-center justify-center gap-2 p-8">
-            <Icon
-              as={AlertTriangle}
-              size={48}
-              className="text-destructive"
-              strokeWidth={1.5}
-            />
-            <Text className="text-sm font-roobert-medium text-center text-destructive">
+            <Icon as={AlertTriangle} size={48} className="text-destructive" strokeWidth={1.5} />
+            <Text className="text-center font-roobert-medium text-sm text-destructive">
               Failed to check computer status
             </Text>
-            <Text className="text-xs text-muted-foreground text-center max-w-xs">
+            <Text className="max-w-xs text-center text-xs text-muted-foreground">
               {sandboxStatusError?.message || 'Unknown error'}
             </Text>
           </View>
@@ -562,15 +551,19 @@ export function FileBrowserView({
           /* Show sandbox status when not ready */
           <View className="flex-1 items-center justify-center gap-2 p-8">
             <AetherLoader size="large" />
-            <Text className="text-sm font-roobert-medium text-center">
-              {(sandboxStatus === 'STARTING' || isAutoStarting) && (isAutoStarting ? 'Waking up computer...' : 'Computer starting...')}
+            <Text className="text-center font-roobert-medium text-sm">
+              {(sandboxStatus === 'STARTING' || isAutoStarting) &&
+                (isAutoStarting ? 'Waking up computer...' : 'Computer starting...')}
               {sandboxStatus === 'OFFLINE' && !isAutoStarting && 'Computer offline'}
               {sandboxStatus === 'FAILED' && 'Computer unavailable'}
               {sandboxStatus === 'UNKNOWN' && 'Initializing...'}
             </Text>
-            <Text className="text-xs text-muted-foreground text-center">
-              {(sandboxStatus === 'STARTING' || isAutoStarting) && 'Files will appear once the computer is ready'}
-              {sandboxStatus === 'OFFLINE' && !isAutoStarting && 'Attempting to start the computer...'}
+            <Text className="text-center text-xs text-muted-foreground">
+              {(sandboxStatus === 'STARTING' || isAutoStarting) &&
+                'Files will appear once the computer is ready'}
+              {sandboxStatus === 'OFFLINE' &&
+                !isAutoStarting &&
+                'Attempting to start the computer...'}
               {sandboxStatus === 'FAILED' && 'There was an issue starting the computer'}
               {sandboxStatus === 'UNKNOWN' && 'Setting up your workspace...'}
             </Text>
@@ -584,52 +577,43 @@ export function FileBrowserView({
           </View>
         ) : displayFiles.length === 0 ? (
           <View className="flex-1 items-center justify-center gap-2 p-8">
-            <Icon
-              as={Folder}
-              size={48}
-              className="text-primary opacity-50"
-              strokeWidth={1.5}
-            />
+            <Icon as={Folder} size={48} className="text-primary opacity-50" strokeWidth={1.5} />
             {!hasSandbox ? (
               <>
-                <Text className="text-sm font-roobert-medium text-center">
+                <Text className="text-center font-roobert-medium text-sm">
                   Computer is not available yet
                 </Text>
-                <Text className="text-xs text-muted-foreground text-center">
+                <Text className="text-center text-xs text-muted-foreground">
                   A computer will be created when you start working on this task
                 </Text>
               </>
             ) : (
-              <Text className="text-sm text-muted-foreground text-center">
-                Directory is empty
-              </Text>
+              <Text className="text-center text-sm text-muted-foreground">Directory is empty</Text>
             )}
           </View>
         ) : (
           <ScrollView
             className="flex-1"
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ padding: 16 }}
-          >
+            contentContainerStyle={{ padding: 16 }}>
             <View className="flex-row flex-wrap gap-3">
               {folders.map((file) => (
                 <Pressable
                   key={file.path}
                   onPress={() => handleItemClick(file)}
-                  className="flex-col items-center justify-between p-3 rounded-2xl border border-border bg-card active:opacity-70"
-                  style={{ width: 100, height: 100 }}
-                >
+                  className="flex-col items-center justify-between rounded-2xl border border-border bg-card p-3 active:opacity-70"
+                  style={{ width: 100, height: 100 }}>
                   {isPresentationFolder(file) && (
-                    <View className="absolute top-1 right-1 bg-card border border-border rounded px-1.5 py-0.5">
-                      <Text className="text-[10px] font-roobert-medium text-primary">
+                    <View className="absolute right-1 top-1 rounded border border-border bg-card px-1.5 py-0.5">
+                      <Text className="font-roobert-medium text-[10px] text-primary">
                         Presentation
                       </Text>
                     </View>
                   )}
-                  <View className="w-10 h-10 items-center justify-center">
-                    {getFileIcon(file)}
-                  </View>
-                  <Text className="text-xs text-center font-roobert-medium text-primary w-full" numberOfLines={2}>
+                  <View className="h-10 w-10 items-center justify-center">{getFileIcon(file)}</View>
+                  <Text
+                    className="w-full text-center font-roobert-medium text-xs text-primary"
+                    numberOfLines={2}>
                     {file.name}
                   </Text>
                 </Pressable>
@@ -639,13 +623,12 @@ export function FileBrowserView({
                 <Pressable
                   key={file.path}
                   onPress={() => handleItemClick(file)}
-                  className="flex-col items-center justify-between p-3 rounded-2xl border border-border bg-card active:opacity-70"
-                  style={{ width: 100, height: 100 }}
-                >
-                  <View className="w-10 h-10 items-center justify-center">
-                    {getFileIcon(file)}
-                  </View>
-                  <Text className="text-xs text-center font-roobert-medium text-primary w-full" numberOfLines={2}>
+                  className="flex-col items-center justify-between rounded-2xl border border-border bg-card p-3 active:opacity-70"
+                  style={{ width: 100, height: 100 }}>
+                  <View className="h-10 w-10 items-center justify-center">{getFileIcon(file)}</View>
+                  <Text
+                    className="w-full text-center font-roobert-medium text-xs text-primary"
+                    numberOfLines={2}>
                     {file.name}
                   </Text>
                 </Pressable>
@@ -657,19 +640,20 @@ export function FileBrowserView({
 
       {/* Footer */}
       <View
-        className="px-4 pt-4 border-t border-border bg-card"
-        style={{ paddingBottom: Math.max(24, insets.bottom + 8) }}
-      >
-        <View className="flex-row items-center justify-between h-9">
+        className="border-t border-border bg-card px-4 pt-4"
+        style={{ paddingBottom: Math.max(24, insets.bottom + 8) }}>
+        <View className="h-9 flex-row items-center justify-between">
           <View className="flex-row items-center gap-2">
-            <View className="flex-row items-center gap-1.5 px-2 py-1 rounded-full border border-border">
+            <View className="flex-row items-center gap-1.5 rounded-full border border-border px-2 py-1">
               <Icon as={Folder} size={12} className="text-primary" />
-              <Text className="text-xs font-roobert-medium text-primary">
+              <Text className="font-roobert-medium text-xs text-primary">
                 {displayFiles.length} {displayFiles.length === 1 ? 'item' : 'items'}
               </Text>
             </View>
           </View>
-          <Text className="text-xs text-primary opacity-50 truncate max-w-[200px]" numberOfLines={1}>
+          <Text
+            className="max-w-[200px] truncate text-xs text-primary opacity-50"
+            numberOfLines={1}>
             {currentPath}
           </Text>
         </View>
@@ -680,15 +664,13 @@ export function FileBrowserView({
         visible={showVersionModal}
         animationType="slide"
         presentationStyle="pageSheet"
-        onRequestClose={() => setShowVersionModal(false)}
-      >
+        onRequestClose={() => setShowVersionModal(false)}>
         <View className="flex-1 bg-background">
-          <View className="px-4 py-3 border-b border-border bg-background flex-row items-center justify-between">
-            <Text className="text-lg font-roobert-semibold text-primary">Version History</Text>
+          <View className="flex-row items-center justify-between border-b border-border bg-background px-4 py-3">
+            <Text className="font-roobert-semibold text-lg text-primary">Version History</Text>
             <Pressable
               onPress={() => setShowVersionModal(false)}
-              className="h-9 w-9 items-center justify-center rounded-xl bg-card border border-border active:opacity-70"
-            >
+              className="h-9 w-9 items-center justify-center rounded-xl border border-border bg-card active:opacity-70">
               <Icon as={X} size={17} className="text-primary" strokeWidth={2} />
             </Pressable>
           </View>
@@ -696,21 +678,19 @@ export function FileBrowserView({
           {isLoadingVersions ? (
             <View className="flex-1 items-center justify-center">
               <AetherLoader size="large" />
-              <Text className="text-sm text-muted-foreground mt-4">Loading history...</Text>
+              <Text className="mt-4 text-sm text-muted-foreground">Loading history...</Text>
             </View>
           ) : versions.length === 0 ? (
             <View className="flex-1 items-center justify-center p-8">
               <Icon as={Clock} size={48} className="text-primary opacity-50" />
-              <Text className="text-sm text-primary opacity-50 mt-4">No history available</Text>
+              <Text className="mt-4 text-sm text-primary opacity-50">No history available</Text>
             </View>
           ) : (
             <FlatList
               data={versions}
               renderItem={renderVersionItem}
               keyExtractor={(item) => item.commit}
-              ItemSeparatorComponent={() => (
-                <View className="h-px bg-border" />
-              )}
+              ItemSeparatorComponent={() => <View className="h-px bg-border" />}
             />
           )}
         </View>
@@ -721,50 +701,57 @@ export function FileBrowserView({
         visible={showRevertModal}
         animationType="fade"
         transparent
-        onRequestClose={() => setShowRevertModal(false)}
-      >
-        <View className="flex-1 items-center justify-center px-4 bg-background/80">
-          <View className="w-full max-w-md rounded-2xl p-4 bg-card border border-border">
-            <Text className="text-lg font-roobert-semibold mb-2 text-primary">Restore Previous Version</Text>
-            <Text className="text-sm text-primary opacity-50 mb-4">
+        onRequestClose={() => setShowRevertModal(false)}>
+        <View className="flex-1 items-center justify-center bg-background/80 px-4">
+          <View className="w-full max-w-md rounded-2xl border border-border bg-card p-4">
+            <Text className="mb-2 font-roobert-semibold text-lg text-primary">
+              Restore Previous Version
+            </Text>
+            <Text className="mb-4 text-sm text-primary opacity-50">
               This will restore all files from this version snapshot.
             </Text>
 
-            <View className="flex-row items-start gap-2 p-3 rounded-xl mb-4 bg-card border border-border">
+            <View className="mb-4 flex-row items-start gap-2 rounded-xl border border-border bg-card p-3">
               <Icon as={AlertTriangle} size={16} className="text-primary" strokeWidth={2} />
-              <Text className="text-xs flex-1 text-primary opacity-70">
-                This will replace current files with the selected version snapshot. Your current changes will be overwritten.
+              <Text className="flex-1 text-xs text-primary opacity-70">
+                This will replace current files with the selected version snapshot. Your current
+                changes will be overwritten.
               </Text>
             </View>
 
             {isLoadingRevertInfo ? (
-              <View className="py-8 items-center">
+              <View className="items-center py-8">
                 <AetherLoader size="small" />
               </View>
             ) : revertCommitInfo ? (
               <View className="mb-4">
-                <Text className="text-sm font-roobert-medium mb-1">{revertCommitInfo.message}</Text>
-                <Text className="text-xs text-muted-foreground mb-3">
-                  {revertCommitInfo.date && new Date(revertCommitInfo.date).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
+                <Text className="mb-1 font-roobert-medium text-sm">{revertCommitInfo.message}</Text>
+                <Text className="mb-3 text-xs text-muted-foreground">
+                  {revertCommitInfo.date &&
+                    new Date(revertCommitInfo.date).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
                 </Text>
 
                 {revertCommitInfo.revert_files && revertCommitInfo.revert_files.length > 0 && (
                   <>
-                    <Text className="text-xs text-muted-foreground mb-2">Files that will be affected:</Text>
-                    <View className="rounded-xl p-2 max-h-40 bg-card border border-border">
+                    <Text className="mb-2 text-xs text-muted-foreground">
+                      Files that will be affected:
+                    </Text>
+                    <View className="max-h-40 rounded-xl border border-border bg-card p-2">
                       <ScrollView>
                         {revertCommitInfo.revert_files.slice(0, 10).map((f, i) => (
                           <View key={i} className="flex-row items-center justify-between py-1">
-                            <Text className="text-xs text-foreground flex-1" numberOfLines={1}>{f.path}</Text>
-                            <Text className="text-xs text-muted-foreground ml-2">{f.status}</Text>
+                            <Text className="flex-1 text-xs text-foreground" numberOfLines={1}>
+                              {f.path}
+                            </Text>
+                            <Text className="ml-2 text-xs text-muted-foreground">{f.status}</Text>
                           </View>
                         ))}
                         {revertCommitInfo.revert_files.length > 10 && (
-                          <Text className="text-xs text-muted-foreground py-1">
+                          <Text className="py-1 text-xs text-muted-foreground">
                             ... and {revertCommitInfo.revert_files.length - 10} more files
                           </Text>
                         )}
@@ -779,25 +766,27 @@ export function FileBrowserView({
               <Pressable
                 onPress={() => setShowRevertModal(false)}
                 disabled={isReverting}
-                className="flex-1 py-3 rounded-xl items-center active:opacity-70 bg-card border border-border"
-              >
-                <Text className="text-sm font-roobert-medium text-primary">Cancel</Text>
+                className="flex-1 items-center rounded-xl border border-border bg-card py-3 active:opacity-70">
+                <Text className="font-roobert-medium text-sm text-primary">Cancel</Text>
               </Pressable>
               <Pressable
                 onPress={handleRevert}
                 disabled={isReverting}
-                className="flex-1 py-3 rounded-xl items-center active:opacity-70"
+                className="flex-1 items-center rounded-xl py-3 active:opacity-70"
                 style={{
                   backgroundColor: '#3b82f6',
-                }}
-              >
+                }}>
                 {isReverting ? (
                   <View className="flex-row items-center gap-2">
                     <AetherLoader size="small" customSize={14} forceTheme="dark" />
-                    <Text className="text-sm font-roobert-medium" style={{ color: '#ffffff' }}>Restoring...</Text>
+                    <Text className="font-roobert-medium text-sm" style={{ color: '#ffffff' }}>
+                      Restoring...
+                    </Text>
                   </View>
                 ) : (
-                  <Text className="text-sm font-roobert-medium" style={{ color: '#ffffff' }}>Restore</Text>
+                  <Text className="font-roobert-medium text-sm" style={{ color: '#ffffff' }}>
+                    Restore
+                  </Text>
                 )}
               </Pressable>
             </View>

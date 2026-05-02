@@ -69,12 +69,18 @@ mock.module('../router/services/billing', () => ({
   deductLLMCredits: async (...args: any[]) => mockDeductResult,
 }));
 
+// NOTE: billing/mocks.ts registers '../../config' (resolved from __tests__/billing/).
+// This mock uses '../config' (resolved from __tests__/). Bun resolves these to the
+// same absolute path, so first-registration-wins applies — but admin-routes.test.ts
+// only runs registerGlobalMocks() inside the test body, not at import time.
+// The module-level mock.module() below may or may not win depending on load order,
+// so we keep it to ensure router tests always have their config.
 mock.module('../config', () => ({
   config: {
     ENV_MODE: 'test',
     INTERNAL_AETHER_ENV: 'test',
     PORT: 8008,
-    DATABASE_URL: 'postgres://mock:mock@localhost/mock',
+    DATABASE_URL: process.env.DATABASE_URL || 'postgres://mock:mock@localhost/mock',
     SUPABASE_URL: 'http://localhost:54321',
     SUPABASE_SERVICE_ROLE_KEY: 'test-key',
     API_KEY_SECRET: 'test-secret',
@@ -114,12 +120,21 @@ mock.module('../config', () => ({
   PLATFORM_FEE_MARKUP: 0.1,
 }));
 
-// Mock DB to prevent real database connections
-mock.module('../shared/db', () => ({
-  hasDatabase: true,
-  db: {
-    select: () => ({ from: () => ({ where: () => ({ limit: () => Promise.resolve([]) }) }) }),
-  },
+// NOTE: Do NOT mock ../shared/db here. The router test's config mock provides
+// DATABASE_URL so the real db module creates a proper connection.
+// Previous mocks (incomplete or Proxy-based) broke other tests that need real
+// DB access (pipedream, deployments, resolve-account-strict) because Bun's
+// mock.module() is process-global and first-registration-wins.
+
+// Mock tenant-config-loader to prevent real DB queries with test account IDs.
+// The router applies tenantConfigLoader to web-search, image-search, and finance
+// routes. Without this mock, those routes hit vertical_configs with a non-UUID
+// test account ID, causing PostgresError in the full suite.
+mock.module('../middleware/tenant-config-loader', () => ({
+  tenantConfigLoader: async (_c: any, next: any) => { await next(); },
+  invalidateTenantCache: mock(() => {}),
+  getCacheMetrics: () => ({ hits: 0, misses: 0, evictions: 0, expirations: 0, size: 0 }),
+  resetCacheMetrics: () => {},
 }));
 
 // Mock finance routes to avoid deep DB import chains
@@ -132,9 +147,36 @@ mock.module('../router/routes/finance', () => ({
   ledgersRoutes: mockFinanceApp,
 }));
 
-// Mock shared/crypto
+// Mock shared/crypto — generates unique keys matching the real format
+// (pk_<32chars>, aether_<32chars>) to avoid breaking downstream tests
+// that validate key format with regex assertions.
+let _routerKeyCounter = 0;
+function _uniqueAlphanumeric(length: number): string {
+  _routerKeyCounter++;
+  const base = _routerKeyCounter.toString(36).padStart(4, '0');
+  return (base + 'x'.repeat(length)).slice(0, length);
+}
 mock.module('../shared/crypto', () => ({
+  KEY_PREFIX: 'aether_',
+  KEY_PREFIX_SANDBOX: 'aether_sb_',
+  KEY_PREFIX_TUNNEL: 'aether_tnl_',
+  KEY_PREFIX_PUBLIC: 'pk_',
+  randomAlphanumeric: (length: number) => _uniqueAlphanumeric(length),
   isAetherToken: (token: string) => token.startsWith('aether_'),
+  generateApiKeyPair: () => ({ publicKey: `pk_${_uniqueAlphanumeric(32)}`, secretKey: `aether_${_uniqueAlphanumeric(32)}` }),
+  generateSandboxKeyPair: () => ({ publicKey: `pk_${_uniqueAlphanumeric(32)}`, secretKey: `aether_sb_${_uniqueAlphanumeric(32)}` }),
+  generateTunnelToken: () => 'aether_tnl_testtoken',
+  generateDeviceCode: () => 'ABCD-1234',
+  isTunnelToken: (token: string) => token.startsWith('aether_tnl_'),
+  hashSecretKey: (key: string) => 'testhash_' + key,
+  verifySecretKey: (_key: string, _hash: string) => true,
+  isApiKeySecretConfigured: () => true,
+  timingSafeStringEqual: (_a: string, _b: string) => _a === _b,
+  deriveSigningKey: (_token: string, _secret: string) => 'testsigningkey',
+  signMessage: (_key: string, _payload: string, _nonce: number) => 'testsig',
+  verifyMessageSignature: (_key: string, _payload: string, _nonce: number, _sig: string) => true,
+  encryptCredential: (plaintext: string) => plaintext,
+  decryptCredential: (encrypted: string) => encrypted,
 }));
 
 mock.module('../router/config/litellm-config', () => ({

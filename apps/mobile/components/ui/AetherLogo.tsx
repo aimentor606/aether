@@ -1,0 +1,1 @@
+export { AetherLogo } from './KortixLogo';

@@ -35,7 +35,7 @@ import {
   Timer,
   Info,
 } from 'lucide-react';
-import { useAdminStressTest } from '@aether/sdk/client';
+import { useStressTest } from '@/hooks/admin/use-stress-test';
 import { cn } from '@/lib/utils';
 
 export default function AdminStressTestPage() {
@@ -45,7 +45,7 @@ export default function AdminStressTestPage() {
     Math.max(1, parseInt(numRequestsInput) || 5),
   );
 
-  const { state, runStressTest, cancelTest, resetTest } = useAdminStressTest();
+  const { state, runStressTest, cancelTest, resetTest } = useStressTest();
 
   const stats = useMemo(() => {
     const done = state.results.filter((r) => r.status === 'done').length;
@@ -125,7 +125,7 @@ export default function AdminStressTestPage() {
   }, [state.results]);
 
   // Build thread URL
-  const getThreadUrl = (result: StressTestResult) => {
+  const getThreadUrl = (result: (typeof state.results)[number]) => {
     if (!result.thread_id || !result.project_id) return null;
     return `/projects/${result.project_id}/thread/${result.thread_id}`;
   };

@@ -1,5 +1,14 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { ActivityIndicator, Animated, Easing, Pressable, ScrollView, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import {
+  ActivityIndicator,
+  Animated,
+  Easing,
+  Pressable,
+  ScrollView,
+  View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import { useQuery } from '@tanstack/react-query';
@@ -25,7 +34,12 @@ import {
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { useGlobalSandboxUpdate } from '@/hooks/useSandboxUpdate';
-import { getFullChangelog, type ChangelogChange, type ChangelogEntry, type UpdatePhase } from '@/lib/platform/client';
+import {
+  getFullChangelog,
+  type ChangelogChange,
+  type ChangelogEntry,
+  type UpdatePhase,
+} from '@/lib/platform/client';
 import { useTabStore, type PageTab } from '@/stores/tab-store';
 import { useThemeColors } from '@/lib/theme-colors';
 import { Ionicons } from '@expo/vector-icons';
@@ -131,7 +145,7 @@ export function UpdatesPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: U
         <Pressable onPress={onOpenDrawer} hitSlop={8} className="mr-3">
           <Icon as={Menu} size={20} className="text-foreground" strokeWidth={2} />
         </Pressable>
-        <Text className="flex-1 text-lg font-roobert-medium text-foreground">{page.label}</Text>
+        <Text className="flex-1 font-roobert-medium text-lg text-foreground">{page.label}</Text>
         <Pressable onPress={onOpenRightDrawer} hitSlop={8} className="ml-3 p-1">
           <Ionicons name="apps-outline" size={20} color={isDark ? '#F8F8F8' : '#121215'} />
         </Pressable>
@@ -144,18 +158,21 @@ export function UpdatesPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: U
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
         onScroll={handleScroll}
         scrollEventThrottle={64}
-        onContentSizeChange={handleContentSizeChange}
-      >
-        <View className="px-5 pt-2 pb-4">
+        onContentSizeChange={handleContentSizeChange}>
+        <View className="px-5 pb-4 pt-2">
           {/* Header */}
-          <Text className="text-2xl font-roobert-semibold text-foreground">Changelog</Text>
+          <Text className="font-roobert-semibold text-2xl text-foreground">Changelog</Text>
           <View className="mt-1 flex-row items-center">
             <Text className="font-roobert text-sm text-muted-foreground">
-              Running <Text className="font-roobert-semibold text-foreground">v{currentVersion || '...'}</Text>
+              Running{' '}
+              <Text className="font-roobert-semibold text-foreground">
+                v{currentVersion || '...'}
+              </Text>
             </Text>
             {latestVersion && updateAvailable && (
               <Text className="font-roobert text-sm text-muted-foreground">
-                {' · Latest: '}<Text className="font-roobert-semibold text-foreground">v{latestVersion}</Text>
+                {' · Latest: '}
+                <Text className="font-roobert-semibold text-foreground">v{latestVersion}</Text>
               </Text>
             )}
           </View>
@@ -165,10 +182,16 @@ export function UpdatesPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: U
             <Pressable
               onPress={handleUpdate}
               className="mt-4 flex-row items-center justify-center self-start rounded-xl px-5 py-2.5 active:opacity-90"
-              style={{ backgroundColor: themeColors.primary }}
-            >
-              <Icon as={ArrowDownToLine} size={15} style={{ color: themeColors.primaryForeground }} strokeWidth={2.5} />
-              <Text className="ml-2 font-roobert-semibold text-sm" style={{ color: themeColors.primaryForeground }}>
+              style={{ backgroundColor: themeColors.primary }}>
+              <Icon
+                as={ArrowDownToLine}
+                size={15}
+                style={{ color: themeColors.primaryForeground } as any}
+                strokeWidth={2.5}
+              />
+              <Text
+                className="ml-2 font-roobert-semibold text-sm"
+                style={{ color: themeColors.primaryForeground }}>
                 Update to v{latestVersion}
               </Text>
             </Pressable>
@@ -190,34 +213,52 @@ export function UpdatesPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: U
               className="mt-4 rounded-2xl border px-4 py-4"
               style={{
                 borderColor: updateError
-                  ? isDark ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.15)'
-                  : isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.08)',
+                  ? isDark
+                    ? 'rgba(239,68,68,0.2)'
+                    : 'rgba(239,68,68,0.15)'
+                  : isDark
+                    ? 'rgba(248,248,248,0.08)'
+                    : 'rgba(18,18,21,0.08)',
                 backgroundColor: updateError
-                  ? isDark ? 'rgba(239,68,68,0.05)' : 'rgba(239,68,68,0.03)'
+                  ? isDark
+                    ? 'rgba(239,68,68,0.05)'
+                    : 'rgba(239,68,68,0.03)'
                   : undefined,
-              }}
-            >
+              }}>
               {/* Header */}
-              <View className="flex-row items-center mb-3">
+              <View className="mb-3 flex-row items-center">
                 {updateError ? (
                   <Icon as={X} size={18} className="text-destructive" strokeWidth={2.5} />
                 ) : (
                   <ActivityIndicator size="small" />
                 )}
                 <View className="ml-3 flex-1">
-                  <Text className={`font-roobert-medium text-[15px] ${updateError ? 'text-destructive' : 'text-foreground'}`}>
+                  <Text
+                    className={`font-roobert-medium text-[15px] ${updateError ? 'text-destructive' : 'text-foreground'}`}>
                     {updateError ? 'Update failed' : `Updating to v${latestVersion}`}
                   </Text>
                 </View>
                 {!updateError && (
-                  <Text className="font-roobert text-xs tabular-nums text-muted-foreground">{Math.round(phaseProgress)}%</Text>
+                  <Text className="font-roobert text-xs tabular-nums text-muted-foreground">
+                    {Math.round(phaseProgress)}%
+                  </Text>
                 )}
               </View>
 
               {/* Progress bar */}
               {!updateError && (
-                <View className="mb-4 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.06)' }}>
-                  <View className="h-full rounded-full" style={{ width: `${Math.max(phaseProgress, 2)}%`, backgroundColor: themeColors.primary }} />
+                <View
+                  className="mb-4 h-1.5 overflow-hidden rounded-full"
+                  style={{
+                    backgroundColor: isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.06)',
+                  }}>
+                  <View
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${Math.max(phaseProgress, 2)}%`,
+                      backgroundColor: themeColors.primary,
+                    }}
+                  />
                 </View>
               )}
 
@@ -227,8 +268,12 @@ export function UpdatesPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: U
               {/* Error details + retry */}
               {updateError && (
                 <View className="mt-3 flex-row items-center">
-                  <Text className="flex-1 font-roobert text-xs text-muted-foreground">{updateError.message}</Text>
-                  <Pressable onPress={handleRetry} className="ml-2 rounded-lg bg-muted/60 px-3 py-1.5 active:opacity-70">
+                  <Text className="flex-1 font-roobert text-xs text-muted-foreground">
+                    {updateError.message}
+                  </Text>
+                  <Pressable
+                    onPress={handleRetry}
+                    className="ml-2 rounded-lg bg-muted/60 px-3 py-1.5 active:opacity-70">
                     <Text className="font-roobert-medium text-xs text-foreground">Try again</Text>
                   </Pressable>
                 </View>
@@ -240,7 +285,7 @@ export function UpdatesPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: U
         {/* Changelog entries */}
         <View className="px-5" style={{ gap: 16 }}>
           {isLoading && (
-            <View className="py-12 items-center">
+            <View className="items-center py-12">
               <ActivityIndicator size="small" />
             </View>
           )}
@@ -248,33 +293,58 @@ export function UpdatesPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: U
           {changelog?.map((entry) => {
             const isCurrent = currentVersion === entry.version;
             const isLatest = latestVersion === entry.version;
-            const borderColor = isLatest && !isCurrent
-              ? isDark ? 'rgba(219,39,119,0.35)' : 'rgba(219,39,119,0.25)'
-              : isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.08)';
-            const bgColor = isLatest && !isCurrent
-              ? isDark ? 'rgba(219,39,119,0.04)' : 'rgba(219,39,119,0.02)'
-              : undefined;
+            const borderColor =
+              isLatest && !isCurrent
+                ? isDark
+                  ? 'rgba(219,39,119,0.35)'
+                  : 'rgba(219,39,119,0.25)'
+                : isDark
+                  ? 'rgba(248,248,248,0.08)'
+                  : 'rgba(18,18,21,0.08)';
+            const bgColor =
+              isLatest && !isCurrent
+                ? isDark
+                  ? 'rgba(219,39,119,0.04)'
+                  : 'rgba(219,39,119,0.02)'
+                : undefined;
 
             return (
-              <View key={entry.version} className="rounded-2xl border px-4 pt-4 pb-3" style={{ borderColor, backgroundColor: bgColor }}>
-                <View className="flex-row items-center mb-2">
-                  <Text className="font-roobert-semibold text-lg text-foreground">v{entry.version}</Text>
+              <View
+                key={entry.version}
+                className="rounded-2xl border px-4 pb-3 pt-4"
+                style={{ borderColor, backgroundColor: bgColor }}>
+                <View className="mb-2 flex-row items-center">
+                  <Text className="font-roobert-semibold text-lg text-foreground">
+                    v{entry.version}
+                  </Text>
                   {isCurrent && (
                     <View className="ml-2 rounded-full bg-emerald-400/15 px-2 py-0.5">
-                      <Text className="text-[10px] font-roobert-medium text-emerald-600 dark:text-emerald-400">Current</Text>
+                      <Text className="font-roobert-medium text-[10px] text-emerald-600 dark:text-emerald-400">
+                        Current
+                      </Text>
                     </View>
                   )}
                   {isLatest && !isCurrent && (
                     <View className="ml-2 rounded-full bg-primary/15 px-2 py-0.5">
-                      <Text className="text-[10px] font-roobert-medium text-primary">Latest</Text>
+                      <Text className="font-roobert-medium text-[10px] text-primary">Latest</Text>
                     </View>
                   )}
                   {!!entry.date && (
-                    <Text className="ml-auto font-roobert text-[11px] text-muted-foreground/60">{entry.date}</Text>
+                    <Text className="ml-auto font-roobert text-[11px] text-muted-foreground/60">
+                      {entry.date}
+                    </Text>
                   )}
                 </View>
-                {!!entry.title && <Text className="font-roobert-medium text-[14px] text-foreground mb-1">{entry.title}</Text>}
-                {!!entry.description && <Text className="font-roobert text-xs text-muted-foreground mb-3 leading-[18px]">{entry.description}</Text>}
+                {!!entry.title && (
+                  <Text className="mb-1 font-roobert-medium text-[14px] text-foreground">
+                    {entry.title}
+                  </Text>
+                )}
+                {!!entry.description && (
+                  <Text className="mb-3 font-roobert text-xs leading-[18px] text-muted-foreground">
+                    {entry.description}
+                  </Text>
+                )}
                 {entry.changes?.length > 0 && (
                   <View style={{ gap: 6 }}>
                     {entry.changes.map((change, idx) => {
@@ -282,10 +352,17 @@ export function UpdatesPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: U
                       const color = CHANGE_COLORS[change.type] || '#60A5FA';
                       return (
                         <View key={idx} className="flex-row items-start py-1">
-                          <View className="mt-0.5 mr-2.5">
-                            <Icon as={ChangeIcon} size={13} style={{ color }} strokeWidth={2.2} />
+                          <View className="mr-2.5 mt-0.5">
+                            <Icon
+                              as={ChangeIcon}
+                              size={13}
+                              style={{ color } as any}
+                              strokeWidth={2.2}
+                            />
                           </View>
-                          <Text className="flex-1 font-roobert text-[13px] text-foreground/90 leading-[18px]">{change.text}</Text>
+                          <Text className="flex-1 font-roobert text-[13px] leading-[18px] text-foreground/90">
+                            {change.text}
+                          </Text>
                         </View>
                       );
                     })}
@@ -296,7 +373,9 @@ export function UpdatesPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: U
           })}
 
           {!isLoading && changelog.length === 0 && (
-            <Text className="py-8 text-center font-roobert text-xs text-muted-foreground">No changelog entries available.</Text>
+            <Text className="py-8 text-center font-roobert text-xs text-muted-foreground">
+              No changelog entries available.
+            </Text>
           )}
         </View>
       </ScrollView>
@@ -316,9 +395,25 @@ const UPDATE_PHASES: { phase: UpdatePhase; label: string; icon: typeof Download 
   { phase: 'complete', label: 'Complete', icon: Check },
 ];
 
-const PHASE_ORDER: UpdatePhase[] = ['pulling', 'stopping', 'removing', 'recreating', 'starting', 'health_check', 'complete'];
+const PHASE_ORDER: UpdatePhase[] = [
+  'pulling',
+  'stopping',
+  'removing',
+  'recreating',
+  'starting',
+  'health_check',
+  'complete',
+];
 
-function UpdatePhaseSteps({ currentPhase, hasError, isDark }: { currentPhase: string; hasError: boolean; isDark: boolean }) {
+function UpdatePhaseSteps({
+  currentPhase,
+  hasError,
+  isDark,
+}: {
+  currentPhase: string;
+  hasError: boolean;
+  isDark: boolean;
+}) {
   const currentIdx = PHASE_ORDER.indexOf(currentPhase as UpdatePhase);
 
   return (
@@ -331,24 +426,28 @@ function UpdatePhaseSteps({ currentPhase, hasError, isDark }: { currentPhase: st
         const textColor = isComplete
           ? 'text-emerald-500'
           : isActive
-          ? 'text-foreground'
-          : isFailed
-          ? 'text-destructive'
-          : 'text-muted-foreground/30';
+            ? 'text-foreground'
+            : isFailed
+              ? 'text-destructive'
+              : 'text-muted-foreground/30';
 
         const iconColor = isComplete
           ? '#10B981'
           : isActive
-          ? isDark ? '#F8F8F8' : '#121215'
-          : isFailed
-          ? '#EF4444'
-          : isDark ? 'rgba(248,248,248,0.2)' : 'rgba(18,18,21,0.15)';
+            ? isDark
+              ? '#F8F8F8'
+              : '#121215'
+            : isFailed
+              ? '#EF4444'
+              : isDark
+                ? 'rgba(248,248,248,0.2)'
+                : 'rgba(18,18,21,0.15)';
 
         return (
           <View key={step.phase} className="flex-row items-center" style={{ height: 28 }}>
             <View className="w-5 items-center justify-center">
               {isComplete ? (
-                <Icon as={Check} size={11} style={{ color: '#10B981' }} strokeWidth={3} />
+                <Icon as={Check} size={11} style={{ color: '#10B981' } as any} strokeWidth={3} />
               ) : isActive ? (
                 <PulsingDot color={iconColor} />
               ) : (
@@ -356,8 +455,7 @@ function UpdatePhaseSteps({ currentPhase, hasError, isDark }: { currentPhase: st
               )}
             </View>
             <Text
-              className={`font-roobert text-[12px] ${textColor} ${isActive ? 'font-roobert-medium' : ''}`}
-            >
+              className={`font-roobert text-[12px] ${textColor} ${isActive ? 'font-roobert-medium' : ''}`}>
               {step.label}
             </Text>
           </View>
@@ -375,14 +473,24 @@ function PulsingDot({ color }: { color: string }) {
     const pulse = Animated.loop(
       Animated.sequence([
         Animated.parallel([
-          Animated.timing(scale, { toValue: 2.2, duration: 800, easing: Easing.out(Easing.ease), useNativeDriver: true }),
-          Animated.timing(opacity, { toValue: 0, duration: 800, easing: Easing.out(Easing.ease), useNativeDriver: true }),
+          Animated.timing(scale, {
+            toValue: 2.2,
+            duration: 800,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: 800,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+          }),
         ]),
         Animated.parallel([
           Animated.timing(scale, { toValue: 1, duration: 0, useNativeDriver: true }),
           Animated.timing(opacity, { toValue: 1, duration: 0, useNativeDriver: true }),
         ]),
-      ]),
+      ])
     );
     pulse.start();
     return () => pulse.stop();

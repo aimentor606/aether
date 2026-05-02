@@ -4,11 +4,11 @@
 
 services:
   llm-proxy:
-    image: ghcr.io/berriai/litellm:main-stable
+    image: ghcr.io/berriai/litellm:v1.83.10-stable
     container_name: llm-proxy
     restart: unless-stopped
     environment:
-      - DATABASE_URL=postgresql://${LITELLM_DB_USER:-litellm}:${LITELLM_DB_PASSWORD:?LITELLM_DB_PASSWORD is required}@postgres:5432/${LITELLM_DB_DATABASE:-litellm}
+      - DATABASE_URL=postgresql://${LITELLM_DB_USER:-litellm}:${LITELLM_DB_PASSWORD:?LITELLM_DB_PASSWORD is required}@supabase-db:5432/${LITELLM_DB_DATABASE:-litellm}
       - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY is required}
       - LITELLM_SALT_KEY=${LITELLM_SALT_KEY:?LITELLM_SALT_KEY is required}
       - STORE_MODEL_IN_DB=True
@@ -24,6 +24,9 @@ services:
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
       - QWEN_API_KEY=${QWEN_API_KEY:-}
       - ZHIPU_API_KEY=${ZHIPU_API_KEY:-}
+      - OPENMETER_API_KEY=${OPENMETER_API_KEY:-}
+      - OPENMETER_API_ENDPOINT=${OPENMETER_API_ENDPOINT:-http://openmeter:8888}
+      - OPENMETER_EVENT_TYPE=${OPENMETER_EVENT_TYPE:-litellm_tokens}
     deploy:
       resources:
         limits:
@@ -31,7 +34,7 @@ services:
           cpus: "2"
     volumes:
       - ./config/litellm/config.yaml:/app/config.yaml:ro
-      - /data/logs/litellm:/app/logs
+      - ${DATA_ROOT:-/data}/logs/litellm:/app/logs
     ports:
       - "127.0.0.1:4000:4000"
     networks:

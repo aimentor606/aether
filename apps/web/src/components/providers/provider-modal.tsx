@@ -50,7 +50,7 @@ import {
 import type { ProviderListResponse } from '@/hooks/opencode/use-opencode-sessions';
 import { useOpenCodeProviders } from '@/hooks/opencode/use-opencode-sessions';
 import { useModelStore } from '@/hooks/opencode/use-model-store';
-import type { FlatModel } from '@/components/session/session-chat-input';
+import type { FlatModel } from '@/lib/models';
 import { getClient } from '@/lib/opencode-sdk';
 import { useQueryClient } from '@tanstack/react-query';
 import { opencodeKeys } from '@/hooks/opencode/use-opencode-sessions';

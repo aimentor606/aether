@@ -91,7 +91,7 @@ export function createBaseService<TRepo extends RepositoryShape>({
 /**
  * Minimum shape a repository must satisfy for use with `createBaseService`.
  */
-interface RepositoryShape {
+export interface RepositoryShape {
   findAll(accountId: string, options?: PaginationOptions): Promise<any>;
   findById(accountId: string, id: string): Promise<any>;
   create(accountId: string, data: any): Promise<any>;

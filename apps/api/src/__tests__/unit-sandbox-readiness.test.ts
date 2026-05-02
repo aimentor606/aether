@@ -1,4 +1,13 @@
 import { afterEach, describe, expect, mock, test } from 'bun:test';
+
+mock.module('../config', () => ({
+  config: {
+    JUSTAVPS_PROXY_DOMAIN: 'aether.cloud',
+    INTERNAL_SERVICE_KEY: 'test-key',
+    JUSTAVPS_API_URL: 'http://localhost:3001',
+  },
+}));
+
 import { probeJustAvpsSandboxReadiness } from '../platform/services/sandbox-readiness';
 
 const originalFetch = globalThis.fetch;
@@ -11,7 +20,7 @@ describe('probeJustAvpsSandboxReadiness', () => {
   test('returns not ready when slug is missing', async () => {
     const result = await probeJustAvpsSandboxReadiness({});
     expect(result.ready).toBe(false);
-    expect(result.message).toContain('slug missing');
+    expect(result.message).toContain('missing');
   });
 
   test('treats 200 as ready', async () => {

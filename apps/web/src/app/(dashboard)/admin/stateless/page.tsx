@@ -31,7 +31,25 @@ import {
   TabsTrigger,
 } from '@aether/ui/primitives';
 import { toast } from '@/lib/toast';
-import { useApiClient, useAdminStateless } from '@aether/sdk/client';
+import {
+  useStatelessHealth,
+  useStatelessDashboard,
+  useStatelessStuckRuns,
+  useStatelessDLQ,
+  useStatelessCircuitBreakers,
+  useStatelessBackpressure,
+  useStatelessRateLimiters,
+  useStatelessMetricsHistory,
+  useStatelessSweep,
+  useStatelessFlush,
+  useStatelessForceComplete,
+  useStatelessForceFail,
+  useStatelessForceResume,
+  useStatelessDLQRetry,
+  useStatelessDLQDelete,
+  useStatelessDLQPurge,
+  useStatelessResetCircuitBreakers,
+} from '@/hooks/admin/use-stateless';
 import {
   StatCard,
   StatCardGrid,
@@ -88,51 +106,44 @@ export default function StatelessAdminPage() {
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
   // Data hooks
-  const client = useApiClient();
-  const admin = useAdminStateless(client, {
-    dlqLimit: 100,
-    stuckLimit: 5,
-    metricsMinutes: 30,
-  });
-
   const {
     data: health,
     isLoading: healthLoading,
     refetch: refetchHealth,
-  } = admin.health;
+  } = useStatelessHealth();
   const {
     data: dashboard,
     isLoading: dashboardLoading,
     refetch: refetchDashboard,
-  } = admin.dashboard;
+  } = useStatelessDashboard();
   const {
     data: stuckRuns,
     isLoading: stuckLoading,
     refetch: refetchStuck,
-  } = admin.stuckRuns;
+  } = useStatelessStuckRuns(5);
   const {
     data: dlqEntries,
     isLoading: dlqLoading,
     refetch: refetchDlq,
-  } = admin.dlq;
+  } = useStatelessDLQ(100);
   const { data: circuitBreakers, refetch: refetchBreakers } =
-    admin.circuitBreakers;
+    useStatelessCircuitBreakers();
   const { data: backpressure, refetch: refetchBackpressure } =
-    admin.backpressure;
+    useStatelessBackpressure();
   const { data: rateLimiters, refetch: refetchRateLimiters } =
-    admin.rateLimiters;
+    useStatelessRateLimiters();
   const { data: metricsHistory, refetch: refetchMetrics } =
-    admin.metricsHistory;
+    useStatelessMetricsHistory(30);
 
-  const sweepMutation = admin.sweep;
-  const flushMutation = admin.flush;
-  const forceCompleteMutation = admin.forceComplete;
-  const forceFailMutation = admin.forceFail;
-  const forceResumeMutation = admin.forceResume;
-  const dlqRetryMutation = admin.dlqRetry;
-  const dlqDeleteMutation = admin.dlqDelete;
-  const dlqPurgeMutation = admin.dlqPurge;
-  const resetCircuitBreakersMutation = admin.resetCircuitBreakers;
+  const sweepMutation = useStatelessSweep();
+  const flushMutation = useStatelessFlush();
+  const forceCompleteMutation = useStatelessForceComplete();
+  const forceFailMutation = useStatelessForceFail();
+  const forceResumeMutation = useStatelessForceResume();
+  const dlqRetryMutation = useStatelessDLQRetry();
+  const dlqDeleteMutation = useStatelessDLQDelete();
+  const dlqPurgeMutation = useStatelessDLQPurge();
+  const resetCircuitBreakersMutation = useStatelessResetCircuitBreakers();
 
   const history = useMemo(() => {
     return formatMetricsHistory(metricsHistory?.history || []);

@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/command';
 
 import { useModelStore } from '@/hooks/opencode/use-model-store';
-import type { FlatModel } from './session-chat-input';
+import type { FlatModel } from '@/lib/models';
 import type { ProviderListResponse } from '@/hooks/opencode/use-opencode-sessions';
 import {
   MODEL_SELECTOR_PROVIDER_IDS,

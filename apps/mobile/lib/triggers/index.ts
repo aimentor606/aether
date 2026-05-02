@@ -8,7 +8,6 @@ export * from './api';
 export * from './hooks';
 
 export {
-  triggerKeys,
   useAllTriggers,
   useAgentTriggers,
   useTrigger,
@@ -22,4 +21,3 @@ export {
   useComposioAppTriggers,
   useCreateComposioEventTrigger,
 } from './hooks';
-

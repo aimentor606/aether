@@ -1,15 +1,14 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import {
   createMockCreditAccount,
+  createCreditsRpcTracker,
   mockRegistry,
   registerGlobalMocks,
-  registerCreditsMock,
   resetMockRegistry,
 } from './mocks';
 
-// Register global mocks + credits service mock (stubs grantCredits/resetExpiringCredits)
+// Register global mocks (credits passthrough is built in)
 registerGlobalMocks();
-registerCreditsMock();
 
 // ─── Track calls ──────────────────────────────────────────────────────────────
 
@@ -35,10 +34,10 @@ beforeEach(() => {
   mockRegistry.upsertCreditAccount = async () => {};
   mockRegistry.getYearlyAccountsDueForRotation = async () => yearlyAccountsDueResult;
 
-  // Credit service defaults
-  mockRegistry.resetExpiringCredits = async (...args: any[]) => {
-    resetExpiringCreditsCalls.push(args);
-  };
+  // Credits RPC tracker (replaces direct mockRegistry.resetExpiringCredits)
+  const tracker = createCreditsRpcTracker();
+  resetExpiringCreditsCalls = tracker.resetExpiringCreditsCalls as any;
+  mockRegistry.supabaseRpc = tracker.supabaseRpc;
 });
 
 // Import AFTER mocking

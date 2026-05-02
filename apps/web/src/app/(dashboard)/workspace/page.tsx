@@ -74,7 +74,20 @@ interface WorkspaceItem {
   kind: ItemKind;
   scope: ItemScope;
   meta?: string;
-  raw?: Agent | Skill | Command | Project | { toolId: string; server?: string } | { serverName: string; status: McpStatus };
+  raw?: Agent | Skill | Command | Project | AetherConnector | { toolId: string; server?: string } | { serverName: string; status: McpStatus };
+}
+
+function isAetherConnector(
+  value: WorkspaceItem['raw'],
+): value is AetherConnector {
+  return Boolean(
+    value &&
+      typeof value === 'object' &&
+      'id' in value &&
+      'source' in value &&
+      'created_at' in value &&
+      'updated_at' in value,
+  );
 }
 
 const COMPOSER_PRESETS: Record<WorkspaceComposerKind, { title: string; prompt: string }> = {
@@ -189,8 +202,8 @@ function DetailSheet({
       rows.push({ label: 'Error', value: (m.status as { error: string }).error });
     }
   }
-  if (item?.kind === 'connector' && item.raw) {
-    const c = item.raw as AetherConnector;
+  if (item?.kind === 'connector' && item.raw && isAetherConnector(item.raw)) {
+    const c = item.raw;
     if (c.source) rows.push({ label: 'Source', value: c.source });
     if (c.pipedream_slug) rows.push({ label: 'Pipedream', value: c.pipedream_slug, mono: true });
     if (c.env_keys?.length) rows.push({ label: 'Env', value: c.env_keys.join(', '), mono: true });
@@ -314,10 +327,11 @@ function DetailSheet({
 // ---------------------------------------------------------------------------
 
 function LoadingSkeleton() {
+  const skeletonKeys = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'] as const;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="rounded-2xl border bg-card p-4 sm:p-5">
+      {skeletonKeys.map((key) => (
+        <div key={`workspace-skeleton-${key}`} className="rounded-2xl border bg-card p-4 sm:p-5">
           <div className="mb-3 space-y-2">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-3 w-20" />
@@ -496,7 +510,9 @@ export default function WorkspacePage() {
 
   const kindCounts = useMemo(() => {
     const c: Record<KindFilter, number> = { all: allItems.length, project: 0, agent: 0, skill: 0, command: 0, tool: 0, mcp: 0, connector: 0 };
-    allItems.forEach((i) => c[i.kind]++);
+    allItems.forEach((i) => {
+      c[i.kind] += 1;
+    });
     return c;
   }, [allItems]);
 
@@ -504,7 +520,9 @@ export default function WorkspacePage() {
     const c: Record<ScopeFilter, number> = { all: 0, project: 0, global: 0, external: 0, 'built-in': 0 };
     const base = kindFilter === 'all' ? allItems : allItems.filter((i) => i.kind === kindFilter);
     c.all = base.length;
-    base.forEach((i) => c[i.scope]++);
+    base.forEach((i) => {
+      c[i.scope] += 1;
+    });
     return c;
   }, [allItems, kindFilter]);
 

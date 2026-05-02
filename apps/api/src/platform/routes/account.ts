@@ -25,7 +25,11 @@ import {
 import type { AuthVariables } from '../../types';
 import { reconcileResolvedAccount, resolveAccountIdStrict as defaultResolveAccountId } from '../../shared/resolve-account';
 import { config } from '../../config';
-import { generateSandboxName } from '../services/ensure-sandbox';
+import {
+  ensureSandbox as defaultEnsureSandbox,
+  generateSandboxName as defaultGenerateSandboxName,
+  type EnsureSandboxResult,
+} from '../services/ensure-sandbox';
 
 // ─── Dependency Injection ────────────────────────────────────────────────────
 
@@ -35,6 +39,8 @@ export interface AccountRouterDeps {
   getDefaultProviderName: () => ProviderName;
   getAvailableProviders: () => ProviderName[];
   resolveAccountId: (userId: string) => Promise<string>;
+  ensureSandbox: (opts: { accountId: string; userId: string; provider?: ProviderName; serverType?: string; location?: string; isIncluded?: boolean }) => Promise<EnsureSandboxResult>;
+  generateSandboxName: (accountId: string, customName?: string) => Promise<string>;
   useAuth: boolean;
 }
 
@@ -44,6 +50,8 @@ const defaultDeps: AccountRouterDeps = {
   getDefaultProviderName: defaultGetDefaultProviderName,
   getAvailableProviders: defaultGetAvailableProviders,
   resolveAccountId: defaultResolveAccountId,
+  ensureSandbox: defaultEnsureSandbox,
+  generateSandboxName: defaultGenerateSandboxName,
   useAuth: true,
 };
 
@@ -77,8 +85,10 @@ function serializeSandbox(row: typeof sandboxes.$inferSelect) {
 export function createAccountRouter(
   overrides: Partial<AccountRouterDeps> = {},
 ): Hono<{ Variables: AuthVariables }> {
-  const deps = { ...defaultDeps, ...overrides };
+  const deps: AccountRouterDeps = { ...defaultDeps, ...overrides };
   const { db, getProvider, getDefaultProviderName, getAvailableProviders, resolveAccountId } = deps;
+  const ensureSandboxFn = deps.ensureSandbox;
+  const generateSandboxNameFn = deps.generateSandboxName;
 
   const router = new Hono<{ Variables: AuthVariables }>();
 
@@ -135,8 +145,7 @@ export function createAccountRouter(
         }
       }
 
-      const { ensureSandbox } = await import('../services/ensure-sandbox');
-      const { row, created } = await ensureSandbox({
+      const { row, created } = await ensureSandboxFn({
         accountId,
         userId,
         provider: requestedProvider,
@@ -262,7 +271,7 @@ export function createAccountRouter(
       }
 
       const hasImage = await provider.hasImage();
-      const sandboxName = await generateSandboxName(accountId);
+      const sandboxName = await generateSandboxNameFn(accountId);
 
       if (hasImage) {
         // Image exists — create sandbox row first, then provision

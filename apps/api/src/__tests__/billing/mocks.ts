@@ -76,6 +76,8 @@ export function createTestConfig(overrides: Record<string, any> = {}) {
     LITELLM_MASTER_KEY: '',
     LITELLM_TIMEOUT_MS: 60000,
     LITELLM_NUM_RETRIES: 3,
+    OPENMETER_URL: 'http://localhost:8888',
+    OPENMETER_API_KEY: 'test-key',
     FRONTEND_URL: 'http://localhost:3000',
     CORS_ALLOWED_ORIGINS: '',
     INTEGRATION_AUTH_PROVIDER: '',

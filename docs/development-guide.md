@@ -20,7 +20,7 @@ pnpm install
 pnpm dev
 ```
 
-This runs `scripts/dev-local.sh` which:
+This runs `scripts/dev.sh` which:
 1. Starts local Supabase (Docker, Postgres on `127.0.0.1:54322`)
 2. Starts Next.js frontend on `:3000`
 3. Starts Hono API on `:8008` (with `AETHER_SKIP_ENSURE_SCHEMA=1`)
@@ -295,8 +295,8 @@ cd scripts/deploy
 # 1. Create data directories and set permissions
 bash ops/setup.sh
 
-# 2. Create Docker network
-bash ops/init-network.sh
+# 2. Create Docker network and /data directories
+bash ops/setup.sh
 
 # 3. Copy and edit environment
 cp ops/.env.example ops/.env
@@ -343,7 +343,7 @@ Checks: container health, CORS preflight, API key auth, frontend response, Kong 
 Used by CI/CD to deploy new API versions without downtime:
 
 ```bash
-PREBUILT_IMAGE="aether/aether-api:<version>" bash scripts/deploy-zero-downtime.sh
+PREBUILT_IMAGE="aether/aether-api:<version>" bash scripts/deploy/zero-downtime.sh
 ```
 
 ### Useful Operations
@@ -392,7 +392,7 @@ core/
   master/           Sandbox orchestrator (OpenCode agents)
   docker/           Docker compose configs
 scripts/
-  dev-local.sh      Local dev (Supabase + frontend + API)
+  dev.sh            Local dev (Supabase + frontend + API)
   dev-prod.sh       Dev against production API
   deploy/
     core/           Docker Compose files (kong, postgres, redis, litellm, newapi)
@@ -444,7 +444,7 @@ pnpm install
 
 `pnpm dev` starts local Supabase. API connects automatically. No `.env` needed for basic dev.
 
-Key env vars used by API (set by dev-local.sh or Supabase):
+Key env vars used by API (set by dev.sh or Supabase):
 
 | Variable | Purpose | Default (local) |
 |----------|---------|-----------------|

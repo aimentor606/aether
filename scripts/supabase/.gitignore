@@ -1,4 +1,5 @@
 volumes/db/data
+volumes/redis/data
 volumes/storage
 volumes/api/certs
 .env

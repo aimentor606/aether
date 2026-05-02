@@ -6,7 +6,7 @@ upstreams:
   - name: upstream-aether-api
     algorithm: round-robin
     targets:
-      - target: aether-api:${{ env "DECK_AETHER_API_PORT" "8008" }}
+      - target: aether-api:${{ env "DECK_AETHER_API_PORT" }}
         weight: 100
 
   # ── LiteLLM Proxy (data plane + management) ────────────────────────────────
@@ -103,7 +103,10 @@ services:
       - name: rate-limiting
         config:
           minute: 10000
-          policy: local
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_password: ${{ env "REDIS_PASSWORD" }}
           fault_tolerant: true
 
       - name: cors
@@ -180,7 +183,10 @@ services:
       - name: rate-limiting
         config:
           minute: 1000
-          policy: local
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_password: ${{ env "REDIS_PASSWORD" }}
           fault_tolerant: true
 
       - name: cors
@@ -229,6 +235,27 @@ services:
         strip_path: false
         tags:
           - litellm-ui
+
+      # Block LiteLLM admin/management paths from external access
+      - name: route-litellm-admin-block
+        paths:
+          - /key
+          - /user
+          - /team
+          - /model
+          - /config
+          - /guardrails
+          - /policies
+          - /health/liveliness
+          - /health/readiness
+        strip_path: false
+        tags:
+          - litellm-admin-block
+        plugins:
+          - name: request-termination
+            config:
+              status_code: 403
+              message: "LiteLLM admin API not accessible externally"
 
       # Catch-all: LiteLLM management uses scattered top-level paths (/key/*, /user/*,
       # /model/*, /health/*, /config/*, /guardrails/*, /policies/*, /server/*, /tools/*,
@@ -282,7 +309,7 @@ consumers:
     tags:
       - production
     keyauth_credentials:
-      - key: ${{ env "DECK_DEFAULT_API_KEY" }}
+      - key: ${{ env "DEFAULT_API_KEY" }}
         tags:
           - prod-key
 
@@ -291,7 +318,7 @@ consumers:
     tags:
       - test
     keyauth_credentials:
-      - key: ${{ env "DECK_PREMIUM_API_KEY" }}
+      - key: ${{ env "PREMIUM_KEY" }}
         tags:
           - test-key
 

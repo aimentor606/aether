@@ -93,7 +93,7 @@ vim ops/.env
 | `PUBLIC_HOST` | 公网域名（如 `www.example.com`） |
 | `USE_HTTPS` | 是否启用 HTTPS（`true`/`false`） |
 
-> **注意**: `ops/.env` 已在 `.gitignore` 中，不会被提交到版本控制。`init-db/init-kong-db.sql` 中的数据库密码必须与 `.env` 中的 `KONG_PG_PASSWORD` 和 `NEWAPI_DB_PASSWORD` 保持一致——当前需手动同步。
+> **注意**: `ops/.env` 已在 `.gitignore` 中，不会被提交到版本控制。`supabase/utils/init-deploy-dbs.sh` 中的数据库密码必须与 `.env` 中的 `KONG_PG_PASSWORD` 和 `NEWAPI_DB_PASSWORD` 保持一致——当前需手动同步。
 
 ### 3.3 放置 SSL 证书（如启用 HTTPS）
 
@@ -111,10 +111,10 @@ sudo ops/setup.sh
 
 此脚本会在 `/data/` 下创建完整的目录结构，并设置正确的 UID 属主。
 
-### 3.5 创建 Docker 网络
+### 3.5 初始化网络和目录
 
 ```bash
-ops/init-network.sh
+ops/setup.sh
 ```
 
 ### 3.6 预拉取镜像（可选，推荐）
@@ -382,8 +382,8 @@ curl http://localhost:8001/metrics
 
 | 现象 | 可能原因 | 解决方法 |
 |------|---------|---------|
-| Kong 无法连接 PostgreSQL | PostgreSQL 容器未就绪，或 `KONG_PG_*` 变量与 `init-kong-db.sql` 不一致 | 检查 `ops/status.sh` 确认 PG 健康；核对 `ops/.env` 和 `init-db/init-kong-db.sql` 中的密码 |
-| 服务启动失败 | Docker 网络不存在 | 执行 `ops/init-network.sh` |
+| Kong 无法连接 PostgreSQL | supabase-db 未就绪，或 `KONG_PG_*` 变量与 `init-deploy-dbs.sh` 不一致 | 检查 `ops/status.sh` 确认 PG 健康；核对 `ops/.env` 和 `supabase/utils/init-deploy-dbs.sh` 中的密码 |
+| 服务启动失败 | Docker 网络不存在 | 执行 `ops/setup.sh`（网络+目录一并初始化） |
 | `/data` 目录权限拒绝 | 目录属主不正确 | 执行 `sudo ops/setup.sh` |
 | Kong Admin API 不可达 | Admin API 仅监听 `127.0.0.1:8001` | 必须从宿主机本地访问，不可从远程访问 |
 | NewAPI 数据库连接失败 | `NEWAPI_DB_*` 环境变量错误 | 核对 `ops/.env`，检查 PostgreSQL 日志 |
@@ -413,7 +413,7 @@ chmod 600 ops/.env
 
 ### 数据库安全
 
-- `init-db/init-kong-db.sql` 中硬编码了数据库用户密码，首次部署前务必修改
+- `supabase/utils/init-deploy-dbs.sh` 中硬编码了数据库用户密码，首次部署前务必修改
 - 修改后需同步更新 `ops/.env` 中对应的变量
 
 ### 网络隔离
@@ -437,17 +437,15 @@ chmod 600 ops/.env
 ```
 aetherai/
 ├── core/                        # Compose 编排文件
-│   ├── db.yml                   # PostgreSQL 服务定义
-│   ├── redis.yml                # Redis 服务定义
 │   ├── compose-kong.yml         # Kong 网关服务定义
 │   ├── newapi.yml               # NewAPI 服务定义
+│   ├── litellm.yml              # LiteLLM 服务定义
 │   ├── kong.yml                 # Kong decK 声明式路由配置
 │   └── config/newapi/           # NewAPI 应用配置
 ├── ops/                         # 运维脚本
 │   ├── .env                     # 环境变量（不入库）
 │   ├── .env.example             # 环境变量模板
-│   ├── setup.sh                 # 初始化 /data 目录 + 权限
-│   ├── init-network.sh          # 创建 Docker 网络
+│   ├── setup.sh                 # 创建 Docker 网络 + /data 目录 + 权限
 │   ├── start.sh                 # 启动服务
 │   ├── stop.sh                  # 停止服务
 │   ├── restart.sh               # 重启服务
@@ -459,8 +457,6 @@ aetherai/
 │   ├── kong-bootstrap.sh        # Kong 数据库迁移
 │   ├── sync-kong.sh             # 同步 Kong 配置
 │   └── pull-images.sh           # 预拉取镜像
-├── init-db/                     # 数据库初始化
-│   └── init-kong-db.sql         # 创建数据库和用户
 ├── ssl/                         # SSL 证书
 ├── backups/                     # 备份输出
 └── docs/                        # 文档
@@ -469,17 +465,16 @@ aetherai/
 
 ### 宿主机数据目录 `/data/`
 
+> PG 和 Redis 数据由 Supabase 栈管理，位于 `scripts/supabase/volumes/`
+
 ```
 /data/
-├── postgres/                    # PostgreSQL 数据文件 (UID 999:999)
-├── redis/                       # Redis 持久化数据 (UID 999:999)
-├── kong/cache/                  # Kong 代理缓存 (UID 1000:1000)
+├── kong/cache/                  # Kong 代理缓存 (UID 1001:1001)
 ├── uploads/newapi/              # NewAPI 用户上传 (UID 1000:1000)
 └── logs/
-    ├── postgresql/              # PG 日志 — 按天轮转 (UID 999:999)
-    ├── redis/                   # Redis 日志 (UID 999:999)
-    ├── kong/                    # Kong 日志 (UID 1000:1000)
-    └── newapi/                  # NewAPI 日志 (UID 1000:1000)
+    ├── kong/                    # Kong 日志 (UID 1001:1001)
+    ├── newapi/                  # NewAPI 日志 (UID 1000:1000)
+    └── litellm/                 # LiteLLM 日志 (UID 1000:1000)
 ```
 
 ---

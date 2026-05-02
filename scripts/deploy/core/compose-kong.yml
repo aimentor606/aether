@@ -10,7 +10,7 @@ services:
     environment:
       # Database Configuration
       KONG_DATABASE: postgres
-      KONG_PG_HOST: postgres
+      KONG_PG_HOST: supabase-db
       KONG_PG_PORT: 5432
       KONG_PG_USER: ${KONG_PG_USER:-kong}
       KONG_PG_PASSWORD: ${KONG_PG_PASSWORD:?KONG_PG_PASSWORD is required}
@@ -22,6 +22,8 @@ services:
       
       # Listener Configuration
       KONG_PROXY_LISTEN: 0.0.0.0:8000, 0.0.0.0:8443 ssl http2
+      # Admin API on container loopback only — not reachable from app-network.
+      # decK sync uses --network container:kong to share the network namespace.
       KONG_ADMIN_LISTEN: 127.0.0.1:8001
       KONG_PROXY_ACCESS_LOG: /var/log/kong/access.log
       KONG_PROXY_ERROR_LOG: /var/log/kong/error.log
@@ -53,8 +55,8 @@ services:
 
     volumes:
       - ../ssl:/var/lib/kong/ssl:ro
-      - /data/kong/cache:/tmp/kong/cache
-      - /data/logs/kong:/var/log/kong
+      - ${DATA_ROOT:-/data}/kong/cache:/tmp/kong/cache
+      - ${DATA_ROOT:-/data}/logs/kong:/var/log/kong
 
     networks:
       - app-network
@@ -64,14 +66,10 @@ services:
         limits:
           memory: 1G
           cpus: "2"
-    # Kong Admin API is intentionally bound to localhost only.
-    # In single-node deployments, this provides adequate isolation.
-    # For multi-node or shared-host scenarios, consider adding
-    # an nginx auth proxy or Unix socket with file permissions.
+    # Admin API is on container loopback only (no port mapping needed).
     ports:
       - "80:8000"
       - "443:8443"
-      - "127.0.0.1:8001:8001"
     healthcheck:
       # test: ["CMD", "curl","-f", "http://0.0.0.0:8001/status"]
       # test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8001/status"]

@@ -1,44 +1,30 @@
-import { litellmConfig } from '../config/litellm-config';
+import { config } from '../../config';
 import { getSupabase } from '../../shared/supabase';
 import { deductCredits } from '../../billing/services/credits';
+import { queryUsage } from '../../shared/openmeter';
+import { logger } from '../../lib/logger';
 
-interface KeyInfo {
-  key_alias?: string;
-  spend?: number;
-  max_budget?: number | null;
-  [key: string]: unknown;
-}
-
-const AETHER_ALIAS_PREFIX = 'aether-';
+const METER_SLUG = 'litellm_tokens';
 
 export async function reconcileSpend(): Promise<{
   processed: number;
   skipped: number;
   errors: number;
 }> {
-  const supabase = getSupabase();
-
-  const response = await fetch(`${litellmConfig.LITELLM_URL}/key/list`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${litellmConfig.LITELLM_MASTER_KEY}`,
-    },
-  });
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(
-      `[Reconciler] LiteLLM key list failed: ${response.status} ${body}`,
-    );
+  if (!config.OPENMETER_URL) {
+    return { processed: 0, skipped: 0, errors: 0 };
   }
 
-  const payload = (await response.json()) as { keys?: KeyInfo[]; data?: KeyInfo[] };
-  const keys: KeyInfo[] = payload.keys ?? payload.data ?? [];
-  const aetherKeys = keys.filter(
-    (k) => k.key_alias?.startsWith(AETHER_ALIAS_PREFIX),
-  );
+  const supabase = getSupabase();
 
-  if (aetherKeys.length === 0) {
+  // Query all accounts with credit accounts that need reconciliation
+  const { data: accounts, error: accountsError } = await supabase
+    .from('credit_accounts')
+    .select('account_id')
+    .limit(500);
+
+  if (accountsError || !accounts?.length) {
+    logger.error('[Reconciler] Failed to fetch accounts', { error: String(accountsError) });
     return { processed: 0, skipped: 0, errors: 0 };
   }
 
@@ -46,10 +32,24 @@ export async function reconcileSpend(): Promise<{
   let skipped = 0;
   let errors = 0;
 
-  for (const keyInfo of aetherKeys) {
+  for (const { account_id: accountId } of accounts) {
     try {
-      const accountId = keyInfo.key_alias!.slice(AETHER_ALIAS_PREFIX.length);
-      const currentSpend = Number(keyInfo.spend) || 0;
+      // Query OpenMeter for this account's total usage
+      const usageData = await queryUsage(METER_SLUG, {
+        subject: accountId,
+        windowSize: 'DAY',
+      });
+
+      // OpenMeter returns aggregated value; sum all windows
+      const currentSpend = usageData
+        ? usageData.reduce((sum, p) => sum + (p.value ?? 0), 0)
+        : null;
+
+      if (currentSpend === null) {
+        // OpenMeter unavailable for this subject — skip (pause, no fallback)
+        skipped++;
+        continue;
+      }
 
       const { data: stateRow } = await supabase
         .from('spend_reconciliation_state')
@@ -79,10 +79,10 @@ export async function reconcileSpend(): Promise<{
         },
         { onConflict: 'account_id' },
       );
-    } catch (err) {
-      console.error(
-        `[Reconciler] Error processing key ${keyInfo.key_alias}:`,
-        err,
+    } catch (err: unknown) {
+      logger.error(
+        `[Reconciler] Error processing account ${accountId}:`,
+        err as Record<string, unknown>,
       );
       errors++;
     }

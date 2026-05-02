@@ -4,6 +4,7 @@ import {
   deductCredits as deductCreditsDb,
 } from '../../repositories/credits';
 import type { BillingCheckResult, BillingDeductResult } from '../../types';
+import { emitCloudEvent } from '../../shared/openmeter';
 
 /**
  * Check if account has sufficient credits.
@@ -76,6 +77,13 @@ export async function deductToolCredits(
   }
 
   console.info(`[BILLING] Deducted $${cost.toFixed(4)}. New balance: $${result.newBalance?.toFixed(2)}`);
+
+  emitCloudEvent('aether_tool_usage', accountId, {
+    tool: toolName,
+    cost,
+    resultCount,
+    sessionId: sessionId ?? null,
+  });
 
   return {
     success: true,

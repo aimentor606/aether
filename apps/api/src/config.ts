@@ -98,6 +98,10 @@ const envSchema = z.object({
   LITELLM_TIMEOUT_MS:          optInt(60_000),
   LITELLM_NUM_RETRIES:         optInt(3),
 
+  // ── OpenMeter Usage Metering (optional — enables real-time usage dashboards) ─
+  OPENMETER_URL:                optUrl('http://openmeter:8888'),
+  OPENMETER_API_KEY:            optStr,
+
   // ── Redis (optional — enables shared multi-instance state) ───────────────
   REDIS_URL:                   optStr,
 
@@ -403,6 +407,10 @@ export const config = {
 
   // ─── Redis ────────────────────────────────────────────────────────────────
   REDIS_URL: env.REDIS_URL,
+
+  // ─── OpenMeter Usage Metering ─────────────────────────────────────────────
+  OPENMETER_URL: env.OPENMETER_URL,
+  OPENMETER_API_KEY: env.OPENMETER_API_KEY,
 
   // ─── LLM Providers (passed to LiteLLM via config.yaml) ──────────────────────
   ANTHROPIC_API_URL: env.ANTHROPIC_API_URL,

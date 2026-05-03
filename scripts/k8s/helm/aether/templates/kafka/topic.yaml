@@ -1,0 +1,16 @@
+{{- if and .Values.kafka.enabled .Values.openmeter.enabled }}
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: {{ .Values.kafka.topic.name }}
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    strimzi.io/cluster: {{ include "aether.kafka.fullname" . }}
+spec:
+  partitions: {{ .Values.kafka.topic.partitions }}
+  replicas: {{ .Values.kafka.topic.replicationFactor }}
+  config:
+    retention.ms: 604800000
+    retention.bytes: 1073741824
+{{- end }}

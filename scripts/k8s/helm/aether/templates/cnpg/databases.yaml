@@ -1,0 +1,31 @@
+{{- if .Values.cnpg.enabled }}
+{{- /* CNPG superuser credentials — password from global secrets */ -}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "aether.cnpg.fullname" . }}-superuser
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    cnpg.io/reload: "true"
+type: kubernetes.io/basic-auth
+data:
+  username: {{ "postgres" | b64enc | quote }}
+  password: {{ .Values.secrets.postgresPassword | default (randAlphaNum 32) | b64enc | quote }}
+---
+{{- /* Per-database credentials */ -}}
+{{- range .Values.cnpg.bootstrapDatabases }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "aether.cnpg.fullname" $ }}-{{ .owner }}-creds
+  namespace: {{ include "aether.namespace" $ }}
+  labels:
+    {{- include "aether.labels" $ | nindent 4 }}
+type: kubernetes.io/basic-auth
+data:
+  username: {{ .owner | b64enc | quote }}
+  password: {{ randAlphaNum 32 | b64enc | quote }}
+---
+{{- end }}
+{{- end }}

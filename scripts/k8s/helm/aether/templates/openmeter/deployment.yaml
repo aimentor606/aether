@@ -1,0 +1,56 @@
+{{- if .Values.openmeter.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "aether.openmeter.fullname" . }}
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    app.kubernetes.io/component: openmeter
+spec:
+  replicas: {{ .Values.openmeter.replicas }}
+  selector:
+    matchLabels:
+      {{- include "aether.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: openmeter
+  template:
+    metadata:
+      labels:
+        {{- include "aether.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: openmeter
+    spec:
+      containers:
+        - name: openmeter
+          image: {{ .Values.openmeter.image }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.openmeter.port }}
+          env:
+            - name: PORT
+              value: {{ .Values.openmeter.port | quote }}
+            {{- if .Values.kafka.enabled }}
+            - name: KAFKA_BROKERS
+              value: {{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:9092" (include "aether.kafka.fullname" .) (include "aether.namespace" .) | quote }}
+            - name: KAFKA_TOPIC
+              value: {{ .Values.kafka.topic.name | quote }}
+            {{- end }}
+            {{- if .Values.clickhouse.enabled }}
+            - name: CLICKHOUSE_URL
+              value: {{ printf "clickhouse://%s.%s.svc.cluster.local:9000" (include "aether.clickhouse.fullname" .) (include "aether.namespace" .) | quote }}
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aether.secretName" . }}
+                  key: CLICKHOUSE_PASSWORD
+            {{- end }}
+            {{- if .Values.cnpg.enabled }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aether.cnpg.fullname" . }}-openmeter-creds
+                  key: uri
+                  optional: true
+            {{- end }}
+          resources:
+            {{- toYaml .Values.openmeter.resources | nindent 12 }}
+{{- end }}

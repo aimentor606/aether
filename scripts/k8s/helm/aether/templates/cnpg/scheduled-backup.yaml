@@ -1,0 +1,32 @@
+{{- if and .Values.cnpg.enabled .Values.cnpg.backup.enabled }}
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: {{ include "aether.cnpg.fullname" . }}-daily
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+spec:
+  cluster:
+    name: {{ include "aether.cnpg.fullname" . }}
+  schedule: "0 3 * * *"
+  backupOwnerReference: cluster
+  method: barmanObjectStore
+  barmanObjectStore:
+    destinationPath: {{ printf "s3://%s/cnpg-backups" .Values.cnpg.backup.s3.bucket }}
+    s3Credentials:
+      accessKeyId:
+        name: {{ include "aether.cnpg.fullname" . }}-backup-creds
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: {{ include "aether.cnpg.fullname" . }}-backup-creds
+        key: ACCESS_SECRET_KEY
+    {{- if .Values.cnpg.backup.s3.endpoint }}
+    endpointURL: {{ .Values.cnpg.backup.s3.endpoint }}
+    {{- end }}
+    wal:
+      compression: gzip
+    data:
+      compression: gzip
+      jobs: 2
+{{- end }}

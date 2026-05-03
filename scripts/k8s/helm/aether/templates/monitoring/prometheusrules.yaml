@@ -1,0 +1,40 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "aether.fullname" . }}-alerts
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    release: prometheus
+spec:
+  groups:
+    - name: aether.rules
+      rules:
+        - alert: PodRestartLoop
+          expr: increase(kube_pod_container_status_restarts_total{namespace="{{ include "aether.namespace" . }}"}[1h]) > 5
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Pod {{ `{{ $labels.pod }}` }} is restarting repeatedly"
+            description: "Pod {{ `{{ $labels.pod }}` }} in namespace {{ include "aether.namespace" . }} has restarted {{ `{{ $value }}` }} times in the last hour."
+
+        - alert: HighMemoryUsage
+          expr: container_memory_working_set_bytes{namespace="{{ include "aether.namespace" . }}"} / container_spec_memory_limit_bytes{namespace="{{ include "aether.namespace" . }}"} > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Pod {{ `{{ $labels.pod }}` }} is using >90% memory"
+            description: "Memory usage is at {{ `{{ $value | humanizePercentage }}` }}."
+
+        - alert: High5xxRate
+          expr: sum(rate(kong_http_status{code=~"5.."}[5m])) / sum(rate(kong_http_status[5m])) > 0.05
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "High 5xx error rate through Kong"
+            description: "5xx error rate is {{ `{{ $value | humanizePercentage }}` }} of all requests."
+{{- end }}

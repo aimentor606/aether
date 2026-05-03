@@ -1,0 +1,13 @@
+apiVersion: v2
+name: aether
+description: Aether autonomous company operating system — self-hosted full-stack deployment
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+
+dependencies:
+  - name: ingress
+    alias: kong
+    version: "2.46.0"
+    repository: https://charts.konghq.com
+    condition: kong.enabled

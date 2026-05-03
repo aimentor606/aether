@@ -1,0 +1,55 @@
+{{- if and .Values.redis.enabled .Values.backup.redis.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "aether.redis.fullname" . }}-backup
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.backup.redis.schedule | quote }}
+  concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: redis:7.4-alpine
+              command:
+                - sh
+                - -c
+                - |
+                  echo "BGSAVE" | redis-cli -h {{ include "aether.redis.fullname" . }}-master -a "$REDIS_PASSWORD" --no-auth-warning
+                  sleep 2
+                  echo "Saving RDB to PVC..."
+              env:
+                - name: REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "aether.secretName" . }}
+                      key: REDIS_PASSWORD
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+          volumes:
+            - name: backup
+              persistentVolumeClaim:
+                claimName: {{ include "aether.redis.fullname" . }}-backup
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "aether.redis.fullname" . }}-backup
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.backup.redis.storage }}
+{{- end }}

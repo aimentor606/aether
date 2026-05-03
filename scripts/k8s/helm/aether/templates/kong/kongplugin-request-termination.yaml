@@ -1,0 +1,13 @@
+{{- if .Values.kong.enabled }}
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: litellm-admin-block
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+config:
+  status_code: 403
+  message: "LiteLLM admin API not accessible externally"
+plugin: request-termination
+{{- end }}

@@ -1,0 +1,66 @@
+# Production overrides for Aether Helm Chart
+# Apply with: helm install aether helm/aether -f values.yaml -f values-production.yaml
+
+global:
+  domain: aether.dev
+
+api:
+  replicas: 3
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 1Gi
+  hpa:
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 60
+
+litellm:
+  replicas: 3
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 1Gi
+  hpa:
+    maxReplicas: 15
+
+cnpg:
+  instances: 3
+  storage: 100Gi
+  backup:
+    enabled: true
+    s3:
+      bucket: aether-pg-backups
+      region: us-east-1
+
+redis:
+  storage: 10Gi
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+kafka:
+  replicas: 3
+  storage: 50Gi
+
+clickhouse:
+  storage: 100Gi
+
+openmeter:
+  enabled: false
+
+# SSL — switch to Let's Encrypt production issuer
+ssl:
+  enabled: true
+  certManager: true
+  issuerEmail: ""  # REQUIRED: set your email
+  environment: prod

@@ -1,0 +1,61 @@
+{{- if .Values.kafka.enabled }}
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: {{ include "aether.kafka.fullname" . }}
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kafka
+spec:
+  kafka:
+    version: {{ .Values.kafka.version }}
+    replicas: {{ .Values.kafka.replicas }}
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+    config:
+      offsets.topic.replication.factor: {{ .Values.kafka.replicas }}
+      transaction.state.log.replication.factor: {{ .Values.kafka.replicas }}
+      transaction.state.log.min.isr: {{ min 2 .Values.kafka.replicas }}
+      default.replication.factor: {{ .Values.kafka.replicas }}
+      min.insync.replicas: {{ min 2 .Values.kafka.replicas }}
+      inter.broker.protocol.version: "3.9"
+    storage:
+      type: persistent-claim
+      size: {{ .Values.kafka.storage | quote }}
+      {{- if .Values.kafka.storageClass }}
+      class: {{ .Values.kafka.storageClass | quote }}
+      {{- end }}
+      deleteClaim: false
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+
+  zookeeper:
+    replicas: {{ .Values.kafka.replicas }}
+    storage:
+      type: persistent-claim
+      size: 5Gi
+      {{- if .Values.kafka.storageClass }}
+      class: {{ .Values.kafka.storageClass | quote }}
+      {{- end }}
+      deleteClaim: false
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+{{- end }}

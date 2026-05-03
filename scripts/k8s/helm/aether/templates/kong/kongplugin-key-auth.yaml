@@ -1,0 +1,14 @@
+{{- if .Values.kong.enabled }}
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: key-auth
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+config:
+  key_names:
+    - X-API-Key
+    - apikey
+plugin: key-auth
+{{- end }}

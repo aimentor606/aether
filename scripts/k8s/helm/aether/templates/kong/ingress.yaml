@@ -1,0 +1,171 @@
+{{- if .Values.kong.enabled }}
+{{- $tlsSecret := printf "%s-tls" (include "aether.fullname" .) }}
+{{- $useTLS := .Values.ssl.enabled }}
+
+# ── Control Plane: /v1/* → Aether API ──────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "aether.fullname" . }}-control
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+  annotations:
+    konghq.com/strip-path: "false"
+    konghq.com/plugins: rate-limiting-control,cors-control
+    kubernetes.io/ingress.class: kong
+    {{- if and $useTLS .Values.ssl.certManager (ne .Values.ssl.environment "dev") }}
+    cert-manager.io/cluster-issuer: {{ printf "%s-letsencrypt-%s" (include "aether.fullname" .) .Values.ssl.environment }}
+    {{- end }}
+spec:
+  {{- if $useTLS }}
+  tls:
+    - hosts:
+        - {{ .Values.global.domain }}
+      secretName: {{ $tlsSecret }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.global.domain }}
+      http:
+        paths:
+          - path: /v1
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "aether.api.fullname" . }}
+                port:
+                  number: {{ .Values.api.port }}
+---
+{{- /* ── Data Plane: /llm/* → LiteLLM (strip prefix) ── */ -}}
+{{- if .Values.litellm.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "aether.fullname" . }}-llm-direct
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+  annotations:
+    konghq.com/strip-path: "true"
+    konghq.com/plugins: rate-limiting-llm,cors-llm
+    kubernetes.io/ingress.class: kong
+spec:
+  {{- if $useTLS }}
+  tls:
+    - hosts:
+        - {{ .Values.global.domain }}
+      secretName: {{ $tlsSecret }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.global.domain }}
+      http:
+        paths:
+          - path: /llm
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "aether.litellm.fullname" . }}
+                port:
+                  number: {{ .Values.litellm.port }}
+---
+{{- /* ── /v1/chat/completions + /v1/models → LiteLLM (backward compat) ── */ -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "aether.fullname" . }}-llm-compat
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+  annotations:
+    konghq.com/strip-path: "false"
+    konghq.com/plugins: rate-limiting-llm,cors-llm
+    kubernetes.io/ingress.class: kong
+spec:
+  {{- if $useTLS }}
+  tls:
+    - hosts:
+        - {{ .Values.global.domain }}
+      secretName: {{ $tlsSecret }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.global.domain }}
+      http:
+        paths:
+          - path: /v1/chat/completions
+            pathType: Exact
+            backend:
+              service:
+                name: {{ include "aether.litellm.fullname" . }}
+                port:
+                  number: {{ .Values.litellm.port }}
+          - path: /v1/models
+            pathType: Exact
+            backend:
+              service:
+                name: {{ include "aether.litellm.fullname" . }}
+                port:
+                  number: {{ .Values.litellm.port }}
+---
+{{- /* ── LiteLLM UI ── */ -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "aether.fullname" . }}-litellm-ui
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+  annotations:
+    konghq.com/strip-path: "false"
+    konghq.com/plugins: cors-llm
+    kubernetes.io/ingress.class: kong
+spec:
+  {{- if $useTLS }}
+  tls:
+    - hosts:
+        - {{ .Values.global.domain }}
+      secretName: {{ $tlsSecret }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.global.domain }}
+      http:
+        paths:
+          - path: /ui
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "aether.litellm.fullname" . }}
+                port:
+                  number: {{ .Values.litellm.port }}
+---
+{{- /* ── Catch-all: / → LiteLLM ── */ -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "aether.fullname" . }}-catchall
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+  annotations:
+    konghq.com/strip-path: "false"
+    konghq.com/plugins: cors-llm
+    kubernetes.io/ingress.class: kong
+spec:
+  {{- if $useTLS }}
+  tls:
+    - hosts:
+        - {{ .Values.global.domain }}
+      secretName: {{ $tlsSecret }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.global.domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "aether.litellm.fullname" . }}
+                port:
+                  number: {{ .Values.litellm.port }}
+{{- end }}
+{{- end }}

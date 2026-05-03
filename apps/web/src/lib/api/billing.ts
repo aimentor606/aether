@@ -1,4 +1,4 @@
-import { backendApi } from "../api-client";
+import { backendApi } from '../api-client';
 
 // =============================================================================
 // UNIFIED ACCOUNT STATE - Primary API for all billing data
@@ -264,18 +264,27 @@ export interface Transaction {
 }
 
 export interface UsageHistory {
-  daily_usage: Record<string, {
-    credits: number;
-    debits: number;
-    count: number;
-  }>;
+  daily_usage: Record<
+    string,
+    {
+      credits: number;
+      debits: number;
+      count: number;
+    }
+  >;
   total_period_usage: number;
   total_period_credits: number;
 }
 
 export interface TrialStatus {
   has_trial: boolean;
-  trial_status?: 'none' | 'active' | 'expired' | 'converted' | 'cancelled' | 'used';
+  trial_status?:
+    | 'none'
+    | 'active'
+    | 'expired'
+    | 'converted'
+    | 'cancelled'
+    | 'used';
   trial_started_at?: string;
   trial_ends_at?: string;
   trial_mode?: string;
@@ -313,15 +322,15 @@ export interface TrialCheckoutResponse {
 
 export interface CheckoutSessionDetails {
   session_id: string;
-  amount_total: number;           // Final amount in cents (after discounts and tax)
-  amount_subtotal: number;        // Amount before discounts/tax in cents
-  amount_discount: number;        // Discount amount in cents
-  amount_tax: number;             // Tax amount in cents
+  amount_total: number; // Final amount in cents (after discounts and tax)
+  amount_subtotal: number; // Amount before discounts/tax in cents
+  amount_discount: number; // Discount amount in cents
+  amount_tax: number; // Tax amount in cents
   currency: string;
-  coupon_id: string | null;       // Internal Stripe coupon ID
-  coupon_name: string | null;     // Coupon display name
-  promotion_code: string | null;  // Customer-facing code (e.g., "HEHE2020")
-  balance_transaction_id: string | null;  // txn_xxx for Stripe balance transaction
+  coupon_id: string | null; // Internal Stripe coupon ID
+  coupon_name: string | null; // Coupon display name
+  promotion_code: string | null; // Customer-facing code (e.g., "HEHE2020")
+  balance_transaction_id: string | null; // txn_xxx for Stripe balance transaction
   status: string;
   payment_status: string;
 }
@@ -367,19 +376,19 @@ function getDefaultAccountState(): AccountState {
         running_count: 0,
         limit: 0,
         can_start: false,
-        tier_name: 'none'
+        tier_name: 'none',
       },
       ai_worker_count: {
         current_count: 0,
         limit: 0,
         can_create: false,
-        tier_name: 'none'
+        tier_name: 'none',
       },
       custom_mcp_count: {
         current_count: 0,
         limit: 0,
         can_create: false,
-        tier_name: 'none'
+        tier_name: 'none',
       },
     },
     tier: {
@@ -402,12 +411,20 @@ export const billingApi = {
    */
   async getAccountState(skipCache = false): Promise<AccountState> {
     const params = skipCache ? '?skip_cache=true' : '';
-    const response = await backendApi.get<AccountState>(`/billing/account-state${params}`, {
-      showErrors: false,
-    });
-    const isGracefulDisabledResponse = response.error?.status === 404
-      && /billing is not enabled/i.test(response.error.message || '');
-    if (response.error && response.error.status !== 401 && !isGracefulDisabledResponse) {
+    const response = await backendApi.get<AccountState>(
+      `/billing/account-state${params}`,
+      {
+        showErrors: false,
+      },
+    );
+    const isGracefulDisabledResponse =
+      response.error?.status === 404 &&
+      /billing is not enabled/i.test(response.error.message || '');
+    if (
+      response.error &&
+      response.error.status !== 401 &&
+      !isGracefulDisabledResponse
+    ) {
       throw response.error;
     }
     if (response.error) {
@@ -417,13 +434,20 @@ export const billingApi = {
   },
 
   async deductUsage(params: { amount: number; description?: string }) {
-    const response = await backendApi.post<DeductResult>('/billing/deduct-usage', params, { showErrors: false });
+    const response = await backendApi.post<DeductResult>(
+      '/billing/deduct-usage',
+      params,
+      { showErrors: false },
+    );
     if (response.error) throw response.error;
     return response.data!;
   },
 
   async deductTokenUsage(usage: TokenUsage) {
-    const response = await backendApi.post<DeductResult>('/billing/deduct', usage);
+    const response = await backendApi.post<DeductResult>(
+      '/billing/deduct',
+      usage,
+    );
     if (response.error) throw response.error;
     return response.data!;
   },
@@ -431,23 +455,23 @@ export const billingApi = {
   async createCheckoutSession(request: CreateCheckoutSessionRequest) {
     const response = await backendApi.post<CreateCheckoutSessionResponse>(
       '/billing/create-checkout-session',
-      request
+      request,
     );
     if (response.error) throw response.error;
-    
+
     const data = response.data!;
     if (data.checkout_url) {
       return {
         ...data,
         status: data.status || 'checkout_created',
-        url: data.checkout_url
+        url: data.checkout_url,
       } as CreateCheckoutSessionResponse;
     } else if ((data as any).success && data.subscription_id) {
       return {
         ...data,
         status: 'updated',
         message: data.message || 'Subscription updated successfully',
-        subscription_id: data.subscription_id
+        subscription_id: data.subscription_id,
       } as CreateCheckoutSessionResponse;
     }
     return data;
@@ -456,7 +480,7 @@ export const billingApi = {
   async createPortalSession(request: CreatePortalSessionRequest) {
     const response = await backendApi.post<CreatePortalSessionResponse>(
       '/billing/create-portal-session',
-      request
+      request,
     );
     if (response.error) throw response.error;
     return response.data!;
@@ -465,7 +489,7 @@ export const billingApi = {
   async cancelSubscription(request?: CancelSubscriptionRequest) {
     const response = await backendApi.post<CancelSubscriptionResponse>(
       '/billing/cancel-subscription',
-      request || {}
+      request || {},
     );
     if (response.error) throw response.error;
     return response.data!;
@@ -473,7 +497,7 @@ export const billingApi = {
 
   async reactivateSubscription() {
     const response = await backendApi.post<ReactivateSubscriptionResponse>(
-      '/billing/reactivate-subscription'
+      '/billing/reactivate-subscription',
     );
     if (response.error) throw response.error;
     return response.data!;
@@ -482,23 +506,24 @@ export const billingApi = {
   async purchaseCredits(request: PurchaseCreditsRequest) {
     const response = await backendApi.post<PurchaseCreditsResponse>(
       '/billing/purchase-credits',
-      request
+      request,
     );
     if (response.error) throw response.error;
     return response.data!;
   },
 
   async getTransactions(limit = 50, offset = 0) {
-    const response = await backendApi.get<{ transactions: Transaction[]; count: number }>(
-      `/billing/transactions?limit=${limit}&offset=${offset}`
-    );
+    const response = await backendApi.get<{
+      transactions: Transaction[];
+      count: number;
+    }>(`/billing/transactions?limit=${limit}&offset=${offset}`);
     if (response.error) throw response.error;
     return response.data!;
   },
 
   async getUsageHistory(days = 30) {
     const response = await backendApi.get<UsageHistory>(
-      `/billing/usage-history?days=${days}`
+      `/billing/usage-history?days=${days}`,
     );
     if (response.error) throw response.error;
     return response.data!;
@@ -511,7 +536,10 @@ export const billingApi = {
   },
 
   async startTrial(request: TrialStartRequest) {
-    const response = await backendApi.post<TrialStartResponse>('/billing/trial/start', request);
+    const response = await backendApi.post<TrialStartResponse>(
+      '/billing/trial/start',
+      request,
+    );
     if (response.error) throw response.error;
     return response.data!;
   },
@@ -519,17 +547,18 @@ export const billingApi = {
   async createTrialCheckout(request: TrialCheckoutRequest) {
     const response = await backendApi.post<TrialCheckoutResponse>(
       '/billing/trial/create-checkout',
-      request
+      request,
     );
     if (response.error) throw response.error;
     return response.data!;
   },
 
   async cancelTrial() {
-    const response = await backendApi.post<{ success: boolean; message: string; subscription_status: string }>(
-      '/billing/trial/cancel',
-      {}
-    );
+    const response = await backendApi.post<{
+      success: boolean;
+      message: string;
+      subscription_status: string;
+    }>('/billing/trial/cancel', {});
     if (response.error) throw response.error;
     return response.data!;
   },
@@ -537,7 +566,7 @@ export const billingApi = {
   async scheduleDowngrade(request: ScheduleDowngradeRequest) {
     const response = await backendApi.post<ScheduleDowngradeResponse>(
       '/billing/schedule-downgrade',
-      request
+      request,
     );
     if (response.error) throw response.error;
     return response.data!;
@@ -545,16 +574,17 @@ export const billingApi = {
 
   async cancelScheduledChange() {
     const response = await backendApi.post<CancelScheduledChangeResponse>(
-      '/billing/cancel-scheduled-change'
+      '/billing/cancel-scheduled-change',
     );
     if (response.error) throw response.error;
     return response.data!;
   },
 
   async syncSubscription() {
-    const response = await backendApi.post<{ success: boolean; message: string }>(
-      '/billing/sync-subscription'
-    );
+    const response = await backendApi.post<{
+      success: boolean;
+      message: string;
+    }>('/billing/sync-subscription');
     if (response.error) throw response.error;
     return response.data!;
   },
@@ -563,14 +593,19 @@ export const billingApi = {
    * Get checkout session details from Stripe.
    * Used to retrieve actual transaction amounts (after discounts) for analytics tracking.
    */
-  async getCheckoutSession(sessionId: string): Promise<CheckoutSessionDetails | null> {
+  async getCheckoutSession(
+    sessionId: string,
+  ): Promise<CheckoutSessionDetails | null> {
     try {
       const response = await backendApi.get<CheckoutSessionDetails>(
         `/billing/checkout-session/${sessionId}`,
-        { showErrors: false }
+        { showErrors: false },
       );
       if (response.error) {
-        console.warn('[Billing] Could not fetch checkout session:', response.error);
+        console.warn(
+          '[Billing] Could not fetch checkout session:',
+          response.error,
+        );
         return null;
       }
       return response.data!;
@@ -578,39 +613,86 @@ export const billingApi = {
       console.warn('[Billing] Error fetching checkout session:', error);
       return null;
     }
-  }
+  },
+
+  async getMeteredUsage(params?: {
+    meter?: string;
+    from?: string;
+    to?: string;
+    windowSize?: string;
+  }): Promise<MeteredUsageResponse | null> {
+    try {
+      const qs = new URLSearchParams();
+      if (params?.meter) qs.set('meter', params.meter);
+      if (params?.from) qs.set('from', params.from);
+      if (params?.to) qs.set('to', params.to);
+      if (params?.windowSize) qs.set('windowSize', params.windowSize);
+      const response = await backendApi.get<MeteredUsageResponse>(
+        `/billing/metered-usage?${qs.toString()}`,
+        { showErrors: false },
+      );
+      if (response.error) return null;
+      return response.data!;
+    } catch {
+      return null;
+    }
+  },
+
+  async getMeteredUsageTotal(params?: {
+    meter?: string;
+    from?: string;
+  }): Promise<MeteredUsageTotalResponse | null> {
+    try {
+      const qs = new URLSearchParams();
+      if (params?.meter) qs.set('meter', params.meter);
+      if (params?.from) qs.set('from', params.from);
+      const response = await backendApi.get<MeteredUsageTotalResponse>(
+        `/billing/metered-usage/total?${qs.toString()}`,
+        { showErrors: false },
+      );
+      if (response.error) return null;
+      return response.data!;
+    } catch {
+      return null;
+    }
+  },
 };
 
 // =============================================================================
 // CONVENIENCE EXPORTS
 // =============================================================================
 
-export const getAccountState = (skipCache?: boolean) => billingApi.getAccountState(skipCache);
+export const getAccountState = (skipCache?: boolean) =>
+  billingApi.getAccountState(skipCache);
 export const deductUsage = (params: { amount: number; description?: string }) =>
   billingApi.deductUsage(params);
-export const deductTokenUsage = (usage: TokenUsage) => billingApi.deductTokenUsage(usage);
-export const createCheckoutSession = (request: CreateCheckoutSessionRequest) => 
+export const deductTokenUsage = (usage: TokenUsage) =>
+  billingApi.deductTokenUsage(usage);
+export const createCheckoutSession = (request: CreateCheckoutSessionRequest) =>
   billingApi.createCheckoutSession(request);
-export const createPortalSession = (request: CreatePortalSessionRequest) => 
+export const createPortalSession = (request: CreatePortalSessionRequest) =>
   billingApi.createPortalSession(request);
-export const cancelSubscription = (feedback?: string) => 
+export const cancelSubscription = (feedback?: string) =>
   billingApi.cancelSubscription(feedback ? { feedback } : undefined);
 export const reactivateSubscription = () => billingApi.reactivateSubscription();
-export const purchaseCredits = (request: PurchaseCreditsRequest) => 
+export const purchaseCredits = (request: PurchaseCreditsRequest) =>
   billingApi.purchaseCredits(request);
-export const getTransactions = (limit?: number, offset?: number) => 
+export const getTransactions = (limit?: number, offset?: number) =>
   billingApi.getTransactions(limit, offset);
-export const getUsageHistory = (days?: number) => billingApi.getUsageHistory(days);
+export const getUsageHistory = (days?: number) =>
+  billingApi.getUsageHistory(days);
 export const getTrialStatus = () => billingApi.getTrialStatus();
-export const startTrial = (request: TrialStartRequest) => billingApi.startTrial(request);
-export const createTrialCheckout = (request: TrialCheckoutRequest) => 
+export const startTrial = (request: TrialStartRequest) =>
+  billingApi.startTrial(request);
+export const createTrialCheckout = (request: TrialCheckoutRequest) =>
   billingApi.createTrialCheckout(request);
 export const cancelTrial = () => billingApi.cancelTrial();
-export const scheduleDowngrade = (request: ScheduleDowngradeRequest) => 
+export const scheduleDowngrade = (request: ScheduleDowngradeRequest) =>
   billingApi.scheduleDowngrade(request);
 export const cancelScheduledChange = () => billingApi.cancelScheduledChange();
 export const syncSubscription = () => billingApi.syncSubscription();
-export const getCheckoutSession = (sessionId: string) => billingApi.getCheckoutSession(sessionId);
+export const getCheckoutSession = (sessionId: string) =>
+  billingApi.getCheckoutSession(sessionId);
 
 // =============================================================================
 // INLINE CHECKOUT
@@ -639,11 +721,11 @@ export interface CreateInlineCheckoutResponse {
 }
 
 export async function createInlineCheckout(
-  request: CreateInlineCheckoutRequest
+  request: CreateInlineCheckoutRequest,
 ): Promise<CreateInlineCheckoutResponse> {
   const response = await backendApi.post<CreateInlineCheckoutResponse>(
     '/billing/create-inline-checkout',
-    request
+    request,
   );
   if (response.error) throw response.error;
   return response.data!;
@@ -662,11 +744,11 @@ export interface ConfirmInlineCheckoutResponse {
 }
 
 export async function confirmInlineCheckout(
-  request: ConfirmInlineCheckoutRequest
+  request: ConfirmInlineCheckoutRequest,
 ): Promise<ConfirmInlineCheckoutResponse> {
   const response = await backendApi.post<ConfirmInlineCheckoutResponse>(
     '/billing/confirm-inline-checkout',
-    request
+    request,
   );
   if (response.error) throw response.error;
   return response.data!;
@@ -688,19 +770,28 @@ export interface AutoTopupSetupStatus {
 }
 
 export async function getAutoTopupSettings(): Promise<AutoTopupConfig> {
-  const response = await backendApi.get<AutoTopupConfig>('/billing/auto-topup/settings');
+  const response = await backendApi.get<AutoTopupConfig>(
+    '/billing/auto-topup/settings',
+  );
   if (response.error) throw response.error;
   return response.data!;
 }
 
-export async function configureAutoTopup(config: AutoTopupConfig): Promise<{ success: boolean }> {
-  const response = await backendApi.post<{ success: boolean }>('/billing/auto-topup/configure', config);
+export async function configureAutoTopup(
+  config: AutoTopupConfig,
+): Promise<{ success: boolean }> {
+  const response = await backendApi.post<{ success: boolean }>(
+    '/billing/auto-topup/configure',
+    config,
+  );
   if (response.error) throw response.error;
   return response.data!;
 }
 
 export async function getAutoTopupSetupStatus(): Promise<AutoTopupSetupStatus> {
-  const response = await backendApi.get<AutoTopupSetupStatus>('/billing/auto-topup/setup-status');
+  const response = await backendApi.get<AutoTopupSetupStatus>(
+    '/billing/auto-topup/setup-status',
+  );
   if (response.error) throw response.error;
   return response.data!;
 }
@@ -708,6 +799,29 @@ export async function getAutoTopupSetupStatus(): Promise<AutoTopupSetupStatus> {
 // =============================================================================
 // INSTANCES (server types)
 // =============================================================================
+
+// =============================================================================
+// METERED USAGE (OpenMeter)
+// =============================================================================
+
+export interface MeteredUsageDataPoint {
+  value: number;
+  windowStart: string;
+  windowEnd: string;
+  subject: string;
+}
+
+export interface MeteredUsageResponse {
+  meter: string;
+  subject: string;
+  data: MeteredUsageDataPoint[];
+}
+
+export interface MeteredUsageTotalResponse {
+  meter: string;
+  subject: string;
+  total: number;
+}
 
 export interface ServerType {
   name: string;
@@ -729,13 +843,18 @@ export interface ServerTypesResponse {
   defaultLocation?: string;
 }
 
-export async function getServerTypes(location?: string): Promise<ServerTypesResponse> {
+export async function getServerTypes(
+  location?: string,
+): Promise<ServerTypesResponse> {
   const params = location ? `?location=${location}` : '';
   const response = await backendApi.get<ServerTypesResponse>(
-    `/platform/sandbox/justavps/server-types${params}`
+    `/platform/sandbox/justavps/server-types${params}`,
   );
   if (response.error) {
-    if (response.error.status === 404 && /justavps provider is not enabled/i.test(response.error.message || '')) {
+    if (
+      response.error.status === 404 &&
+      /justavps provider is not enabled/i.test(response.error.message || '')
+    ) {
       return {
         serverTypes: [],
         location: location || 'hel1',
@@ -754,25 +873,44 @@ export interface CreateInstanceRequest {
   backgroundProvisioning?: boolean;
 }
 
-export async function createInstance(request: CreateInstanceRequest): Promise<any> {
-  const response = await backendApi.post<any>('/platform/sandbox', request, { timeout: 180000 });
+export async function createInstance(
+  request: CreateInstanceRequest,
+): Promise<any> {
+  const response = await backendApi.post<any>('/platform/sandbox', request, {
+    timeout: 180000,
+  });
   if (response.error) throw response.error;
   return response.data!;
 }
 
-export async function deleteInstance(sandboxId: string): Promise<{ success: boolean }> {
-  const response = await backendApi.delete<{ success: boolean }>(`/platform/sandbox?sandbox_id=${sandboxId}`);
+export async function deleteInstance(
+  sandboxId: string,
+): Promise<{ success: boolean }> {
+  const response = await backendApi.delete<{ success: boolean }>(
+    `/platform/sandbox?sandbox_id=${sandboxId}`,
+  );
   if (response.error) throw response.error;
   return response.data!;
 }
 
-export async function markInstanceError(sandboxId: string, errorMessage: string): Promise<void> {
-  await backendApi.post('/platform/sandbox/mark-error', { sandbox_id: sandboxId, error_message: errorMessage }, { showErrors: false, timeout: 10000 });
+export async function markInstanceError(
+  sandboxId: string,
+  errorMessage: string,
+): Promise<void> {
+  await backendApi.post(
+    '/platform/sandbox/mark-error',
+    { sandbox_id: sandboxId, error_message: errorMessage },
+    { showErrors: false, timeout: 10000 },
+  );
 }
 
 /** Claim a free default computer for legacy paid users. */
 export async function claimComputer(): Promise<any> {
-  const response = await backendApi.post<any>('/platform/sandbox/claim-computer', {}, { timeout: 60000 });
+  const response = await backendApi.post<any>(
+    '/platform/sandbox/claim-computer',
+    {},
+    { timeout: 60000 },
+  );
   if (response.error) throw response.error;
   return response.data!;
 }

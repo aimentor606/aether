@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import type { TOCItemType } from "fumadocs-core/toc";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import {
@@ -12,7 +13,7 @@ import { source } from "@/lib/source";
 
 type DocsMdxComponent = (props: {
 	components?: Record<string, unknown>;
-}) => React.JSX.Element;
+}) => JSX.Element;
 
 type DocsRuntimePageData = {
 	title?: string;

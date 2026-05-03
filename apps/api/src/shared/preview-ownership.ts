@@ -1,4 +1,4 @@
-import { and, eq, ne, or, sql } from 'drizzle-orm';
+import { and, eq, ne, or } from 'drizzle-orm';
 import { sandboxes } from '@aether/db';
 import { db } from './db';
 import { resolveAccountIdStrict } from './resolve-account';
@@ -59,6 +59,3 @@ export async function canAccessPreviewSandbox(input: {
   return !!actorAccountId && actorAccountId === sandboxAccountId;
 }
 
-export function clearPreviewOwnershipCache(): void {
-  sandboxOwnerCache.clear();
-}

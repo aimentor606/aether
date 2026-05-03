@@ -4,6 +4,7 @@ import { deductCredits, calculateTokenCost } from '../services/credits';
 import { getVisibleTiers } from '../services/tiers';
 import { getCreditBalance } from '../repositories/credit-accounts';
 import { getTransactionsSummary } from '../repositories/transactions';
+import { queryUsage, queryTotalUsage } from '../../shared/openmeter';
 import type { TokenUsageRequest } from '../../types';
 
 export const creditsRouter = new Hono<AppEnv>();
@@ -87,4 +88,32 @@ creditsRouter.get('/usage-history', async (c) => {
   const days = Number(c.req.query('days') ?? 30);
   const summary = await getTransactionsSummary(accountId, days);
   return c.json(summary);
+});
+
+creditsRouter.get('/metered-usage', async (c) => {
+  const accountId = c.get('userId');
+  const meter = c.req.query('meter') ?? 'litellm_tokens';
+  const from = c.req.query('from') ?? undefined;
+  const to = c.req.query('to') ?? undefined;
+  const windowSize = (c.req.query('windowSize') as 'MINUTE' | 'HOUR' | 'DAY' | 'MONTH' | undefined) ?? 'DAY';
+
+  const data = await queryUsage(meter, { subject: accountId, from, to, windowSize });
+  if (!data) {
+    return c.json({ error: 'Usage metering unavailable' }, 503);
+  }
+
+  return c.json({ meter, subject: accountId, data });
+});
+
+creditsRouter.get('/metered-usage/total', async (c) => {
+  const accountId = c.get('userId');
+  const meter = c.req.query('meter') ?? 'litellm_tokens';
+  const from = c.req.query('from') ?? undefined;
+
+  const total = await queryTotalUsage(meter, accountId, from);
+  if (total === null) {
+    return c.json({ error: 'Usage metering unavailable' }, 503);
+  }
+
+  return c.json({ meter, subject: accountId, total });
 });

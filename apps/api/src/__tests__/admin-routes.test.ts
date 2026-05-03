@@ -106,49 +106,11 @@ mock.module('../shared/db', () => ({
   },
 }));
 
-mock.module('@aether/db', () => ({
-  featureFlags: {
-    id: 'id', accountId: 'accountId', verticalId: 'verticalId',
-    featureName: 'featureName', enabled: 'enabled', config: 'config',
-    createdAt: 'createdAt', updatedAt: 'updatedAt',
-  },
-  sandboxes: {
-    sandboxId: 'sandboxId', externalId: 'externalId', name: 'name',
-    provider: 'provider', baseUrl: 'baseUrl', status: 'status',
-    metadata: 'metadata', createdAt: 'createdAt', updatedAt: 'updatedAt',
-    lastUsedAt: 'lastUsedAt', accountId: 'accountId',
-  },
-  accounts: { accountId: 'accountId', name: 'name', __name: 'aether.accounts' },
-  platformUserRoles: {
-    id: 'id', accountId: 'accountId', userId: 'userId',
-    role: 'role', createdAt: 'createdAt',
-  },
-  accountMembers: {
-    userId: 'account_members.user_id',
-    accountId: 'account_members.account_id',
-    accountRole: 'account_members.account_role',
-    __name: 'aether.account_members',
-  },
-  accountUser: {
-    userId: 'account_user.user_id',
-    accountId: 'account_user.account_id',
-    __name: 'basejump.account_user',
-  },
-  billingCustomers: {
-    accountId: 'billing_customers.account_id',
-    email: 'billing_customers.email',
-    __name: 'aether.billing_customers',
-  },
-  creditAccounts: {
-    accountId: 'credit_accounts.account_id',
-    tier: 'credit_accounts.tier',
-    __name: 'aether.credit_accounts',
-  },
-  creditLedger: { id: 'id', accountId: 'accountId', amount: 'amount', type: 'type' },
-  creditUsage: { id: 'id', accountId: 'accountId', amount: 'amount' },
-  creditPurchases: { id: 'id', accountId: 'accountId', amount: 'amount' },
-  accountDeletionRequests: { id: 'id', accountId: 'accountId', status: 'status' },
-}));
+// NOTE: @aether/db is NOT mocked here. The admin routes use dynamic import
+// (await import('@aether/db')) and the mock db from ../shared/db ignores
+// .from() arguments, so real Drizzle table objects work fine.
+// Mocking @aether/db globally breaks other test files (platform, api-keys)
+// that need real createDb and Drizzle table objects for DB operations.
 
 // ─── Require after mocks ────────────────────────────────────────────────────
 

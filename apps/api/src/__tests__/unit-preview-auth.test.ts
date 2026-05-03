@@ -20,6 +20,10 @@ mock.module('../shared/resolve-account', () => ({
   reconcileResolvedAccount: async () => {},
 }));
 
+// Mock repositories/api-keys with ALL exports. First-registration-wins means
+// an incomplete mock breaks downstream tests (e2e-api-keys, e2e-platform) that
+// need createApiKey, listApiKeys, etc. Only validateSecretKey has real behavior;
+// the rest are stubs since preview-auth tests don't call them.
 mock.module('../repositories/api-keys', () => ({
   validateSecretKey: async (token: string) => {
     if (token === 'aether_owner') {
@@ -30,6 +34,10 @@ mock.module('../repositories/api-keys', () => ({
     }
     return { isValid: false, error: 'Invalid Aether token' };
   },
+  createApiKey: async () => { throw new Error('Not implemented in preview-auth mock'); },
+  listApiKeys: async () => [],
+  revokeApiKey: async () => false,
+  deleteApiKey: async () => false,
 }));
 
 mock.module('../shared/crypto', () => ({

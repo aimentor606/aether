@@ -31,6 +31,7 @@ params = %{
   }]
 }
 
-if !Supavisor.Tenants.get_tenant_by_external_id(params["external_id"]) do
-  {:ok, _} = Supavisor.Tenants.create_tenant(params)
+case Supavisor.Tenants.get_tenant_by_external_id(params["external_id"]) do
+  nil -> {:ok, _} = Supavisor.Tenants.create_tenant(params)
+  tenant -> {:ok, _} = Supavisor.Tenants.update_tenant(tenant, params)
 end

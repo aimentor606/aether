@@ -69,9 +69,6 @@ let pricingMap: Map<string, ModelPricingEntry> = new Map();
 
 let refreshTimer: ReturnType<typeof setInterval> | null = null;
 
-let lastFetchedAt: Date | null = null;
-let modelCount = 0;
-
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -121,21 +118,6 @@ export function stopModelPricing(): void {
   }
 }
 
-/**
- * Return a summary for startup logging.
- */
-export function getModelPricingStatus(): {
-  loaded: boolean;
-  modelCount: number;
-  lastFetchedAt: Date | null;
-} {
-  return {
-    loaded: pricingMap.size > 0,
-    modelCount,
-    lastFetchedAt,
-  };
-}
-
 // ---------------------------------------------------------------------------
 // Internal
 // ---------------------------------------------------------------------------
@@ -174,8 +156,6 @@ async function refreshPricing(): Promise<void> {
 
     // Atomic swap — readers never see a partially-built map
     pricingMap = newMap;
-    modelCount = newMap.size;
-    lastFetchedAt = new Date();
 
     console.log(
       `[model-pricing] Loaded ${newMap.size} model prices from models.dev ` +

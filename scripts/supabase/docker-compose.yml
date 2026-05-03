@@ -69,6 +69,11 @@ services:
       # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
       EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1"
     volumes:
       - ./volumes/snippets:/app/snippets:Z
       - ./volumes/functions:/app/edge-functions:Z
@@ -93,6 +98,11 @@ services:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
       - ${KONG_ADMIN_PORT:-8100}:8100/tcp
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
     volumes:
       # https://github.com/supabase/supabase/issues/12661
       - ./volumes/api/kong.yml:/home/kong/temp.yml:ro,z
@@ -119,6 +129,7 @@ services:
       SERVICE_ROLE_KEY_ASYMMETRIC: ${SERVICE_ROLE_KEY_ASYMMETRIC:-}
       DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
       DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
     entrypoint: /home/kong/kong-entrypoint.sh
 
   auth:
@@ -256,11 +267,21 @@ services:
       # GOTRUE_HOOK_SEND_EMAIL_ENABLED: "false"
       # GOTRUE_HOOK_SEND_EMAIL_URI: "http://host.docker.internal:54321/functions/v1/email_sender"
       # GOTRUE_HOOK_SEND_EMAIL_SECRETS: "v1,whsec_VGhpcyBpcyBhbiBleGFtcGxlIG9mIGEgc2hvcnRlciBCYXNlNjQgc3RyaW5n"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "1"
 
   rest:
     container_name: supabase-rest
     image: postgrest/postgrest:v14.8
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1"]
+      timeout: 5s
+      interval: 10s
+      retries: 3
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -280,6 +301,11 @@ services:
       PGRST_DB_USE_LEGACY_GUCS: "false"
       PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET}
       PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "1"
     command:
       [
         "postgrest"
@@ -330,6 +356,11 @@ services:
       SEED_SELF_HOST: "true"
       RUN_JANITOR: "true"
       DISABLE_HEALTHCHECK_LOGGING: "true"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1"
 
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
@@ -392,6 +423,11 @@ services:
       # S3 protocol endpoint configuration
       S3_PROTOCOL_ACCESS_KEY_ID: ${S3_PROTOCOL_ACCESS_KEY_ID}
       S3_PROTOCOL_ACCESS_KEY_SECRET: ${S3_PROTOCOL_ACCESS_KEY_SECRET}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1"
     volumes:
       - ./volumes/storage:/var/lib/storage:z
 
@@ -417,11 +453,21 @@ services:
       IMGPROXY_USE_ETAG: "true"
       IMGPROXY_AUTO_WEBP: ${IMGPROXY_AUTO_WEBP}
       IMGPROXY_MAX_SRC_RESOLUTION: 16.8
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
 
   meta:
     container_name: supabase-meta
     image: supabase/postgres-meta:v0.96.3
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1"]
+      timeout: 5s
+      interval: 10s
+      retries: 3
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -434,11 +480,26 @@ services:
       PG_META_DB_USER: supabase_admin
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
       CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
 
   functions:
     container_name: supabase-edge-functions
     image: supabase/edge-runtime:v1.71.2
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:9999/health || exit 1"]
+      timeout: 5s
+      interval: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1"
     volumes:
       - ./volumes/functions:/home/deno/functions:Z
       - deno-cache:/root/.cache/deno
@@ -512,6 +573,11 @@ services:
       # Uncomment to use Big Query backend for analytics
       # GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
       # GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1"
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
@@ -537,7 +603,7 @@ services:
       # Use named volume to persist pgsodium decryption key between restarts
       - db-config:/etc/postgresql-custom
     ports:
-      - "5434:5432"
+      - "127.0.0.1:5434:5432"
     healthcheck:
       test:
         [
@@ -561,6 +627,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXP: ${JWT_EXPIRY}
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: "4"
     command:
       [
         "postgres",
@@ -569,6 +640,11 @@ services:
         "-c",
         "log_min_messages=fatal" # prevents Realtime polling queries from appearing in logs
       ]
+    networks:
+      default:
+      app-network:
+        aliases:
+          - postgres
 
   vector:
     container_name: supabase-vector
@@ -592,6 +668,11 @@ services:
       retries: 3
     environment:
       LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
     command:
       [
         "--config",
@@ -607,8 +688,8 @@ services:
     hostname: supavisor
     restart: unless-stopped
     ports:
-      - ${POOLER_SESSION_PORT:-5433}:5432
-      - ${POOLER_PROXY_PORT_TRANSACTION}:6543
+      - 127.0.0.1:${POOLER_SESSION_PORT:-5433}:5432
+      - 127.0.0.1:${POOLER_PROXY_PORT_TRANSACTION}:6543
     volumes:
       - ./volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro,z
     healthcheck:
@@ -647,6 +728,11 @@ services:
       POOLER_MAX_CLIENT_CONN: ${POOLER_MAX_CLIENT_CONN}
       POOLER_POOL_MODE: transaction
       DB_POOL_SIZE: ${POOLER_DB_POOL_SIZE}
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "1"
     command:
       [
         "/bin/sh",
@@ -654,6 +740,38 @@ services:
         "/app/bin/migrate && /app/bin/supavisor eval \"$$(cat /etc/pooler/pooler.exs)\" && /app/bin/server"
       ]
 
+  redis:
+    container_name: supabase-redis
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - ./volumes/redis/data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.5"
+    command: >
+      redis-server
+      --maxmemory 64mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      ${REDIS_PASSWORD:+--requirepass ${REDIS_PASSWORD}}
+    networks:
+      default:
+      app-network:
+        aliases:
+          - redis
+
 volumes:
   db-config:
   deno-cache:
+
+networks:
+  app-network:
+    external: true

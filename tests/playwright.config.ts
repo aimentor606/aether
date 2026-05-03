@@ -5,6 +5,8 @@ const apiURL = process.env.E2E_API_URL || 'http://localhost:13738/v1';
 
 export default defineConfig({
   testDir: './e2e/specs',
+  globalSetup: './e2e/global-setup',
+  globalTeardown: './e2e/global-teardown',
   timeout: 300_000,
   expect: {
     timeout: 30_000,

@@ -12,7 +12,7 @@ import { source } from "@/lib/source";
 
 type DocsMdxComponent = (props: {
 	components?: Record<string, unknown>;
-}) => React.JSX.Element;
+}) => JSX.Element;
 
 type DocsRuntimePageData = {
 	title?: string;

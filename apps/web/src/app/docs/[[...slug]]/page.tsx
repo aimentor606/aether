@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import type { TOCItemType } from "fumadocs-core/toc";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import {

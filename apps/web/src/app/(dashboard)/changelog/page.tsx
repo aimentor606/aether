@@ -125,7 +125,7 @@ function VersionEntryCard({ entry, isCurrent, isLatestInChannel, onInstall, isIn
       versionType === 'patch' && !isCurrent && 'border-border/50',
       // Compact padding for dev/patch
       isDev ? 'py-3' : isMajor ? 'py-6' : 'py-4',
-    )}>
+    )} data-testid="version-card">
       <CardHeader className={cn(
         'flex flex-row items-start justify-between gap-4',
         // Reduce gap for card's default gap-6
@@ -288,7 +288,7 @@ function FilterTabs({ value, onChange, showDev }: { value: FilterOption; onChang
   if (!showDev) return null;
 
   return (
-    <FilterBar>
+    <FilterBar data-testid="version-filter">
       {options.map((opt) => (
         <FilterBarItem
           key={opt.key}
@@ -372,8 +372,8 @@ export default function ChangelogPage() {
         <div className="mb-8">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-foreground mb-2">Versions</h1>
-              <p className="text-sm text-muted-foreground">
+              <h1 className="text-2xl font-semibold text-foreground mb-2" data-testid="changelog-heading">Versions</h1>
+              <p className="text-sm text-muted-foreground" data-testid="current-version">
                 {currentVersion ? (
                   <>
                     Running{' '}
@@ -414,6 +414,7 @@ export default function ChangelogPage() {
               size="xs"
               onClick={toggleDev}
               className="mt-1.5 text-muted-foreground/55 hover:text-foreground"
+              data-testid="dev-toggle"
             >
               {showDev ? 'Hide dev builds' : 'Dev builds'}
             </Button>

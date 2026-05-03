@@ -13,15 +13,13 @@ export class SettingsApiKeysPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByRole('heading', { name: 'API Keys' });
-    this.createKeyButton = page.getByRole('button', { name: /Create Key/i });
-    this.keyDialog = page.getByRole('dialog');
+    this.heading = page.getByTestId('api-keys-heading');
+    this.createKeyButton = page.getByTestId('create-key-button');
+    this.keyDialog = page.getByTestId('key-dialog');
     this.keyNameInput = page.locator('#title');
     this.dialogCancelButton = page.getByRole('button', { name: /Cancel/i });
     this.dialogSubmitButton = page.getByRole('button', { name: /Create/i });
-    this.keyRows = page.locator('[data-key-id], [data-testid="api-key-row"]').or(
-      page.locator('table tbody tr, .space-y-3 > div'),
-    );
+    this.keyRows = page.getByTestId('api-key-row');
     this.statusDots = page.locator('span[aria-hidden="true"].rounded-full');
   }
 
@@ -52,7 +50,7 @@ export class SettingsApiKeysPage {
 
   async revokeKey(name: string) {
     const row = await this.findKeyByName(name);
-    const revokeBtn = row.getByRole('button', { name: /Revoke/i });
+    const revokeBtn = row.locator('[data-testid="revoke-key-button"]');
     if (await revokeBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await revokeBtn.click();
     }

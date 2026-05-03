@@ -13,12 +13,12 @@ export class ActivateTrialPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByRole('heading', { name: /Welcome to Aether/i });
+    this.heading = page.getByTestId('trial-heading');
     this.subheading = page.getByText(/Start your journey with a 7-day free trial/i);
-    this.startTrialButton = page.getByRole('button', { name: /Start 7-Day Free Trial/i });
+    this.startTrialButton = page.getByTestId('start-trial-button');
     this.featuresList = page.getByText(/What's included in trial/i);
-    this.termsLink = page.getByRole('link', { name: /Terms of Service/i });
-    this.privacyLink = page.getByRole('link', { name: /Privacy Policy/i });
+    this.termsLink = page.getByTestId('terms-link');
+    this.privacyLink = page.getByTestId('privacy-link');
     this.logoutButton = page.getByRole('button', { name: /Log Out/i });
     this.maintenancePage = page.getByText(/Maintenance|Under Maintenance/i);
   }
@@ -46,9 +46,9 @@ export class CheckoutPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.container = page.locator('#checkout-container');
+    this.container = page.getByTestId('checkout-container');
     this.loadingText = page.getByText(/Loading secure checkout/i);
-    this.errorHeading = page.getByRole('heading', { name: /Checkout Error/i });
+    this.errorHeading = page.getByTestId('checkout-error');
     this.errorAlert = page.getByText(/Unable to load checkout|No checkout session/i);
   }
 
@@ -83,14 +83,10 @@ export class NewInstanceModal {
     this.page = page;
     this.heading = page.getByRole('heading', { name: /Your Aether/i });
     this.chooseMachineLabel = page.getByText(/Choose your machine/i);
-    this.tierOptions = page.locator('[role="radiogroup"] [role="radio"]').or(
-      page.locator('button').filter({ hasText: /vCPU/i }),
-    );
-    this.ctaButton = page.getByRole('button', { name: /Get Your Aether/i });
+    this.tierOptions = page.getByTestId('tier-options');
+    this.ctaButton = page.getByTestId('instance-cta');
     this.includesSection = page.getByText(/Every plan includes/i);
-    this.closeButton = page.getByRole('button', { name: 'Close' }).or(
-      page.locator('button').filter({ has: page.locator('[data-lucide="x"], svg.lucide-x') }),
-    );
+    this.closeButton = page.getByTestId('modal-close');
   }
 
   async assertVisible() {
@@ -123,9 +119,7 @@ export class CreditPurchaseModal {
   constructor(page: Page) {
     this.page = page;
     this.heading = page.getByRole('heading', { name: /Buy Credits/i });
-    this.packageButtons = page.locator('button').filter({ hasText: /\$\d+.*\d+ credits/i }).or(
-      page.locator('[role="dialog"] button').filter({ hasText: /\$/i }),
-    );
+    this.packageButtons = page.getByTestId('credit-packages').locator('button');
     this.ctaButton = page.getByRole('button', { name: /Buy \$|Select a package/i });
     this.noSubscriptionText = page.getByText(/Credits Not Available|active subscription/i);
   }

@@ -17,17 +17,17 @@ export class SessionPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.chatInput = page.locator('textarea').first();
-    this.sendButton = page.getByRole('button', { name: 'Send message' });
-    this.stopButton = page.getByRole('button', { name: 'Stop' });
-    this.attachButton = page.getByRole('button', { name: 'Attach files' });
+    this.chatInput = page.getByTestId('chat-input');
+    this.sendButton = page.getByTestId('send-button');
+    this.stopButton = page.getByTestId('stop-button');
+    this.attachButton = page.getByTestId('attach-button');
     this.messageArea = page.locator('[role="log"]');
     this.welcomeState = page.getByText(/Ask anything/i);
     this.notFoundState = page.getByText(/Session not found/i);
-    this.sidebarNewSessionButton = page.getByRole('button', { name: /New session/i });
+    this.sidebarNewSessionButton = page.getByTestId('new-session-sidebar');
     this.sessionRows = page.locator('a[href^="/sessions/"]');
-    this.sessionEmptyState = page.getByText(/No sessions yet/i);
-    this.moreActionsButton = page.getByRole('button', { name: /More actions/i });
+    this.sessionEmptyState = page.getByTestId('session-empty');
+    this.moreActionsButton = page.getByTestId('more-actions');
     this.scrollToBottomButton = page.getByRole('button', { name: /Scroll to bottom/i });
   }
 

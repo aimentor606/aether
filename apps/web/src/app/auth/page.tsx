@@ -866,6 +866,7 @@ function LoginContent() {
       role="button"
       tabIndex={0}
       aria-label="Unlock screen"
+      data-testid="lock-screen"
       className="fixed inset-0 overflow-hidden cursor-pointer"
       onClick={() => phase === 'lock' && setPhase('form')}
     >
@@ -963,7 +964,7 @@ function LoginContent() {
             >
               <div className="bg-background/80 dark:bg-background/75 backdrop-blur-2xl border border-foreground/[0.06] rounded-[20px] px-7 py-8">
                 {/* Shared header */}
-                <p className="text-[11px] text-center text-foreground/30 tracking-[0.2em] uppercase mb-6">
+                <p data-testid="auth-heading" className="text-[11px] text-center text-foreground/30 tracking-[0.2em] uppercase mb-6">
                   Sign in to Aether
                 </p>
 
@@ -992,6 +993,7 @@ function LoginContent() {
                       formAction={handlePasswordAuth}
                       className="w-full h-11 text-[13px] font-medium rounded-xl shadow-none mt-1"
                       pendingText="Signing in…"
+                      data-testid="sign-in-button"
                     >
                       Sign in
                     </SubmitButton>
@@ -1195,6 +1197,7 @@ function SelfHostedLoginContent() {
       role="button"
       tabIndex={0}
       aria-label="Unlock screen"
+      data-testid="lock-screen"
       className="fixed inset-0 overflow-hidden cursor-pointer"
       onClick={() => phase === 'lock' && setPhase('form')}
     >

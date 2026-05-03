@@ -141,7 +141,7 @@ function CheckoutContent() {
         {error ? (
           <Card className="w-full max-w-md bg-white">
             <CardHeader className="text-center">
-              <CardTitle className="text-gray-900">Checkout Error</CardTitle>
+              <CardTitle data-testid="checkout-error" className="text-gray-900">Checkout Error</CardTitle>
               <CardDescription className="text-gray-600">Unable to load checkout</CardDescription>
             </CardHeader>
             <CardContent>
@@ -160,7 +160,7 @@ function CheckoutContent() {
         ) : (
           // Embedded checkout container
           <div className="w-full max-w-4xl">
-            <div id="checkout-container"></div>
+            <div id="checkout-container" data-testid="checkout-container"></div>
           </div>
         )}
       </div>

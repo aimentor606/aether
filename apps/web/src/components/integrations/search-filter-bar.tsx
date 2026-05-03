@@ -30,6 +30,7 @@ export const SearchFilterBar = ({
           onChange={onSearchChange}
           placeholder="Search apps..."
           className="max-w-md"
+          data-testid="connectors-search"
         />
 
         <FilterBar>

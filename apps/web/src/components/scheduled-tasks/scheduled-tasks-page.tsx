@@ -145,6 +145,7 @@ const TaskListItem = ({
         'transition-colors cursor-pointer group',
         isSelected ? 'bg-muted' : 'bg-card',
       )}
+      data-testid="task-card"
     >
       <div
         onClick={onClick}
@@ -225,7 +226,7 @@ const TaskListItem = ({
 };
 
 const EmptyState = ({ onCreateClick }: { onCreateClick: () => void }) => (
-  <div className="bg-muted/20 rounded-3xl border flex flex-col items-center justify-center py-16 px-4">
+  <div className="bg-muted/20 rounded-3xl border flex flex-col items-center justify-center py-16 px-4" data-testid="triggers-empty">
     <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4">
       <Calendar className="h-6 w-6 text-muted-foreground" />
     </div>
@@ -374,7 +375,7 @@ export function ScheduledTasksPage() {
           <PageHeader icon={Calendar}>
             <div className="space-y-2 sm:space-y-4">
               <div className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
-                <span className="text-primary">Triggers</span>
+                <span className="text-primary" data-testid="triggers-heading">Triggers</span>
               </div>
             </div>
           </PageHeader>
@@ -401,6 +402,7 @@ export function ScheduledTasksPage() {
                   onChange={setSearchQuery}
                   placeholder="Search triggers..."
                   className="max-w-md"
+                  data-testid="triggers-search"
                 />
                 <FilterBar className="hidden sm:inline-flex">
                   {(['all', 'cron', 'webhook'] as const).map((f) => (
@@ -420,6 +422,7 @@ export function ScheduledTasksPage() {
                 variant="default"
                 size="default"
                 onClick={() => setShowCreateDialog(true)}
+                data-testid="create-trigger-button"
               >
                 <Plus className="h-4 w-4" />
                 <span className="hidden xs:inline">Add Trigger</span>
@@ -436,7 +439,7 @@ export function ScheduledTasksPage() {
               ) : filteredTriggers.length === 0 ? (
                 <EmptyState onCreateClick={() => setShowCreateDialog(true)} />
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4" data-testid="task-list">
                   {filteredTriggers.map((trigger) => (
                     <TaskListItem
                       key={trigger.triggerId}
@@ -474,6 +477,7 @@ export function ScheduledTasksPage() {
             <TaskDetailPanel
               trigger={selectedTrigger}
               onClose={handleClosePanel}
+              data-testid="task-detail"
             />
           )}
         </div>

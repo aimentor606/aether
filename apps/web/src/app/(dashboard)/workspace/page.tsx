@@ -222,6 +222,7 @@ function DetailSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
+        data-testid="detail-sheet"
         side="right"
         className="w-full sm:max-w-lg p-0 flex flex-col gap-0 [&>button:last-child]:hidden"
       >
@@ -231,7 +232,7 @@ function DetailSheet({
             <SheetHeader className="px-6 pt-6 pb-4 border-b border-border/50 gap-0 space-y-0">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <SheetTitle className={cn('text-sm break-all', item.kind === 'command' && 'font-mono')}>
+                  <SheetTitle className={cn('text-sm break-all', item.kind === 'command' && 'font-mono')} data-testid="detail-sheet-title">
                     {item.name}
                   </SheetTitle>
                   <SheetDescription className="sr-only">
@@ -371,7 +372,7 @@ function FilterPill({ active, onClick, children }: { active: boolean; onClick: (
 function EmptyState({ hasFilters, onClear }: { hasFilters: boolean; onClear: () => void }) {
   if (hasFilters) {
     return (
-      <div className="py-12 text-center text-sm text-muted-foreground">
+      <div className="py-12 text-center text-sm text-muted-foreground" data-testid="workspace-empty">
         No items match your filters.{' '}
         <Button onClick={onClear} variant="link" size="sm" className="h-auto p-0 ">
           Clear filters
@@ -380,7 +381,7 @@ function EmptyState({ hasFilters, onClear }: { hasFilters: boolean; onClear: () 
     );
   }
   return (
-    <div className="flex flex-col items-center justify-center py-20 rounded-xl border border-dashed border-border/50">
+    <div className="flex flex-col items-center justify-center py-20 rounded-xl border border-dashed border-border/50" data-testid="workspace-empty">
       <Blocks className="h-7 w-7 text-muted-foreground/30 mb-3" />
       <p className="text-sm font-medium text-foreground mb-1">Nothing here yet</p>
       <p className="text-xs text-muted-foreground text-center max-w-xs">
@@ -573,7 +574,7 @@ export default function WorkspacePage() {
         {/* Page header */}
         <div className="container mx-auto max-w-7xl px-3 sm:px-4 py-3 sm:py-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 fill-mode-both">
           <PageHeader icon={Blocks}>
-            <div className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight" data-testid="workspace-heading">
               <span className="text-primary">Workspace</span>
             </div>
           </PageHeader>
@@ -593,6 +594,7 @@ export default function WorkspacePage() {
                     type="button"
                     onClick={() => openComposer(action.kind)}
                     disabled={createSession.isPending}
+                    data-testid={action.title === 'New agent' ? 'new-agent-button' : action.title === 'New skill' ? 'new-skill-button' : action.title === 'New command' ? 'new-command-button' : 'new-project-button'}
                     className="group flex items-center gap-3 w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-left transition-colors hover:bg-accent hover:border-border disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                   >
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border/50 bg-muted">
@@ -616,8 +618,8 @@ export default function WorkspacePage() {
             {/* MCP + Settings row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
               {[
-                { title: 'Add MCP server', desc: 'Register a new MCP server and connect its tools', meta: `${kindCounts.mcp} connected`, icon: Plug, onClick: () => openSettings('mcp') },
-                { title: 'Settings', desc: 'Providers, permissions, and workspace defaults', meta: undefined, icon: Settings, onClick: () => openSettings('general') },
+                { title: 'Add MCP server', desc: 'Register a new MCP server and connect its tools', meta: `${kindCounts.mcp} connected`, icon: Plug, onClick: () => openSettings('mcp'), testId: 'add-mcp-button' },
+                { title: 'Settings', desc: 'Providers, permissions, and workspace defaults', meta: undefined, icon: Settings, onClick: () => openSettings('general'), testId: 'workspace-settings' },
               ].map((action) => {
                 const Icon = action.icon;
                 return (
@@ -625,6 +627,7 @@ export default function WorkspacePage() {
                     key={action.title}
                     type="button"
                     onClick={action.onClick}
+                    data-testid={action.testId}
                     className="group flex items-center gap-3 w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-left transition-colors hover:bg-accent hover:border-border cursor-pointer"
                   >
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border/50 bg-muted">
@@ -650,9 +653,10 @@ export default function WorkspacePage() {
               onChange={setSearch}
               placeholder="Search..."
               className="max-w-sm"
+              data-testid="workspace-search"
             />
 
-            <FilterBar className="hidden lg:inline-flex">
+            <FilterBar className="hidden lg:inline-flex" data-testid="kind-filter-bar">
               {kindTabs.map((tab) => (
                 <FilterBarItem
                   key={tab.value}
@@ -679,7 +683,7 @@ export default function WorkspacePage() {
 
           {/* Scope sub-filter */}
           {!isLoading && activeScopeTabs.length > 2 && (
-            <FilterBar className="w-fit mb-4">
+            <FilterBar className="w-fit mb-4" data-testid="scope-filter-bar">
               {activeScopeTabs.map((tab) => (
                 <FilterBarItem
                   key={tab.value}
@@ -719,6 +723,7 @@ export default function WorkspacePage() {
                   {filteredItems.map((item, index) => (
                     <WorkspaceItemCard
                       key={item.id}
+                      data-testid="workspace-item"
                       item={{
                         id: item.id,
                         name: item.name,

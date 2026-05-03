@@ -327,6 +327,7 @@ function FileCard({
           onDragEnd={handleDragEnd}
           onClick={isRenaming ? undefined : onClick}
           onDoubleClick={isRenaming ? undefined : onDoubleClick}
+          data-testid="file-card"
           className={cn(
             'group relative flex flex-col rounded-lg border border-border/50 cursor-pointer select-none overflow-hidden',
             'transition-colors duration-150',
@@ -538,7 +539,7 @@ export function DriveGridView({
 
       {/* Empty state */}
       {dirs.length === 0 && files.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="flex flex-col items-center justify-center py-20 text-center" data-testid="files-empty">
           <FolderOpen className="h-16 w-16 text-muted-foreground/20 mb-4" />
           <p className="text-sm text-muted-foreground">This folder is empty</p>
           <p className="text-xs text-muted-foreground/60 mt-1">

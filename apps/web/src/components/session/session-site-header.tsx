@@ -85,6 +85,7 @@ export function SessionSiteHeader({
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
+                        data-testid="more-actions"
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>

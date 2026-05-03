@@ -119,7 +119,7 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
   const price = selectedType ? `$${selectedType.priceMonthlyMarkup.toFixed(0)}` : '–';
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" data-testid="new-instance-modal">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !isLoading && onOpenChange(false)} />
 
       <div
@@ -128,7 +128,7 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
         className="relative bg-background rounded-2xl border border-border overflow-hidden flex flex-col max-h-[90vh] w-full max-w-[460px] outline-none animate-in fade-in-0 zoom-in-[0.97] duration-150"
       >
         {/* Close */}
-        <Button onClick={() => onOpenChange(false)} variant="ghost" size="icon-sm" className="absolute top-3.5 right-3.5 z-10" aria-label="Close">
+        <Button onClick={() => onOpenChange(false)} variant="ghost" size="icon-sm" className="absolute top-3.5 right-3.5 z-10" aria-label="Close" data-testid="modal-close">
           <X className="size-4" />
         </Button>
 
@@ -155,7 +155,7 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
                 <Skeleton className="h-[72px] w-full rounded-xl" />
               </div>
             ) : (
-              <RadioGroup value={selected ?? undefined} onValueChange={setSelected} className="gap-2.5">
+              <RadioGroup value={selected ?? undefined} onValueChange={setSelected} className="gap-2.5" data-testid="tier-options">
                 {serverTypes.map((t) => {
                   const isSelected = selected === t.name;
                   const isRecommended = t.name === 'pro';
@@ -240,7 +240,7 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
             </div>
             <p className="text-[11px] text-muted-foreground/60 mt-0.5">Cancel anytime</p>
           </div>
-          <Button className="h-11 px-7 text-sm font-semibold" disabled={isLoading || !selected} onClick={handleCta}>
+          <Button className="h-11 px-7 text-sm font-semibold" disabled={isLoading || !selected} onClick={handleCta} data-testid="instance-cta">
             {isLoading ? <Loader2 className="size-4 animate-spin" /> : <>Get Your Aether<ArrowRight className="size-3.5 ml-1.5" /></>}
           </Button>
         </div>

@@ -10,11 +10,11 @@ export class UsagePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByRole('heading', { name: /Usage Dashboard/i });
-    this.periodSelector = page.locator('[role="tablist"]').filter({ hasText: /days/i });
-    this.statCards = page.locator('[class*="card"]').filter({ has: page.locator('[class*="font-medium"]') });
-    this.chart = page.locator('.recharts-area-chart').or(page.locator('[data-chart-container]'));
-    this.noDataState = page.getByText(/Usage metering not configured/i);
+    this.heading = page.getByTestId('usage-heading');
+    this.periodSelector = page.getByTestId('period-selector');
+    this.statCards = page.getByTestId('stat-card');
+    this.chart = page.getByTestId('usage-chart');
+    this.noDataState = page.getByTestId('usage-no-data');
   }
 
   async goto() {
@@ -23,7 +23,6 @@ export class UsagePage {
   }
 
   async assertLoaded() {
-    // Page is loaded when either the heading or the no-data fallback is visible
     const hasHeading = await this.heading.isVisible({ timeout: 15_000 }).catch(() => false);
     if (!hasHeading) {
       await expect(this.noDataState).toBeVisible({ timeout: 10_000 });
@@ -42,11 +41,11 @@ export class ChangelogPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByRole('heading', { name: /Versions/i });
-    this.currentVersion = page.getByText(/Running/i).locator('..');
-    this.filterTabs = page.locator('[data-state]').filter({ hasText: /All|Stable|Dev/ });
-    this.versionCards = page.locator('[class*="card"]').filter({ has: page.locator('span.font-mono') });
-    this.devToggle = page.getByRole('button', { name: /Dev builds|Hide dev builds/i });
+    this.heading = page.getByTestId('changelog-heading');
+    this.currentVersion = page.getByTestId('current-version');
+    this.filterTabs = page.getByTestId('version-filter');
+    this.versionCards = page.getByTestId('version-card');
+    this.devToggle = page.getByTestId('dev-toggle');
     this.updateAvailable = page.getByRole('button', { name: /Update to/i });
   }
 
@@ -58,7 +57,6 @@ export class ChangelogPage {
   async assertLoaded() {
     const hasHeading = await this.heading.isVisible({ timeout: 15_000 }).catch(() => false);
     if (!hasHeading) {
-      // Fallback: any content rendered on the changelog route
       await expect(this.page.locator('body')).toContainText(/Versions|version history/i);
     }
   }

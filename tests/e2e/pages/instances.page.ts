@@ -13,11 +13,11 @@ export class InstancesPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByRole('heading', { name: 'Instances' });
-    this.newInstanceButton = page.getByRole('button', { name: /New Aether/i });
-    this.instanceCards = page.locator('button[class*="rounded"]').filter({ has: page.locator('[class*="font-semibold"]') });
-    this.emptyState = page.getByText(/No instances yet/i);
-    this.errorState = page.getByText(/Failed to load instances/i);
+    this.heading = page.getByTestId('instances-heading');
+    this.newInstanceButton = page.getByTestId('new-instance-button');
+    this.instanceCards = page.getByTestId('instance-card');
+    this.emptyState = page.getByTestId('instances-empty');
+    this.errorState = page.getByTestId('instances-error');
     this.retryButton = page.getByRole('button', { name: /Retry/i });
     this.settingsButton = page.getByRole('button', { name: /Settings/i });
     this.logoutButton = page.getByRole('button', { name: /Log Out/i });
@@ -33,7 +33,7 @@ export class InstancesPage {
   }
 
   async getInstanceCardByName(name: string): Promise<Locator> {
-    return this.page.locator('button').filter({ hasText: new RegExp(name, 'i') }).first();
+    return this.instanceCards.filter({ hasText: new RegExp(name, 'i') }).first();
   }
 
   async getInstanceCount(): Promise<number> {
@@ -52,7 +52,7 @@ export class InstancesPage {
 
   async getVisibleStatuses(): Promise<string[]> {
     const statuses: string[] = [];
-    const statusElements = this.page.locator('[class*="rounded-full"]').filter({ hasText: /Active|Provisioning|Stopped|Error|Available/i });
+    const statusElements = this.page.getByTestId('instance-status');
     const count = await statusElements.count();
     for (let i = 0; i < count; i++) {
       statuses.push((await statusElements.nth(i).textContent())?.trim() ?? '');
@@ -73,13 +73,13 @@ export class InstanceDetailPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.backButton = page.getByRole('button', { name: /Instances/i }).first();
+    this.backToInstancesButton = page.getByTestId('back-to-instances');
+    this.backButton = this.backToInstancesButton;
     this.title = page.getByRole('heading').first();
     this.provisioningTitle = page.getByText(/Creating Workspace/i);
     this.healthCheckTitle = page.getByText(/Pinging Sandbox/i);
     this.errorTitle = page.getByText(/Something went wrong/i);
     this.stoppedTitle = page.getByText(/Instance Stopped/i);
-    this.backToInstancesButton = page.getByRole('button', { name: /Back to Instances/i });
   }
 
   async goto(instanceId: string) {
@@ -104,7 +104,7 @@ export class InstanceDetailPage {
   }
 
   async goBack() {
-    await this.backButton.click();
+    await this.backToInstancesButton.click();
     await this.page.waitForURL(/\/instances$/);
   }
 }
@@ -121,7 +121,7 @@ export class InstanceBackupsPage {
   constructor(page: Page) {
     this.page = page;
     this.heading = page.getByRole('heading', { name: /Backups/i });
-    this.backButton = page.getByRole('button', { name: /Instances/i });
+    this.backButton = page.getByTestId('back-to-instances');
     this.descriptionInput = page.locator('input[placeholder*="Backup description"]');
     this.backupNowButton = page.getByRole('button', { name: /Backup Now/i });
     this.emptyState = page.getByText(/No backups yet/i);

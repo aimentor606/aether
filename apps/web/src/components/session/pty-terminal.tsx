@@ -362,6 +362,7 @@ export const PtyTerminal = forwardRef<PtyTerminalHandle, PtyTerminalProps>(funct
   return (
     <div
       ref={terminalRef}
+      data-testid="terminal-container"
       className={cn(
         'overflow-hidden',
         'bg-[#0f0f14]',

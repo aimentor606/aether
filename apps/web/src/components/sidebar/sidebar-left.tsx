@@ -1031,6 +1031,7 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
             <button
               onClick={handleNewSession}
               disabled={createSession.isPending}
+              data-testid="new-session-sidebar"
               className={cn(
                 'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-[13px] cursor-pointer',
                 'transition-colors duration-150',

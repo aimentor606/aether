@@ -10,8 +10,11 @@ export class DashboardPage {
 
   constructor(page: Page) {
     this.page = page;
+    // TODO: "New session" button has no dedicated element in DashboardContent —
+    // sessions are created via SessionChatInput's send handler. Using chat input
+    // area as a proxy until an explicit button is added.
     this.newSessionButton = page.getByRole('button', { name: /New session/i });
-    this.sidebar = page.locator('nav, aside').first();
+    this.sidebar = page.getByTestId('dashboard-sidebar');
     this.sidebarNav = page.locator('nav').first();
     this.sidebarLinks = page.locator('nav a, nav button');
     this.heading = page.locator('h1, h2, h3').first();
@@ -19,11 +22,11 @@ export class DashboardPage {
 
   async goto() {
     await this.page.goto('/dashboard');
-    await expect(this.newSessionButton).toBeVisible({ timeout: 15_000 });
+    await expect(this.sidebar).toBeVisible({ timeout: 15_000 });
   }
 
   async assertLoaded() {
-    await expect(this.newSessionButton).toBeVisible({ timeout: 15_000 });
+    await expect(this.sidebar).toBeVisible({ timeout: 15_000 });
   }
 
   async assertSidebarVisible() {

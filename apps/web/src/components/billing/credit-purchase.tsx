@@ -101,7 +101,7 @@ export function CreditPurchaseModal({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-lg" data-testid="credit-modal">
                 <DialogHeader>
                     <DialogTitle>Buy Credits</DialogTitle>
                     <DialogDescription>
@@ -118,7 +118,7 @@ export function CreditPurchaseModal({
                 {/* Buy credits */}
                 <div>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Buy credits</p>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-3 gap-2" data-testid="credit-packages">
                         {CREDIT_PACKAGES.map((pkg) => (
                             <Button
                                 key={pkg.price}

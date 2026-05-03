@@ -13,14 +13,14 @@ export class ConnectorsPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByText('Connectors', { exact: false }).first();
-    this.searchInput = page.locator('input[placeholder*="Search apps"]');
-    this.availableAppsGrid = page.getByText('Available Apps', { exact: false }).first();
-    this.connectedSection = page.getByText('Connected', { exact: false }).first();
-    this.connectorRegistry = page.getByText('Your Connectors', { exact: false }).first();
-    this.appCards = page.locator('[class*="grid"] [class*="spotlight-card"], [class*="grid"] [class*="bg-card"]').filter({ has: page.locator('h3') });
-    this.connectButtons = page.getByRole('button', { name: /Connect/i });
-    this.emptyState = page.getByText(/No apps found|No channels yet/i).first();
+    this.heading = page.getByTestId('connectors-heading');
+    this.searchInput = page.getByTestId('connectors-search');
+    this.availableAppsGrid = page.getByTestId('available-apps');
+    this.connectedSection = page.getByTestId('connected-section');
+    this.connectorRegistry = page.getByTestId('connector-registry');
+    this.appCards = page.getByTestId('app-card');
+    this.connectButtons = page.getByTestId('connect-button');
+    this.emptyState = page.getByTestId('connectors-empty');
   }
 
   async goto() {
@@ -37,7 +37,7 @@ export class ConnectorsPage {
   }
 
   async getConnectedCount(): Promise<number> {
-    const connectedSection = this.page.locator('div').filter({ hasText: /^Connected$/ }).first();
+    const connectedSection = this.connectedSection;
     const badge = connectedSection.locator('[class*="badge"], [data-slot="badge"]');
     const isVisible = await badge.isVisible({ timeout: 3_000 }).catch(() => false);
     if (!isVisible) return 0;

@@ -12,13 +12,13 @@ export class ScheduledTasksPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByText('Triggers');
-    this.taskList = page.locator('.space-y-4').filter({ has: page.locator('[role="button"]') });
-    this.taskCards = page.locator('[role="button"][aria-label="View task details"]');
-    this.createButton = page.getByRole('button', { name: /Add Trigger|Add/i });
-    this.searchInput = page.locator('input[placeholder*="Search triggers"]');
-    this.emptyState = page.getByText(/Create a trigger/i);
-    this.detailPanel = page.locator('.border-l').filter({ has: page.getByText(/Details|Schedule|History/i) });
+    this.heading = page.getByTestId('triggers-heading');
+    this.taskList = page.getByTestId('task-list');
+    this.taskCards = page.getByTestId('task-card');
+    this.createButton = page.getByTestId('create-trigger-button');
+    this.searchInput = page.getByTestId('triggers-search');
+    this.emptyState = page.getByTestId('triggers-empty');
+    this.detailPanel = page.getByTestId('task-detail');
   }
 
   async goto() {
@@ -27,7 +27,6 @@ export class ScheduledTasksPage {
   }
 
   async assertLoaded() {
-    // Page is loaded when either the heading or the create button is visible
     const hasHeading = await this.heading.first().isVisible({ timeout: 15_000 }).catch(() => false);
     if (!hasHeading) {
       await expect(this.createButton).toBeVisible({ timeout: 10_000 });

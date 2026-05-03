@@ -178,6 +178,7 @@ function ListRow({
           onDrop={handleDrop}
           onClick={isRenaming ? undefined : onClick}
           onDoubleClick={isRenaming ? undefined : onDoubleClick}
+          data-testid="file-row"
           className={cn(
             'group grid grid-cols-[1fr_80px_80px_40px] items-center gap-4 px-4 h-10 cursor-pointer select-none',
             'transition-colors duration-100',
@@ -368,7 +369,7 @@ export function DriveListView({
 
   if (allItems.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="flex flex-col items-center justify-center py-20 text-center" data-testid="files-empty">
         <FolderOpen className="h-16 w-16 text-muted-foreground/20 mb-4" />
         <p className="text-sm text-muted-foreground">This folder is empty</p>
         <p className="text-xs text-muted-foreground/60 mt-1">

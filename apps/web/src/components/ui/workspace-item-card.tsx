@@ -27,16 +27,18 @@ export function WorkspaceItemCard({
   index = 0,
   onClick,
   actions,
+  ...rest
 }: {
   item: WorkspaceCardItem;
   index?: number;
   onClick?: () => void;
   /** Optional slot for buttons rendered in the bottom-right */
   actions?: React.ReactNode;
-}) {
+} & { 'data-testid'?: string }) {
   return (
     <motion.div
       layout
+      {...rest}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96 }}

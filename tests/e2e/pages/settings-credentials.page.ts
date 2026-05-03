@@ -8,11 +8,9 @@ export class SettingsCredentialsPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByRole('heading', { name: 'Secrets Manager' });
-    this.addButton = page.getByRole('button', { name: /Add/i });
-    this.filterInput = page.locator('input[placeholder*="Search"], input[placeholder*="Filter"]').or(
-      page.locator('input[type="search"]').first(),
-    );
+    this.heading = page.getByTestId('credentials-heading');
+    this.addButton = page.getByTestId('add-credential-button');
+    this.filterInput = page.getByTestId('credential-search');
   }
 
   async goto() {

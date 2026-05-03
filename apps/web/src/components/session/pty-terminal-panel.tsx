@@ -181,6 +181,7 @@ export function PtyTerminalPanel({ className, serverId, hidden }: PtyTerminalPan
             <button
               onClick={handleCreate}
               disabled={createPty.isPending}
+              data-testid="new-terminal-button"
               className={cn(
                 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer',
                 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900',
@@ -225,6 +226,7 @@ export function PtyTerminalPanel({ className, serverId, hidden }: PtyTerminalPan
         <button
           onClick={handleCreate}
           disabled={createPty.isPending}
+          data-testid="new-terminal-button"
           className="flex-shrink-0 p-1 rounded text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer disabled:opacity-50"
           title="New terminal"
         >
@@ -232,6 +234,7 @@ export function PtyTerminalPanel({ className, serverId, hidden }: PtyTerminalPan
         </button>
         <button
           onClick={() => refetch()}
+          data-testid="terminal-refresh"
           className="flex-shrink-0 p-1 rounded text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer ml-auto"
           title="Refresh"
         >
@@ -288,6 +291,7 @@ function PtyTab({
   return (
     <div
       onClick={onClick}
+      data-testid="terminal-tab"
       className={cn(
         'group flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium transition-colors cursor-pointer max-w-[160px]',
         isActive

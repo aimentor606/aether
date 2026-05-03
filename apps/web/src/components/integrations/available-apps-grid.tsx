@@ -36,7 +36,7 @@ const AppCard = ({
   const connectionCount = connections.length;
 
   return (
-    <SpotlightCard className="bg-card border border-border/50">
+    <SpotlightCard className="bg-card border border-border/50" data-testid="app-card">
       <div className="p-4 sm:p-5 flex flex-col h-full">
         <div className="flex items-center gap-3 mb-3">
           <AppLogo app={{ imgSrc: app.imgSrc, name: app.name }} />
@@ -107,6 +107,7 @@ const AppCard = ({
               className="h-8 px-3 text-xs"
               onClick={onConnect}
               disabled={isConnecting}
+              data-testid="connect-button"
             >
               {isConnecting ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />

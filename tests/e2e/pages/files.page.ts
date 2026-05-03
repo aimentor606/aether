@@ -38,40 +38,32 @@ export class FilesPage {
     // the toolbar area serves as the primary visual landmark.
     this.heading = page.locator('h1, h2, h3').first();
 
-    // Drive toolbar container (DriveToolbar renders a flex row with breadcrumbs + actions)
-    this.toolbar = page.locator(
-      'div.flex.items-center.gap-2.border-b',
-    );
+    // Drive toolbar container
+    this.toolbar = page.getByTestId('files-toolbar');
 
     // Upload button — opens file picker (in the "New" dropdown menu)
-    this.uploadButton = page.getByRole('menuitem', { name: /File upload|Upload/i });
+    this.uploadButton = page.getByTestId('upload-button');
 
     // New folder button — in the "New" dropdown menu
-    this.newFolderButton = page.getByRole('menuitem', { name: /New folder/i });
+    this.newFolderButton = page.getByTestId('new-folder-button');
 
     // Search toggle button in toolbar
-    this.searchButton = page.getByRole('button', { name: /Search files/i });
+    this.searchButton = page.getByTestId('files-search');
 
     // Search input — appears in FileSearch overlay after toggling
-    this.searchInput = page.getByPlaceholder(/Search files|Search/i).or(
-      page.locator('input[type="text"]').filter({ hasText: '' }).first(),
-    );
+    this.searchInput = page.getByPlaceholder(/Search files|Search/i);
 
     // View toggle (grid/list switch)
-    this.viewToggleButton = page.getByRole('button', {
-      name: /Switch to (list|grid) view/i,
-    });
+    this.viewToggleButton = page.getByTestId('view-toggle');
 
     // Breadcrumb navigation (nav element inside toolbar)
-    this.breadcrumbs = page.locator('nav').first();
+    this.breadcrumbs = page.getByTestId('files-breadcrumbs');
 
     // Individual breadcrumb segment buttons
     this.breadcrumbItems = this.breadcrumbs.locator('button');
 
     // Grid view container (DriveGridView renders file cards in a CSS grid)
-    this.fileGrid = page.locator(
-      'div[class*="grid"]',
-    );
+    this.fileGrid = page.locator('div[class*="grid"]');
 
     // List view container (DriveListView renders table rows)
     this.fileList = page.locator('table, [role="table"]').or(
@@ -79,30 +71,22 @@ export class FilesPage {
     );
 
     // File cards in grid view
-    this.fileCards = page.locator(
-      '[data-testid="file-card"], div[class*="cursor-pointer"][class*="rounded"]',
-    );
+    this.fileCards = page.getByTestId('file-card');
 
     // File rows in list view
-    this.fileRows = page.locator(
-      '[data-testid="file-row"], div[class*="flex"][class*="items-center"][class*="hover"]',
-    );
+    this.fileRows = page.getByTestId('file-row');
 
-    // File tree sidebar (used in the legacy FileBrowser, not in DriveExplorerPage)
-    this.fileTree = page.locator('[data-testid="file-tree"]').or(
-      page.locator('div.p-1\\.5.min-h-full'),
-    );
+    // File tree sidebar
+    this.fileTree = page.getByTestId('file-tree');
 
-    // Preview modal — full-screen overlay with backdrop-blur
-    this.previewModal = page.locator(
-      'div.fixed.inset-0.z-50.flex.flex-col',
-    );
+    // Preview modal — full-screen overlay
+    this.previewModal = page.getByTestId('file-preview');
 
     // Preview close button (X icon in top bar)
     this.previewCloseButton = page.getByRole('button', { name: /Close preview/i });
 
     // Empty state message
-    this.emptyState = page.getByText(/Empty directory|No files/i);
+    this.emptyState = page.getByTestId('files-empty');
   }
 
   /**
@@ -117,8 +101,6 @@ export class FilesPage {
    * Verify the file explorer has loaded by checking the toolbar is visible.
    */
   async assertLoaded() {
-    // The toolbar is the primary landmark for the file explorer.
-    // Wait for either the toolbar or the breadcrumb nav to appear.
     await this.viewToggleButton
       .or(this.breadcrumbs)
       .or(this.searchButton)

@@ -11,12 +11,12 @@ export class SkillsPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByText('Marketplace');
-    this.searchInput = page.getByPlaceholder('Search components...');
-    this.filterTabs = page.locator('[data-state]');
-    this.skillCards = page.locator('[class*="rounded"]').filter({ has: page.locator('[class*="font-semibold"]') });
-    this.installButtons = page.getByRole('button', { name: /Install/i });
-    this.emptyState = page.getByText(/No results|Nothing installed|No components found/i);
+    this.heading = page.getByTestId('marketplace-heading');
+    this.searchInput = page.getByTestId('marketplace-search');
+    this.filterTabs = page.getByTestId('marketplace-filters');
+    this.skillCards = page.getByTestId('skill-card');
+    this.installButtons = page.getByTestId('install-button');
+    this.emptyState = page.getByTestId('marketplace-empty');
   }
 
   async goto() {
@@ -29,7 +29,7 @@ export class SkillsPage {
   }
 
   async filterBy(filterName: string) {
-    const filterTab = this.filterTabs.filter({ hasText: new RegExp(`^${filterName}`, 'i') }).first();
+    const filterTab = this.filterTabs.locator(`[data-state]`).filter({ hasText: new RegExp(`^${filterName}`, 'i') }).first();
     await filterTab.click();
   }
 

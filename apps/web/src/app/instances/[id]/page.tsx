@@ -263,7 +263,7 @@ export default function InstanceDetailPage() {
   return (
     <div className="w-full relative overflow-hidden min-h-screen bg-background">
       <div className="absolute top-4 left-4 z-20">
-        <Button variant="ghost" size="sm" onClick={() => router.push('/instances')} className="gap-1.5 text-muted-foreground/50 hover:text-foreground">
+        <Button variant="ghost" size="sm" onClick={() => router.push('/instances')} className="gap-1.5 text-muted-foreground/50 hover:text-foreground" data-testid="back-to-instances">
           <ArrowLeft className="h-3.5 w-3.5" />
           Instances
         </Button>

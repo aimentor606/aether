@@ -138,7 +138,7 @@ export function DriveToolbar({
   };
 
   return (
-    <div className="flex items-center gap-2 px-4 h-12 border-b border-border/40 bg-background shrink-0">
+    <div className="flex items-center gap-2 px-4 h-12 border-b border-border/40 bg-background shrink-0" data-testid="files-toolbar">
       {/* ── Breadcrumbs ── */}
       <div className="flex items-center gap-0.5 min-w-0 flex-1 overflow-hidden">
         {isEditing ? (
@@ -162,6 +162,7 @@ export function DriveToolbar({
           <nav
             className="flex items-center gap-0.5 min-w-0 flex-1 overflow-x-auto"
             onDoubleClick={handleDoubleClick}
+            data-testid="files-breadcrumbs"
             title="Double-click to edit path"
           >
             {/* Home / root */}
@@ -222,6 +223,7 @@ export function DriveToolbar({
           size="icon"
           className="h-8 w-8 text-muted-foreground hover:text-foreground"
           onClick={toggleViewMode}
+          data-testid="view-toggle"
           title={
             viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'
           }
@@ -299,6 +301,7 @@ export function DriveToolbar({
           size="icon"
           className="h-8 w-8 text-muted-foreground hover:text-foreground"
           onClick={toggleSearch}
+          data-testid="files-search"
           title="Search files (Ctrl+P)"
           aria-label="Search files"
         >
@@ -348,7 +351,7 @@ export function DriveToolbar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={onNewFolder}>
+            <DropdownMenuItem onClick={onNewFolder} data-testid="new-folder-button">
               <FolderPlus className="mr-2 h-4 w-4" />
               New folder
             </DropdownMenuItem>
@@ -357,7 +360,7 @@ export function DriveToolbar({
               New file
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onUpload}>
+            <DropdownMenuItem onClick={onUpload} data-testid="upload-button">
               <Upload className="mr-2 h-4 w-4" />
               File upload
             </DropdownMenuItem>

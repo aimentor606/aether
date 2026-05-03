@@ -125,7 +125,7 @@ export default function ActivateTrialPage() {
       <Card className="w-full max-w-2xl border-2 shadow-none bg-transparent border-none">
         <CardHeader className="text-center space-y-4">
           <div>
-            <CardTitle className="text-2xl font-medium flex items-center justify-center gap-2">
+            <CardTitle data-testid="trial-heading" className="text-2xl font-medium flex items-center justify-center gap-2">
               <AetherLogo />
               <span>Welcome to Aether</span>
             </CardTitle>
@@ -177,6 +177,7 @@ export default function ActivateTrialPage() {
               onClick={handleStartTrial}
               disabled={startTrialMutation.isPending}
               className="w-full"
+              data-testid="start-trial-button"
             >
               {startTrialMutation.isPending ? (
                 <>
@@ -194,11 +195,11 @@ export default function ActivateTrialPage() {
           </div>
           <div className="text-center text-sm text-muted-foreground">
             By starting your trial, you agree to our{' '}
-            <Link href="/legal?tab=terms" className="underline hover:text-primary">
+            <Link href="/legal?tab=terms" className="underline hover:text-primary" data-testid="terms-link">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="/legal?tab=privacy" className="underline hover:text-primary">
+            <Link href="/legal?tab=privacy" className="underline hover:text-primary" data-testid="privacy-link">
               Privacy Policy
             </Link>
           </div>

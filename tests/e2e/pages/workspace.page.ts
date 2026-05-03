@@ -21,24 +21,22 @@ export class WorkspacePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByText('Workspace', { exact: false }).first();
-    this.searchInput = page.locator('input[placeholder="Search..."]').first();
-    this.kindFilterTabs = page.locator('[role="tablist"], [data-slot="filter-bar"]').first().locator('button');
-    this.scopeFilters = page.locator('[data-slot="filter-bar"]').nth(1).locator('button');
-    this.itemCards = page.locator('[class*="spotlight-card"], [class*="bg-card"][class*="border"]').filter({ has: page.locator('h3') });
+    this.heading = page.getByTestId('workspace-heading');
+    this.searchInput = page.getByTestId('workspace-search');
+    this.kindFilterTabs = page.getByTestId('kind-filter-bar').locator('button');
+    this.scopeFilters = page.getByTestId('scope-filter-bar').locator('button');
+    this.itemCards = page.getByTestId('workspace-item');
     this.quickActionCards = page.locator('button[type="button"]').filter({ hasText: /New agent|New skill|New command|New project/ });
-    this.newAgentButton = page.getByRole('button', { name: /New agent/i });
-    this.newSkillButton = page.getByRole('button', { name: /New skill/i });
-    this.newCommandButton = page.getByRole('button', { name: /New command/i });
-    this.newProjectButton = page.getByRole('button', { name: /New project/i });
-    this.detailSheet = page.locator('[role="dialog"], [data-state="open"]').filter({ has: page.locator('[class*="Sheet"]') }).or(
-      page.locator('[role="dialog"]').first(),
-    );
-    this.detailSheetTitle = page.locator('[role="dialog"] [class*="font-semibold"], [role="dialog"] h2, [role="dialog"] [data-slot="sheet-title"]').first();
+    this.newAgentButton = page.getByTestId('new-agent-button');
+    this.newSkillButton = page.getByTestId('new-skill-button');
+    this.newCommandButton = page.getByTestId('new-command-button');
+    this.newProjectButton = page.getByTestId('new-project-button');
+    this.detailSheet = page.getByTestId('detail-sheet');
+    this.detailSheetTitle = page.getByTestId('detail-sheet-title');
     this.detailSheetClose = page.locator('[role="dialog"] button[aria-label="Close"], [role="dialog"] button').filter({ hasText: /close/i }).first();
-    this.settingsButton = page.getByRole('button', { name: /Settings/i }).filter({ hasText: /Providers, permissions/ });
-    this.addMcpButton = page.getByRole('button', { name: /Add MCP server/i });
-    this.emptyState = page.getByText(/Nothing here yet|No items match your filters/i);
+    this.settingsButton = page.getByTestId('workspace-settings');
+    this.addMcpButton = page.getByTestId('add-mcp-button');
+    this.emptyState = page.getByTestId('workspace-empty');
   }
 
   async goto() {
@@ -51,13 +49,13 @@ export class WorkspacePage {
   }
 
   async filterByKind(kind: string) {
-    const tab = this.page.locator('button').filter({ hasText: new RegExp(kind, 'i') }).first();
+    const tab = this.kindFilterTabs.filter({ hasText: new RegExp(kind, 'i') }).first();
     await tab.click();
     await this.page.waitForTimeout(500);
   }
 
   async filterByScope(scope: string) {
-    const pill = this.page.locator('[data-slot="filter-bar"]').nth(1).locator('button').filter({ hasText: new RegExp(scope, 'i') }).first();
+    const pill = this.scopeFilters.filter({ hasText: new RegExp(scope, 'i') }).first();
     await pill.click();
     await this.page.waitForTimeout(500);
   }

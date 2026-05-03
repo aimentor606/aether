@@ -85,6 +85,7 @@ export function AppProviders({
   return (
     <SidebarProvider defaultOpen={defaultSidebarOpen}>
       <div
+        data-testid="dashboard-sidebar"
         className="transition-[max-width,opacity] duration-500 ease-out overflow-hidden"
         style={{
           maxWidth: hideSidebar ? 0 : '280px',

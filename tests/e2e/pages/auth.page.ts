@@ -14,16 +14,16 @@ export class AuthPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.lockScreenHint = page.getByText('Click or press Enter to sign in');
-    this.lockScreenOverlay = page.locator('div.fixed.inset-0.cursor-pointer').first();
-    this.lockScreenButton = page.locator(
-      'div.fixed.inset-0.cursor-pointer[role="button"]',
-    ).first();
-    this.heading = page.getByRole('heading', { name: /Sign in/i });
+    this.lockScreenHint = page.getByTestId('lock-screen');
+    this.lockScreenOverlay = page.getByTestId('lock-screen');
+    this.lockScreenButton = page.getByTestId('lock-screen');
+    this.heading = page.getByTestId('auth-heading');
     this.emailInput = page.locator('input[name="email"]');
     this.passwordInput = page.locator('input[name="password"]');
-    this.signInButton = page.getByRole('button', { name: 'Sign in' });
+    this.signInButton = page.getByTestId('sign-in-button');
+    // NOTE: errorAlert uses toast role="alert" — no data-testid available on auth page
     this.errorAlert = page.locator('[role="alert"]');
+    // NOTE: forgotPasswordLink does not exist in the current auth page (magic link flow)
     this.forgotPasswordLink = page.getByRole('link', { name: /Forgot password/i });
   }
 

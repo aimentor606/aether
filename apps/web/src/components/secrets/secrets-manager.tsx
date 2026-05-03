@@ -113,12 +113,14 @@ export function SecretsManager() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filter keys..."
+              data-testid="credential-search"
               className="h-8 pl-8 text-xs shadow-none"
             />
           </div>
           <Button
             variant="outline" size="sm"
             className="text-xs flex-shrink-0"
+            data-testid="add-credential-button"
             onClick={() => setAddingNew(true)}
           >
             <Plus className="h-3.5 w-3.5 mr-1" />

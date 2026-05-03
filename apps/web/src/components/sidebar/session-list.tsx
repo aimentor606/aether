@@ -836,7 +836,7 @@ export function SessionList({ projectId }: SessionListProps = {}) {
             </Button>
           </div>
         ) : rootSessions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+          <div className="flex flex-col items-center justify-center py-12 px-6 text-center" data-testid="session-empty">
             <MessageCircle className="h-8 w-8 text-muted-foreground mb-3" />
             <p className="text-sm text-muted-foreground">No sessions yet</p>
             <p className="text-xs text-muted-foreground mt-1">

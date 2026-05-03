@@ -48,7 +48,7 @@ export function TunnelDetail({ tunnelId }: TunnelDetailProps) {
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="p-6 pb-4 space-y-4">
-        <Button variant="ghost" size="sm" onClick={() => router.push('/tunnel')}>
+        <Button variant="ghost" size="sm" onClick={() => router.push('/tunnel')} data-testid="tunnel-back">
           <ArrowLeft className="h-3.5 w-3.5 mr-1" />
           Back
         </Button>
@@ -61,7 +61,7 @@ export function TunnelDetail({ tunnelId }: TunnelDetailProps) {
             <Monitor className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold">{connection.name}</h1>
+            <h1 className="text-lg font-semibold" data-testid="tunnel-detail-heading">{connection.name}</h1>
             <div className="flex items-center gap-2 mt-1">
               {isOnline ? (
                 <Wifi className="h-3.5 w-3.5 text-emerald-500" />

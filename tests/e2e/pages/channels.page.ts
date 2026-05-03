@@ -12,17 +12,13 @@ export class ChannelsPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByText('Channels', { exact: false }).first();
-    this.channelCards = page.locator('[class*="spotlight-card"], [class*="bg-card"]').filter({ has: page.locator('h3') });
-    this.addChannelButton = page.getByRole('button', { name: /Add Channel/i });
+    this.heading = page.getByTestId('channels-heading');
+    this.channelCards = page.getByTestId('channel-card');
+    this.addChannelButton = page.getByTestId('add-channel-button');
     this.configDialog = page.locator('[role="dialog"]');
-    this.telegramSetupButton = page.getByRole('button', { name: /Telegram/i }).or(
-      page.locator('button').filter({ hasText: /Connect a Telegram bot/i }),
-    );
-    this.slackSetupButton = page.getByRole('button', { name: /Slack/i }).or(
-      page.locator('button').filter({ hasText: /Connect a Slack app/i }),
-    );
-    this.emptyState = page.getByText(/No channels yet/i);
+    this.telegramSetupButton = page.getByTestId('telegram-setup');
+    this.slackSetupButton = page.getByTestId('slack-setup');
+    this.emptyState = page.getByTestId('channels-empty');
   }
 
   async goto() {

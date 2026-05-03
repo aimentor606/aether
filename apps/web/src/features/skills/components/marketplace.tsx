@@ -239,6 +239,7 @@ function ComponentDetailModal({
                 className="px-3 text-xs"
                 onClick={handleInstall}
                 disabled={!component || isInstalling || isInstalled}
+                data-testid="install-button"
               >
                 {isInstalling ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -353,6 +354,7 @@ function ComponentCard({
   return (
     <>
       <WorkspaceItemCard
+        data-testid="skill-card"
         item={{
           id: component.name,
           name: component.name,
@@ -382,6 +384,7 @@ function ComponentCard({
               className="px-3 text-xs"
               onClick={handleInstall}
               disabled={isInstalling}
+              data-testid="install-button"
             >
               {isInstalling ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
@@ -447,7 +450,7 @@ function MarketplaceEmptyState({
       : 'No components are available in this category right now.';
 
   return (
-    <div className="flex flex-col items-center justify-center py-20 rounded-xl border border-dashed border-border/50">
+    <div className="flex flex-col items-center justify-center py-20 rounded-xl border border-dashed border-border/50" data-testid="marketplace-empty">
       {icon}
       <p className="mt-3 text-sm font-medium text-foreground">{title}</p>
       {sub && (
@@ -537,7 +540,7 @@ export function Marketplace() {
         <div className="container mx-auto max-w-7xl px-3 sm:px-4 py-3 sm:py-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 fill-mode-both">
           <PageHeader icon={Sparkles}>
             <div className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
-              <span className="text-primary">Marketplace</span>
+              <span className="text-primary" data-testid="marketplace-heading">Marketplace</span>
             </div>
           </PageHeader>
         </div>
@@ -550,9 +553,10 @@ export function Marketplace() {
               onChange={setSearch}
               placeholder="Search components..."
               className="max-w-sm"
+              data-testid="marketplace-search"
             />
 
-            <FilterBar className="hidden sm:inline-flex">
+            <FilterBar className="hidden sm:inline-flex" data-testid="marketplace-filters">
               {FILTERS.map((f) => (
                 <FilterBarItem
                   key={f.key}

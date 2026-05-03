@@ -6,7 +6,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Pressable, Alert, ActivityIndicator, StyleSheet, Keyboard } from 'react-native';
 import { Text } from '@/components/ui/text';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView, BottomSheetModal, BottomSheetView, BottomSheetTextInput } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetScrollView,
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetTextInput,
+} from '@gorhom/bottom-sheet';
 import { useColorScheme } from 'nativewind';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Pencil, Trash2, Calendar, Link2, Unlink, Monitor } from 'lucide-react-native';
@@ -31,7 +37,11 @@ interface ManageConnectionSheetProps {
   onDismiss: () => void;
 }
 
-export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: ManageConnectionSheetProps) {
+export function ManageConnectionSheet({
+  connection,
+  appImgSrc,
+  onDismiss,
+}: ManageConnectionSheetProps) {
   const sheetRef = useRef<BottomSheet>(null);
   const renameSheetRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['60%', '85%'], []);
@@ -51,9 +61,7 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
   const [localLabel, setLocalLabel] = useState<string | null>(null);
 
   // Fetch sandboxes linked to this integration
-  const { data: sandboxData } = useIntegrationSandboxes(
-    connection?.integrationId ?? null,
-  );
+  const { data: sandboxData } = useIntegrationSandboxes(connection?.integrationId ?? null);
 
   const linkedSandboxes = sandboxData?.sandboxes ?? [];
   const isLinked = linkedSandboxes.some((s: any) => s.sandboxId === sandboxUuid);
@@ -73,15 +81,19 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
     (index: number) => {
       if (index === -1) onDismiss();
     },
-    [onDismiss],
+    [onDismiss]
   );
 
   const renderBackdrop = useCallback(
     (props: any) => (
       <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.5} />
     ),
-    [],
+    []
   );
+
+  // ── Display name (must be declared before handleOpenRename) ──
+  const displayName =
+    localLabel || connection?.label || connection?.appName || connection?.app || '';
 
   // ── Rename ──
   const handleOpenRename = useCallback(() => {
@@ -107,16 +119,27 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
 
   // ── Link/Unlink sandbox ──
   const handleToggleLink = useCallback(async () => {
-    log.log('[ManageConnection] Toggle link:', { integrationId: connection?.integrationId, sandboxUuid, sandboxId, isLinked });
+    log.log('[ManageConnection] Toggle link:', {
+      integrationId: connection?.integrationId,
+      sandboxUuid,
+      sandboxId,
+      isLinked,
+    });
     if (!connection || !sandboxUuid) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       if (isLinked) {
         log.log('[ManageConnection] Unlinking...');
-        await unlinkSandbox.mutateAsync({ integrationId: connection.integrationId, sandboxId: sandboxUuid });
+        await unlinkSandbox.mutateAsync({
+          integrationId: connection.integrationId,
+          sandboxId: sandboxUuid,
+        });
       } else {
         log.log('[ManageConnection] Linking...');
-        await linkSandbox.mutateAsync({ integrationId: connection.integrationId, sandboxId: sandboxUuid });
+        await linkSandbox.mutateAsync({
+          integrationId: connection.integrationId,
+          sandboxId: sandboxUuid,
+        });
       }
       log.log('[ManageConnection] Success!');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -148,7 +171,7 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
             }
           },
         },
-      ],
+      ]
     );
   }, [connection, disconnect, onDismiss]);
 
@@ -158,12 +181,14 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
   const subtleBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)';
   const borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
 
-  const displayName = localLabel || connection?.label || connection?.appName || connection?.app || '';
-
   const formatDate = (iso: string | null) => {
     if (!iso) return null;
     try {
-      return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      return new Date(iso).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
     } catch {
       return null;
     }
@@ -179,15 +204,14 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
         onChange={handleSheetChange}
         backdropComponent={renderBackdrop}
         backgroundStyle={{ backgroundColor: isDark ? '#161618' : '#FFFFFF' }}
-        handleIndicatorStyle={{ backgroundColor: isDark ? '#555' : '#ccc' }}
-      >
+        handleIndicatorStyle={{ backgroundColor: isDark ? '#555' : '#ccc' }}>
         <BottomSheetScrollView
-          contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 20 }}
-        >
+          contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 20 }}>
           {connection && (
             <>
               {/* Header — Icon left, Name + Provider right */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 20 }}>
                 <AppIcon
                   name={connection.appName || connection.app}
                   imgSrc={appImgSrc || (connection.metadata as any)?.imgSrc}
@@ -202,7 +226,8 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
                       <Pencil size={14} color={muted} />
                     </Pressable>
                   </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                  <View
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 3 }}>
                     <View
                       style={{
                         width: 6,
@@ -220,7 +245,8 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
 
               {/* Connected date */}
               {connection.connectedAt && (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+                <View
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 20 }}>
                   <Calendar size={16} color={muted} />
                   <Text style={{ fontSize: 14, fontFamily: 'Roobert', color: muted }}>
                     Connected {formatDate(connection.connectedAt)}
@@ -231,13 +257,27 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
               {/* Linked Sandboxes */}
               {sandboxUuid && (
                 <View style={{ marginBottom: 24 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 8,
+                      marginBottom: 12,
+                    }}>
                     <Link2 size={16} color={muted} />
-                    <Text style={{ fontSize: 13, fontFamily: 'Roobert-Medium', color: muted, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontFamily: 'Roobert-Medium',
+                        color: muted,
+                        textTransform: 'uppercase',
+                        letterSpacing: 0.5,
+                      }}>
                       Linked Sandboxes
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 13, fontFamily: 'Roobert', color: muted, marginBottom: 12 }}>
+                  <Text
+                    style={{ fontSize: 13, fontFamily: 'Roobert', color: muted, marginBottom: 12 }}>
                     Choose which sandboxes can use this integration for authenticated API calls.
                   </Text>
 
@@ -252,10 +292,11 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
                       backgroundColor: subtleBg,
                       borderWidth: StyleSheet.hairlineWidth,
                       borderColor,
-                    }}
-                  >
+                    }}>
                     <Monitor size={18} color={muted} style={{ marginRight: 10 }} />
-                    <Text style={{ flex: 1, fontSize: 14, fontFamily: 'Roobert', color: fg }} numberOfLines={1}>
+                    <Text
+                      style={{ flex: 1, fontSize: 14, fontFamily: 'Roobert', color: fg }}
+                      numberOfLines={1}>
                       {sandboxName || sandboxId}
                     </Text>
                     <Pressable
@@ -269,21 +310,35 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
                         paddingVertical: 6,
                         borderRadius: 8,
                         backgroundColor: isLinked
-                          ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)')
+                          ? isDark
+                            ? 'rgba(255,255,255,0.08)'
+                            : 'rgba(0,0,0,0.06)'
                           : theme.primary,
-                      }}
-                    >
-                      {(linkSandbox.isPending || unlinkSandbox.isPending) ? (
-                        <ActivityIndicator size="small" color={isLinked ? muted : theme.primaryForeground} />
+                      }}>
+                      {linkSandbox.isPending || unlinkSandbox.isPending ? (
+                        <ActivityIndicator
+                          size="small"
+                          color={isLinked ? muted : theme.primaryForeground}
+                        />
                       ) : isLinked ? (
                         <>
                           <Unlink size={13} color={muted} />
-                          <Text style={{ fontSize: 13, fontFamily: 'Roobert-Medium', color: muted }}>Unlink</Text>
+                          <Text
+                            style={{ fontSize: 13, fontFamily: 'Roobert-Medium', color: muted }}>
+                            Unlink
+                          </Text>
                         </>
                       ) : (
                         <>
                           <Link2 size={13} color={theme.primaryForeground} />
-                          <Text style={{ fontSize: 13, fontFamily: 'Roobert-Medium', color: theme.primaryForeground }}>Link</Text>
+                          <Text
+                            style={{
+                              fontSize: 13,
+                              fontFamily: 'Roobert-Medium',
+                              color: theme.primaryForeground,
+                            }}>
+                            Link
+                          </Text>
                         </>
                       )}
                     </Pressable>
@@ -302,8 +357,7 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
                   paddingVertical: 14,
                   borderRadius: 14,
                   backgroundColor: isDark ? 'rgba(239,68,68,0.1)' : 'rgba(239,68,68,0.06)',
-                }}
-              >
+                }}>
                 {disconnect.isPending ? (
                   <ActivityIndicator size="small" color="#ef4444" />
                 ) : (
@@ -338,15 +392,13 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
           width: 36,
           height: 5,
           borderRadius: 3,
-        }}
-      >
+        }}>
         <BottomSheetView
           style={{
             paddingHorizontal: 24,
             paddingTop: 8,
             paddingBottom: Math.max(insets.bottom, 20) + 16,
-          }}
-        >
+          }}>
           {/* Header */}
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
             {connection && (
@@ -362,7 +414,9 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
               <Text style={{ fontSize: 18, fontFamily: 'Roobert-Semibold', color: fg }}>
                 Rename
               </Text>
-              <Text style={{ fontSize: 12, fontFamily: 'Roobert', color: muted, marginTop: 2 }} numberOfLines={1}>
+              <Text
+                style={{ fontSize: 12, fontFamily: 'Roobert', color: muted, marginTop: 2 }}
+                numberOfLines={1}>
                 {displayName}
               </Text>
             </View>
@@ -402,14 +456,22 @@ export function ManageConnectionSheet({ connection, appImgSrc, onDismiss }: Mana
               justifyContent: 'center',
               paddingVertical: 14,
               borderRadius: 14,
-              backgroundColor: !renameDraft.trim() ? (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)') : fg,
+              backgroundColor: !renameDraft.trim()
+                ? isDark
+                  ? 'rgba(255,255,255,0.05)'
+                  : 'rgba(0,0,0,0.04)'
+                : fg,
               opacity: !renameDraft.trim() ? 0.5 : 1,
-            }}
-          >
+            }}>
             {rename.isPending ? (
               <ActivityIndicator size="small" color={isDark ? '#121215' : '#F8F8F8'} />
             ) : (
-              <Text style={{ fontSize: 16, fontFamily: 'Roobert-Medium', color: isDark ? '#121215' : '#F8F8F8' }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontFamily: 'Roobert-Medium',
+                  color: isDark ? '#121215' : '#F8F8F8',
+                }}>
                 Save
               </Text>
             )}

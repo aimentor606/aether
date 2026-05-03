@@ -323,7 +323,7 @@ jobs:
             git reset --hard origin/main
             git submodule sync --recursive
             git submodule update --init --recursive --remote
-            PREBUILT_IMAGE="${{ needs.merge-api.outputs.image }}" bash scripts/deploy-zero-downtime.sh
+            PREBUILT_IMAGE="${{ needs.merge-api.outputs.image }}" bash scripts/deploy/zero-downtime.sh
 
       - name: Summary
         if: always()

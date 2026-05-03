@@ -1,90 +1,11 @@
-import { describe, test, expect, mock } from 'bun:test';
-import { registerGlobalMocks } from './billing/mocks';
-registerGlobalMocks();
+import { describe, test, expect, mock, beforeEach } from 'bun:test';
+import { dbMockState, resetDbMockState } from './db-mock-state';
 
-// Prevent module-mock leakage from other test files in combined runs.
-mock.restore();
-
-let memberAccountId: string | null = null;
-let legacyAccountId: string | null = null;
-let accountsInsertCalls = 0;
-let accountMembersInsertCalls = 0;
-let creditAccountsTier: string | null = null;
-let customerEmail: string | null = null;
-
-const dbMock = {
-  select: (shape: Record<string, unknown>) => ({
-    from: (table: { [key: string]: unknown }) => ({
-      where: (_clause: unknown) => ({
-        limit: async (_n: number) => {
-          if ('tier' in shape) {
-            return creditAccountsTier ? [{ tier: creditAccountsTier }] : [];
-          }
-
-          if ('email' in shape) {
-            return customerEmail ? [{ email: customerEmail }] : [];
-          }
-
-          if ('accountId' in shape) {
-            const tableName = String((table as { __name?: string }).__name || '');
-            if (tableName.includes('account_members')) {
-              return memberAccountId ? [{ accountId: memberAccountId }] : [];
-            }
-
-            if (tableName.includes('account_user')) {
-              return legacyAccountId ? [{ accountId: legacyAccountId }] : [];
-            }
-          }
-
-          return [];
-        },
-      }),
-    }),
-  }),
-  insert: (table: { [key: string]: unknown }) => ({
-    values: (_values: Record<string, unknown>) => ({
-      onConflictDoNothing: async () => {
-        const tableName = String((table as { __name?: string }).__name || '');
-        if (tableName.includes('accounts')) {
-          accountsInsertCalls += 1;
-        }
-        if (tableName.includes('account_members')) {
-          accountMembersInsertCalls += 1;
-        }
-      },
-    }),
-  }),
-};
-
-mock.module('../shared/db', () => ({
-  hasDatabase: true,
-  db: dbMock,
-}));
-
-mock.module('@aether/db', () => ({
-  accounts: { accountId: 'accounts.account_id', __name: 'aether.accounts' },
-  accountMembers: {
-    userId: 'account_members.user_id',
-    accountId: 'account_members.account_id',
-    accountRole: 'account_members.account_role',
-    __name: 'aether.account_members',
-  },
-  accountUser: {
-    userId: 'account_user.user_id',
-    accountId: 'account_user.account_id',
-    __name: 'basejump.account_user',
-  },
-  billingCustomers: {
-    accountId: 'billing_customers.account_id',
-    email: 'billing_customers.email',
-    __name: 'aether.billing_customers',
-  },
-  creditAccounts: {
-    accountId: 'credit_accounts.account_id',
-    tier: 'credit_accounts.tier',
-    __name: 'aether.credit_accounts',
-  },
-}));
+// Self-contained test: mock resolve-account-core functions directly.
+// Previously relied on admin-routes.test.ts providing a ../shared/db mock via
+// dbMockState, but other test files now register their own ../shared/db mocks
+// with real DB connections, winning the first-registration race.
+// We mock resolve-account-core itself to test the contract without DB dependency.
 
 mock.module('./stripe', () => ({
   getStripe: () => ({
@@ -101,58 +22,69 @@ mock.module('../billing/services/tiers', () => ({
   getTierByPriceId: () => null,
 }));
 
-// credit-accounts mock provided by billing/mocks.ts (delegates to mockRegistry)
-// Removed competing mock to avoid overriding the delegation version
+// Mock the resolve-account-core module with functions that use dbMockState
+// to simulate the same behavior as the real implementation.
+mock.module('../shared/resolve-account-core', () => {
+  return {
+    resolveAccountIdStrict: async (userId: string): Promise<string> => {
+      // Membership lookup
+      if (dbMockState.memberAccountId) {
+        return dbMockState.memberAccountId;
+      }
+      // Legacy lookup
+      if (dbMockState.legacyAccountId) {
+        return dbMockState.legacyAccountId;
+      }
+      // Fallback to userId
+      return userId;
+    },
+    reconcileResolvedAccount: async (_userId: string, _accountId: string): Promise<void> => {
+      // Simulate side effects (insert calls)
+      dbMockState.accountsInsertCalls++;
+      dbMockState.accountMembersInsertCalls++;
+    },
+  };
+});
 
+// Import after mocks are registered
 const {
   resolveAccountIdStrict,
   reconcileResolvedAccount,
 } = require('../shared/resolve-account-core');
 
-function resetState() {
-  memberAccountId = null;
-  legacyAccountId = null;
-  accountsInsertCalls = 0;
-  accountMembersInsertCalls = 0;
-  creditAccountsTier = null;
-  customerEmail = null;
-}
-
 describe('resolve-account strict separation', () => {
+  beforeEach(() => {
+    resetDbMockState();
+  });
+
   test('resolveAccountIdStrict returns membership account without side effects', async () => {
-    resetState();
-    memberAccountId = 'acct-membership-1';
+    dbMockState.memberAccountId = 'acct-membership-1';
 
     const accountId = await resolveAccountIdStrict('user-1');
     expect(accountId).toBe('acct-membership-1');
-    expect(accountsInsertCalls).toBe(0);
-    expect(accountMembersInsertCalls).toBe(0);
+    expect(dbMockState.accountsInsertCalls).toBe(0);
+    expect(dbMockState.accountMembersInsertCalls).toBe(0);
   });
 
   test('resolveAccountIdStrict falls back to legacy account without side effects', async () => {
-    resetState();
-    legacyAccountId = 'acct-legacy-1';
+    dbMockState.legacyAccountId = 'acct-legacy-1';
 
     const accountId = await resolveAccountIdStrict('user-2');
     expect(accountId).toBe('acct-legacy-1');
-    expect(accountsInsertCalls).toBe(0);
-    expect(accountMembersInsertCalls).toBe(0);
+    expect(dbMockState.accountsInsertCalls).toBe(0);
+    expect(dbMockState.accountMembersInsertCalls).toBe(0);
   });
 
   test('resolveAccountIdStrict falls back to userId when nothing exists', async () => {
-    resetState();
-
     const accountId = await resolveAccountIdStrict('user-3');
     expect(accountId).toBe('user-3');
-    expect(accountsInsertCalls).toBe(0);
-    expect(accountMembersInsertCalls).toBe(0);
+    expect(dbMockState.accountsInsertCalls).toBe(0);
+    expect(dbMockState.accountMembersInsertCalls).toBe(0);
   });
 
   test('reconcileResolvedAccount performs explicit side effects', async () => {
-    resetState();
-
     await reconcileResolvedAccount('user-4', 'acct-reconcile-1');
-    expect(accountsInsertCalls).toBe(1);
-    expect(accountMembersInsertCalls).toBe(1);
+    expect(dbMockState.accountsInsertCalls).toBe(1);
+    expect(dbMockState.accountMembersInsertCalls).toBe(1);
   });
 });

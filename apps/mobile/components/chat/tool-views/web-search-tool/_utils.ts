@@ -72,9 +72,8 @@ export function extractWebSearchData(
   let images: string[] = [];
 
   if (toolResult?.output) {
-    const output = typeof toolResult.output === 'string'
-      ? parseContent(toolResult.output)
-      : toolResult.output;
+    const output =
+      typeof toolResult.output === 'string' ? parseContent(toolResult.output) : toolResult.output;
 
     // Check if this is a batch search response
     if (output.batch_mode === true && Array.isArray(output.results)) {
@@ -85,20 +84,19 @@ export function extractWebSearchData(
         results: (batchItem.results || []).map((r: any) => ({
           title: r.title || '',
           url: r.url || '',
-          snippet: r.content || r.snippet || ''
+          snippet: r.content || r.snippet || '',
         })),
         answer: batchItem.answer || '',
-        images: normalizeImages(batchItem.images || [])
+        images: normalizeImages(batchItem.images || []),
       }));
 
       // Flatten all results and images for combined display
-      const allResults = batchResults.flatMap(br => br.results);
-      const allImages = batchResults.flatMap(br => br.images);
-      const allQueries = batchResults.map(br => br.query).filter(Boolean);
-      const combinedQuery = allQueries.length > 1
-        ? `${allQueries.length} queries`
-        : allQueries[0] || null;
-      const allSuccessful = batchResults.every(br => br.success);
+      const allResults = batchResults.flatMap((br: any) => br.results);
+      const allImages = batchResults.flatMap((br: any) => br.images);
+      const allQueries = batchResults.map((br: any) => br.query).filter(Boolean);
+      const combinedQuery =
+        allQueries.length > 1 ? `${allQueries.length} queries` : allQueries[0] || null;
+      const allSuccessful = batchResults.every((br: any) => br.success);
 
       return {
         query: combinedQuery,
@@ -106,7 +104,7 @@ export function extractWebSearchData(
         images: allImages,
         success: allSuccessful,
         isBatch: true,
-        batchResults
+        batchResults,
       };
     }
 
@@ -128,7 +126,7 @@ export function extractWebSearchData(
       results = output.results.map((r: any) => ({
         title: r.title || '',
         url: r.url || '',
-        snippet: r.content || r.snippet || ''
+        snippet: r.content || r.snippet || '',
       }));
     }
   }
@@ -138,7 +136,7 @@ export function extractWebSearchData(
     results,
     images,
     success: toolResult?.success ?? isSuccess,
-    isBatch: false
+    isBatch: false,
   };
 }
 
@@ -210,7 +208,10 @@ export function getFavicon(url: string): string {
  * Determines the result type (Website, Article, Wiki, Blog) based on URL and title.
  * Returns an object with the icon component and label string.
  */
-export function getResultType(result: { url?: string; title?: string }): { icon: LucideIcon; label: string } {
+export function getResultType(result: { url?: string; title?: string }): {
+  icon: LucideIcon;
+  label: string;
+} {
   const { url, title } = result;
 
   // Guard against undefined/null values
@@ -231,4 +232,3 @@ export function getResultType(result: { url?: string; title?: string }): { icon:
     return { icon: Globe, label: 'Website' };
   }
 }
-

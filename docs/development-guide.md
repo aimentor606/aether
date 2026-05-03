@@ -20,7 +20,7 @@ pnpm install
 pnpm dev
 ```
 
-This runs `scripts/dev-local.sh` which:
+This runs `scripts/dev.sh` which:
 1. Starts local Supabase (Docker, Postgres on `127.0.0.1:54322`)
 2. Starts Next.js frontend on `:3000`
 3. Starts Hono API on `:8008` (with `AETHER_SKIP_ENSURE_SCHEMA=1`)
@@ -172,18 +172,18 @@ pnpm db:migrate:mark-baseline
 pnpm db:studio
 ```
 
-### Local Supabase
+### Local Supabase (Self-Hosted)
 
-`pnpm dev` starts Supabase automatically. Manual control:
+`pnpm dev` starts the self-hosted Supabase stack automatically. Manual control:
 
 ```bash
-cd supabase
-supabase start     # Start
-supabase stop      # Stop
-supabase status    # Check status, show credentials
+cd scripts/supabase
+docker compose --env-file .env up -d     # Start all 13 services
+docker compose --env-file .env down      # Stop
+docker compose --env-file .env ps        # Check status
 ```
 
-Default Postgres: `127.0.0.1:54322`, Studio: `http://127.0.0.1:54323`
+Ports: Postgres `127.0.0.1:5434` (direct) / `5433` (pooler), Kong API `:8000`, Studio `:3000`, Auth `:9999`
 
 ### Remote Database (Supabase Cloud)
 
@@ -295,8 +295,8 @@ cd scripts/deploy
 # 1. Create data directories and set permissions
 bash ops/setup.sh
 
-# 2. Create Docker network
-bash ops/init-network.sh
+# 2. Create Docker network and /data directories
+bash ops/setup.sh
 
 # 3. Copy and edit environment
 cp ops/.env.example ops/.env
@@ -343,7 +343,7 @@ Checks: container health, CORS preflight, API key auth, frontend response, Kong 
 Used by CI/CD to deploy new API versions without downtime:
 
 ```bash
-PREBUILT_IMAGE="aether/aether-api:<version>" bash scripts/deploy-zero-downtime.sh
+PREBUILT_IMAGE="aether/aether-api:<version>" bash scripts/deploy/zero-downtime.sh
 ```
 
 ### Useful Operations
@@ -392,7 +392,7 @@ core/
   master/           Sandbox orchestrator (OpenCode agents)
   docker/           Docker compose configs
 scripts/
-  dev-local.sh      Local dev (Supabase + frontend + API)
+  dev.sh            Local dev (Supabase + frontend + API)
   dev-prod.sh       Dev against production API
   deploy/
     core/           Docker Compose files (kong, postgres, redis, litellm, newapi)
@@ -444,13 +444,13 @@ pnpm install
 
 `pnpm dev` starts local Supabase. API connects automatically. No `.env` needed for basic dev.
 
-Key env vars used by API (set by dev-local.sh or Supabase):
+Key env vars used by API (set by dev.sh or Supabase):
 
 | Variable | Purpose | Default (local) |
 |----------|---------|-----------------|
-| `SUPABASE_URL` | Supabase endpoint | `http://127.0.0.1:54321` |
-| `SUPABASE_ANON_KEY` | Supabase anon key | From `supabase status` |
-| `DATABASE_URL` | Postgres connection | `http://127.0.0.1:54322` |
+| `SUPABASE_URL` | Supabase endpoint | `http://127.0.0.1:8000` |
+| `SUPABASE_ANON_KEY` | Supabase anon key | From `scripts/supabase/.env` |
+| `DATABASE_URL` | Postgres connection | `postgresql://postgres:...@127.0.0.1:5434/postgres` |
 
 ### VPS Deployment
 

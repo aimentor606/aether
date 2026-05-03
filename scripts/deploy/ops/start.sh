@@ -1,45 +1,97 @@
 #!/bin/bash
 set -e
 cd "$(dirname "$0")/.."
-source ops/.env
 
-# Validate that critical secrets are not still placeholder values
-SECRET_VARS="DB_ROOT_PASSWORD REDIS_PASSWORD KONG_PG_PASSWORD SESSION_SECRET NEWAPI_DB_PASSWORD LITELLM_DB_PASSWORD LITELLM_MASTER_KEY LITELLM_SALT_KEY DEFAULT_API_KEY"
-for var in $SECRET_VARS; do
-  if [ "${!var}" = "CHANGE_ME" ] || [ "${!var}" = "sk-CHANGE_ME" ]; then
-    echo "ERROR: $var is still set to a placeholder value. Edit ops/.env before starting." >&2
-    exit 1
+if [ -f ops/.env ]; then
+  source ops/.env
+  ENV_FLAG="--env-file ops/.env"
+
+  # Security: check .env file permissions
+  ENV_PERM=$(stat -f '%Lp' ops/.env 2>/dev/null || stat -c '%a' ops/.env 2>/dev/null || echo "000")
+  if [ "$((ENV_PERM & 007))" -ne 0 ]; then
+    echo "WARNING: ops/.env is group/other readable (mode=$ENV_PERM). Run: chmod 600 ops/.env" >&2
   fi
-done
 
-# Validate SSL certs when HTTPS is enabled
-if [ "${USE_HTTPS}" = "true" ]; then
-  for cert in ../ssl/fullchain.pem ../ssl/privkey.pem; do
-    if [ ! -f "$cert" ]; then
-      echo "ERROR: USE_HTTPS=true but $cert not found. Provide SSL certs or set USE_HTTPS=false." >&2
+  # Validate that critical secrets are not still placeholder values
+  SECRET_VARS="KONG_PG_PASSWORD SESSION_SECRET"
+  case "${LLM_PROXY:-}" in
+    newapi)  SECRET_VARS="$SECRET_VARS NEWAPI_DB_PASSWORD DEFAULT_API_KEY" ;;
+    litellm) SECRET_VARS="$SECRET_VARS LITELLM_DB_PASSWORD LITELLM_MASTER_KEY LITELLM_SALT_KEY DEFAULT_API_KEY" ;;
+  esac
+  for var in $SECRET_VARS; do
+    if [ "${!var}" = "CHANGE_ME" ] || [ "${!var}" = "sk-CHANGE_ME" ]; then
+      echo "ERROR: $var is still set to a placeholder value. Edit ops/.env before starting." >&2
       exit 1
     fi
   done
+
+  # Redis password is mandatory for production
+  if [ -z "${REDIS_PASSWORD:-}" ]; then
+    echo "ERROR: REDIS_PASSWORD is empty. Set a strong password in ops/.env." >&2
+    exit 1
+  fi
+
+  # Cross-stack: REDIS_PASSWORD must match supabase/.env
+  SUPABASE_REDIS=$(grep '^REDIS_PASSWORD=' "$(dirname "$0")/../../supabase/.env" 2>/dev/null | cut -d= -f2 || true)
+  if [ -n "$SUPABASE_REDIS" ] && [ "$REDIS_PASSWORD" != "$SUPABASE_REDIS" ]; then
+    echo "ERROR: REDIS_PASSWORD mismatch between deploy/ops/.env and supabase/.env" >&2
+    exit 1
+  fi
+
+  # Validate SSL certs when HTTPS is enabled
+  if [ "${USE_HTTPS}" = "true" ]; then
+    for cert in ../ssl/fullchain.pem ../ssl/privkey.pem; do
+      if [ ! -f "$cert" ]; then
+        echo "ERROR: USE_HTTPS=true but $cert not found. Provide SSL certs or set USE_HTTPS=false." >&2
+        exit 1
+      fi
+    done
+  fi
+else
+  ENV_FLAG=""
+  echo "WARNING: ops/.env not found, running without env file (dev mode)" >&2
 fi
 
 # Auto-derive FORWARDED_PROTO from USE_HTTPS
-# (matches logic in sync-kong.sh — keep in sync)
 FORWARDED_PROTO="http"
-[ "${USE_HTTPS}" = "true" ] && FORWARDED_PROTO="https"
+[ "${USE_HTTPS:-false}" = "true" ] && FORWARDED_PROTO="https"
 export FORWARDED_PROTO
 
-BASE_COMPOSE="-f core/db.yml -f core/redis.yml -f core/compose-kong.yml"
+# Ensure Supabase stack (PG + Redis) is running
+echo "Checking Supabase stack (shared PG + Redis)..."
+if ! docker inspect --format='{{.State.Health.Status}}' supabase-db 2>/dev/null | grep -q "healthy"; then
+  echo "ERROR: supabase-db is not running. Start the Supabase stack first." >&2
+  echo "  Run: docker compose -f scripts/supabase/docker-compose.yml --env-file scripts/supabase/.env up -d" >&2
+  exit 1
+fi
+if ! docker inspect --format='{{.State.Health.Status}}' supabase-redis 2>/dev/null | grep -q "healthy"; then
+  echo "ERROR: supabase-redis is not running. Start the Supabase stack first." >&2
+  exit 1
+fi
+echo "  supabase-db: healthy"
+echo "  supabase-redis: healthy"
 
-case "${LLM_PROXY:-newapi}" in
-  litellm) PROXY_COMPOSE="-f core/litellm.yml" ;;
-  *)       PROXY_COMPOSE="-f core/newapi.yml" ;;
+BASE_COMPOSE="-f core/compose-kong.yml"
+
+PROXY_COMPOSE=""
+WAIT_SERVICES="kong"
+case "${LLM_PROXY:-}" in
+  newapi)  PROXY_COMPOSE="-f core/newapi.yml";  WAIT_SERVICES="kong llm-proxy" ;;
+  litellm) PROXY_COMPOSE="-f core/litellm.yml"; WAIT_SERVICES="kong llm-proxy" ;;
+  *)       ;; # empty or "none" — skip LLM proxy
 esac
 
-echo "Starting services (LLM_PROXY=${LLM_PROXY:-newapi}, FORWARDED_PROTO=${FORWARDED_PROTO})..."
-docker compose --env-file ops/.env $BASE_COMPOSE $PROXY_COMPOSE up -d
+# OpenMeter usage metering (optional — only started when OPENMETER_URL is set)
+OPENMETER_COMPOSE=""
+if [ -f "core/openmeter.yml" ] && [ -n "${OPENMETER_URL:-}" ]; then
+  OPENMETER_COMPOSE="-f core/openmeter.yml"
+  WAIT_SERVICES="$WAIT_SERVICES clickhouse kafka openmeter"
+fi
+
+echo "Starting services (LLM_PROXY=${LLM_PROXY:-none}, FORWARDED_PROTO=${FORWARDED_PROTO})..."
+docker compose $ENV_FLAG $BASE_COMPOSE $PROXY_COMPOSE $OPENMETER_COMPOSE up -d
 echo "Waiting for services to become healthy..."
-DEADLINE=$((SECONDS + 120))
-for svc in postgres redis kong llm-proxy; do
+for svc in $WAIT_SERVICES; do
   ELAPSED=0
   while [ "$ELAPSED" -lt 60 ]; do
     STATUS=$(docker inspect --format='{{.State.Health.Status}}' "$svc" 2>/dev/null || echo "missing")
@@ -54,5 +106,12 @@ for svc in postgres redis kong llm-proxy; do
     echo "  ⚠️  $svc: $STATUS (may still be starting)"
   fi
 done
-docker compose --env-file ops/.env $BASE_COMPOSE $PROXY_COMPOSE ps
+docker compose $ENV_FLAG $BASE_COMPOSE $PROXY_COMPOSE $OPENMETER_COMPOSE ps 2>/dev/null || true
+
+# Sync Kong routes (idempotent — safe on every start)
+if [ -f core/kong.yml ] && [ -n "$ENV_FLAG" ]; then
+  echo "Syncing Kong routes..."
+  bash ops/sync-kong.sh
+fi
+
 echo "✅ All services started"

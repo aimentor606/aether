@@ -17,24 +17,16 @@ import {
   BottomSheetView,
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
-import {
-  Check,
-  Cloud,
-  Globe,
-  Monitor,
-  Pencil,
-  Plus,
-  Server,
-} from 'lucide-react-native';
+import { Check, Cloud, Globe, Monitor, Pencil, Plus, Server } from 'lucide-react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { useSandboxContext } from '@/contexts/SandboxContext';
+import { useInstances, useProviders, useCreateLocalInstance } from '@/lib/platform/hooks';
 import {
-  useInstances,
-  useProviders,
-  useCreateLocalInstance,
-} from '@/lib/platform/hooks';
-import { checkInstanceHealth, type SandboxInfo, type SandboxProviderName } from '@/lib/platform/client';
+  checkInstanceHealth,
+  type SandboxInfo,
+  type SandboxProviderName,
+} from '@/lib/platform/client';
 import { setInstanceProgress, useInstanceProgress } from '@/stores/instance-progress';
 import { useThemeColors } from '@/lib/theme-colors';
 
@@ -42,29 +34,49 @@ import { useThemeColors } from '@/lib/theme-colors';
 
 function providerLabel(provider: SandboxProviderName): string {
   switch (provider) {
-    case 'local_docker': return 'LOCAL';
-    case 'justavps': return 'CLOUD';
-    case 'daytona': return 'CLOUD';
-    default: return 'INSTANCE';
+    case 'local_docker':
+      return 'LOCAL';
+    case 'justavps':
+      return 'CLOUD';
+    case 'daytona':
+      return 'CLOUD';
+    default:
+      return 'INSTANCE';
   }
 }
 
 function statusColor(status: string): string {
   switch (status) {
-    case 'running': case 'ready': case 'active': return '#34D399';
-    case 'stopped': case 'archived': return '#9CA3AF';
-    case 'error': case 'failed': return '#EF4444';
-    default: return '#FBBF24';
+    case 'running':
+    case 'ready':
+    case 'active':
+      return '#34D399';
+    case 'stopped':
+    case 'archived':
+      return '#9CA3AF';
+    case 'error':
+    case 'failed':
+      return '#EF4444';
+    default:
+      return '#FBBF24';
   }
 }
 
 function statusLabel(status: string): string {
   switch (status) {
-    case 'running': case 'ready': case 'active': return 'Connected';
-    case 'stopped': return 'Stopped';
-    case 'archived': return 'Archived';
-    case 'error': case 'failed': return 'Error';
-    default: return status;
+    case 'running':
+    case 'ready':
+    case 'active':
+      return 'Connected';
+    case 'stopped':
+      return 'Stopped';
+    case 'archived':
+      return 'Archived';
+    case 'error':
+    case 'failed':
+      return 'Error';
+    default:
+      return status;
   }
 }
 
@@ -86,8 +98,14 @@ export default function InstancesScreen() {
 
   // Auto-poll when any instance is provisioning
   const hasProvisioning = React.useMemo(
-    () => instances?.some((i) => !['running', 'ready', 'active', 'stopped', 'archived', 'error', 'failed'].includes(i.status)),
-    [instances],
+    () =>
+      instances?.some(
+        (i) =>
+          !['running', 'ready', 'active', 'stopped', 'archived', 'error', 'failed'].includes(
+            i.status
+          )
+      ),
+    [instances]
   );
   React.useEffect(() => {
     if (!hasProvisioning) return;
@@ -95,11 +113,14 @@ export default function InstancesScreen() {
     return () => clearInterval(interval);
   }, [hasProvisioning, refetch]);
 
-  const handleSelect = React.useCallback((instance: SandboxInfo) => {
-    if (instance.external_id === sandboxId) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    switchSandbox(instance);
-  }, [sandboxId, switchSandbox]);
+  const handleSelect = React.useCallback(
+    (instance: SandboxInfo) => {
+      if (instance.external_id === sandboxId) return;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      switchSandbox(instance);
+    },
+    [sandboxId, switchSandbox]
+  );
 
   const handleRename = React.useCallback((instance: SandboxInfo) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -137,13 +158,12 @@ export default function InstancesScreen() {
         className="flex-1 bg-background"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
-        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
-      >
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}>
         <View className="px-5 pt-1">
           {/* Instances */}
           {((instances && instances.length > 0) || creatingProgress) && (
             <View className="px-1">
-              <Text className="mb-2 text-[11px] font-roobert-medium uppercase tracking-wider text-muted-foreground/80">
+              <Text className="mb-2 font-roobert-medium text-[11px] uppercase tracking-wider text-muted-foreground/80">
                 Instances
               </Text>
               <View>
@@ -151,10 +171,15 @@ export default function InstancesScreen() {
                 {creatingProgress && (
                   <>
                     <View className="py-3.5">
-                      <View className="flex-row items-center mb-2">
-                        <View className="h-2.5 w-2.5 rounded-full mr-3" style={{ backgroundColor: '#FBBF24' }} />
+                      <View className="mb-2 flex-row items-center">
+                        <View
+                          className="mr-3 h-2.5 w-2.5 rounded-full"
+                          style={{ backgroundColor: '#FBBF24' }}
+                        />
                         <View className="flex-1">
-                          <Text className="font-roobert-medium text-[15px] text-foreground">Local Docker</Text>
+                          <Text className="font-roobert-medium text-[15px] text-foreground">
+                            Local Docker
+                          </Text>
                           <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">
                             {creatingProgress.message}
                           </Text>
@@ -164,9 +189,12 @@ export default function InstancesScreen() {
                         </Text>
                       </View>
                       <View
-                        className="h-1.5 rounded-full overflow-hidden"
-                        style={{ backgroundColor: isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.06)' }}
-                      >
+                        className="h-1.5 overflow-hidden rounded-full"
+                        style={{
+                          backgroundColor: isDark
+                            ? 'rgba(248,248,248,0.08)'
+                            : 'rgba(18,18,21,0.06)',
+                        }}>
                         <View
                           className="h-full rounded-full"
                           style={{
@@ -183,17 +211,34 @@ export default function InstancesScreen() {
                 {instances?.map((instance, idx) => {
                   const isActive = instance.external_id === sandboxId;
                   const isLast = idx === (instances?.length ?? 0) - 1;
-                  const isProvisioning = !['running', 'ready', 'active', 'stopped', 'archived', 'error', 'failed'].includes(instance.status);
+                  const isProvisioning = ![
+                    'running',
+                    'ready',
+                    'active',
+                    'stopped',
+                    'archived',
+                    'error',
+                    'failed',
+                  ].includes(instance.status);
                   return (
                     <View key={instance.sandbox_id}>
-                      <Pressable onPress={() => handleSelect(instance)} disabled={isProvisioning} className="py-3.5 active:opacity-85">
+                      <Pressable
+                        onPress={() => handleSelect(instance)}
+                        disabled={isProvisioning}
+                        className="py-3.5 active:opacity-85">
                         <View className="flex-row items-center">
                           <View
-                            className="h-2.5 w-2.5 rounded-full mr-3"
-                            style={{ backgroundColor: isProvisioning ? '#FBBF24' : statusColor(instance.status) }}
+                            className="mr-3 h-2.5 w-2.5 rounded-full"
+                            style={{
+                              backgroundColor: isProvisioning
+                                ? '#FBBF24'
+                                : statusColor(instance.status),
+                            }}
                           />
                           <View className="flex-1">
-                            <Text className="font-roobert-medium text-[15px] text-foreground" numberOfLines={1}>
+                            <Text
+                              className="font-roobert-medium text-[15px] text-foreground"
+                              numberOfLines={1}>
                               {instance.name}
                             </Text>
                             <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">
@@ -207,22 +252,34 @@ export default function InstancesScreen() {
                               <Pressable
                                 onPress={() => handleRename(instance)}
                                 hitSlop={8}
-                                className="active:opacity-60"
-                              >
-                                <Icon as={Pencil} size={14} className="text-muted-foreground/40" strokeWidth={2.2} />
+                                className="active:opacity-60">
+                                <Icon
+                                  as={Pencil}
+                                  size={14}
+                                  className="text-muted-foreground/40"
+                                  strokeWidth={2.2}
+                                />
                               </Pressable>
                             )}
                             {isProvisioning && <ActivityIndicator size="small" />}
                             {isActive && !isProvisioning && (
-                              <Icon as={Check} size={16} className="text-primary" strokeWidth={2.7} />
+                              <Icon
+                                as={Check}
+                                size={16}
+                                className="text-primary"
+                                strokeWidth={2.7}
+                              />
                             )}
                           </View>
                         </View>
                         {isProvisioning && (
                           <View
-                            className="mt-2 h-1 rounded-full overflow-hidden"
-                            style={{ backgroundColor: isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.06)' }}
-                          >
+                            className="mt-2 h-1 overflow-hidden rounded-full"
+                            style={{
+                              backgroundColor: isDark
+                                ? 'rgba(248,248,248,0.08)'
+                                : 'rgba(18,18,21,0.06)',
+                            }}>
                             <View
                               className="h-full rounded-full"
                               style={{ width: '30%', backgroundColor: '#FBBF24' }}
@@ -242,7 +299,9 @@ export default function InstancesScreen() {
           {!isLoading && (!instances || instances.length === 0) && !creatingProgress && (
             <View className="items-center justify-center py-12">
               <Icon as={Server} size={32} className="text-muted-foreground/40" strokeWidth={1.5} />
-              <Text className="mt-3 font-roobert-medium text-[15px] text-foreground">No Instances</Text>
+              <Text className="mt-3 font-roobert-medium text-[15px] text-foreground">
+                No Instances
+              </Text>
               <Text className="mt-1 text-center font-roobert text-xs text-muted-foreground">
                 Tap the button below to add one.
               </Text>
@@ -256,17 +315,33 @@ export default function InstancesScreen() {
         <Pressable
           onPress={openAddSheet}
           className="flex-row items-center justify-center rounded-2xl py-3.5 active:opacity-90"
-          style={{ backgroundColor: themeColors.primary }}
-        >
-          <Icon as={Plus} size={16} style={{ color: themeColors.primaryForeground }} strokeWidth={2.5} />
-          <Text className="ml-2 font-roobert-semibold text-[15px]" style={{ color: themeColors.primaryForeground }}>
+          style={{ backgroundColor: themeColors.primary }}>
+          <Icon
+            as={Plus}
+            size={16}
+            style={{ color: themeColors.primaryForeground } as any}
+            strokeWidth={2.5}
+          />
+          <Text
+            className="ml-2 font-roobert-semibold text-[15px]"
+            style={{ color: themeColors.primaryForeground }}>
             New Instance
           </Text>
         </Pressable>
       </View>
 
-      <AddInstanceSheet ref={addSheetRef} isDark={isDark} onCreated={onInstanceAdded} onProgress={setInstanceProgress} />
-      <RenameSheet ref={renameSheetRef} isDark={isDark} instance={renameTarget} onRenamed={onRenamed} />
+      <AddInstanceSheet
+        ref={addSheetRef}
+        isDark={isDark}
+        onCreated={onInstanceAdded}
+        onProgress={setInstanceProgress}
+      />
+      <RenameSheet
+        ref={renameSheetRef}
+        isDark={isDark}
+        instance={renameTarget}
+        onRenamed={onRenamed}
+      />
     </>
   );
 }
@@ -306,16 +381,23 @@ const RenameSheet = React.forwardRef<
       )}
       handleIndicatorStyle={{
         backgroundColor: isDark ? '#3F3F46' : '#D4D4D8',
-        width: 36, height: 5, borderRadius: 3,
+        width: 36,
+        height: 5,
+        borderRadius: 3,
       }}
       backgroundStyle={{
         backgroundColor: isDark ? '#161618' : '#FFFFFF',
-        borderTopLeftRadius: 24, borderTopRightRadius: 24,
-      }}
-    >
-      <BottomSheetView style={{ paddingHorizontal: 24, paddingTop: 4, paddingBottom: Math.max(insets.bottom, 20) + 16 }}>
-        <Text className="text-lg font-roobert-semibold text-foreground">Rename Instance</Text>
-        <Text className="mt-0.5 mb-4 font-roobert text-xs text-muted-foreground">
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+      }}>
+      <BottomSheetView
+        style={{
+          paddingHorizontal: 24,
+          paddingTop: 4,
+          paddingBottom: Math.max(insets.bottom, 20) + 16,
+        }}>
+        <Text className="font-roobert-semibold text-lg text-foreground">Rename Instance</Text>
+        <Text className="mb-4 mt-0.5 font-roobert text-xs text-muted-foreground">
           Set a display name for this instance.
         </Text>
 
@@ -348,19 +430,25 @@ const RenameSheet = React.forwardRef<
           className="items-center rounded-2xl py-3.5 active:opacity-90"
           style={{
             backgroundColor: canSave
-              ? isDark ? '#f8f8f8' : '#121215'
-              : isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.06)',
+              ? isDark
+                ? '#f8f8f8'
+                : '#121215'
+              : isDark
+                ? 'rgba(248,248,248,0.08)'
+                : 'rgba(18,18,21,0.06)',
             opacity: canSave ? 1 : 0.5,
-          }}
-        >
+          }}>
           <Text
             className="font-roobert-semibold text-[15px]"
             style={{
               color: canSave
-                ? isDark ? '#121215' : '#f8f8f8'
-                : isDark ? 'rgba(248,248,248,0.3)' : 'rgba(18,18,21,0.3)',
-            }}
-          >
+                ? isDark
+                  ? '#121215'
+                  : '#f8f8f8'
+                : isDark
+                  ? 'rgba(248,248,248,0.3)'
+                  : 'rgba(18,18,21,0.3)',
+            }}>
             Save
           </Text>
         </Pressable>
@@ -375,7 +463,11 @@ type AddStep = 'select' | 'custom';
 
 const AddInstanceSheet = React.forwardRef<
   BottomSheetModal,
-  { isDark: boolean; onCreated: () => void; onProgress: (p: { percent: number; message: string } | null) => void }
+  {
+    isDark: boolean;
+    onCreated: () => void;
+    onProgress: (p: { percent: number; message: string } | null) => void;
+  }
 >(function AddInstanceSheet({ isDark, onCreated, onProgress }, ref) {
   const insets = useSafeAreaInsets();
   const [step, setStep] = React.useState<AddStep>('select');
@@ -399,7 +491,7 @@ const AddInstanceSheet = React.forwardRef<
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.35} />
     ),
-    [],
+    []
   );
 
   const resetState = React.useCallback(() => {
@@ -438,7 +530,7 @@ const AddInstanceSheet = React.forwardRef<
           onProgress(null);
           Alert.alert('Error', err?.message || 'Failed to create local instance');
         },
-      },
+      }
     );
   }, [createLocalMutation, onCreated, onProgress, resetState]);
 
@@ -453,7 +545,10 @@ const AddInstanceSheet = React.forwardRef<
     setIsCreating(false);
 
     if (version) {
-      Alert.alert('Connected', `Instance is reachable (v${version}). Custom URL instances will be available in a future update.`);
+      Alert.alert(
+        'Connected',
+        `Instance is reachable (v${version}). Custom URL instances will be available in a future update.`
+      );
       onCreated();
       resetState();
     } else {
@@ -471,34 +566,46 @@ const AddInstanceSheet = React.forwardRef<
       onDismiss={resetState}
       handleIndicatorStyle={{
         backgroundColor: isDark ? '#3F3F46' : '#D4D4D8',
-        width: 36, height: 5, borderRadius: 3,
+        width: 36,
+        height: 5,
+        borderRadius: 3,
       }}
       backgroundStyle={{
         backgroundColor: isDark ? '#161618' : '#FFFFFF',
-        borderTopLeftRadius: 24, borderTopRightRadius: 24,
-      }}
-    >
-      <BottomSheetView style={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: Math.max(insets.bottom, 20) + 16 }}>
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+      }}>
+      <BottomSheetView
+        style={{
+          paddingHorizontal: 20,
+          paddingTop: 4,
+          paddingBottom: Math.max(insets.bottom, 20) + 16,
+        }}>
         {isCreating && progress ? (
           <View className="px-1">
-            <Text className="mb-2 text-[11px] font-roobert-medium uppercase tracking-wider text-muted-foreground/80">
+            <Text className="mb-2 font-roobert-medium text-[11px] uppercase tracking-wider text-muted-foreground/80">
               Creating Instance
             </Text>
             <View className="py-4">
-              <View className="flex-row items-center mb-3">
+              <View className="mb-3 flex-row items-center">
                 <Icon as={Monitor} size={18} className="text-foreground/80" strokeWidth={2.2} />
                 <View className="ml-4 flex-1">
-                  <Text className="font-roobert-medium text-[15px] text-foreground">Local Docker</Text>
-                  <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">{progress.message}</Text>
+                  <Text className="font-roobert-medium text-[15px] text-foreground">
+                    Local Docker
+                  </Text>
+                  <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">
+                    {progress.message}
+                  </Text>
                 </View>
                 <Text className="font-roobert text-xs tabular-nums text-muted-foreground">
                   {Math.round(progress.percent)}%
                 </Text>
               </View>
               <View
-                className="h-1.5 rounded-full overflow-hidden"
-                style={{ backgroundColor: isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.06)' }}
-              >
+                className="h-1.5 overflow-hidden rounded-full"
+                style={{
+                  backgroundColor: isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.06)',
+                }}>
                 <View
                   className="h-full rounded-full"
                   style={{
@@ -511,7 +618,7 @@ const AddInstanceSheet = React.forwardRef<
           </View>
         ) : step === 'select' ? (
           <View className="px-1">
-            <Text className="mb-2 text-[11px] font-roobert-medium uppercase tracking-wider text-muted-foreground/80">
+            <Text className="mb-2 font-roobert-medium text-[11px] uppercase tracking-wider text-muted-foreground/80">
               New Instance
             </Text>
             <Text className="mb-3 font-roobert text-xs text-muted-foreground">
@@ -524,15 +631,25 @@ const AddInstanceSheet = React.forwardRef<
                   <Pressable
                     onPress={handleLocalDocker}
                     disabled={isCreating}
-                    className="py-3.5 active:opacity-85"
-                  >
+                    className="py-3.5 active:opacity-85">
                     <View className="flex-row items-center">
-                      <Icon as={Monitor} size={18} className="text-foreground/80" strokeWidth={2.2} />
+                      <Icon
+                        as={Monitor}
+                        size={18}
+                        className="text-foreground/80"
+                        strokeWidth={2.2}
+                      />
                       <View className="ml-4 flex-1">
-                        <Text className="font-roobert-medium text-[15px] text-foreground">Local Docker</Text>
-                        <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">Runs on your machine via Docker</Text>
+                        <Text className="font-roobert-medium text-[15px] text-foreground">
+                          Local Docker
+                        </Text>
+                        <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">
+                          Runs on your machine via Docker
+                        </Text>
                       </View>
-                      {isCreating && createLocalMutation.isPending && <ActivityIndicator size="small" />}
+                      {isCreating && createLocalMutation.isPending && (
+                        <ActivityIndicator size="small" />
+                      )}
                     </View>
                   </Pressable>
                   <View className="h-px bg-border/35" />
@@ -540,14 +657,20 @@ const AddInstanceSheet = React.forwardRef<
               )}
 
               <Pressable
-                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setStep('custom'); }}
-                className="py-3.5 active:opacity-85"
-              >
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setStep('custom');
+                }}
+                className="py-3.5 active:opacity-85">
                 <View className="flex-row items-center">
                   <Icon as={Globe} size={18} className="text-foreground/80" strokeWidth={2.2} />
                   <View className="ml-4 flex-1">
-                    <Text className="font-roobert-medium text-[15px] text-foreground">Custom URL</Text>
-                    <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">Connect to any Aether instance by address</Text>
+                    <Text className="font-roobert-medium text-[15px] text-foreground">
+                      Custom URL
+                    </Text>
+                    <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">
+                      Connect to any Aether instance by address
+                    </Text>
                   </View>
                 </View>
               </Pressable>
@@ -555,7 +678,7 @@ const AddInstanceSheet = React.forwardRef<
           </View>
         ) : (
           <View className="px-1">
-            <Text className="mb-2 text-[11px] font-roobert-medium uppercase tracking-wider text-muted-foreground/80">
+            <Text className="mb-2 font-roobert-medium text-[11px] uppercase tracking-wider text-muted-foreground/80">
               Custom URL
             </Text>
             <Text className="mb-4 font-roobert text-xs text-muted-foreground">
@@ -574,8 +697,13 @@ const AddInstanceSheet = React.forwardRef<
                 backgroundColor: isDark ? 'rgba(248,248,248,0.06)' : 'rgba(18,18,21,0.04)',
                 borderWidth: 1,
                 borderColor: isDark ? 'rgba(248,248,248,0.1)' : 'rgba(18,18,21,0.08)',
-                borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14,
-                fontSize: 14, fontFamily: 'Roobert', color: fgColor, marginBottom: 10,
+                borderRadius: 14,
+                paddingHorizontal: 16,
+                paddingVertical: 14,
+                fontSize: 14,
+                fontFamily: 'Roobert',
+                color: fgColor,
+                marginBottom: 10,
               }}
             />
 
@@ -590,8 +718,13 @@ const AddInstanceSheet = React.forwardRef<
                 backgroundColor: isDark ? 'rgba(248,248,248,0.06)' : 'rgba(18,18,21,0.04)',
                 borderWidth: 1,
                 borderColor: isDark ? 'rgba(248,248,248,0.1)' : 'rgba(18,18,21,0.08)',
-                borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14,
-                fontSize: 14, fontFamily: 'Roobert', color: fgColor, marginBottom: 16,
+                borderRadius: 14,
+                paddingHorizontal: 16,
+                paddingVertical: 14,
+                fontSize: 14,
+                fontFamily: 'Roobert',
+                color: fgColor,
+                marginBottom: 16,
               }}
             />
 
@@ -601,24 +734,36 @@ const AddInstanceSheet = React.forwardRef<
               className="items-center rounded-2xl py-3.5 active:opacity-90"
               style={{
                 backgroundColor: customUrl.trim()
-                  ? isDark ? '#f8f8f8' : '#121215'
-                  : isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.06)',
+                  ? isDark
+                    ? '#f8f8f8'
+                    : '#121215'
+                  : isDark
+                    ? 'rgba(248,248,248,0.08)'
+                    : 'rgba(18,18,21,0.06)',
                 opacity: customUrl.trim() ? 1 : 0.5,
-              }}
-            >
+              }}>
               {isCreating ? (
                 <ActivityIndicator size="small" color={isDark ? '#121215' : '#f8f8f8'} />
               ) : (
                 <Text
                   className="font-roobert-semibold text-[15px]"
-                  style={{ color: customUrl.trim() ? (isDark ? '#121215' : '#f8f8f8') : (isDark ? 'rgba(248,248,248,0.3)' : 'rgba(18,18,21,0.3)') }}
-                >
+                  style={{
+                    color: customUrl.trim()
+                      ? isDark
+                        ? '#121215'
+                        : '#f8f8f8'
+                      : isDark
+                        ? 'rgba(248,248,248,0.3)'
+                        : 'rgba(18,18,21,0.3)',
+                  }}>
                   Connect
                 </Text>
               )}
             </Pressable>
 
-            <Pressable onPress={() => setStep('select')} className="mt-3 items-center py-2 active:opacity-70">
+            <Pressable
+              onPress={() => setStep('select')}
+              className="mt-3 items-center py-2 active:opacity-70">
               <Text className="font-roobert-medium text-sm text-muted-foreground">Back</Text>
             </Pressable>
           </View>

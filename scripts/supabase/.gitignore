@@ -1,0 +1,8 @@
+volumes/db/data
+volumes/redis/data
+volumes/storage
+volumes/api/certs
+.env
+test.http
+docker-compose.override.yml
+.env.old

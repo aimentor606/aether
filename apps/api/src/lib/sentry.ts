@@ -109,14 +109,6 @@ export function setSentryUser(user: { id: string; email?: string; accountId?: st
 }
 
 /**
- * Clear user context (e.g., on logout or between requests).
- */
-export function clearSentryUser(): void {
-  if (!SENTRY_DSN) return;
-  Sentry.setUser(null);
-}
-
-/**
  * Add a breadcrumb for debugging context on future errors.
  */
 export function addBreadcrumb(message: string, data?: Record<string, unknown>, category = 'app'): void {

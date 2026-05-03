@@ -7,7 +7,7 @@
  * created in DB with status 'failed'. This tests the full request/response
  * flow, validation, per-user isolation, and error handling.
  */
-import { describe, it, expect, beforeAll, afterAll } from 'bun:test';
+import { describe, it, expect, beforeAll, afterAll, mock } from 'bun:test';
 import {
   createTestApp,
   createMockProvider,
@@ -21,6 +21,19 @@ import {
 } from './helpers';
 
 const HAS_DB = !!process.env.DATABASE_URL;
+
+// Register a ../shared/db mock that delegates to the REAL test database.
+// This prevents cross-test contamination from other test files that mock
+// ../shared/db with incomplete stubs. Bun's mock.module() is process-global
+// and first-registration-wins.
+if (HAS_DB) {
+  const { createDb } = await import('@aether/db');
+  const _realDb = createDb(process.env.DATABASE_URL!);
+  mock.module('../shared/db', () => ({
+    hasDatabase: true,
+    db: _realDb,
+  }));
+}
 
 describe.skipIf(!HAS_DB)('Deployments — CRUD & Lifecycle (Freestyle-backed)', () => {
   const dockerProvider = createMockProvider('local_docker');

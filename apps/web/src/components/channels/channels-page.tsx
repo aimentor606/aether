@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,7 +13,6 @@ import {
   RefreshCw,
   Settings,
   MessageSquare,
-  ExternalLink,
 } from 'lucide-react';
 import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { PageHeader } from '@/components/ui/page-header';
@@ -51,7 +50,11 @@ async function channelFetch(path: string, opts?: RequestInit): Promise<any> {
   try {
     const res = await authenticatedFetch(`${url}/aether/channels${path}`, opts);
     const text = await res.text();
-    try { return JSON.parse(text); } catch { return null; }
+    try {
+      return JSON.parse(text);
+    } catch {
+      return null;
+    }
   } catch {
     return null;
   }
@@ -64,21 +67,47 @@ async function detectChannelsFromEnv(): Promise<Channel[]> {
   try {
     const res = await authenticatedFetch(`${url}/env/TELEGRAM_BOT_TOKEN`);
     if (res.ok) {
-      const data = await res.json() as Record<string, string>;
+      const data = (await res.json()) as Record<string, string>;
       if (data?.TELEGRAM_BOT_TOKEN) {
-        channels.push({ id: 'env-telegram', platform: 'telegram', name: 'Telegram Bot', enabled: true, bot_username: null, default_agent: '', default_model: '', webhook_path: '', created_by: null, created_at: new Date().toISOString() });
+        channels.push({
+          id: 'env-telegram',
+          platform: 'telegram',
+          name: 'Telegram Bot',
+          enabled: true,
+          bot_username: null,
+          default_agent: '',
+          default_model: '',
+          webhook_path: '',
+          created_by: null,
+          created_at: new Date().toISOString(),
+        });
       }
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   try {
     const res = await authenticatedFetch(`${url}/env/SLACK_BOT_TOKEN`);
     if (res.ok) {
-      const data = await res.json() as Record<string, string>;
+      const data = (await res.json()) as Record<string, string>;
       if (data?.SLACK_BOT_TOKEN) {
-        channels.push({ id: 'env-slack', platform: 'slack', name: 'Slack Bot', enabled: true, bot_username: null, default_agent: '', default_model: '', webhook_path: '', created_by: null, created_at: new Date().toISOString() });
+        channels.push({
+          id: 'env-slack',
+          platform: 'slack',
+          name: 'Slack Bot',
+          enabled: true,
+          bot_username: null,
+          default_agent: '',
+          default_model: '',
+          webhook_path: '',
+          created_by: null,
+          created_at: new Date().toISOString(),
+        });
       }
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return channels;
 }
 
@@ -98,7 +127,9 @@ function ChannelCard({
   onSettings: (channel: Channel) => void;
 }) {
   const Icon = channel.platform === 'telegram' ? TelegramIcon : SlackIcon;
-  const modelShort = channel.default_model ? channel.default_model.split('/').pop() : null;
+  const modelShort = channel.default_model
+    ? channel.default_model.split('/').pop()
+    : null;
 
   return (
     <motion.div
@@ -109,7 +140,13 @@ function ChannelCard({
       transition={{ duration: 0.2, delay: Math.min(index * 0.03, 0.3) }}
     >
       <SpotlightCard className="bg-card border border-border/50">
-        <div className="p-4 flex items-start gap-3 cursor-pointer group" onClick={() => onSettings(channel)}>
+        <div
+          className="p-4 flex items-start gap-3 cursor-pointer group"
+          onClick={() => onSettings(channel)}
+          role="button"
+          tabIndex={0}
+          aria-label="Channel settings"
+        >
           {/* Icon */}
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-muted border border-border/50 shrink-0">
             <Icon className="h-5 w-5 text-foreground" />
@@ -118,18 +155,22 @@ function ChannelCard({
           {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <h3 className="text-sm font-semibold text-foreground truncate">{channel.name}</h3>
+              <h3 className="text-sm font-semibold text-foreground truncate">
+                {channel.name}
+              </h3>
               <Badge
-                variant={channel.enabled ? "highlight" : "secondary"}
+                variant={channel.enabled ? 'highlight' : 'secondary'}
                 className="text-[10px] shrink-0"
               >
-                {channel.enabled ? "Live" : "Off"}
+                {channel.enabled ? 'Live' : 'Off'}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground truncate">
               @{channel.bot_username || '?'}
               {modelShort ? ` · ${modelShort}` : ''}
-              {channel.default_agent && channel.default_agent !== 'aether' ? ` · ${channel.default_agent}` : ''}
+              {channel.default_agent && channel.default_agent !== 'aether'
+                ? ` · ${channel.default_agent}`
+                : ''}
             </p>
             {channel.webhook_url && (
               <p className="text-[10px] text-muted-foreground/50 truncate mt-0.5 font-mono">
@@ -139,14 +180,36 @@ function ChannelCard({
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
-            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onSettings(channel)}>
+          <div
+            className="flex items-center gap-0.5 shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => onSettings(channel)}
+            >
               <Settings className="h-3.5 w-3.5" />
             </Button>
-            <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => onToggle(channel.id, !channel.enabled)}>
-              {channel.enabled ? <PowerOff className="h-3.5 w-3.5" /> : <Power className="h-3.5 w-3.5" />}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={() => onToggle(channel.id, !channel.enabled)}
+            >
+              {channel.enabled ? (
+                <PowerOff className="h-3.5 w-3.5" />
+              ) : (
+                <Power className="h-3.5 w-3.5" />
+              )}
             </Button>
-            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive" onClick={() => onRemove(channel.id)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+              onClick={() => onRemove(channel.id)}
+            >
               <Trash2 className="h-3.5 w-3.5" />
             </Button>
           </div>
@@ -163,7 +226,9 @@ export function ChannelsPage() {
   const [loading, setLoading] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
-  const [configDialogPlatform, setConfigDialogPlatform] = useState<'telegram' | 'slack' | undefined>(undefined);
+  const [configDialogPlatform, setConfigDialogPlatform] = useState<
+    'telegram' | 'slack' | undefined
+  >(undefined);
   const [settingsChannel, setSettingsChannel] = useState<Channel | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -194,36 +259,57 @@ export function ChannelsPage() {
   }, [loaded, load]);
 
   const handleToggle = async (id: string, enabled: boolean) => {
-    setChannels(prev => prev.map(ch => ch.id === id ? { ...ch, enabled } : ch));
-    const data = await channelFetch(`/${id}/${enabled ? 'enable' : 'disable'}`, { method: 'POST' });
+    setChannels((prev) =>
+      prev.map((ch) => (ch.id === id ? { ...ch, enabled } : ch)),
+    );
+    const data = await channelFetch(
+      `/${id}/${enabled ? 'enable' : 'disable'}`,
+      { method: 'POST' },
+    );
     if (data?.ok) {
       toast.success(enabled ? 'Enabled' : 'Disabled');
     } else {
-      setChannels(prev => prev.map(ch => ch.id === id ? { ...ch, enabled: !enabled } : ch));
+      setChannels((prev) =>
+        prev.map((ch) => (ch.id === id ? { ...ch, enabled: !enabled } : ch)),
+      );
       toast.error('Failed');
     }
   };
 
   const handleRemove = async (id: string) => {
-    const ch = channels.find(c => c.id === id);
+    const ch = channels.find((c) => c.id === id);
     if (!confirm(`Remove ${ch?.name}?`)) return;
-    setChannels(prev => prev.filter(c => c.id !== id));
+    setChannels((prev) => prev.filter((c) => c.id !== id));
 
     // Env-based channels: remove env vars
     if (id === 'env-telegram') {
       const url = getActiveOpenCodeUrl();
       if (url) {
         try {
-          const envRes = await authenticatedFetch(`${url}/env/TELEGRAM_BOT_TOKEN`);
+          const envRes = await authenticatedFetch(
+            `${url}/env/TELEGRAM_BOT_TOKEN`,
+          );
           if (envRes.ok) {
-            const data = await envRes.json() as Record<string, string>;
+            const data = (await envRes.json()) as Record<string, string>;
             if (data?.TELEGRAM_BOT_TOKEN) {
-              await fetch(`https://api.telegram.org/bot${data.TELEGRAM_BOT_TOKEN}/deleteWebhook`, { method: 'POST' });
+              await fetch(
+                `https://api.telegram.org/bot${data.TELEGRAM_BOT_TOKEN}/deleteWebhook`,
+                { method: 'POST' },
+              );
             }
           }
-        } catch { /* ignore */ }
-        for (const key of ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET_TOKEN']) {
-          try { await authenticatedFetch(`${url}/env/${key}`, { method: 'DELETE' }); } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
+        for (const key of [
+          'TELEGRAM_BOT_TOKEN',
+          'TELEGRAM_WEBHOOK_SECRET_TOKEN',
+        ]) {
+          try {
+            await authenticatedFetch(`${url}/env/${key}`, { method: 'DELETE' });
+          } catch {
+            /* ignore */
+          }
         }
       }
       toast.success('Removed');
@@ -233,7 +319,11 @@ export function ChannelsPage() {
       const url = getActiveOpenCodeUrl();
       if (url) {
         for (const key of ['SLACK_BOT_TOKEN', 'SLACK_SIGNING_SECRET']) {
-          try { await authenticatedFetch(`${url}/env/${key}`, { method: 'DELETE' }); } catch { /* ignore */ }
+          try {
+            await authenticatedFetch(`${url}/env/${key}`, { method: 'DELETE' });
+          } catch {
+            /* ignore */
+          }
         }
       }
       toast.success('Removed');
@@ -255,8 +345,8 @@ export function ChannelsPage() {
     setConfigDialogOpen(true);
   };
 
-  const telegramChannels = channels.filter(c => c.platform === 'telegram');
-  const slackChannels = channels.filter(c => c.platform === 'slack');
+  const telegramChannels = channels.filter((c) => c.platform === 'telegram');
+  const slackChannels = channels.filter((c) => c.platform === 'slack');
 
   return (
     <div className="min-h-[100dvh]">
@@ -276,14 +366,27 @@ export function ChannelsPage() {
         {channels.length > 0 && (
           <div className="flex items-center justify-between gap-4 pb-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 fill-mode-both delay-75">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Your Channels</span>
-              <Badge variant="secondary" className="text-xs tabular-nums">{channels.length}</Badge>
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Your Channels
+              </span>
+              <Badge variant="secondary" className="text-xs tabular-nums">
+                {channels.length}
+              </Badge>
             </div>
             <div className="flex gap-2">
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={load}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={load}
+              >
                 <RefreshCw className="h-3.5 w-3.5" />
               </Button>
-              <Button size="sm" className="gap-1.5" onClick={() => openSetupDialog()}>
+              <Button
+                size="sm"
+                className="gap-1.5"
+                onClick={() => openSetupDialog()}
+              >
                 <Plus className="h-3.5 w-3.5" />
                 Add Channel
               </Button>
@@ -293,7 +396,10 @@ export function ChannelsPage() {
         {loading && !loaded ? (
           <div className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={i} className="rounded-2xl border bg-card p-4 flex items-center gap-3">
+              <div
+                key={i}
+                className="rounded-2xl border bg-card p-4 flex items-center gap-3"
+              >
                 <Skeleton className="h-10 w-10 rounded-xl" />
                 <div className="flex-1 space-y-2">
                   <Skeleton className="h-4 w-32" />
@@ -311,7 +417,8 @@ export function ChannelsPage() {
               </div>
               <h3 className="text-base font-semibold mb-1">No channels yet</h3>
               <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                Connect a messaging platform so users can talk to your agent directly.
+                Connect a messaging platform so users can talk to your agent
+                directly.
               </p>
             </div>
 
@@ -325,7 +432,9 @@ export function ChannelsPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium">Telegram</p>
-                  <p className="text-[11px] text-muted-foreground">Connect a Telegram bot</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Connect a Telegram bot
+                  </p>
                 </div>
               </button>
               <button
@@ -337,7 +446,9 @@ export function ChannelsPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium">Slack</p>
-                  <p className="text-[11px] text-muted-foreground">Connect a Slack app</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Connect a Slack app
+                  </p>
                 </div>
               </button>
             </div>
@@ -349,13 +460,30 @@ export function ChannelsPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 px-1">
                   <TelegramIcon className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Telegram</span>
-                  <Badge variant="secondary" className="text-[10px] tabular-nums">{telegramChannels.length}</Badge>
+                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Telegram
+                  </span>
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] tabular-nums"
+                  >
+                    {telegramChannels.length}
+                  </Badge>
                 </div>
                 <div className="space-y-2">
                   <AnimatePresence mode="popLayout">
                     {telegramChannels.map((ch, i) => (
-                      <ChannelCard key={ch.id} channel={ch} index={i} onToggle={handleToggle} onRemove={handleRemove} onSettings={(ch) => { setSettingsChannel(ch); setSettingsOpen(true); }} />
+                      <ChannelCard
+                        key={ch.id}
+                        channel={ch}
+                        index={i}
+                        onToggle={handleToggle}
+                        onRemove={handleRemove}
+                        onSettings={(ch) => {
+                          setSettingsChannel(ch);
+                          setSettingsOpen(true);
+                        }}
+                      />
                     ))}
                   </AnimatePresence>
                 </div>
@@ -366,13 +494,30 @@ export function ChannelsPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 px-1">
                   <SlackIcon className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Slack</span>
-                  <Badge variant="secondary" className="text-[10px] tabular-nums">{slackChannels.length}</Badge>
+                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Slack
+                  </span>
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] tabular-nums"
+                  >
+                    {slackChannels.length}
+                  </Badge>
                 </div>
                 <div className="space-y-2">
                   <AnimatePresence mode="popLayout">
                     {slackChannels.map((ch, i) => (
-                      <ChannelCard key={ch.id} channel={ch} index={i} onToggle={handleToggle} onRemove={handleRemove} onSettings={(ch) => { setSettingsChannel(ch); setSettingsOpen(true); }} />
+                      <ChannelCard
+                        key={ch.id}
+                        channel={ch}
+                        index={i}
+                        onToggle={handleToggle}
+                        onRemove={handleRemove}
+                        onSettings={(ch) => {
+                          setSettingsChannel(ch);
+                          setSettingsOpen(true);
+                        }}
+                      />
                     ))}
                   </AnimatePresence>
                 </div>

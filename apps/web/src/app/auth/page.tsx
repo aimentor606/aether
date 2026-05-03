@@ -5,12 +5,37 @@ import { SubmitButton } from '@/components/ui/submit-button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { useState, useEffect, Suspense, lazy, useRef, useCallback, useActionState } from 'react';
-import { signUp, verifyOtp, requestAccess, signInWithPassword, sendOtpCode } from './actions';
+import {
+  useState,
+  useEffect,
+  Suspense,
+  lazy,
+  useRef,
+  useCallback,
+  useActionState,
+} from 'react';
+import {
+  signUp,
+  verifyOtp,
+  requestAccess,
+  signInWithPassword,
+  sendOtpCode,
+} from './actions';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Mail, MailCheck, Clock, ExternalLink, ChevronRight } from 'lucide-react';
+import {
+  Mail,
+  MailCheck,
+  Clock,
+  ExternalLink,
+  ChevronRight,
+} from 'lucide-react';
 import { AetherLoader } from '@/components/ui/aether-loader';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { useAuth } from '@/components/AuthProvider';
 import { useAuthMethodTracking } from '@/stores/auth-tracking';
 import { toast } from '@/lib/toast';
@@ -25,7 +50,6 @@ import { cn } from '@/lib/utils';
 
 // Lazy load heavy components
 const GoogleSignIn = lazy(() => import('@/components/GoogleSignIn'));
-
 
 /* ─── Live clock ────────────────────────────────────────────────────────── */
 
@@ -44,7 +68,10 @@ function LiveClock() {
   const m = now ? now.getMinutes().toString().padStart(2, '0') : '--';
   return (
     <div className="flex flex-col items-center select-none pointer-events-none">
-      <p className="text-foreground/35 text-[13px] font-light tracking-widest" suppressHydrationWarning>
+      <p
+        className="text-foreground/35 text-[13px] font-light tracking-widest"
+        suppressHydrationWarning
+      >
         {day} {month} {date}
       </p>
       <p
@@ -62,36 +89,108 @@ function LiveClock() {
 function getEmailProviderInfo(email: string) {
   const domain = email.split('@')[1]?.toLowerCase();
   if (!domain) return null;
-  const isMobileDevice = typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  const providers: { [key: string]: { name: string; webUrl: string; mobileUrl: string } } = {
-    'gmail.com': { name: 'Gmail', webUrl: 'https://mail.google.com', mobileUrl: 'googlegmail://' },
-    'googlemail.com': { name: 'Gmail', webUrl: 'https://mail.google.com', mobileUrl: 'googlegmail://' },
-    'outlook.com': { name: 'Outlook', webUrl: 'https://outlook.live.com', mobileUrl: 'ms-outlook://' },
-    'hotmail.com': { name: 'Outlook', webUrl: 'https://outlook.live.com', mobileUrl: 'ms-outlook://' },
-    'live.com': { name: 'Outlook', webUrl: 'https://outlook.live.com', mobileUrl: 'ms-outlook://' },
-    'msn.com': { name: 'Outlook', webUrl: 'https://outlook.live.com', mobileUrl: 'ms-outlook://' },
-    'yahoo.com': { name: 'Yahoo Mail', webUrl: 'https://mail.yahoo.com', mobileUrl: 'ymail://' },
-    'icloud.com': { name: 'Mail', webUrl: 'https://www.icloud.com/mail', mobileUrl: 'message://' },
-    'me.com': { name: 'Mail', webUrl: 'https://www.icloud.com/mail', mobileUrl: 'message://' },
-    'mac.com': { name: 'Mail', webUrl: 'https://www.icloud.com/mail', mobileUrl: 'message://' },
-    'protonmail.com': { name: 'ProtonMail', webUrl: 'https://mail.proton.me', mobileUrl: 'protonmail://' },
-    'proton.me': { name: 'ProtonMail', webUrl: 'https://mail.proton.me', mobileUrl: 'protonmail://' },
-    'pm.me': { name: 'ProtonMail', webUrl: 'https://mail.proton.me', mobileUrl: 'protonmail://' },
+  const isMobileDevice =
+    typeof window !== 'undefined' &&
+    /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const providers: {
+    [key: string]: { name: string; webUrl: string; mobileUrl: string };
+  } = {
+    'gmail.com': {
+      name: 'Gmail',
+      webUrl: 'https://mail.google.com',
+      mobileUrl: 'googlegmail://',
+    },
+    'googlemail.com': {
+      name: 'Gmail',
+      webUrl: 'https://mail.google.com',
+      mobileUrl: 'googlegmail://',
+    },
+    'outlook.com': {
+      name: 'Outlook',
+      webUrl: 'https://outlook.live.com',
+      mobileUrl: 'ms-outlook://',
+    },
+    'hotmail.com': {
+      name: 'Outlook',
+      webUrl: 'https://outlook.live.com',
+      mobileUrl: 'ms-outlook://',
+    },
+    'live.com': {
+      name: 'Outlook',
+      webUrl: 'https://outlook.live.com',
+      mobileUrl: 'ms-outlook://',
+    },
+    'msn.com': {
+      name: 'Outlook',
+      webUrl: 'https://outlook.live.com',
+      mobileUrl: 'ms-outlook://',
+    },
+    'yahoo.com': {
+      name: 'Yahoo Mail',
+      webUrl: 'https://mail.yahoo.com',
+      mobileUrl: 'ymail://',
+    },
+    'icloud.com': {
+      name: 'Mail',
+      webUrl: 'https://www.icloud.com/mail',
+      mobileUrl: 'message://',
+    },
+    'me.com': {
+      name: 'Mail',
+      webUrl: 'https://www.icloud.com/mail',
+      mobileUrl: 'message://',
+    },
+    'mac.com': {
+      name: 'Mail',
+      webUrl: 'https://www.icloud.com/mail',
+      mobileUrl: 'message://',
+    },
+    'protonmail.com': {
+      name: 'ProtonMail',
+      webUrl: 'https://mail.proton.me',
+      mobileUrl: 'protonmail://',
+    },
+    'proton.me': {
+      name: 'ProtonMail',
+      webUrl: 'https://mail.proton.me',
+      mobileUrl: 'protonmail://',
+    },
+    'pm.me': {
+      name: 'ProtonMail',
+      webUrl: 'https://mail.proton.me',
+      mobileUrl: 'protonmail://',
+    },
   };
   const provider = providers[domain];
   if (!provider) return null;
-  return { name: provider.name, url: isMobileDevice ? provider.mobileUrl : provider.webUrl };
+  return {
+    name: provider.name,
+    url: isMobileDevice ? provider.mobileUrl : provider.webUrl,
+  };
 }
 
 /* ─── Cloud auth main content ───────────────────────────────────────────── */
 
 type AuthPhase = 'lock' | 'form';
 
-function AccessRequestForm({ email, onSubmitted, onBack }: { email: string; onSubmitted: () => void; onBack: () => void }) {
+function AccessRequestForm({
+  email,
+  onSubmitted,
+  onBack,
+}: {
+  email: string;
+  onSubmitted: () => void;
+  onBack: () => void;
+}) {
   const handleRequestAccess = async (_prev: any, formData: FormData) => {
     formData.set('email', email);
     const result = await requestAccess(_prev, formData);
-    if (result && typeof result === 'object' && 'success' in result && result.success) {
+    if (
+      result &&
+      typeof result === 'object' &&
+      'success' in result &&
+      result.success
+    ) {
       onSubmitted();
     }
     return result || {};
@@ -119,7 +218,8 @@ function AccessRequestForm({ email, onSubmitted, onBack }: { email: string; onSu
       </div>
 
       <form className="space-y-3.5">
-        <Input type="text"
+        <Input
+          type="text"
           name="company"
           placeholder="Company (optional)"
           className="h-12 text-[15px] rounded-xl bg-foreground/[0.04] border-foreground/[0.08]"
@@ -130,7 +230,11 @@ function AccessRequestForm({ email, onSubmitted, onBack }: { email: string; onSu
           rows={3}
           className="w-full rounded-xl bg-foreground/[0.04] border border-foreground/[0.08] text-[15px] text-foreground/80 placeholder:text-foreground/30 px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/15 transition-colors"
         />
-        <SubmitButton formAction={handleRequestAccess} className="w-full h-10 text-[15px] font-medium rounded-xl shadow-none" pendingText="Submitting...">
+        <SubmitButton
+          formAction={handleRequestAccess}
+          className="w-full h-10 text-[15px] font-medium rounded-xl shadow-none"
+          pendingText="Submitting..."
+        >
           Request Early Access
         </SubmitButton>
       </form>
@@ -153,8 +257,11 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const { user, isLoading } = useAuth();
   const mode = searchParams.get('mode');
-  const rawReturnUrl = searchParams.get('returnUrl') || searchParams.get('redirect');
-  const returnUrl = rawReturnUrl?.match(/^\/instances\/[^/]+/) ? '/instances' : rawReturnUrl;
+  const rawReturnUrl =
+    searchParams.get('returnUrl') || searchParams.get('redirect');
+  const returnUrl = rawReturnUrl?.match(/^\/instances\/[^/]+/)
+    ? '/instances'
+    : rawReturnUrl;
   const message = searchParams.get('message');
   const isExpired = searchParams.get('expired') === 'true';
   const expiredEmail = searchParams.get('email') || '';
@@ -168,7 +275,8 @@ function LoginContent() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const { wasLastMethod: wasEmailLastMethod, markAsUsed: markEmailAsUsed } = useAuthMethodTracking('email');
+  const { wasLastMethod: wasEmailLastMethod, markAsUsed: markEmailAsUsed } =
+    useAuthMethodTracking('email');
 
   const isSuccessMessage =
     message &&
@@ -176,7 +284,8 @@ function LoginContent() {
       message.includes('Account created') ||
       message.includes('success'));
 
-  const [registrationSuccess, setRegistrationSuccess] = useState(!!isSuccessMessage);
+  const [registrationSuccess, setRegistrationSuccess] =
+    useState(!!isSuccessMessage);
   const [registrationEmail, setRegistrationEmail] = useState('');
 
   const [signupClosed, setSignupClosed] = useState(false);
@@ -193,16 +302,24 @@ function LoginContent() {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const autoSendAttempted = useRef(false);
 
-  const sendOtpCodeForEmail = useCallback(async (email: string) => {
-    const formData = new FormData();
-    formData.set('email', email);
-    formData.set('returnUrl', returnUrl || '/instances');
-    formData.set('origin', isElectron() ? getAuthOrigin() : window.location.origin);
-    if (isElectron()) formData.set('isDesktopApp', 'true');
-    return sendOtpCode({}, formData);
-  }, [returnUrl]);
+  const sendOtpCodeForEmail = useCallback(
+    async (email: string) => {
+      const formData = new FormData();
+      formData.set('email', email);
+      formData.set('returnUrl', returnUrl || '/instances');
+      formData.set(
+        'origin',
+        isElectron() ? getAuthOrigin() : window.location.origin,
+      );
+      if (isElectron()) formData.set('isDesktopApp', 'true');
+      return sendOtpCode({}, formData);
+    },
+    [returnUrl],
+  );
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -226,12 +343,24 @@ function LoginContent() {
   // Auto-send new OTP code when link expires
   useEffect(() => {
     const autoSendNewCode = async () => {
-      if (!isExpired || !expiredEmail || autoSendAttempted.current || isLoading || user) return;
+      if (
+        !isExpired ||
+        !expiredEmail ||
+        autoSendAttempted.current ||
+        isLoading ||
+        user
+      )
+        return;
       autoSendAttempted.current = true;
       setAutoSendingCode(true);
       try {
         const response = await sendOtpCodeForEmail(expiredEmail);
-        if (response && typeof response === 'object' && 'success' in response && response.success) {
+        if (
+          response &&
+          typeof response === 'object' &&
+          'success' in response &&
+          response.success
+        ) {
           setNewCodeSent(true);
           setAutoSendError(false);
         } else {
@@ -267,7 +396,10 @@ function LoginContent() {
     setRegistrationEmail(email);
     const finalReturnUrl = returnUrl || '/instances';
     formData.append('returnUrl', finalReturnUrl);
-    formData.append('origin', isElectron() ? getAuthOrigin() : window.location.origin);
+    formData.append(
+      'origin',
+      isElectron() ? getAuthOrigin() : window.location.origin,
+    );
     formData.append('acceptedTerms', acceptedTerms.toString());
     if (isElectron()) formData.append('isDesktopApp', 'true');
     const result = await signUp(prevState, formData);
@@ -286,7 +418,10 @@ function LoginContent() {
         }
       }
       if ('message' in result) {
-        toast.error(t('signUpFailed'), { description: result.message as string, duration: 5000 });
+        toast.error(t('signUpFailed'), {
+          description: result.message as string,
+          duration: 5000,
+        });
         return {};
       }
     }
@@ -298,11 +433,15 @@ function LoginContent() {
     const result = await signInWithPassword(prevState, formData);
     if (result && typeof result === 'object') {
       if ('message' in result) {
-        toast.error('Sign in failed', { description: result.message as string, duration: 5000 });
+        toast.error('Sign in failed', {
+          description: result.message as string,
+          duration: 5000,
+        });
         return {};
       }
       if ('success' in result && result.success) {
-        const redirectTo = (result as { redirectTo?: string }).redirectTo || '/dashboard';
+        const redirectTo =
+          (result as { redirectTo?: string }).redirectTo || '/dashboard';
         window.location.href = redirectTo;
         return result;
       }
@@ -311,21 +450,33 @@ function LoginContent() {
   };
 
   const handleVerifyOtp = async (prevState: unknown, formData: FormData) => {
-    const email = expiredEmailState || registrationEmail || formData.get('email') as string;
-    if (!email) { toast.error(t('pleaseEnterValidEmail')); return {}; }
+    const email =
+      expiredEmailState ||
+      registrationEmail ||
+      (formData.get('email') as string);
+    if (!email) {
+      toast.error(t('pleaseEnterValidEmail'));
+      return {};
+    }
     formData.set('email', email);
     formData.set('token', otpCode);
     formData.set('returnUrl', returnUrl || '/instances');
     const result = await verifyOtp(prevState, formData);
     if (result && typeof result === 'object') {
       if ('message' in result) {
-        toast.error('Verification failed', { description: result.message as string, duration: 5000 });
+        toast.error('Verification failed', {
+          description: result.message as string,
+          duration: 5000,
+        });
         return {};
       }
       if ('success' in result && result.success) {
-        const redirectTo = (result as { redirectTo?: string }).redirectTo || '/dashboard';
-        const authEvent = (result as { authEvent?: string }).authEvent || 'login';
-        const authMethod = (result as { authMethod?: string }).authMethod || 'email_otp';
+        const redirectTo =
+          (result as { redirectTo?: string }).redirectTo || '/dashboard';
+        const authEvent =
+          (result as { authEvent?: string }).authEvent || 'login';
+        const authMethod =
+          (result as { authMethod?: string }).authMethod || 'email_otp';
         window.location.href = `${redirectTo}?auth_event=${authEvent}&auth_method=${authMethod}`;
         return result;
       }
@@ -336,11 +487,19 @@ function LoginContent() {
   const handleSendOtpCode = async (prevState: unknown, formData: FormData) => {
     trackSendAuthLink();
     markEmailAsUsed();
-    const email = expiredEmailState || formData.get('email') as string;
-    if (!email) { toast.error(t('pleaseEnterValidEmail')); return {}; }
+    const email = expiredEmailState || (formData.get('email') as string);
+    if (!email) {
+      toast.error(t('pleaseEnterValidEmail'));
+      return {};
+    }
     try {
       const response = await sendOtpCodeForEmail(email);
-      if (response && typeof response === 'object' && 'success' in response && response.success) {
+      if (
+        response &&
+        typeof response === 'object' &&
+        'success' in response &&
+        response.success
+      ) {
         setRegistrationEmail(email);
         setExpiredEmailState(email);
         setNewCodeSent(true);
@@ -348,11 +507,21 @@ function LoginContent() {
         setAutoSendError(false);
         return { success: true };
       } else {
-        toast.error('Failed to send code', { description: (response && typeof response === 'object' && 'message' in response ? response.message as string : 'Failed to send verification code'), duration: 5000 });
+        toast.error('Failed to send code', {
+          description:
+            response && typeof response === 'object' && 'message' in response
+              ? (response.message as string)
+              : 'Failed to send verification code',
+          duration: 5000,
+        });
         return {};
       }
     } catch (error: unknown) {
-      toast.error('Failed to send code', { description: error instanceof Error ? error.message : 'An error occurred', duration: 5000 });
+      toast.error('Failed to send code', {
+        description:
+          error instanceof Error ? error.message : 'An error occurred',
+        duration: 5000,
+      });
       return {};
     }
   };
@@ -367,7 +536,9 @@ function LoginContent() {
 
   /* ── Registration success ── */
   if (registrationSuccess) {
-    const provider = registrationEmail ? getEmailProviderInfo(registrationEmail) : null;
+    const provider = registrationEmail
+      ? getEmailProviderInfo(registrationEmail)
+      : null;
     return (
       <div className="fixed inset-0">
         <WallpaperBackground />
@@ -378,7 +549,9 @@ function LoginContent() {
           </h1>
           <p className="text-[15px] text-foreground/50 text-center">
             We sent a magic link to{' '}
-            <span className="text-foreground/80 font-medium">{registrationEmail}</span>
+            <span className="text-foreground/80 font-medium">
+              {registrationEmail}
+            </span>
           </p>
           <div className="flex flex-col gap-3 w-full max-w-[320px]">
             {provider && (
@@ -393,23 +566,36 @@ function LoginContent() {
               </a>
             )}
             <button
-              onClick={() => { setOtpCode(''); setShowOtpModal(true); }}
+              onClick={() => {
+                setOtpCode('');
+                setShowOtpModal(true);
+              }}
               className="text-xs text-foreground/30 hover:text-foreground/50 transition-colors text-center"
             >
-              Or <span className="underline underline-offset-2">enter 6-digit code</span>
+              Or{' '}
+              <span className="underline underline-offset-2">
+                enter 6-digit code
+              </span>
             </button>
             <button
               onClick={() => setRegistrationSuccess(false)}
               className="text-xs text-foreground/30 hover:text-foreground/50 transition-colors text-center"
             >
-              {t('didntReceiveEmail')} <span className="underline underline-offset-2">{t('resend')}</span>
+              {t('didntReceiveEmail')}{' '}
+              <span className="underline underline-offset-2">
+                {t('resend')}
+              </span>
             </button>
           </div>
         </div>
 
         {/* OTP verification modal */}
         <Dialog open={showOtpModal} onOpenChange={setShowOtpModal}>
-          <DialogContent className="!max-w-[300px] sm:!max-w-[300px] p-5 gap-0 rounded-2xl" hideCloseButton aria-describedby="otp-modal-desc">
+          <DialogContent
+            className="!max-w-[300px] sm:!max-w-[300px] p-5 gap-0 rounded-2xl"
+            hideCloseButton
+            aria-describedby="otp-modal-desc"
+          >
             <DialogTitle className="text-sm font-medium text-foreground/70 text-center">
               Enter code
             </DialogTitle>
@@ -425,10 +611,17 @@ function LoginContent() {
                 autoFocus
                 placeholder="000000"
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                onChange={(e) =>
+                  setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))
+                }
                 className="h-11 text-center text-lg font-mono tracking-[0.3em] bg-foreground/[0.03] border-foreground/[0.08] rounded-xl shadow-none focus-visible:border-foreground/20 transition-colors"
               />
-              <SubmitButton formAction={handleVerifyOtp} className="w-full h-10 text-[13px] font-medium rounded-xl shadow-none" pendingText="Verifying…" disabled={otpCode.length !== 6}>
+              <SubmitButton
+                formAction={handleVerifyOtp}
+                className="w-full h-10 text-[13px] font-medium rounded-xl shadow-none"
+                pendingText="Verifying…"
+                disabled={otpCode.length !== 6}
+              >
                 Verify
               </SubmitButton>
             </form>
@@ -469,11 +662,18 @@ function LoginContent() {
                       You&apos;re on the list
                     </h1>
                     <p className="text-[13px] text-foreground/40 mt-1.5 max-w-[260px] mx-auto">
-                      We&apos;ll email <span className="text-foreground/60 font-medium">{signupClosedEmail}</span> when your access is ready.
+                      We&apos;ll email{' '}
+                      <span className="text-foreground/60 font-medium">
+                        {signupClosedEmail}
+                      </span>{' '}
+                      when your access is ready.
                     </p>
                   </div>
                   <button
-                    onClick={() => { setSignupClosed(false); setAccessRequestSubmitted(false); }}
+                    onClick={() => {
+                      setSignupClosed(false);
+                      setAccessRequestSubmitted(false);
+                    }}
                     className="text-[11px] text-foreground/25 hover:text-foreground/45 transition-colors mt-1"
                   >
                     &larr; Back to sign in
@@ -496,7 +696,9 @@ function LoginContent() {
   /* ── Expired link / OTP flow ── */
   if (linkExpired) {
     const emailForProvider = expiredEmailState || resendEmail;
-    const provider = emailForProvider ? getEmailProviderInfo(emailForProvider) : null;
+    const provider = emailForProvider
+      ? getEmailProviderInfo(emailForProvider)
+      : null;
     const otpDigits = otpCode.padEnd(6, '').split('');
 
     return (
@@ -507,7 +709,9 @@ function LoginContent() {
             <div className="flex flex-col items-center gap-4">
               <AetherLogo size={28} />
               <AetherLoader size="medium" />
-              <p className="text-[15px] text-foreground/50">Sending a fresh code…</p>
+              <p className="text-[15px] text-foreground/50">
+                Sending a fresh code…
+              </p>
             </div>
           ) : newCodeSent ? (
             <div className="flex flex-col items-center gap-6 w-full max-w-[340px]">
@@ -516,38 +720,68 @@ function LoginContent() {
                 <MailCheck className="h-6 w-6 text-emerald-500" />
               </div>
               <div className="text-center space-y-1">
-                <h1 className="text-[28px] font-extralight tracking-tight text-foreground/80">Check your email</h1>
-                <p className="text-sm text-foreground/50">We sent a 6-digit code to <span className="text-foreground/70">{expiredEmailState || resendEmail}</span></p>
+                <h1 className="text-[28px] font-extralight tracking-tight text-foreground/80">
+                  Check your email
+                </h1>
+                <p className="text-sm text-foreground/50">
+                  We sent a 6-digit code to{' '}
+                  <span className="text-foreground/70">
+                    {expiredEmailState || resendEmail}
+                  </span>
+                </p>
               </div>
               <label htmlFor="otp-input" className="w-full cursor-text">
                 <div className="flex justify-center gap-2">
-                  {[0,1,2,3,4,5].map((i) => (
+                  {[0, 1, 2, 3, 4, 5].map((i) => (
                     <div
                       key={i}
                       className={cn(
-                        "w-11 h-14 rounded-xl border-2 flex items-center justify-center text-xl font-medium font-mono transition-colors duration-200 bg-background/60 backdrop-blur-sm",
+                        'w-11 h-14 rounded-xl border-2 flex items-center justify-center text-xl font-medium font-mono transition-colors duration-200 bg-background/60 backdrop-blur-sm',
                         otpDigits[i] ? 'border-foreground/20' : 'border-border',
-                        i === otpCode.length && otpCode.length < 6 ? 'border-foreground/40 ring-2 ring-foreground/10' : ''
+                        i === otpCode.length && otpCode.length < 6
+                          ? 'border-foreground/40 ring-2 ring-foreground/10'
+                          : '',
                       )}
                     >
-                      {otpDigits[i] || <span className="text-foreground/20">·</span>}
+                      {otpDigits[i] || (
+                        <span className="text-foreground/20">·</span>
+                      )}
                     </div>
                   ))}
                 </div>
                 <input
-                  type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6}
-                  value={otpCode} onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="sr-only" autoFocus id="otp-input"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) =>
+                    setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))
+                  }
+                  className="sr-only"
+                  autoFocus
+                  id="otp-input"
                 />
               </label>
               <form className="w-full space-y-3">
-                <SubmitButton formAction={handleVerifyOtp} className="w-full h-11 text-sm" pendingText="Verifying…" disabled={otpCode.length !== 6}>
+                <SubmitButton
+                  formAction={handleVerifyOtp}
+                  className="w-full h-11 text-sm"
+                  pendingText="Verifying…"
+                  disabled={otpCode.length !== 6}
+                >
                   Verify code
                 </SubmitButton>
                 {provider && (
                   <Button asChild variant="outline" className="w-full h-11">
-                    <a href={provider.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                      <ExternalLink className="size-4" />{t('openProvider', { provider: provider.name })}
+                    <a
+                      href={provider.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2"
+                    >
+                      <ExternalLink className="size-4" />
+                      {t('openProvider', { provider: provider.name })}
                     </a>
                   </Button>
                 )}
@@ -557,8 +791,15 @@ function LoginContent() {
                 onClick={async () => {
                   setAutoSendingCode(true);
                   try {
-                    const res = await sendOtpCodeForEmail(expiredEmailState || resendEmail);
-                    if (res && typeof res === 'object' && 'success' in res && res.success) {
+                    const res = await sendOtpCodeForEmail(
+                      expiredEmailState || resendEmail,
+                    );
+                    if (
+                      res &&
+                      typeof res === 'object' &&
+                      'success' in res &&
+                      res.success
+                    ) {
                       setOtpCode('');
                       toast.success('New code sent!');
                     } else {
@@ -572,7 +813,8 @@ function LoginContent() {
                 }}
                 className="text-xs text-foreground/40 hover:text-foreground/60 transition-colors"
               >
-                Didn&apos;t receive it? <span className="underline underline-offset-2">Send again</span>
+                Didn&apos;t receive it?{' '}
+                <span className="underline underline-offset-2">Send again</span>
               </button>
             </div>
           ) : (
@@ -582,16 +824,32 @@ function LoginContent() {
                 <Clock className="h-6 w-6 text-amber-500" />
               </div>
               <div className="text-center space-y-1">
-                <h1 className="text-[28px] font-extralight tracking-tight text-foreground/80">{t('magicLinkExpired')}</h1>
+                <h1 className="text-[28px] font-extralight tracking-tight text-foreground/80">
+                  {t('magicLinkExpired')}
+                </h1>
                 <p className="text-sm text-foreground/50 max-w-[260px]">
-                  {autoSendError ? "We couldn't send a code automatically. Try again below." : t('magicLinkExpiredDescription')}
+                  {autoSendError
+                    ? "We couldn't send a code automatically. Try again below."
+                    : t('magicLinkExpiredDescription')}
                 </p>
               </div>
               <form className="w-full space-y-3">
                 {!expiredEmailState && (
-                  <Input name="email" type="email" placeholder={t('emailAddress')} required onChange={(e) => setResendEmail(e.target.value)} className="h-11" />
+                  <Input
+                    name="email"
+                    type="email"
+                    placeholder={t('emailAddress')}
+                    required
+                    onChange={(e) => setResendEmail(e.target.value)}
+                    className="h-11"
+                  />
                 )}
-                <SubmitButton formAction={handleSendOtpCode} className="w-full h-11 text-sm" pendingText="Sending…" disabled={!expiredEmailState && !resendEmail}>
+                <SubmitButton
+                  formAction={handleSendOtpCode}
+                  className="w-full h-11 text-sm"
+                  pendingText="Sending…"
+                  disabled={!expiredEmailState && !resendEmail}
+                >
                   Send verification code
                 </SubmitButton>
               </form>
@@ -605,6 +863,9 @@ function LoginContent() {
   /* ── Lock screen + auth form ── */
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label="Unlock screen"
       className="fixed inset-0 overflow-hidden cursor-pointer"
       onClick={() => phase === 'lock' && setPhase('form')}
     >
@@ -627,7 +888,11 @@ function LoginContent() {
               className="flex justify-center pt-[12vh] sm:pt-[14vh]"
               initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                duration: 0.8,
+                delay: 0.15,
+                ease: [0.16, 1, 0.3, 1],
+              }}
             >
               <LiveClock />
             </motion.div>
@@ -637,7 +902,11 @@ function LoginContent() {
               className="absolute bottom-[10vh] left-0 right-0 flex flex-col items-center gap-3"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                duration: 0.7,
+                delay: 0.35,
+                ease: [0.16, 1, 0.3, 1],
+              }}
             >
               <div className="flex flex-col items-center gap-1.5">
                 <p className="text-foreground/50 text-sm font-medium tracking-wide">
@@ -650,7 +919,11 @@ function LoginContent() {
               {/* Scroll indicator */}
               <motion.div
                 animate={{ y: [0, 5, 0] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                transition={{
+                  duration: 1.8,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
               >
                 <ChevronRight className="size-3.5 text-foreground/20 rotate-90" />
               </motion.div>
@@ -727,8 +1000,15 @@ function LoginContent() {
                   /* ── Cloud auth (Google + magic link) ── */
                   <>
                     {/* Google OAuth */}
-                    <Suspense fallback={<div className="h-11 bg-foreground/[0.04] rounded-xl animate-pulse" />}>
-                      <GoogleSignIn returnUrl={returnUrl || undefined} referralCode={referralCode} />
+                    <Suspense
+                      fallback={
+                        <div className="h-11 bg-foreground/[0.04] rounded-xl animate-pulse" />
+                      }
+                    >
+                      <GoogleSignIn
+                        returnUrl={returnUrl || undefined}
+                        referralCode={referralCode}
+                      />
                     </Suspense>
 
                     {/* Divider */}
@@ -737,7 +1017,9 @@ function LoginContent() {
                         <div className="w-full border-t border-foreground/[0.06]" />
                       </div>
                       <div className="relative flex justify-center">
-                        <span className="px-3 bg-background/80 dark:bg-background/75 text-[10px] text-foreground/20 tracking-[0.15em] uppercase">or</span>
+                        <span className="px-3 bg-background/80 dark:bg-background/75 text-[10px] text-foreground/20 tracking-[0.15em] uppercase">
+                          or
+                        </span>
                       </div>
                     </div>
 
@@ -755,28 +1037,53 @@ function LoginContent() {
 
                       {referralCodeParam && (
                         <div className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-xl px-3 py-2">
-                          <p className="text-[10px] text-foreground/35 mb-0.5">Referral</p>
-                          <p className="text-[13px] font-semibold">{referralCode}</p>
+                          <p className="text-[10px] text-foreground/35 mb-0.5">
+                            Referral
+                          </p>
+                          <p className="text-[13px] font-semibold">
+                            {referralCode}
+                          </p>
                         </div>
                       )}
-                      {!referralCodeParam && <input type="hidden" name="referralCode" value={referralCode} />}
+                      {!referralCodeParam && (
+                        <input
+                          type="hidden"
+                          name="referralCode"
+                          value={referralCode}
+                        />
+                      )}
 
                       {/* GDPR consent */}
                       <div className="flex items-center gap-2.5 pt-0.5">
                         <Checkbox
                           id="gdprConsent"
                           checked={acceptedTerms}
-                          onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+                          onCheckedChange={(checked) =>
+                            setAcceptedTerms(checked === true)
+                          }
                           required
                           className="h-[14px] w-[14px] rounded-[4px] shrink-0"
                         />
-                        <label htmlFor="gdprConsent" className="text-[11px] leading-[1.6] text-foreground/30 cursor-pointer select-none">
+                        <label
+                          htmlFor="gdprConsent"
+                          className="text-[11px] leading-[1.6] text-foreground/30 cursor-pointer select-none"
+                        >
                           I agree to the{' '}
-                          <a href="https://www.aether.dev/legal?tab=privacy" target="_blank" rel="noopener noreferrer" className="text-foreground/45 hover:text-foreground/65 transition-colors">
+                          <a
+                            href="https://www.aether.dev/legal?tab=privacy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-foreground/45 hover:text-foreground/65 transition-colors"
+                          >
                             Privacy Policy
                           </a>
                           {' & '}
-                          <a href="https://www.aether.dev/legal?tab=terms" target="_blank" rel="noopener noreferrer" className="text-foreground/45 hover:text-foreground/65 transition-colors">
+                          <a
+                            href="https://www.aether.dev/legal?tab=terms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-foreground/45 hover:text-foreground/65 transition-colors"
+                          >
                             Terms
                           </a>
                         </label>
@@ -823,7 +1130,10 @@ function LoginContent() {
         open={showReferralDialog}
         onOpenChange={setShowReferralDialog}
         referralCode={referralCode}
-        onCodeChange={(code) => { setReferralCode(code); setShowReferralDialog(false); }}
+        onCodeChange={(code) => {
+          setReferralCode(code);
+          setShowReferralDialog(false);
+        }}
       />
     </div>
   );
@@ -832,15 +1142,21 @@ function LoginContent() {
 /* ─── Self-hosted check ─────────────────────────────────────────────────── */
 
 import { isSelfHosted, isBillingEnabled } from '@/lib/config';
-import { SelfHostedForm, useInstallStatus } from '@/components/auth/self-hosted-auth';
+import {
+  SelfHostedForm,
+  useInstallStatus,
+} from '@/components/auth/self-hosted-auth';
 
 function SelfHostedLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isLoading } = useAuth();
   const { installed, loading: statusLoading } = useInstallStatus();
-  const rawReturnUrl = searchParams.get('returnUrl') || searchParams.get('redirect');
-  const returnUrl = rawReturnUrl?.match(/^\/instances\/[^/]+/) ? '/instances' : rawReturnUrl;
+  const rawReturnUrl =
+    searchParams.get('returnUrl') || searchParams.get('redirect');
+  const returnUrl = rawReturnUrl?.match(/^\/instances\/[^/]+/)
+    ? '/instances'
+    : rawReturnUrl;
   const [phase, setPhase] = useState<'lock' | 'form'>('lock');
 
   // After auth, redirect to /instances. The /instances page handles
@@ -876,6 +1192,9 @@ function SelfHostedLoginContent() {
   // Lock screen → frosted glass auth form
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label="Unlock screen"
       className="fixed inset-0 overflow-hidden cursor-pointer"
       onClick={() => phase === 'lock' && setPhase('form')}
     >
@@ -896,7 +1215,11 @@ function SelfHostedLoginContent() {
               className="flex justify-center pt-[12vh] sm:pt-[14vh]"
               initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                duration: 0.8,
+                delay: 0.15,
+                ease: [0.16, 1, 0.3, 1],
+              }}
             >
               <LiveClock />
             </motion.div>
@@ -904,15 +1227,27 @@ function SelfHostedLoginContent() {
               className="absolute bottom-[10vh] left-0 right-0 flex flex-col items-center gap-3"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              transition={{
+                duration: 0.7,
+                delay: 0.35,
+                ease: [0.16, 1, 0.3, 1],
+              }}
             >
               <div className="flex flex-col items-center gap-1.5">
-                <p className="text-foreground/50 text-sm font-medium tracking-wide">Aether</p>
-                <p className="text-foreground/25 text-xs tracking-widest uppercase">Click or press Enter to sign in</p>
+                <p className="text-foreground/50 text-sm font-medium tracking-wide">
+                  Aether
+                </p>
+                <p className="text-foreground/25 text-xs tracking-widest uppercase">
+                  Click or press Enter to sign in
+                </p>
               </div>
               <motion.div
                 animate={{ y: [0, 5, 0] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                transition={{
+                  duration: 1.8,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
               >
                 <ChevronRight className="size-3.5 text-foreground/20 rotate-90" />
               </motion.div>
@@ -948,11 +1283,7 @@ function SelfHostedLoginContent() {
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             >
               <div className="bg-background/75 dark:bg-background/70 backdrop-blur-2xl border border-foreground/[0.08] rounded-2xl p-7 max-h-[calc(100vh-4rem)] overflow-y-auto">
-
-                <SelfHostedForm
-                  returnUrl={returnUrl}
-                  installed={installed}
-                />
+                <SelfHostedForm returnUrl={returnUrl} installed={installed} />
               </div>
             </motion.div>
           </motion.div>
@@ -967,13 +1298,25 @@ function SelfHostedLoginContent() {
 export default function Login() {
   if (isSelfHosted()) {
     return (
-      <Suspense fallback={<div className="fixed inset-0 bg-background flex items-center justify-center"><AetherLoader size="medium" /></div>}>
+      <Suspense
+        fallback={
+          <div className="fixed inset-0 bg-background flex items-center justify-center">
+            <AetherLoader size="medium" />
+          </div>
+        }
+      >
         <SelfHostedLoginContent />
       </Suspense>
     );
   }
   return (
-    <Suspense fallback={<div className="fixed inset-0 bg-background flex items-center justify-center"><AetherLoader size="medium" /></div>}>
+    <Suspense
+      fallback={
+        <div className="fixed inset-0 bg-background flex items-center justify-center">
+          <AetherLoader size="medium" />
+        </div>
+      }
+    >
       <LoginContent />
     </Suspense>
   );

@@ -14,20 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useUserPreferencesStore } from '@/stores/user-preferences-store';
-import {
-  X,
-  Trash2,
-  ExternalLink,
-  Info,
-  Plug,
-  Bell,
-  Mail,
-  Smartphone,
-  AppWindow,
-  Key,
-  Camera,
-  Upload,
-} from 'lucide-react';
+import { X, Info, Bell, Camera, Upload } from 'lucide-react';
 import { AetherLoader } from '@/components/ui/aether-loader';
 import { cn } from '@/lib/utils';
 import {
@@ -38,12 +25,10 @@ import {
 import { createClient } from '@/lib/supabase/client';
 import { toast } from '@/lib/toast';
 import { isBillingEnabled } from '@/lib/config';
-import { backendApi } from '@/lib/api-client';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Switch } from '@/components/ui/switch';
 
 import { useIsMobile } from '@/hooks/utils';
-import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useAccountDeletionStatus,

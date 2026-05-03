@@ -45,7 +45,7 @@ interface DriveToolbarProps {
 
 /**
  * Google Drive-style toolbar.
- * 
+ *
  * Layout: [Breadcrumbs] ... [New +] [View Toggle] [Sort] [Search] [More]
  */
 export function DriveToolbar({
@@ -77,7 +77,8 @@ export function DriveToolbar({
     : '/workspace';
 
   // Breadcrumb segments
-  const isRoot = currentPath === '/' || currentPath === '.' || currentPath === '';
+  const isRoot =
+    currentPath === '/' || currentPath === '.' || currentPath === '';
   const allSegments = useMemo(
     () => (isRoot ? [] : currentPath.split('/').filter(Boolean)),
     [isRoot, currentPath],
@@ -89,7 +90,7 @@ export function DriveToolbar({
     [rootPath],
   );
   const segments = useMemo(
-    () => rootPath ? allSegments.slice(rootSegments.length) : allSegments,
+    () => (rootPath ? allSegments.slice(rootSegments.length) : allSegments),
     [rootPath, allSegments, rootSegments],
   );
 
@@ -122,7 +123,8 @@ export function DriveToolbar({
     (index: number) => {
       // Offset by rootSegments length to reconstruct the full absolute path
       const absoluteIndex = rootPath ? index + rootSegments.length : index;
-      const pathToHere = '/' + allSegments.slice(0, absoluteIndex + 1).join('/');
+      const pathToHere =
+        '/' + allSegments.slice(0, absoluteIndex + 1).join('/');
       navigateToPath(pathToHere);
     },
     [allSegments, rootSegments, rootPath, navigateToPath],
@@ -169,20 +171,28 @@ export function DriveToolbar({
               size="sm"
               className={cn(
                 'gap-1.5 shrink-0',
-                segments.length === 0 ? 'text-foreground font-medium' : 'text-muted-foreground',
+                segments.length === 0
+                  ? 'text-foreground font-medium'
+                  : 'text-muted-foreground',
               )}
             >
               <Home className="h-4 w-4" />
-              <span className="font-mono text-xs">{rootPath ? homeLabel : '/workspace'}</span>
+              <span className="font-mono text-xs">
+                {rootPath ? homeLabel : '/workspace'}
+              </span>
             </Button>
 
             {segments.map((segment, index) => {
               // Skip 'workspace' only when not sandboxed (rootPath null)
-              if (!rootPath && index === 0 && segment === 'workspace') return null;
+              if (!rootPath && index === 0 && segment === 'workspace')
+                return null;
               const isLast = index === segments.length - 1;
 
               return (
-                <div key={index} className="flex items-center gap-0.5 min-w-0 shrink-0">
+                <div
+                  key={index}
+                  className="flex items-center gap-0.5 min-w-0 shrink-0"
+                >
                   <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
                   <Button
                     onClick={() => handleSegmentClick(index)}
@@ -190,7 +200,9 @@ export function DriveToolbar({
                     size="sm"
                     className={cn(
                       'truncate max-w-[200px]',
-                      isLast ? 'text-foreground font-medium' : 'text-muted-foreground',
+                      isLast
+                        ? 'text-foreground font-medium'
+                        : 'text-muted-foreground',
                     )}
                   >
                     {segment}
@@ -210,7 +222,12 @@ export function DriveToolbar({
           size="icon"
           className="h-8 w-8 text-muted-foreground hover:text-foreground"
           onClick={toggleViewMode}
-          title={viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
+          title={
+            viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'
+          }
+          aria-label={
+            viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'
+          }
         >
           {viewMode === 'grid' ? (
             <List className="h-4 w-4" />
@@ -227,16 +244,26 @@ export function DriveToolbar({
               size="icon"
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
               title="Sort"
+              aria-label="Sort files"
             >
               <ArrowUpDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44">
-            <DropdownMenuLabel className="text-xs text-muted-foreground">Sort by</DropdownMenuLabel>
-            <DropdownMenuRadioGroup value={sortBy} onValueChange={(v) => setSortBy(v as SortField)}>
+            <DropdownMenuLabel className="text-xs text-muted-foreground">
+              Sort by
+            </DropdownMenuLabel>
+            <DropdownMenuRadioGroup
+              value={sortBy}
+              onValueChange={(v) => setSortBy(v as SortField)}
+            >
               <DropdownMenuRadioItem value="name">Name</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="modified">Last modified</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="size">File size</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="modified">
+                Last modified
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="size">
+                File size
+              </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="type">Type</DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
             <DropdownMenuSeparator />
@@ -257,8 +284,13 @@ export function DriveToolbar({
           )}
           onClick={toggleHidden}
           title={showHidden ? 'Hide dotfiles' : 'Show dotfiles'}
+          aria-label={showHidden ? 'Hide dotfiles' : 'Show dotfiles'}
         >
-          {showHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+          {showHidden ? (
+            <Eye className="h-4 w-4" />
+          ) : (
+            <EyeOff className="h-4 w-4" />
+          )}
         </Button>
 
         {/* Search */}
@@ -268,6 +300,7 @@ export function DriveToolbar({
           className="h-8 w-8 text-muted-foreground hover:text-foreground"
           onClick={toggleSearch}
           title="Search files (Ctrl+P)"
+          aria-label="Search files"
         >
           <Search className="h-4 w-4" />
         </Button>
@@ -279,6 +312,7 @@ export function DriveToolbar({
           className="h-8 w-8 text-muted-foreground hover:text-foreground"
           onClick={() => invalidateFileList()}
           title="Refresh"
+          aria-label="Refresh files"
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -291,6 +325,7 @@ export function DriveToolbar({
           onClick={onDownloadDir}
           disabled={isDownloading}
           title="Download directory as zip"
+          aria-label="Download directory as zip"
         >
           {isDownloading ? (
             <RefreshCw className="h-4 w-4 animate-spin" />
@@ -307,6 +342,7 @@ export function DriveToolbar({
               size="icon"
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
               title="New file or folder"
+              aria-label="New file or folder"
             >
               <Plus className="h-4 w-4" />
             </Button>

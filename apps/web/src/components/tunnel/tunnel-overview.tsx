@@ -2,7 +2,15 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Cable, Plus, Monitor, Trash2, Search, X, Terminal, Copy, Check } from 'lucide-react';
+import {
+  Cable,
+  Plus,
+  Monitor,
+  Trash2,
+  Terminal,
+  Copy,
+  Check,
+} from 'lucide-react';
 import { getEnv } from '@/lib/env-config';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,7 +36,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useTunnelConnections, useDeleteTunnelConnection, type TunnelConnection } from '@/hooks/tunnel/use-tunnel';
+import {
+  useTunnelConnections,
+  useDeleteTunnelConnection,
+  type TunnelConnection,
+} from '@/hooks/tunnel/use-tunnel';
 import { useTunnelRealtimeSync } from '@/hooks/tunnel/use-tunnel-realtime';
 import { TunnelSettingsDialog } from './tunnel-settings-dialog';
 import { TunnelPermissionRequestDialog } from './tunnel-permission-request-dialog';
@@ -48,7 +60,9 @@ function ConnectionItem({
   index: number;
 }) {
   const isOnline = connection.isLive;
-  const machineInfo = connection.machineInfo as Record<string, string> | undefined;
+  const machineInfo = connection.machineInfo as
+    | Record<string, string>
+    | undefined;
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   return (
@@ -61,7 +75,13 @@ function ConnectionItem({
         transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.6) }}
       >
         <SpotlightCard className="bg-card border border-border/50">
-          <div onClick={onClick} className="p-4 sm:p-5 flex flex-col h-full cursor-pointer group">
+          <div
+            onClick={onClick}
+            className="p-4 sm:p-5 flex flex-col h-full cursor-pointer group"
+            role="button"
+            tabIndex={0}
+            aria-label="View tunnel details"
+          >
             <div className="flex items-center gap-3 mb-3">
               <div className="relative">
                 <div className="flex items-center justify-center w-9 h-9 rounded-[10px] bg-muted border border-border/50 shrink-0">
@@ -76,7 +96,9 @@ function ConnectionItem({
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <h3 className="text-sm font-semibold text-foreground truncate">{connection.name}</h3>
+                  <h3 className="text-sm font-semibold text-foreground truncate">
+                    {connection.name}
+                  </h3>
                   <Badge
                     variant={isOnline ? 'highlight' : 'secondary'}
                     className="text-xs shrink-0"
@@ -87,7 +109,8 @@ function ConnectionItem({
                 {machineInfo?.hostname && (
                   <p className="text-xs text-muted-foreground truncate mt-0.5">
                     {machineInfo.hostname}
-                    {machineInfo.platform && ` · ${machineInfo.platform} ${machineInfo.arch || ''}`}
+                    {machineInfo.platform &&
+                      ` · ${machineInfo.platform} ${machineInfo.arch || ''}`}
                   </p>
                 )}
               </div>
@@ -125,8 +148,12 @@ function ConnectionItem({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete connection?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete <span className="font-medium text-foreground">{connection.name}</span> and
-              remove all its permissions and audit logs. This action cannot be undone.
+              This will permanently delete{' '}
+              <span className="font-medium text-foreground">
+                {connection.name}
+              </span>{' '}
+              and remove all its permissions and audit logs. This action cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -231,9 +258,12 @@ function ConnectGuide() {
         <div className="w-16 h-16 bg-muted border rounded-2xl flex items-center justify-center mb-4">
           <Cable className="h-7 w-7 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">Connect your machine</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">
+          Connect your machine
+        </h3>
         <p className="text-sm text-muted-foreground text-center leading-relaxed mb-6">
-          Run this command on any machine to connect it to Aether. You&apos;ll approve the connection in your browser.
+          Run this command on any machine to connect it to Aether. You&apos;ll
+          approve the connection in your browser.
         </p>
 
         <button
@@ -295,16 +325,21 @@ export function TunnelOverview() {
   const deleteMutation = useDeleteTunnelConnection();
   useTunnelRealtimeSync();
 
-  const [selectedTunnel, setSelectedTunnel] = useState<TunnelConnection | null>(null);
+  const [selectedTunnel, setSelectedTunnel] = useState<TunnelConnection | null>(
+    null,
+  );
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const hasConnections = connections.length > 0;
 
   const filtered = searchQuery
-    ? connections.filter((c) =>
-        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (c.machineInfo as Record<string, string>)?.hostname?.toLowerCase()?.includes(searchQuery.toLowerCase()),
+    ? connections.filter(
+        (c) =>
+          c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (c.machineInfo as Record<string, string>)?.hostname
+            ?.toLowerCase()
+            ?.includes(searchQuery.toLowerCase()),
       )
     : connections;
 

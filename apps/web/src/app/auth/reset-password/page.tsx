@@ -121,7 +121,10 @@ function ResetPasswordContent() {
           <div className="relative z-10 flex justify-center px-6 pb-24">
             <div className="w-full max-w-md rounded-xl bg-[#F3F4F6] dark:bg-[#F9FAFB]/[0.02] border border-border p-8">
               {errorMessage && (
-                <div className="mb-6 p-4 rounded-lg flex items-center gap-3 bg-secondary/10 border border-secondary/20 text-secondary">
+                <div
+                  role="alert"
+                  className="mb-6 p-4 rounded-lg flex items-center gap-3 bg-secondary/10 border border-secondary/20 text-secondary"
+                >
                   <AlertCircle className="h-5 w-5 flex-shrink-0 text-secondary" />
                   <span className="text-sm font-medium">{errorMessage}</span>
                 </div>

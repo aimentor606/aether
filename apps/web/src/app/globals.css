@@ -935,7 +935,6 @@
   }
   html {
     scroll-behavior: smooth;
-    font-size: 105%;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -1078,23 +1077,6 @@
   width: 100%;
   transform: translateX(-100%);
 }
-
-/* stylelint-disable-next-line at-rule-no-unknown */
-@theme inline {
-  --animate-shiny-text: shiny-text 5s infinite;
-
-  @keyframes shiny-text {
-    0%,
-    90%,
-    100% {
-      background-position: calc(-100% - var(--shiny-width)) 0;
-    }
-    30%,
-    60% {
-      background-position: calc(100% + var(--shiny-width)) 0;
-    }
-  }
-  }
 
 .react-colorful {
   width: 100% !important;
@@ -1680,4 +1662,21 @@
 }
 .animate-canvas-shimmer {
   animation: canvas-shimmer 1.8s ease-in-out infinite;
+}
+
+/* ─── Reduced motion: disable continuous animations ─── */
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer,
+  .animate-shimmer::before,
+  .animate-shimmer-gray,
+  .animate-shimmer-gray::before,
+  .animate-shimmer-text,
+  .animate-text-shimmer,
+  .animate-pulse-heartbeat,
+  .animate-cursor-blink,
+  .animate-canvas-shimmer,
+  .skeleton-animate,
+  .skeleton-shimmer-bar {
+    animation: none !important;
+  }
 }

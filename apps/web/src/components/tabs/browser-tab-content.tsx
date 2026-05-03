@@ -1,7 +1,19 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ExternalLink, RefreshCw, Loader2, Globe, AlertTriangle } from 'lucide-react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import {
+  ExternalLink,
+  RefreshCw,
+  Loader2,
+  Globe,
+  AlertTriangle,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useSandboxProxy } from '@/hooks/use-sandbox-proxy';
@@ -83,10 +95,22 @@ export function BrowserTabContent() {
             <span className="text-xs font-medium">Browser</span>
           </div>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              disabled
+              aria-label="Refresh"
+            >
               <RefreshCw className="h-3.5 w-3.5" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              disabled
+              aria-label="Open in new tab"
+            >
               <ExternalLink className="h-3.5 w-3.5" />
             </Button>
           </div>
@@ -107,7 +131,9 @@ export function BrowserTabContent() {
       <div className="flex items-center justify-between h-9 px-3 border-b bg-muted/20 shrink-0">
         <div className="flex items-center gap-2">
           <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className="text-xs font-medium text-muted-foreground">Browser</span>
+          <span className="text-xs font-medium text-muted-foreground">
+            Browser
+          </span>
           {isLoading && (
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
@@ -116,10 +142,26 @@ export function BrowserTabContent() {
           )}
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleRefresh} title="Refresh">
-            <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={handleRefresh}
+            title="Refresh"
+            aria-label="Refresh browser"
+          >
+            <RefreshCw
+              className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')}
+            />
           </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleOpenExternal} title="Open in new tab">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={handleOpenExternal}
+            title="Open in new tab"
+            aria-label="Open in new tab"
+          >
             <ExternalLink className="h-3.5 w-3.5" />
           </Button>
         </div>
@@ -134,7 +176,8 @@ export function BrowserTabContent() {
               <div>
                 <p className="text-sm font-medium">Browser unavailable</p>
                 <p className="text-xs mt-1">
-                  The browser viewer (port 9224) is not reachable. The sandbox may still be starting.
+                  The browser viewer (port 9224) is not reachable. The sandbox
+                  may still be starting.
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={handleRefresh}>

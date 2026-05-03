@@ -18,6 +18,7 @@ import { claimComputer } from '@/lib/api/billing';
 import { NewInstanceModal } from '@/components/billing/pricing/new-instance-modal';
 import { UserSettingsModal } from '@/components/settings/user-settings-modal';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import {
   Server,
   Cloud,
@@ -39,40 +40,104 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 // ─── Status helpers ─────────────────────────────────────────────────────────
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; dotColor: string }> = {
-  active: { label: 'Active', color: 'text-emerald-500', dotColor: 'bg-emerald-500' },
-  provisioning: { label: 'Provisioning', color: 'text-amber-500', dotColor: 'bg-amber-400' },
-  stopped: { label: 'Stopped', color: 'text-muted-foreground', dotColor: 'bg-muted-foreground/40' },
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; color: string; dotColor: string }
+> = {
+  active: {
+    label: 'Active',
+    color: 'text-emerald-500',
+    dotColor: 'bg-emerald-500',
+  },
+  provisioning: {
+    label: 'Provisioning',
+    color: 'text-amber-500',
+    dotColor: 'bg-amber-400',
+  },
+  stopped: {
+    label: 'Stopped',
+    color: 'text-muted-foreground',
+    dotColor: 'bg-muted-foreground/40',
+  },
   error: { label: 'Error', color: 'text-red-400', dotColor: 'bg-red-400' },
-  available: { label: 'Available', color: 'text-blue-500', dotColor: 'bg-blue-500' },
-  archived: { label: 'Archived', color: 'text-muted-foreground/50', dotColor: 'bg-muted-foreground/20' },
+  available: {
+    label: 'Available',
+    color: 'text-blue-500',
+    dotColor: 'bg-blue-500',
+  },
+  archived: {
+    label: 'Archived',
+    color: 'text-muted-foreground/50',
+    dotColor: 'bg-muted-foreground/20',
+  },
 };
 
 function getStatusConfig(status: string) {
-  return STATUS_CONFIG[status] ?? { label: status, color: 'text-muted-foreground', dotColor: 'bg-muted-foreground/30' };
+  return (
+    STATUS_CONFIG[status] ?? {
+      label: status,
+      color: 'text-muted-foreground',
+      dotColor: 'bg-muted-foreground/30',
+    }
+  );
 }
 
-const PROVIDER_CONFIG: Record<string, { label: string; icon: typeof Server; badgeCls: string }> = {
-  justavps: { label: 'VPS', icon: Server, badgeCls: 'text-orange-500/70 bg-orange-500/10' },
-  daytona: { label: 'Cloud', icon: Cloud, badgeCls: 'text-violet-500/70 bg-violet-500/10' },
-  local_docker: { label: 'Local', icon: Container, badgeCls: 'text-blue-500/70 bg-blue-500/10' },
-  custom: { label: 'Custom', icon: Box, badgeCls: 'text-muted-foreground/70 bg-muted/50' },
+const PROVIDER_CONFIG: Record<
+  string,
+  { label: string; icon: typeof Server; badgeCls: string }
+> = {
+  justavps: {
+    label: 'VPS',
+    icon: Server,
+    badgeCls: 'text-orange-500/70 bg-orange-500/10',
+  },
+  daytona: {
+    label: 'Cloud',
+    icon: Cloud,
+    badgeCls: 'text-violet-500/70 bg-violet-500/10',
+  },
+  local_docker: {
+    label: 'Local',
+    icon: Container,
+    badgeCls: 'text-blue-500/70 bg-blue-500/10',
+  },
+  custom: {
+    label: 'Custom',
+    icon: Box,
+    badgeCls: 'text-muted-foreground/70 bg-muted/50',
+  },
 };
 
 function getProviderConfig(provider: string) {
-  return PROVIDER_CONFIG[provider] ?? { label: provider, icon: Box, badgeCls: 'text-muted-foreground/70 bg-muted/50' };
+  return (
+    PROVIDER_CONFIG[provider] ?? {
+      label: provider,
+      icon: Box,
+      badgeCls: 'text-muted-foreground/70 bg-muted/50',
+    }
+  );
 }
 
 // ─── Instance Card ──────────────────────────────────────────────────────────
 
-function InstanceCard({ sandbox, onClick, onBackups }: { sandbox: SandboxInfo; onClick: () => void; onBackups?: () => void }) {
+function InstanceCard({
+  sandbox,
+  onClick,
+  onBackups,
+}: {
+  sandbox: SandboxInfo;
+  onClick: () => void;
+  onBackups?: () => void;
+}) {
   const status = getStatusConfig(sandbox.status);
   const provider = getProviderConfig(sandbox.provider);
   const ProviderIcon = provider.icon;
   const meta = sandbox.metadata as Record<string, unknown> | undefined;
   const location = (meta?.location as string) || null;
   const serverType = (meta?.serverType as string) || null;
-  const showBackups = sandbox.provider === 'justavps' && ['active', 'stopped'].includes(sandbox.status);
+  const showBackups =
+    sandbox.provider === 'justavps' &&
+    ['active', 'stopped'].includes(sandbox.status);
 
   return (
     <button
@@ -89,33 +154,54 @@ function InstanceCard({ sandbox, onClick, onBackups }: { sandbox: SandboxInfo; o
             <span className="text-sm font-semibold text-foreground truncate">
               {sandbox.name || sandbox.sandbox_id}
             </span>
-            <span className={cn('px-1.5 py-px text-[0.5625rem] font-medium rounded-full uppercase tracking-wider leading-none', provider.badgeCls)}>
+            <span
+              className={cn(
+                'px-1.5 py-px text-[0.5625rem] font-medium rounded-full uppercase tracking-wider leading-none',
+                provider.badgeCls,
+              )}
+            >
               {provider.label}
             </span>
           </div>
 
           <div className="flex items-center gap-3 mt-1.5">
             {/* Status */}
-            <span className={cn('flex items-center gap-1.5 text-xs font-medium', status.color)}>
-              <span className={cn('h-[7px] w-[7px] rounded-full flex-shrink-0', status.dotColor,
-                sandbox.status === 'provisioning' && 'animate-pulse',
-              )} />
+            <span
+              className={cn(
+                'flex items-center gap-1.5 text-xs font-medium',
+                status.color,
+              )}
+            >
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'h-[7px] w-[7px] rounded-full flex-shrink-0',
+                  status.dotColor,
+                  sandbox.status === 'provisioning' && 'animate-pulse',
+                )}
+              />
               {status.label}
             </span>
 
             {/* Location */}
             {location && (
-              <span className="text-[11px] text-muted-foreground/50">{location}</span>
+              <span className="text-[11px] text-muted-foreground/50">
+                {location}
+              </span>
             )}
 
             {/* Server type */}
             {serverType && (
-              <span className="text-[11px] text-muted-foreground/50 font-mono">{serverType}</span>
+              <span className="text-[11px] text-muted-foreground/50 font-mono">
+                {serverType}
+              </span>
             )}
 
             {/* Version */}
             {sandbox.version && (
-              <span className="text-[11px] text-muted-foreground/50 font-mono">v{sandbox.version}</span>
+              <span className="text-[11px] text-muted-foreground/50 font-mono">
+                v{sandbox.version}
+              </span>
             )}
           </div>
         </div>
@@ -125,8 +211,16 @@ function InstanceCard({ sandbox, onClick, onBackups }: { sandbox: SandboxInfo; o
             <span
               role="button"
               tabIndex={0}
-              onClick={(e) => { e.stopPropagation(); onBackups(); }}
-              onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); onBackups(); } }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onBackups();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.stopPropagation();
+                  onBackups();
+                }
+              }}
               title="Backups"
               className="flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground/30 hover:text-muted-foreground/80 hover:bg-muted/50 transition-colors opacity-0 group-hover:opacity-100"
             >
@@ -140,7 +234,15 @@ function InstanceCard({ sandbox, onClick, onBackups }: { sandbox: SandboxInfo; o
   );
 }
 
-function FallbackInstanceCard({ server, isActive, onClick }: { server: ServerEntry; isActive: boolean; onClick: () => void }) {
+function FallbackInstanceCard({
+  server,
+  isActive,
+  onClick,
+}: {
+  server: ServerEntry;
+  isActive: boolean;
+  onClick: () => void;
+}) {
   const provider = getProviderConfig(server.provider || 'custom');
   const status = getStatusConfig(server.instanceId ? 'active' : 'available');
   const ProviderIcon = provider.icon;
@@ -157,8 +259,15 @@ function FallbackInstanceCard({ server, isActive, onClick }: { server: ServerEnt
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-foreground truncate">{server.label || server.instanceId || server.id}</span>
-            <span className={cn('px-1.5 py-px text-[0.5625rem] font-medium rounded-full uppercase tracking-wider leading-none', provider.badgeCls)}>
+            <span className="text-sm font-semibold text-foreground truncate">
+              {server.label || server.instanceId || server.id}
+            </span>
+            <span
+              className={cn(
+                'px-1.5 py-px text-[0.5625rem] font-medium rounded-full uppercase tracking-wider leading-none',
+                provider.badgeCls,
+              )}
+            >
               {provider.label}
             </span>
             {isActive && (
@@ -168,11 +277,26 @@ function FallbackInstanceCard({ server, isActive, onClick }: { server: ServerEnt
             )}
           </div>
           <div className="flex items-center gap-3 mt-1.5">
-            <span className={cn('flex items-center gap-1.5 text-xs font-medium', status.color)}>
-              <span className={cn('h-[7px] w-[7px] rounded-full flex-shrink-0', status.dotColor)} />
+            <span
+              className={cn(
+                'flex items-center gap-1.5 text-xs font-medium',
+                status.color,
+              )}
+            >
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'h-[7px] w-[7px] rounded-full flex-shrink-0',
+                  status.dotColor,
+                )}
+              />
               {status.label}
             </span>
-            {server.instanceId && <span className="text-[11px] text-muted-foreground/50 font-mono">{server.instanceId}</span>}
+            {server.instanceId && (
+              <span className="text-[11px] text-muted-foreground/50 font-mono">
+                {server.instanceId}
+              </span>
+            )}
           </div>
         </div>
         <ExternalLink className="h-4 w-4 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0 mt-1" />
@@ -192,7 +316,11 @@ export default function InstancesPage() {
   const [autoCreating, setAutoCreating] = useState(false);
   const [claiming, setClaiming] = useState(false);
   const isCloud = isBillingEnabled();
-  const { data: accountState, isLoading: accountStateLoading, refetch: refetchAccountState } = useAccountState();
+  const {
+    data: accountState,
+    isLoading: accountStateLoading,
+    refetch: refetchAccountState,
+  } = useAccountState();
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -201,7 +329,12 @@ export default function InstancesPage() {
     }
   }, [authLoading, user, router]);
 
-  const { data: sandboxes, isLoading, error, refetch } = useQuery({
+  const {
+    data: sandboxes,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['platform', 'sandbox', 'list'],
     queryFn: listSandboxes,
     enabled: !!user,
@@ -234,7 +367,10 @@ export default function InstancesPage() {
       setAutoCreating(true);
       ensureSandbox()
         .then(() => refetch())
-        .catch(() => { })
+        .catch((err) => {
+          console.error('[instances] Auto-create sandbox failed:', err);
+          toast.error('Failed to create sandbox. Please try again.');
+        })
         .finally(() => setAutoCreating(false));
     }
   }, [user, isLoading, sandboxes, autoCreating, isCloud, refetch]);
@@ -274,7 +410,10 @@ export default function InstancesPage() {
       setAutoCreating(true);
       ensureSandbox()
         .then(() => refetch())
-        .catch(() => { })
+        .catch((err) => {
+          console.error('[instances] Sandbox creation failed:', err);
+          toast.error('Failed to create sandbox. Please try again.');
+        })
         .finally(() => setAutoCreating(false));
     }
   }
@@ -327,9 +466,14 @@ export default function InstancesPage() {
           >
             {user?.user_metadata?.avatar_url ? (
               <Avatar className="h-5 w-5">
-                <AvatarImage src={user.user_metadata.avatar_url} alt={user.user_metadata?.name || ''} />
+                <AvatarImage
+                  src={user.user_metadata.avatar_url}
+                  alt={user.user_metadata?.name || ''}
+                />
                 <AvatarFallback className="text-[10px] bg-muted">
-                  {(user.user_metadata?.name || user.email || 'U').charAt(0).toUpperCase()}
+                  {(user.user_metadata?.name || user.email || 'U')
+                    .charAt(0)
+                    .toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             ) : (
@@ -361,7 +505,11 @@ export default function InstancesPage() {
                 disabled={autoCreating}
                 className="gap-1.5"
               >
-                {autoCreating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+                {autoCreating ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Plus className="h-3.5 w-3.5" />
+                )}
                 {autoCreating ? 'Creating...' : 'New Aether'}
               </Button>
             )}
@@ -379,8 +527,12 @@ export default function InstancesPage() {
             <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-destructive font-medium">Failed to load instances</p>
-                <p className="text-xs text-destructive/70 mt-0.5">{(error as Error).message}</p>
+                <p className="text-sm text-destructive font-medium">
+                  Failed to load instances
+                </p>
+                <p className="text-xs text-destructive/70 mt-0.5">
+                  {(error as Error).message}
+                </p>
               </div>
               <Button variant="outline" size="sm" onClick={() => refetch()}>
                 Retry
@@ -403,8 +555,19 @@ export default function InstancesPage() {
                 </h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
                   Your plan now includes a dedicated cloud computer
-                  {accountState?.tier?.monthly_credits ? (<> with <span className="text-foreground font-medium">${accountState.tier.monthly_credits}/mo</span> in credits</>) : ''}.
-                  Always on, runs while you sleep, full root access.
+                  {accountState?.tier?.monthly_credits ? (
+                    <>
+                      {' '}
+                      with{' '}
+                      <span className="text-foreground font-medium">
+                        ${accountState.tier.monthly_credits}/mo
+                      </span>{' '}
+                      in credits
+                    </>
+                  ) : (
+                    ''
+                  )}
+                  . Always on, runs while you sleep, full root access.
                 </p>
               </div>
 
@@ -435,23 +598,29 @@ export default function InstancesPage() {
           )}
 
           {/* Empty state */}
-          {!pageLoading && !error && visible.length === 0 && fallbackServers.length === 0 && !canClaimComputer && (
-            <div className="rounded-xl border border-dashed border-border/60 bg-muted/10 p-8 flex flex-col items-center gap-4">
-              <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-muted/50">
-                <Server className="h-7 w-7 text-muted-foreground/40" />
+          {!pageLoading &&
+            !error &&
+            visible.length === 0 &&
+            fallbackServers.length === 0 &&
+            !canClaimComputer && (
+              <div className="rounded-xl border border-dashed border-border/60 bg-muted/10 p-8 flex flex-col items-center gap-4">
+                <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-muted/50">
+                  <Server className="h-7 w-7 text-muted-foreground/40" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-foreground/80">
+                    No instances yet
+                  </p>
+                  <p className="text-xs text-muted-foreground/60 mt-1">
+                    Create your first Aether instance to get started.
+                  </p>
+                </div>
+                <Button onClick={handleCreateInstance} className="gap-1.5">
+                  <Plus className="h-3.5 w-3.5" />
+                  New Aether
+                </Button>
               </div>
-              <div className="text-center">
-                <p className="text-sm font-medium text-foreground/80">No instances yet</p>
-                <p className="text-xs text-muted-foreground/60 mt-1">
-                  Create your first Aether instance to get started.
-                </p>
-              </div>
-              <Button onClick={handleCreateInstance} className="gap-1.5">
-                <Plus className="h-3.5 w-3.5" />
-                New Aether
-              </Button>
-            </div>
-          )}
+            )}
 
           {/* Instance list */}
           {!pageLoading && visible.length > 0 && (
@@ -461,25 +630,29 @@ export default function InstancesPage() {
                   key={sandbox.sandbox_id}
                   sandbox={sandbox}
                   onClick={() => handleInstanceClick(sandbox)}
-                  onBackups={() => router.push(`/instances/${sandbox.sandbox_id}/backups`)}
+                  onBackups={() =>
+                    router.push(`/instances/${sandbox.sandbox_id}/backups`)
+                  }
                 />
               ))}
             </div>
           )}
 
           {/* Fallback list from server store when sandbox API list is unavailable */}
-          {!pageLoading && visible.length === 0 && fallbackServers.length > 0 && (
-            <div className="flex flex-col gap-2">
-              {fallbackServers.map((server) => (
-                <FallbackInstanceCard
-                  key={server.id}
-                  server={server}
-                  isActive={server.id === activeServerId}
-                  onClick={() => handleFallbackServerClick(server)}
-                />
-              ))}
-            </div>
-          )}
+          {!pageLoading &&
+            visible.length === 0 &&
+            fallbackServers.length > 0 && (
+              <div className="flex flex-col gap-2">
+                {fallbackServers.map((server) => (
+                  <FallbackInstanceCard
+                    key={server.id}
+                    server={server}
+                    isActive={server.id === activeServerId}
+                    onClick={() => handleFallbackServerClick(server)}
+                  />
+                ))}
+              </div>
+            )}
         </div>
       </div>
 

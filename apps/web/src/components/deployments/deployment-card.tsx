@@ -25,24 +25,46 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import type { Deployment, DeploymentStatus, DeploymentSource } from '@/hooks/deployments/use-deployments';
+import type {
+  Deployment,
+  DeploymentStatus,
+  DeploymentSource,
+} from '@/hooks/deployments/use-deployments';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-export const statusConfig: Record<DeploymentStatus, {
-  label: string;
-  variant: 'highlight' | 'secondary' | 'destructive' | 'outline' | 'beta';
-  dotColor: string;
-}> = {
+export const statusConfig: Record<
+  DeploymentStatus,
+  {
+    label: string;
+    variant: 'highlight' | 'secondary' | 'destructive' | 'outline' | 'beta';
+    dotColor: string;
+  }
+> = {
   active: { label: 'Active', variant: 'highlight', dotColor: 'bg-emerald-500' },
-  pending: { label: 'Pending', variant: 'beta', dotColor: 'bg-blue-500 animate-pulse' },
-  building: { label: 'Building', variant: 'beta', dotColor: 'bg-blue-500 animate-pulse' },
-  deploying: { label: 'Deploying', variant: 'beta', dotColor: 'bg-blue-500 animate-pulse' },
+  pending: {
+    label: 'Pending',
+    variant: 'beta',
+    dotColor: 'bg-blue-500 animate-pulse',
+  },
+  building: {
+    label: 'Building',
+    variant: 'beta',
+    dotColor: 'bg-blue-500 animate-pulse',
+  },
+  deploying: {
+    label: 'Deploying',
+    variant: 'beta',
+    dotColor: 'bg-blue-500 animate-pulse',
+  },
   failed: { label: 'Failed', variant: 'destructive', dotColor: 'bg-red-500' },
   stopped: { label: 'Stopped', variant: 'secondary', dotColor: 'bg-gray-400' },
 };
 
-const sourceIcons: Record<DeploymentSource, React.ComponentType<{ className?: string }>> = {
+const sourceIcons: Record<
+  DeploymentSource,
+  React.ComponentType<{ className?: string }>
+> = {
   git: GitBranch,
   code: FileCode2,
   files: Files,
@@ -58,7 +80,10 @@ const sourceLabels: Record<DeploymentSource, string> = {
 
 export function isFreestyleKeyError(error: string): boolean {
   const lower = error.toLowerCase();
-  return lower.includes('freestyle') && (lower.includes('key') || lower.includes('configured'));
+  return (
+    lower.includes('freestyle') &&
+    (lower.includes('key') || lower.includes('configured'))
+  );
 }
 
 export function formatRelativeTime(dateStr: string): string {
@@ -113,8 +138,14 @@ export function DeploymentCard({
   const status = statusConfig[deployment.status] || statusConfig.pending;
   const SourceIcon = sourceIcons[deployment.sourceType] || FileCode2;
   const domain = deployment.domains?.[0] || null;
-  const isInProgress = deployment.status === 'pending' || deployment.status === 'building' || deployment.status === 'deploying';
-  const canRedeploy = deployment.status === 'active' || deployment.status === 'failed' || deployment.status === 'stopped';
+  const isInProgress =
+    deployment.status === 'pending' ||
+    deployment.status === 'building' ||
+    deployment.status === 'deploying';
+  const canRedeploy =
+    deployment.status === 'active' ||
+    deployment.status === 'failed' ||
+    deployment.status === 'stopped';
 
   // ─── Compact version row (used inside domain groups) ────────────────────
   if (compact) {
@@ -127,8 +158,17 @@ export function DeploymentCard({
           {deployment.status === 'failed' && deployment.error ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge variant={status.variant} className="text-xs shrink-0 cursor-help">
-                  <span className={cn('inline-block w-1.5 h-1.5 rounded-full mr-1', status.dotColor)} />
+                <Badge
+                  variant={status.variant}
+                  className="text-xs shrink-0 cursor-help"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'inline-block w-1.5 h-1.5 rounded-full mr-1',
+                      status.dotColor,
+                    )}
+                  />
                   {status.label}
                 </Badge>
               </TooltipTrigger>
@@ -138,7 +178,13 @@ export function DeploymentCard({
             </Tooltip>
           ) : (
             <Badge variant={status.variant} className="text-xs shrink-0">
-              <span className={cn('inline-block w-1.5 h-1.5 rounded-full mr-1', status.dotColor)} />
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'inline-block w-1.5 h-1.5 rounded-full mr-1',
+                  status.dotColor,
+                )}
+              />
               {status.label}
             </Badge>
           )}
@@ -154,7 +200,9 @@ export function DeploymentCard({
               </>
             )}
             <span className="text-border">·</span>
-            <span className="shrink-0">{formatRelativeTime(deployment.createdAt)}</span>
+            <span className="shrink-0">
+              {formatRelativeTime(deployment.createdAt)}
+            </span>
           </div>
         </div>
 
@@ -172,7 +220,9 @@ export function DeploymentCard({
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>
               </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">Open live URL</TooltipContent>
+              <TooltipContent side="bottom" className="text-xs">
+                Open live URL
+              </TooltipContent>
             </Tooltip>
           )}
           <Tooltip>
@@ -185,9 +235,11 @@ export function DeploymentCard({
                 <ScrollText className="h-3.5 w-3.5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-xs">View logs</TooltipContent>
+            <TooltipContent side="bottom" className="text-xs">
+              View logs
+            </TooltipContent>
           </Tooltip>
-           {canRedeploy && (
+          {canRedeploy && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -196,10 +248,17 @@ export function DeploymentCard({
                   variant="ghost"
                   size="icon-sm"
                 >
-                  <RotateCcw className={cn('h-3.5 w-3.5', isRedeployPending && 'animate-spin')} />
+                  <RotateCcw
+                    className={cn(
+                      'h-3.5 w-3.5',
+                      isRedeployPending && 'animate-spin',
+                    )}
+                  />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">Redeploy</TooltipContent>
+              <TooltipContent side="bottom" className="text-xs">
+                Redeploy
+              </TooltipContent>
             </Tooltip>
           )}
           {(deployment.status === 'active' || isInProgress) && (
@@ -215,7 +274,9 @@ export function DeploymentCard({
                   <Square className="h-3.5 w-3.5" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">Stop</TooltipContent>
+              <TooltipContent side="bottom" className="text-xs">
+                Stop
+              </TooltipContent>
             </Tooltip>
           )}
           <Tooltip>
@@ -230,7 +291,9 @@ export function DeploymentCard({
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-xs">Delete</TooltipContent>
+            <TooltipContent side="bottom" className="text-xs">
+              Delete
+            </TooltipContent>
           </Tooltip>
         </div>
       </div>
@@ -253,7 +316,13 @@ export function DeploymentCard({
                   {domain || deployment.deploymentId.slice(0, 8)}
                 </h3>
                 <Badge variant={status.variant} className="text-xs">
-                  <span className={cn('inline-block w-1.5 h-1.5 rounded-full mr-1', status.dotColor)} />
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'inline-block w-1.5 h-1.5 rounded-full mr-1',
+                      status.dotColor,
+                    )}
+                  />
                   {status.label}
                 </Badge>
                 {deployment.version > 1 && (
@@ -276,7 +345,9 @@ export function DeploymentCard({
                 {deployment.sourceRef && (
                   <>
                     <span className="text-border">|</span>
-                    <span className="truncate max-w-[200px]">{deployment.sourceRef}</span>
+                    <span className="truncate max-w-[200px]">
+                      {deployment.sourceRef}
+                    </span>
                   </>
                 )}
                 <span className="text-border">|</span>
@@ -299,7 +370,9 @@ export function DeploymentCard({
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">Open live URL</TooltipContent>
+                <TooltipContent side="bottom" className="text-xs">
+                  Open live URL
+                </TooltipContent>
               </Tooltip>
             )}
             <Tooltip>
@@ -312,7 +385,9 @@ export function DeploymentCard({
                   <ScrollText className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">View logs</TooltipContent>
+              <TooltipContent side="bottom" className="text-xs">
+                View logs
+              </TooltipContent>
             </Tooltip>
             {canRedeploy && (
               <Tooltip>
@@ -325,7 +400,9 @@ export function DeploymentCard({
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">Edit &amp; Redeploy</TooltipContent>
+                <TooltipContent side="bottom" className="text-xs">
+                  Edit &amp; Redeploy
+                </TooltipContent>
               </Tooltip>
             )}
             {canRedeploy && (
@@ -337,10 +414,17 @@ export function DeploymentCard({
                     variant="ghost"
                     size="icon"
                   >
-                    <RotateCcw className={cn('h-4 w-4', isRedeployPending && 'animate-spin')} />
+                    <RotateCcw
+                      className={cn(
+                        'h-4 w-4',
+                        isRedeployPending && 'animate-spin',
+                      )}
+                    />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">Redeploy</TooltipContent>
+                <TooltipContent side="bottom" className="text-xs">
+                  Redeploy
+                </TooltipContent>
               </Tooltip>
             )}
             {(deployment.status === 'active' || isInProgress) && (
@@ -356,7 +440,9 @@ export function DeploymentCard({
                     <Square className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">Stop</TooltipContent>
+                <TooltipContent side="bottom" className="text-xs">
+                  Stop
+                </TooltipContent>
               </Tooltip>
             )}
             <Tooltip>
@@ -371,7 +457,9 @@ export function DeploymentCard({
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">Delete</TooltipContent>
+              <TooltipContent side="bottom" className="text-xs">
+                Delete
+              </TooltipContent>
             </Tooltip>
           </div>
         </div>
@@ -424,7 +512,12 @@ export function DeploymentCard({
                 onClick={() => onRedeploy(deployment)}
                 disabled={isRedeployPending}
               >
-                <RotateCcw className={cn('h-3.5 w-3.5', isRedeployPending && 'animate-spin')} />
+                <RotateCcw
+                  className={cn(
+                    'h-3.5 w-3.5',
+                    isRedeployPending && 'animate-spin',
+                  )}
+                />
                 {isRedeployPending ? 'Redeploying...' : 'Redeploy'}
               </Button>
             </div>

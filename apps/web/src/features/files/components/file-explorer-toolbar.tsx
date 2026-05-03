@@ -29,7 +29,8 @@ export function FileExplorerToolbar() {
   const { data: project } = useCurrentProject();
   const invalidateFileList = useInvalidateFileList();
 
-  const projectName = project?.name || project?.worktree?.split('/').pop() || 'Project';
+  const projectName =
+    project?.name || project?.worktree?.split('/').pop() || 'Project';
   const fileName = selectedFilePath?.split('/').pop() || '';
 
   return (
@@ -41,6 +42,7 @@ export function FileExplorerToolbar() {
         className="h-7 w-7 shrink-0 text-muted-foreground/60 hover:text-foreground"
         onClick={toggleSidebar}
         title={isSidebarCollapsed ? 'Show explorer' : 'Hide explorer'}
+        aria-label={isSidebarCollapsed ? 'Show explorer' : 'Hide explorer'}
       >
         {isSidebarCollapsed ? (
           <PanelLeft className="h-4 w-4" />
@@ -62,7 +64,9 @@ export function FileExplorerToolbar() {
             </span>
           </>
         ) : (
-          <span className="text-muted-foreground/40 text-xs select-none">{projectName}</span>
+          <span className="text-muted-foreground/40 text-xs select-none">
+            {projectName}
+          </span>
         )}
       </div>
 
@@ -71,9 +75,13 @@ export function FileExplorerToolbar() {
         <Button
           variant="ghost"
           size="icon"
-          className={cn('h-7 w-7 hover:text-foreground', showHidden ? 'text-foreground' : 'text-muted-foreground/60')}
+          className={cn(
+            'h-7 w-7 hover:text-foreground',
+            showHidden ? 'text-foreground' : 'text-muted-foreground/60',
+          )}
           onClick={toggleHidden}
           title={showHidden ? 'Hide dotfiles' : 'Show dotfiles'}
+          aria-label={showHidden ? 'Hide dotfiles' : 'Show dotfiles'}
         >
           {showHidden ? (
             <Eye className="h-4 w-4" />
@@ -87,6 +95,7 @@ export function FileExplorerToolbar() {
           className="h-7 w-7 text-muted-foreground/60 hover:text-foreground"
           onClick={toggleSearch}
           title="Search files"
+          aria-label="Search files"
         >
           <Search className="h-4 w-4" />
         </Button>
@@ -96,6 +105,7 @@ export function FileExplorerToolbar() {
           className="h-7 w-7 text-muted-foreground/60 hover:text-foreground"
           onClick={() => invalidateFileList()}
           title="Refresh"
+          aria-label="Refresh files"
         >
           <RefreshCw className="h-4 w-4" />
         </Button>

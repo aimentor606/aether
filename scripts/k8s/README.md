@@ -165,6 +165,7 @@ litellm:
 | `make uninstall` | Remove release |
 | `make template` | Render YAML to `/tmp/aether-rendered.yaml` |
 | `make lint` | Lint + update dependencies |
+| `make test` | Run helm-unittest chart tests |
 | `make status` | Show pods, services, ingress |
 | `make backup` | Trigger CNPG backup |
 | `make secrets` | Show auto-generated secret keys |

@@ -2,7 +2,7 @@ CHART_DIR := helm/aether
 RELEASE   := aether
 NAMESPACE := aether
 
-.PHONY: install-operators install install-dev upgrade uninstall template lint status backup secrets
+.PHONY: install-operators install install-dev upgrade uninstall template lint test status backup secrets
 
 # Install all required operators into the cluster
 install-operators:
@@ -51,6 +51,10 @@ template:
 lint:
 	helm dependency update $(CHART_DIR)
 	helm lint $(CHART_DIR)
+
+# Run helm-unittest chart tests
+test:
+	helm unittest $(CHART_DIR)
 
 # Show cluster status
 status:

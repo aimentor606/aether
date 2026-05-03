@@ -1,0 +1,14 @@
+suite: Production values override
+values:
+  - ../values.yaml
+  - ../values-production.yaml
+templates:
+  - templates/monitoring/otel-collector.yaml
+tests:
+  - it: OTEL Collector uses 2 replicas in production
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 2
+        documentIndex: 1
+        template: templates/monitoring/otel-collector.yaml

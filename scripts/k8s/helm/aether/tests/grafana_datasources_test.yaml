@@ -1,0 +1,58 @@
+suite: Grafana Datasources
+templates:
+  - templates/monitoring/grafana-datasources.yaml
+tests:
+  - it: renders datasource ConfigMap when grafana enabled
+    set:
+      grafana.enabled: true
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.labels.grafana_datasource
+          value: "1"
+
+  - it: provisions VictoriaMetrics as default Prometheus datasource
+    set:
+      grafana.enabled: true
+    asserts:
+      - matchRegex:
+          path: data["datasources.yaml"]
+          pattern: "type: prometheus"
+      - matchRegex:
+          path: data["datasources.yaml"]
+          pattern: "victoriametrics:8428"
+      - matchRegex:
+          path: data["datasources.yaml"]
+          pattern: "isDefault: true"
+
+  - it: provisions VictoriaLogs plugin datasource
+    set:
+      grafana.enabled: true
+    asserts:
+      - matchRegex:
+          path: data["datasources.yaml"]
+          pattern: "victorialogs-datasource"
+      - matchRegex:
+          path: data["datasources.yaml"]
+          pattern: "victorialogs:9428"
+
+  - it: provisions VictoriaTraces as Jaeger datasource
+    set:
+      grafana.enabled: true
+    asserts:
+      - matchRegex:
+          path: data["datasources.yaml"]
+          pattern: "type: jaeger"
+      - matchRegex:
+          path: data["datasources.yaml"]
+          pattern: "victoriatraces:16686"
+
+  - it: skips when grafana disabled
+    set:
+      grafana.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0

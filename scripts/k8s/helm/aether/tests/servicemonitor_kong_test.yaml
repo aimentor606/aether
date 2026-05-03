@@ -1,0 +1,35 @@
+suite: ServiceMonitor Kong
+templates:
+  - templates/monitoring/servicemonitor-kong.yaml
+tests:
+  - it: renders when victoriametrics and kong both enabled
+    set:
+      victoriametrics.enabled: true
+      kong.enabled: true
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.endpoints[0].port
+          value: metrics
+      - equal:
+          path: spec.endpoints[0].interval
+          value: 30s
+
+  - it: skips when victoriametrics disabled
+    set:
+      victoriametrics.enabled: false
+      kong.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: skips when kong disabled
+    set:
+      victoriametrics.enabled: true
+      kong.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0

@@ -32,8 +32,15 @@ export function TunnelDetail({ tunnelId }: TunnelDetailProps) {
   if (!connection) {
     return (
       <div className="p-6">
-        <p className="text-sm text-muted-foreground">Tunnel connection not found.</p>
-        <Button variant="outline" size="sm" className="mt-2" onClick={() => router.push('/tunnel')}>
+        <p className="text-sm text-muted-foreground">
+          Tunnel connection not found.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-2"
+          onClick={() => router.push('/tunnel')}
+        >
           <ArrowLeft className="h-3.5 w-3.5 mr-1" />
           Back to tunnels
         </Button>
@@ -42,36 +49,54 @@ export function TunnelDetail({ tunnelId }: TunnelDetailProps) {
   }
 
   const isOnline = connection.isLive;
-  const machineInfo = connection.machineInfo as Record<string, string> | undefined;
+  const machineInfo = connection.machineInfo as
+    | Record<string, string>
+    | undefined;
 
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="p-6 pb-4 space-y-4">
-        <Button variant="ghost" size="sm" onClick={() => router.push('/tunnel')} data-testid="tunnel-back">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push('/tunnel')}
+          data-testid="tunnel-back"
+        >
           <ArrowLeft className="h-3.5 w-3.5 mr-1" />
           Back
         </Button>
 
         <div className="flex items-start gap-4">
-          <div className={cn(
-            'flex h-12 w-12 items-center justify-center rounded-xl',
-            isOnline ? 'bg-emerald-500/10 text-emerald-500' : 'bg-muted text-muted-foreground',
-          )}>
+          <div
+            className={cn(
+              'flex h-12 w-12 items-center justify-center rounded-xl',
+              isOnline
+                ? 'bg-emerald-500/10 text-emerald-500'
+                : 'bg-muted text-muted-foreground',
+            )}
+          >
             <Monitor className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold" data-testid="tunnel-detail-heading">{connection.name}</h1>
+            <h1
+              className="text-lg font-semibold"
+              data-testid="tunnel-detail-heading"
+            >
+              {connection.name}
+            </h1>
             <div className="flex items-center gap-2 mt-1">
               {isOnline ? (
                 <Wifi className="h-3.5 w-3.5 text-emerald-500" />
               ) : (
                 <WifiOff className="h-3.5 w-3.5 text-muted-foreground" />
               )}
-              <span className={cn(
-                'text-sm',
-                isOnline ? 'text-emerald-600' : 'text-muted-foreground',
-              )}>
+              <span
+                className={cn(
+                  'text-sm',
+                  isOnline ? 'text-emerald-600' : 'text-muted-foreground',
+                )}
+              >
                 {isOnline ? 'Connected' : 'Offline'}
               </span>
               {machineInfo?.hostname && (
@@ -84,7 +109,9 @@ export function TunnelDetail({ tunnelId }: TunnelDetailProps) {
             {connection.capabilities.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {connection.capabilities.map((cap) => (
-                  <Badge key={cap} variant="secondary" className="text-xs">{cap}</Badge>
+                  <Badge key={cap} variant="secondary" className="text-xs">
+                    {cap}
+                  </Badge>
                 ))}
               </div>
             )}

@@ -19,7 +19,7 @@ import {
   useAdminSentimentSummary,
 } from '@/hooks/admin/use-admin-feedback';
 
-export function FeedbackStatsCards() {
+export function FeedbackStatsCards({ ...rest }: { 'data-testid'?: string }) {
   const { data: stats, isLoading: statsLoading } = useAdminFeedbackStats();
   const { data: sentiment, isLoading: sentimentLoading } =
     useAdminSentimentSummary();
@@ -62,7 +62,7 @@ export function FeedbackStatsCards() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4" {...rest}>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">

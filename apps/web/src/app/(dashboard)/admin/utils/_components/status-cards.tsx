@@ -14,13 +14,15 @@ import { Wrench, AlertTriangle, Clock, AlertCircle } from 'lucide-react';
 interface MaintenanceCardProps {
   enabled: boolean;
   onClick: () => void;
+  'data-testid'?: string;
 }
 
-export function MaintenanceCard({ enabled, onClick }: MaintenanceCardProps) {
+export function MaintenanceCard({ enabled, onClick, ...rest }: MaintenanceCardProps) {
   return (
     <Card
       className="cursor-pointer hover:border-primary/50 transition-colors p-4"
       onClick={onClick}
+      {...rest}
     >
       <CardHeader className="p-0">
         <div className="flex items-center justify-between">
@@ -65,17 +67,20 @@ interface TechnicalIssueCardProps {
   enabled: boolean;
   message?: string;
   onClick: () => void;
+  'data-testid'?: string;
 }
 
 export function TechnicalIssueCard({
   enabled,
   message,
   onClick,
+  ...rest
 }: TechnicalIssueCardProps) {
   return (
     <Card
       className="cursor-pointer hover:border-primary/50 transition-colors p-4"
       onClick={onClick}
+      {...rest}
     >
       <CardHeader className="p-0">
         <div className="flex items-center justify-between">

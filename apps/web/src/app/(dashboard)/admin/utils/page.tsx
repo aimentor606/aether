@@ -146,7 +146,7 @@ export default function AdminUtilsPage() {
               <Settings className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">
+              <h1 className="text-2xl font-semibold tracking-tight" data-testid="admin-utils-heading">
                 Admin Utils
               </h1>
               <p className="text-sm text-muted-foreground">
@@ -163,12 +163,14 @@ export default function AdminUtilsPage() {
             <MaintenanceCard
               enabled={status?.maintenance_notice.enabled ?? false}
               onClick={() => setMaintenanceDialogOpen(true)}
+              data-testid="maintenance-card"
             />
 
             <TechnicalIssueCard
               enabled={status?.technical_issue.enabled ?? false}
               message={status?.technical_issue.message ?? undefined}
               onClick={() => setTechnicalIssueDialogOpen(true)}
+              data-testid="technical-issue-card"
             />
           </div>
 
@@ -182,6 +184,7 @@ export default function AdminUtilsPage() {
       </div>
 
       <MaintenanceDialog
+        data-testid="maintenance-dialog"
         open={maintenanceDialogOpen}
         onOpenChange={setMaintenanceDialogOpen}
         enabled={maintenanceEnabled}
@@ -195,6 +198,7 @@ export default function AdminUtilsPage() {
       />
 
       <TechnicalIssueDialog
+        data-testid="technical-issue-dialog"
         open={technicalIssueDialogOpen}
         onOpenChange={setTechnicalIssueDialogOpen}
         enabled={technicalIssueEnabled}

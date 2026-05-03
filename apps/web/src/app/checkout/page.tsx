@@ -2,7 +2,13 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { AetherLoader } from '@/components/ui/aether-loader';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Script from 'next/script';
@@ -17,7 +23,10 @@ function CheckoutContent() {
   // Check if Stripe is already loaded
   useEffect(() => {
     const checkStripe = () => {
-      if (typeof window !== 'undefined' && typeof window.Stripe !== 'undefined') {
+      if (
+        typeof window !== 'undefined' &&
+        typeof window.Stripe !== 'undefined'
+      ) {
         console.log('✅ Stripe already loaded on window!');
         setStripeLoaded(true);
         return true;
@@ -39,7 +48,9 @@ function CheckoutContent() {
       clearInterval(interval);
       if (typeof window.Stripe === 'undefined') {
         console.error('❌ Stripe still not loaded after 5 seconds');
-        setError('Payment system taking too long to load. Please refresh the page.');
+        setError(
+          'Payment system taking too long to load. Please refresh the page.',
+        );
         setIsLoading(false);
       }
     }, 5000);
@@ -51,11 +62,18 @@ function CheckoutContent() {
   }, []);
 
   useEffect(() => {
-    console.log('🔍 Effect running - clientSecret:', clientSecret ? 'YES' : 'NO', 'stripeLoaded:', stripeLoaded);
+    console.log(
+      '🔍 Effect running - clientSecret:',
+      clientSecret ? 'YES' : 'NO',
+      'stripeLoaded:',
+      stripeLoaded,
+    );
 
     if (!clientSecret) {
       console.error('❌ No client secret provided');
-      setError('No checkout session provided. Please start the checkout process again.');
+      setError(
+        'No checkout session provided. Please start the checkout process again.',
+      );
       setIsLoading(false);
       return;
     }
@@ -70,7 +88,7 @@ function CheckoutContent() {
     // Initialize Stripe checkout
     const initCheckout = async () => {
       try {
-        const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "";
+        const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
 
         console.log('🔄 Initializing Stripe checkout...');
         console.log('🔑 Stripe key:', stripeKey?.substring(0, 20) + '...');
@@ -141,8 +159,12 @@ function CheckoutContent() {
         {error ? (
           <Card className="w-full max-w-md bg-white">
             <CardHeader className="text-center">
-              <CardTitle data-testid="checkout-error" className="text-gray-900">Checkout Error</CardTitle>
-              <CardDescription className="text-gray-600">Unable to load checkout</CardDescription>
+              <CardTitle data-testid="checkout-error" className="text-gray-900">
+                Checkout Error
+              </CardTitle>
+              <CardDescription className="text-gray-600">
+                Unable to load checkout
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Alert variant="destructive">
@@ -170,13 +192,14 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <AetherLoader size="large" forceTheme="light" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <AetherLoader size="large" forceTheme="light" />
+        </div>
+      }
+    >
       <CheckoutContent />
     </Suspense>
   );
 }
-

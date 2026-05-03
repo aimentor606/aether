@@ -964,7 +964,10 @@ function LoginContent() {
             >
               <div className="bg-background/80 dark:bg-background/75 backdrop-blur-2xl border border-foreground/[0.06] rounded-[20px] px-7 py-8">
                 {/* Shared header */}
-                <p data-testid="auth-heading" className="text-[11px] text-center text-foreground/30 tracking-[0.2em] uppercase mb-6">
+                <p
+                  data-testid="auth-heading"
+                  className="text-[11px] text-center text-foreground/30 tracking-[0.2em] uppercase mb-6"
+                >
                   Sign in to Aether
                 </p>
 

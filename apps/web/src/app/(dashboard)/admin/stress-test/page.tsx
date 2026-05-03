@@ -136,7 +136,7 @@ export default function AdminStressTestPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+            <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2" data-testid="admin-stress-test-heading">
               <Zap className="h-6 w-6 text-yellow-500" />
               Stress Test - Admin
             </h1>
@@ -313,6 +313,7 @@ export default function AdminStressTestPage() {
                   type="number"
                   min={1}
                   max={200}
+                  data-testid="request-count-input"
                   value={numRequestsInput}
                   onChange={(e) => setNumRequestsInput(e.target.value)}
                   onFocus={(e) => e.target.select()}
@@ -331,7 +332,7 @@ export default function AdminStressTestPage() {
 
               <div className="flex gap-2">
                 {!state.isRunning ? (
-                  <Button onClick={handleStart} className="gap-2">
+                  <Button onClick={handleStart} className="gap-2" data-testid="start-test-button">
                     <Play className="h-4 w-4" />
                     Start Test
                   </Button>
@@ -340,6 +341,7 @@ export default function AdminStressTestPage() {
                     onClick={cancelTest}
                     variant="destructive"
                     className="gap-2"
+                    data-testid="stop-test-button"
                   >
                     <Square className="h-4 w-4" />
                     Stop Test
@@ -351,6 +353,7 @@ export default function AdminStressTestPage() {
                     onClick={resetTest}
                     variant="outline"
                     className="gap-2"
+                    data-testid="reset-button"
                   >
                     <RefreshCw className="h-4 w-4" />
                     Reset
@@ -414,7 +417,7 @@ export default function AdminStressTestPage() {
             </Card>
 
             {/* Results Table */}
-            <Card>
+            <Card data-testid="stress-test-results">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Activity className="h-5 w-5" />
@@ -568,7 +571,7 @@ export default function AdminStressTestPage() {
 
         {/* Summary */}
         {state.summary && (
-          <Card>
+          <Card data-testid="stress-test-summary">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />

@@ -215,7 +215,7 @@ export function AdminFeedbackTable() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="admin-feedback-table">
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1 space-y-2">
           <Label className="text-sm font-medium text-muted-foreground">

@@ -355,7 +355,10 @@ export function ChannelsPage() {
       <div className="container mx-auto max-w-7xl px-3 sm:px-4 py-3 sm:py-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 fill-mode-both">
         <PageHeader icon={Radio}>
           <div className="space-y-2 sm:space-y-4">
-            <div className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight" data-testid="channels-heading">
+            <div
+              className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight"
+              data-testid="channels-heading"
+            >
               <span className="text-primary">Channels</span>
             </div>
           </div>
@@ -420,7 +423,10 @@ export function ChannelsPage() {
               <h3 className="text-base font-semibold mb-1">No channels yet</h3>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg mx-auto" data-testid="channels-empty">
+            <div
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg mx-auto"
+              data-testid="channels-empty"
+            >
               <p className="text-sm text-muted-foreground max-w-sm mx-auto">
                 Connect a messaging platform so users can talk to your agent
                 directly.

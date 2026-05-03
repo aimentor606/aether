@@ -210,6 +210,7 @@ function SandboxesTab() {
           <Input
             type="text"
             className="pl-8 h-8 text-sm"
+            data-testid="sandbox-search"
             placeholder="Search by sandbox ID, name, account, email..."
             autoComplete="off"
             value={searchInput}
@@ -220,7 +221,7 @@ function SandboxesTab() {
           value={statusFilter || 'all'}
           onValueChange={(v) => setStatusFilter(v === 'all' ? '' : v)}
         >
-          <SelectTrigger className="h-8 w-[130px] text-sm">
+          <SelectTrigger className="h-8 w-[130px] text-sm" data-testid="sandbox-status-filter">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -249,6 +250,7 @@ function SandboxesTab() {
         <Button
           variant="outline"
           size="sm"
+          data-testid="sandbox-refresh-button"
           onClick={() => refetch()}
           disabled={isFetching}
           className="h-8 gap-1.5"
@@ -277,7 +279,7 @@ function SandboxesTab() {
             isFetching ? 'opacity-60' : '',
           )}
         >
-          <Table>
+          <Table data-testid="sandboxes-table">
             <TableHeader>
               <TableRow className="hover:bg-transparent">
                 <TableHead className="w-[90px]">ID</TableHead>
@@ -902,7 +904,7 @@ export default function AdminSandboxesPage() {
       <div className="max-w-6xl mx-auto p-6 space-y-5">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+            <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2" data-testid="admin-sandboxes-heading">
               <Server className="h-6 w-6" />
               Sandboxes
             </h1>

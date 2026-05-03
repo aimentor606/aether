@@ -11,10 +11,14 @@ import { NewInstanceModal } from '@/components/billing/pricing/new-instance-moda
 import { useNewInstanceModalStore } from '@/stores/pricing-modal-store';
 
 const SidebarLeft = lazy(() =>
-  import('@/components/sidebar/sidebar-left').then(mod => ({ default: mod.SidebarLeft }))
+  import('@/components/sidebar/sidebar-left').then((mod) => ({
+    default: mod.SidebarLeft,
+  })),
 );
 const SidebarRight = lazy(() =>
-  import('@/components/sidebar/sidebar-right').then(mod => ({ default: mod.SidebarRight }))
+  import('@/components/sidebar/sidebar-right').then((mod) => ({
+    default: mod.SidebarRight,
+  })),
 );
 
 function SidebarSkeleton() {
@@ -38,7 +42,11 @@ function SidebarSkeleton() {
   );
 }
 
-function DeleteOperationEffectsWrapper({ children }: { children: React.ReactNode }) {
+function DeleteOperationEffectsWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   useDeleteOperationEffects();
   return <>{children}</>;
 }
@@ -46,7 +54,13 @@ function DeleteOperationEffectsWrapper({ children }: { children: React.ReactNode
 /** Store-driven NewInstanceModal — mounted once globally */
 function GlobalNewInstanceModal() {
   const { isOpen, title, closeNewInstanceModal } = useNewInstanceModalStore();
-  return <NewInstanceModal open={isOpen} onOpenChange={(o) => !o && closeNewInstanceModal()} title={title} />;
+  return (
+    <NewInstanceModal
+      open={isOpen}
+      onOpenChange={(o) => !o && closeNewInstanceModal()}
+      title={title}
+    />
+  );
 }
 
 interface AppProvidersProps {
@@ -62,7 +76,7 @@ export function AppProviders({
   showSidebar = true,
   defaultSidebarOpen,
   sidebarContent,
-  sidebarSiblings
+  sidebarSiblings,
 }: AppProvidersProps) {
   // Hydrate global default model from server on first mount
   useModelHydration();

@@ -243,7 +243,7 @@ export default function AdminAnalyticsPage() {
         <header className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">
+              <h1 className="text-2xl font-semibold tracking-tight" data-testid="admin-analytics-heading">
                 Analytics
               </h1>
               <p className="text-sm text-muted-foreground mt-0.5">
@@ -254,7 +254,7 @@ export default function AdminAnalyticsPage() {
             {/* Date Navigation */}
             <div className="flex items-center gap-2">
               {/* Date Presets */}
-              <div className="flex items-center gap-1 mr-2">
+              <div className="flex items-center gap-1 mr-2" data-testid="date-presets">
                 {[
                   { label: 'Today', from: localToday, to: localToday },
                   { label: '7D', from: subDays(localToday, 6), to: localToday },
@@ -442,7 +442,7 @@ export default function AdminAnalyticsPage() {
                   ) : (
                     <div className="space-y-4">
                       {/* Row 1: Core metrics */}
-                      <div className="grid grid-cols-7 gap-3">
+                      <div className="grid grid-cols-7 gap-3" data-testid="analytics-stat-card">
                         <div className="text-center p-3 rounded-lg bg-muted/30">
                           <p className="text-2xl font-bold">
                             {conversionFunnel?.visitors?.toLocaleString() || 0}
@@ -830,7 +830,7 @@ export default function AdminAnalyticsPage() {
               </section>
 
               {/* SECTION 4: Financials */}
-              <section className="rounded-xl border bg-card">
+              <section className="rounded-xl border bg-card" data-testid="financials-section">
                 <div className="p-5 pb-4 border-b flex items-center justify-between">
                   <h2 className="text-sm font-medium flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />

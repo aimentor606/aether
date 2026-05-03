@@ -441,7 +441,12 @@ export default function APIKeysPage() {
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold" data-testid="api-keys-heading">API Keys</h1>
+            <h1
+              className="text-lg sm:text-xl font-semibold"
+              data-testid="api-keys-heading"
+            >
+              API Keys
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
               Manage keys for programmatic access to your sandbox.
             </p>

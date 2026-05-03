@@ -76,27 +76,36 @@ function ListRow({
 
   const isDir = node.type === 'directory';
 
-  const handleDragStart = useCallback((e: React.DragEvent) => {
-    e.dataTransfer.setData(DRAG_MIME, node.path);
-    e.dataTransfer.setData('text/plain', node.name);
-    e.dataTransfer.effectAllowed = 'move';
-    setIsDragging(true);
-  }, [node.path, node.name]);
+  const handleDragStart = useCallback(
+    (e: React.DragEvent) => {
+      e.dataTransfer.setData(DRAG_MIME, node.path);
+      e.dataTransfer.setData('text/plain', node.name);
+      e.dataTransfer.effectAllowed = 'move';
+      setIsDragging(true);
+    },
+    [node.path, node.name],
+  );
 
   const handleDragEnd = useCallback(() => setIsDragging(false), []);
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    if (!isDir || !e.dataTransfer.types.includes(DRAG_MIME)) return;
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  }, [isDir]);
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      if (!isDir || !e.dataTransfer.types.includes(DRAG_MIME)) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    },
+    [isDir],
+  );
 
-  const handleDragEnter = useCallback((e: React.DragEvent) => {
-    if (!isDir || !e.dataTransfer.types.includes(DRAG_MIME)) return;
-    e.preventDefault();
-    dragCounterRef.current++;
-    setIsDragOver(true);
-  }, [isDir]);
+  const handleDragEnter = useCallback(
+    (e: React.DragEvent) => {
+      if (!isDir || !e.dataTransfer.types.includes(DRAG_MIME)) return;
+      e.preventDefault();
+      dragCounterRef.current++;
+      setIsDragOver(true);
+    },
+    [isDir],
+  );
 
   const handleDragLeave = useCallback(() => {
     if (!isDir) return;
@@ -107,16 +116,24 @@ function ListRow({
     }
   }, [isDir]);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    if (!isDir) return;
-    e.preventDefault();
-    e.stopPropagation();
-    dragCounterRef.current = 0;
-    setIsDragOver(false);
-    const sourcePath = e.dataTransfer.getData(DRAG_MIME);
-    if (!sourcePath || sourcePath === node.path || node.path.startsWith(sourcePath + '/')) return;
-    onDropMove?.(sourcePath, node.path);
-  }, [isDir, node.path, onDropMove]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      if (!isDir) return;
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounterRef.current = 0;
+      setIsDragOver(false);
+      const sourcePath = e.dataTransfer.getData(DRAG_MIME);
+      if (
+        !sourcePath ||
+        sourcePath === node.path ||
+        node.path.startsWith(sourcePath + '/')
+      )
+        return;
+      onDropMove?.(sourcePath, node.path);
+    },
+    [isDir, node.path, onDropMove],
+  );
 
   const startRenaming = useCallback(() => {
     setRenameName(node.name);
@@ -162,7 +179,10 @@ function ListRow({
     }
   }, []);
 
-  const ext = !isDir && node.name.includes('.') ? node.name.split('.').pop()?.toUpperCase() || '—' : '—';
+  const ext =
+    !isDir && node.name.includes('.')
+      ? node.name.split('.').pop()?.toUpperCase() || '—'
+      : '—';
 
   return (
     <ContextMenu>
@@ -191,10 +211,14 @@ function ListRow({
         >
           {/* Name column */}
           <div className="flex items-center gap-3 min-w-0">
-            {isDir
-              ? <Folder className="h-5 w-5 text-muted-foreground shrink-0" />
-              : getFileIcon(node.name, { className: 'h-5 w-5 shrink-0', variant: 'monochrome' })
-            }
+            {isDir ? (
+              <Folder className="h-5 w-5 text-muted-foreground shrink-0" />
+            ) : (
+              getFileIcon(node.name, {
+                className: 'h-5 w-5 shrink-0',
+                variant: 'monochrome',
+              })
+            )}
             {isRenaming ? (
               <input
                 ref={renameInputRef}
@@ -210,11 +234,13 @@ function ListRow({
                 className="flex-1 text-sm bg-transparent border-b border-primary/50 py-0 outline-none min-w-0"
               />
             ) : (
-              <span className={cn(
-                'text-sm truncate',
-                node.ignored && 'opacity-50',
-                node.name.startsWith('.') && 'text-muted-foreground',
-              )}>
+              <span
+                className={cn(
+                  'text-sm truncate',
+                  node.ignored && 'opacity-50',
+                  node.name.startsWith('.') && 'text-muted-foreground',
+                )}
+              >
                 {node.name}
               </span>
             )}
@@ -226,9 +252,7 @@ function ListRow({
           </span>
 
           {/* Size column */}
-          <span className="text-xs text-muted-foreground">
-            —
-          </span>
+          <span className="text-xs text-muted-foreground">—</span>
 
           {/* Actions column */}
           <div className="flex justify-end">
@@ -256,9 +280,20 @@ function ListRow({
           </ContextMenuItem>
         )}
         {onDownload && (
-          <ContextMenuItem onClick={() => onDownload(node)} disabled={isDownloadingItem}>
-            {isDownloadingItem ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-            {isDownloadingItem ? 'Zipping...' : isDir ? 'Download as zip' : 'Download'}
+          <ContextMenuItem
+            onClick={() => onDownload(node)}
+            disabled={isDownloadingItem}
+          >
+            {isDownloadingItem ? (
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            {isDownloadingItem
+              ? 'Zipping...'
+              : isDir
+                ? 'Download as zip'
+                : 'Download'}
           </ContextMenuItem>
         )}
         {!isDir && onHistory && (
@@ -280,7 +315,9 @@ function ListRow({
             Cut
           </ContextMenuItem>
         )}
-        <ContextMenuItem onClick={() => navigator.clipboard.writeText(node.path)}>
+        <ContextMenuItem
+          onClick={() => navigator.clipboard.writeText(node.path)}
+        >
           <Copy className="mr-2 h-4 w-4" />
           Copy path
         </ContextMenuItem>
@@ -360,16 +397,21 @@ export function DriveListView({
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortBy !== field) return null;
-    return sortOrder === 'asc'
-      ? <ArrowUp className="h-3 w-3 ml-1" />
-      : <ArrowDown className="h-3 w-3 ml-1" />;
+    return sortOrder === 'asc' ? (
+      <ArrowUp className="h-3 w-3 ml-1" />
+    ) : (
+      <ArrowDown className="h-3 w-3 ml-1" />
+    );
   };
 
   const allItems = [...dirs, ...files];
 
   if (allItems.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center" data-testid="files-empty">
+      <div
+        className="flex flex-col items-center justify-center py-20 text-center"
+        data-testid="files-empty"
+      >
         <FolderOpen className="h-16 w-16 text-muted-foreground/20 mb-4" />
         <p className="text-sm text-muted-foreground">This folder is empty</p>
         <p className="text-xs text-muted-foreground/60 mt-1">

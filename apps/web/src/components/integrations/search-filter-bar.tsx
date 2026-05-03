@@ -40,7 +40,11 @@ export const SearchFilterBar = ({
               onClick={() => onAuthFilterChange(filter)}
               data-state={authFilter === filter ? 'active' : 'inactive'}
             >
-              {filter === 'oauth' ? 'OAuth' : filter === 'keys' ? 'API Key' : 'All'}
+              {filter === 'oauth'
+                ? 'OAuth'
+                : filter === 'keys'
+                  ? 'API Key'
+                  : 'All'}
             </FilterBarItem>
           ))}
         </FilterBar>

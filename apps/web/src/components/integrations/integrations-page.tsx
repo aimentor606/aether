@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from 'react';
 import { Plug, AlertCircle } from 'lucide-react';
@@ -56,20 +56,29 @@ export function IntegrationsPage() {
       <div className="container mx-auto max-w-7xl px-3 sm:px-4 py-3 sm:py-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 fill-mode-both">
         <PageHeader icon={Plug}>
           <div className="space-y-2 sm:space-y-4">
-            <div className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight" data-testid="connectors-heading">
-               <span className="text-primary">Connectors</span>
+            <div
+              className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight"
+              data-testid="connectors-heading"
+            >
+              <span className="text-primary">Connectors</span>
             </div>
           </div>
         </PageHeader>
       </div>
       <div className="container mx-auto max-w-7xl px-3 sm:px-4">
         {/* Your Connectors — file-based registry with live status */}
-        <div className="animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-75 fill-mode-both" data-testid="connector-registry">
+        <div
+          className="animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-75 fill-mode-both"
+          data-testid="connector-registry"
+        >
           <ConnectorRegistrySection pipedreamConnections={connections} />
         </div>
 
         {/* Pipedream Connected — OAuth connections */}
-        <div className="animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both" data-testid="connected-section">
+        <div
+          className="animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both"
+          data-testid="connected-section"
+        >
           <ConnectedSection
             connections={connections}
             appImgMap={appImgMap}
@@ -86,7 +95,10 @@ export function IntegrationsPage() {
             onAuthFilterChange={setAuthFilter}
           />
         </div>
-        <div className="animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both" data-testid="available-apps">
+        <div
+          className="animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both"
+          data-testid="available-apps"
+        >
           <AvailableAppsGrid
             filteredApps={filteredApps}
             apps={apps}
@@ -112,7 +124,9 @@ export function IntegrationsPage() {
           if (!open) setManageConnection(null);
         }}
         connection={manageConnection}
-        imgSrc={manageConnection ? appImgMap.get(manageConnection.app) : undefined}
+        imgSrc={
+          manageConnection ? appImgMap.get(manageConnection.app) : undefined
+        }
       />
     </div>
   );

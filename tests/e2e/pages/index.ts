@@ -15,3 +15,5 @@ export { TerminalPage } from './terminal.page';
 export { TunnelOverviewPage, TunnelDetailPage } from './tunnel.page';
 export { UsagePage, ChangelogPage } from './usage.page';
 export { WorkspacePage } from './workspace.page';
+export { AdminAnalyticsPage, AdminSandboxPoolPage, AdminSandboxesPage, AdminStatelessPage, AdminStressTestPage } from './admin-complex.page';
+export { AdminAccessRequestsPage, AdminFeatureFlagsPage, AdminLiteLLMPage, AdminNotificationsPage, AdminUtilsPage, AdminFeedbackPage } from './admin-basic.page';

@@ -501,7 +501,12 @@ export default function InstancesPage() {
       <div className="flex-1 flex items-start justify-center px-4 pt-12 pb-20">
         <div className="w-full max-w-lg">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-foreground" data-testid="instances-heading">Instances</h1>
+            <h1
+              className="text-xl font-semibold text-foreground"
+              data-testid="instances-heading"
+            >
+              Instances
+            </h1>
             {(isCloud || visible.length === 0) && (
               <Button
                 size="sm"
@@ -529,7 +534,10 @@ export default function InstancesPage() {
 
           {/* Error */}
           {error && !pageLoading && fallbackServers.length === 0 && (
-            <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 flex items-center gap-3" data-testid="instances-error">
+            <div
+              className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 flex items-center gap-3"
+              data-testid="instances-error"
+            >
               <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-destructive font-medium">
@@ -608,7 +616,10 @@ export default function InstancesPage() {
             visible.length === 0 &&
             fallbackServers.length === 0 &&
             !canClaimComputer && (
-              <div className="rounded-xl border border-dashed border-border/60 bg-muted/10 p-8 flex flex-col items-center gap-4" data-testid="instances-empty">
+              <div
+                className="rounded-xl border border-dashed border-border/60 bg-muted/10 p-8 flex flex-col items-center gap-4"
+                data-testid="instances-empty"
+              >
                 <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-muted/50">
                   <Server className="h-7 w-7 text-muted-foreground/40" />
                 </div>

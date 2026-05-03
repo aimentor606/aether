@@ -138,7 +138,10 @@ export function DriveToolbar({
   };
 
   return (
-    <div className="flex items-center gap-2 px-4 h-12 border-b border-border/40 bg-background shrink-0" data-testid="files-toolbar">
+    <div
+      className="flex items-center gap-2 px-4 h-12 border-b border-border/40 bg-background shrink-0"
+      data-testid="files-toolbar"
+    >
       {/* ── Breadcrumbs ── */}
       <div className="flex items-center gap-0.5 min-w-0 flex-1 overflow-hidden">
         {isEditing ? (
@@ -351,7 +354,10 @@ export function DriveToolbar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={onNewFolder} data-testid="new-folder-button">
+            <DropdownMenuItem
+              onClick={onNewFolder}
+              data-testid="new-folder-button"
+            >
               <FolderPlus className="mr-2 h-4 w-4" />
               New folder
             </DropdownMenuItem>

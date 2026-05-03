@@ -71,12 +71,15 @@ function FolderCard({
   const dragCounterRef = useRef(0);
   const contextTriggerRef = useRef<HTMLDivElement>(null);
 
-  const handleDragStart = useCallback((e: React.DragEvent) => {
-    e.dataTransfer.setData(DRAG_MIME, node.path);
-    e.dataTransfer.setData('text/plain', node.name);
-    e.dataTransfer.effectAllowed = 'move';
-    setIsDragging(true);
-  }, [node.path, node.name]);
+  const handleDragStart = useCallback(
+    (e: React.DragEvent) => {
+      e.dataTransfer.setData(DRAG_MIME, node.path);
+      e.dataTransfer.setData('text/plain', node.name);
+      e.dataTransfer.effectAllowed = 'move';
+      setIsDragging(true);
+    },
+    [node.path, node.name],
+  );
 
   const handleDragEnd = useCallback(() => setIsDragging(false), []);
 
@@ -101,15 +104,23 @@ function FolderCard({
     }
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dragCounterRef.current = 0;
-    setIsDragOver(false);
-    const sourcePath = e.dataTransfer.getData(DRAG_MIME);
-    if (!sourcePath || sourcePath === node.path || node.path.startsWith(sourcePath + '/')) return;
-    onDropMove?.(sourcePath, node.path);
-  }, [node.path, onDropMove]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounterRef.current = 0;
+      setIsDragOver(false);
+      const sourcePath = e.dataTransfer.getData(DRAG_MIME);
+      if (
+        !sourcePath ||
+        sourcePath === node.path ||
+        node.path.startsWith(sourcePath + '/')
+      )
+        return;
+      onDropMove?.(sourcePath, node.path);
+    },
+    [node.path, onDropMove],
+  );
 
   const startRenaming = useCallback(() => {
     setRenameName(node.name);
@@ -207,7 +218,10 @@ function FolderCard({
       <ContextMenuContent className="w-48">
         <ContextMenuItem onClick={onClick}>Open folder</ContextMenuItem>
         {onDownload && (
-          <ContextMenuItem onClick={() => onDownload(node)} disabled={isDownloadingItem}>
+          <ContextMenuItem
+            onClick={() => onDownload(node)}
+            disabled={isDownloadingItem}
+          >
             <Download className="mr-2 h-4 w-4" />
             {isDownloadingItem ? 'Zipping...' : 'Download as zip'}
           </ContextMenuItem>
@@ -225,7 +239,9 @@ function FolderCard({
             Cut
           </ContextMenuItem>
         )}
-        <ContextMenuItem onClick={() => navigator.clipboard.writeText(node.path)}>
+        <ContextMenuItem
+          onClick={() => navigator.clipboard.writeText(node.path)}
+        >
           <Copy className="mr-2 h-4 w-4" />
           Copy path
         </ContextMenuItem>
@@ -268,12 +284,15 @@ function FileCard({
   const renameInputRef = useRef<HTMLInputElement>(null);
   const contextTriggerRef = useRef<HTMLDivElement>(null);
 
-  const handleDragStart = useCallback((e: React.DragEvent) => {
-    e.dataTransfer.setData(DRAG_MIME, node.path);
-    e.dataTransfer.setData('text/plain', node.name);
-    e.dataTransfer.effectAllowed = 'move';
-    setIsDragging(true);
-  }, [node.path, node.name]);
+  const handleDragStart = useCallback(
+    (e: React.DragEvent) => {
+      e.dataTransfer.setData(DRAG_MIME, node.path);
+      e.dataTransfer.setData('text/plain', node.name);
+      e.dataTransfer.effectAllowed = 'move';
+      setIsDragging(true);
+    },
+    [node.path, node.name],
+  );
 
   const handleDragEnd = useCallback(() => setIsDragging(false), []);
 
@@ -374,17 +393,20 @@ function FileCard({
               />
             ) : (
               <div className="flex items-center gap-1.5 min-w-0 w-full">
-                {getFileIcon(node.name, { className: 'h-4 w-4 shrink-0', variant: 'monochrome' })}
-                <span className="text-[13px] truncate text-foreground">{node.name}</span>
+                {getFileIcon(node.name, {
+                  className: 'h-4 w-4 shrink-0',
+                  variant: 'monochrome',
+                })}
+                <span className="text-[13px] truncate text-foreground">
+                  {node.name}
+                </span>
               </div>
             )}
           </div>
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent className="w-48">
-        <ContextMenuItem onClick={onClick}>
-          Preview
-        </ContextMenuItem>
+        <ContextMenuItem onClick={onClick}>Preview</ContextMenuItem>
         {onOpenInTab && (
           <ContextMenuItem onClick={() => onOpenInTab(node)}>
             <ExternalLink className="mr-2 h-4 w-4" />
@@ -416,7 +438,9 @@ function FileCard({
             Cut
           </ContextMenuItem>
         )}
-        <ContextMenuItem onClick={() => navigator.clipboard.writeText(node.path)}>
+        <ContextMenuItem
+          onClick={() => navigator.clipboard.writeText(node.path)}
+        >
           <Copy className="mr-2 h-4 w-4" />
           Copy path
         </ContextMenuItem>
@@ -489,7 +513,12 @@ export function DriveGridView({
           <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 px-1">
             Folders
           </h3>
-          <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
+          <div
+            className="grid gap-2"
+            style={{
+              gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+            }}
+          >
             {dirs.map((node) => (
               <FolderCard
                 key={node.path}
@@ -502,7 +531,9 @@ export function DriveGridView({
                 onCopy={onCopy}
                 onCut={onCut}
                 onDropMove={onDropMove}
-                isCut={clipboardOperation === 'cut' && clipboardPath === node.path}
+                isCut={
+                  clipboardOperation === 'cut' && clipboardPath === node.path
+                }
               />
             ))}
           </div>
@@ -515,7 +546,12 @@ export function DriveGridView({
           <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 px-1">
             Files
           </h3>
-          <div className="grid gap-2.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))' }}>
+          <div
+            className="grid gap-2.5"
+            style={{
+              gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+            }}
+          >
             {files.map((node) => (
               <FileCard
                 key={node.path}
@@ -530,7 +566,9 @@ export function DriveGridView({
                 onCut={onCut}
                 onOpenInTab={onOpenInTab}
                 gitStatus={gitStatusMap.get(node.path)}
-                isCut={clipboardOperation === 'cut' && clipboardPath === node.path}
+                isCut={
+                  clipboardOperation === 'cut' && clipboardPath === node.path
+                }
               />
             ))}
           </div>
@@ -539,7 +577,10 @@ export function DriveGridView({
 
       {/* Empty state */}
       {dirs.length === 0 && files.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-center" data-testid="files-empty">
+        <div
+          className="flex flex-col items-center justify-center py-20 text-center"
+          data-testid="files-empty"
+        >
           <FolderOpen className="h-16 w-16 text-muted-foreground/20 mb-4" />
           <p className="text-sm text-muted-foreground">This folder is empty</p>
           <p className="text-xs text-muted-foreground/60 mt-1">

@@ -74,7 +74,10 @@ function ConnectionItem({
         exit={{ opacity: 0, y: -8, scale: 0.95 }}
         transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.6) }}
       >
-        <SpotlightCard className="bg-card border border-border/50" data-testid="tunnel-card">
+        <SpotlightCard
+          className="bg-card border border-border/50"
+          data-testid="tunnel-card"
+        >
           <div
             onClick={onClick}
             className="p-4 sm:p-5 flex flex-col h-full cursor-pointer group"
@@ -253,7 +256,10 @@ function ConnectGuide() {
   };
 
   return (
-    <div className="relative bg-muted/20 rounded-3xl border border-dashed border-border/50 flex flex-col items-center justify-center py-16 px-4 overflow-hidden" data-testid="tunnel-empty">
+    <div
+      className="relative bg-muted/20 rounded-3xl border border-dashed border-border/50 flex flex-col items-center justify-center py-16 px-4 overflow-hidden"
+      data-testid="tunnel-empty"
+    >
       <Ripple mainCircleSize={160} mainCircleOpacity={0.12} numCircles={6} />
       <div className="relative z-10 flex flex-col items-center max-w-lg">
         <div className="w-16 h-16 bg-muted border rounded-2xl flex items-center justify-center mb-4">
@@ -369,7 +375,9 @@ export function TunnelOverview() {
         <PageHeader icon={Cable}>
           <div className="space-y-2 sm:space-y-4">
             <div className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
-              <span className="text-primary" data-testid="tunnel-heading">Tunnel</span>
+              <span className="text-primary" data-testid="tunnel-heading">
+                Tunnel
+              </span>
             </div>
           </div>
         </PageHeader>

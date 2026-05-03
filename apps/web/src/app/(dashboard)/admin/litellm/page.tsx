@@ -16,7 +16,7 @@ export default function LiteLLMAdminPage() {
     <div className="flex flex-col h-full w-full">
       {/* Header */}
       <div className="border-b px-6 py-4">
-        <h1 className="text-xl font-semibold">LiteLLM Management</h1>
+        <h1 className="text-xl font-semibold" data-testid="admin-litellm-heading">LiteLLM Management</h1>
         <p className="text-sm text-muted-foreground">
           Model catalog, proxy health, and provider status
         </p>
@@ -25,7 +25,7 @@ export default function LiteLLMAdminPage() {
       <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Status Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
+          <Card data-testid="litellm-status-card">
             <CardContent className="p-4">
               <div className="text-sm text-muted-foreground">Proxy Status</div>
               <div className="flex items-center gap-2 mt-1">
@@ -42,7 +42,7 @@ export default function LiteLLMAdminPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card data-testid="litellm-status-card">
             <CardContent className="p-4">
               <div className="text-sm text-muted-foreground">
                 Registered Models
@@ -51,7 +51,7 @@ export default function LiteLLMAdminPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card data-testid="litellm-status-card">
             <CardContent className="p-4">
               <div className="text-sm text-muted-foreground">
                 Free Tier Models
@@ -68,7 +68,7 @@ export default function LiteLLMAdminPage() {
         {/* Model Catalog Table */}
         <div>
           <h2 className="text-lg font-semibold mb-3">Model Catalog</h2>
-          <div className="rounded-md border">
+          <div className="rounded-md border" data-testid="model-catalog-table">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">

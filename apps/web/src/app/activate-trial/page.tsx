@@ -1,13 +1,30 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CreditCard, Zap, Shield, ArrowRight, CheckCircle, LogOut } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  CreditCard,
+  Zap,
+  Shield,
+  ArrowRight,
+  CheckCircle,
+  LogOut,
+} from 'lucide-react';
 import { AetherLoader } from '@/components/ui/aether-loader';
 import { toast } from '@/lib/toast';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, Suspense, lazy } from 'react';
-import { useTrialStatus, useStartTrial, useAccountState } from '@/hooks/billing';
+import {
+  useTrialStatus,
+  useStartTrial,
+  useAccountState,
+} from '@/hooks/billing';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AetherLogo } from '@/components/sidebar/aether-logo';
 import Link from 'next/link';
@@ -18,7 +35,11 @@ import { useAuth } from '@/components/AuthProvider';
 import { useAdminRole } from '@/hooks/admin';
 
 // Lazy load heavy components
-const MaintenancePage = lazy(() => import('@/components/maintenance/maintenance-page').then(mod => ({ default: mod.MaintenancePage })));
+const MaintenancePage = lazy(() =>
+  import('@/components/maintenance/maintenance-page').then((mod) => ({
+    default: mod.MaintenancePage,
+  })),
+);
 
 // Skeleton for immediate FCP
 function ActivateTrialSkeleton() {
@@ -42,24 +63,37 @@ function ActivateTrialSkeleton() {
 export default function ActivateTrialPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { data: accountState, isLoading: isLoadingSubscription } = useAccountState({ enabled: !!user });
+  const { data: accountState, isLoading: isLoadingSubscription } =
+    useAccountState({ enabled: !!user });
   const subscription = accountState?.subscription;
-  const { data: trialStatus, isLoading: isLoadingTrial } = useTrialStatus({ enabled: !!user });
+  const { data: trialStatus, isLoading: isLoadingTrial } = useTrialStatus({
+    enabled: !!user,
+  });
   const startTrialMutation = useStartTrial();
-  const { data: maintenanceNotice, isLoading: maintenanceLoading } = useMaintenanceNoticeQuery();
-  const { data: adminRoleData, isLoading: isCheckingAdminRole } = useAdminRole();
+  const { data: maintenanceNotice, isLoading: maintenanceLoading } =
+    useMaintenanceNoticeQuery();
+  const { data: adminRoleData, isLoading: isCheckingAdminRole } =
+    useAdminRole();
   const isAdmin = adminRoleData?.isAdmin ?? false;
 
   useEffect(() => {
-    if (!isLoadingSubscription && !isLoadingTrial && accountState && trialStatus) {
-      const hasActiveTrial = trialStatus.has_trial && trialStatus.trial_status === 'active';
-      const hasUsedTrial = trialStatus.trial_status === 'used' ||
+    if (
+      !isLoadingSubscription &&
+      !isLoadingTrial &&
+      accountState &&
+      trialStatus
+    ) {
+      const hasActiveTrial =
+        trialStatus.has_trial && trialStatus.trial_status === 'active';
+      const hasUsedTrial =
+        trialStatus.trial_status === 'used' ||
         trialStatus.trial_status === 'expired' ||
         trialStatus.trial_status === 'cancelled' ||
         trialStatus.trial_status === 'converted';
-      
+
       // ✅ Use tier_key and allow free tier
-      const tierKey = accountState?.subscription?.tier_key || accountState?.tier?.name;
+      const tierKey =
+        accountState?.subscription?.tier_key || accountState?.tier?.name;
       const hasActiveSubscription = tierKey && tierKey !== 'none';
 
       if (hasActiveTrial || hasActiveSubscription) {
@@ -68,7 +102,13 @@ export default function ActivateTrialPage() {
         router.push('/subscription');
       }
     }
-  }, [accountState, trialStatus, isLoadingSubscription, isLoadingTrial, router]);
+  }, [
+    accountState,
+    trialStatus,
+    isLoadingSubscription,
+    isLoadingTrial,
+    router,
+  ]);
 
   const handleStartTrial = async () => {
     try {
@@ -94,7 +134,12 @@ export default function ActivateTrialPage() {
   };
 
   // Show skeleton immediately for FCP instead of blocking loader
-  if (maintenanceNotice?.enabled && !maintenanceLoading && !isCheckingAdminRole && !isAdmin) {
+  if (
+    maintenanceNotice?.enabled &&
+    !maintenanceLoading &&
+    !isCheckingAdminRole &&
+    !isAdmin
+  ) {
     return (
       <Suspense fallback={<ActivateTrialSkeleton />}>
         <MaintenancePage />
@@ -102,7 +147,11 @@ export default function ActivateTrialPage() {
     );
   }
 
-  const isLoading = isLoadingSubscription || isLoadingTrial || maintenanceLoading || isCheckingAdminRole;
+  const isLoading =
+    isLoadingSubscription ||
+    isLoadingTrial ||
+    maintenanceLoading ||
+    isCheckingAdminRole;
 
   // Show skeleton during initial load
   if (isLoading) {
@@ -125,7 +174,10 @@ export default function ActivateTrialPage() {
       <Card className="w-full max-w-2xl border-2 shadow-none bg-transparent border-none">
         <CardHeader className="text-center space-y-4">
           <div>
-            <CardTitle data-testid="trial-heading" className="text-2xl font-medium flex items-center justify-center gap-2">
+            <CardTitle
+              data-testid="trial-heading"
+              className="text-2xl font-medium flex items-center justify-center gap-2"
+            >
               <AetherLogo />
               <span>Welcome to Aether</span>
             </CardTitle>
@@ -147,14 +199,18 @@ export default function ActivateTrialPage() {
                 <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-medium">$5 in Credits</p>
-                  <p className="text-sm text-muted-foreground">Full access to all AI models</p>
+                  <p className="text-sm text-muted-foreground">
+                    Full access to all AI models
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-medium">7 Days Free</p>
-                  <p className="text-sm text-muted-foreground">Cancel anytime, no charge</p>
+                  <p className="text-sm text-muted-foreground">
+                    Cancel anytime, no charge
+                  </p>
                 </div>
               </div>
             </div>
@@ -165,8 +221,8 @@ export default function ActivateTrialPage() {
               <div className="space-y-1">
                 <p className="font-medium">No charge during trial</p>
                 <p className="text-sm text-muted-foreground">
-                  Your card will only be charged after 7 days if you don't cancel.
-                  You can cancel anytime from your billing settings.
+                  Your card will only be charged after 7 days if you don't
+                  cancel. You can cancel anytime from your billing settings.
                 </p>
               </div>
             </div>
@@ -195,11 +251,19 @@ export default function ActivateTrialPage() {
           </div>
           <div className="text-center text-sm text-muted-foreground">
             By starting your trial, you agree to our{' '}
-            <Link href="/legal?tab=terms" className="underline hover:text-primary" data-testid="terms-link">
+            <Link
+              href="/legal?tab=terms"
+              className="underline hover:text-primary"
+              data-testid="terms-link"
+            >
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="/legal?tab=privacy" className="underline hover:text-primary" data-testid="privacy-link">
+            <Link
+              href="/legal?tab=privacy"
+              className="underline hover:text-primary"
+              data-testid="privacy-link"
+            >
               Privacy Policy
             </Link>
           </div>
@@ -207,4 +271,4 @@ export default function ActivateTrialPage() {
       </Card>
     </div>
   );
-} 
+}

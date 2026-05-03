@@ -24,7 +24,12 @@ export default function ProvidersPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold" data-testid="providers-heading">LLM Providers</h1>
+            <h1
+              className="text-lg sm:text-xl font-semibold"
+              data-testid="providers-heading"
+            >
+              LLM Providers
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
               Connect model providers that power your agent.
             </p>
@@ -54,7 +59,9 @@ export default function ProvidersPage() {
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-border/60 py-16 flex flex-col items-center gap-4">
-            <p className="text-sm text-muted-foreground/60">No providers connected yet</p>
+            <p className="text-sm text-muted-foreground/60">
+              No providers connected yet
+            </p>
             <Button
               variant="outline"
               size="sm"

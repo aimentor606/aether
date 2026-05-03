@@ -1,14 +1,8 @@
-"use client";
+'use client';
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Plug,
-  Loader2,
-  CheckCircle2,
-  Plus,
-  Settings,
-} from 'lucide-react';
+import { Plug, Loader2, CheckCircle2, Plus, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SpotlightCard } from '@/components/ui/spotlight-card';
@@ -17,7 +11,10 @@ import { EmptyState } from './empty-state';
 import { LoadingSkeleton } from './loading-skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import type { IntegrationApp, IntegrationConnection } from '@/hooks/integrations';
+import type {
+  IntegrationApp,
+  IntegrationConnection,
+} from '@/hooks/integrations';
 
 const AppCard = ({
   app,
@@ -36,7 +33,10 @@ const AppCard = ({
   const connectionCount = connections.length;
 
   return (
-    <SpotlightCard className="bg-card border border-border/50" data-testid="app-card">
+    <SpotlightCard
+      className="bg-card border border-border/50"
+      data-testid="app-card"
+    >
       <div className="p-4 sm:p-5 flex flex-col h-full">
         <div className="flex items-center gap-3 mb-3">
           <AppLogo app={{ imgSrc: app.imgSrc, name: app.name }} />
@@ -165,7 +165,8 @@ export const AvailableAppsGrid = ({
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Failed to load available apps. Configure your Pipedream credentials above.
+            Failed to load available apps. Configure your Pipedream credentials
+            above.
           </AlertDescription>
         </Alert>
       ) : appsLoading || connectionsLoading ? (
@@ -174,7 +175,11 @@ export const AvailableAppsGrid = ({
         <EmptyState />
       ) : filteredApps.length === 0 ? (
         <p className="text-sm text-muted-foreground py-4">
-          No apps found{searchQuery ? ` for "${searchQuery}"` : ''}{authFilter !== 'all' ? ` with ${authFilter === 'oauth' ? 'OAuth' : 'API key'} auth` : ''}.
+          No apps found{searchQuery ? ` for "${searchQuery}"` : ''}
+          {authFilter !== 'all'
+            ? ` with ${authFilter === 'oauth' ? 'OAuth' : 'API key'} auth`
+            : ''}
+          .
         </p>
       ) : (
         <>

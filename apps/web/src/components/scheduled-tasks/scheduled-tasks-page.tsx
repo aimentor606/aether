@@ -226,7 +226,10 @@ const TaskListItem = ({
 };
 
 const EmptyState = ({ onCreateClick }: { onCreateClick: () => void }) => (
-  <div className="bg-muted/20 rounded-3xl border flex flex-col items-center justify-center py-16 px-4" data-testid="triggers-empty">
+  <div
+    className="bg-muted/20 rounded-3xl border flex flex-col items-center justify-center py-16 px-4"
+    data-testid="triggers-empty"
+  >
     <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4">
       <Calendar className="h-6 w-6 text-muted-foreground" />
     </div>
@@ -375,7 +378,9 @@ export function ScheduledTasksPage() {
           <PageHeader icon={Calendar}>
             <div className="space-y-2 sm:space-y-4">
               <div className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
-                <span className="text-primary" data-testid="triggers-heading">Triggers</span>
+                <span className="text-primary" data-testid="triggers-heading">
+                  Triggers
+                </span>
               </div>
             </div>
           </PageHeader>

@@ -34,6 +34,7 @@ export function MoneyDisplay({ amount, currency = 'USD', colorize = true, classN
         colorize && !isNegative && num > 0 && 'text-green-600',
         className,
       )}
+      data-testid="money-display"
     >
       {isNegative ? `-${formatted}` : formatted}
     </span>

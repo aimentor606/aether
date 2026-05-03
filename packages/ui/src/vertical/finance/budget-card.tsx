@@ -24,6 +24,7 @@ export function BudgetCard({ budget, onClick, className }: BudgetCardProps) {
   return (
     <Card
       className={cn('cursor-pointer transition-shadow hover:shadow-md', className)}
+      data-testid="budget-card"
       onClick={onClick}
     >
       <CardContent className="p-4 space-y-3">
@@ -53,6 +54,7 @@ export function BudgetCard({ budget, onClick, className }: BudgetCardProps) {
         {/* Progress bar */}
         <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
           <div
+            data-testid="budget-progress"
             className={cn(
               'h-full rounded-full transition-all',
               isOver ? 'bg-red-500' : pct > 80 ? 'bg-yellow-500' : 'bg-primary',

@@ -348,7 +348,7 @@ describe('resetExpiringCredits', () => {
 describe.skip('refreshDailyCredits (not implemented)', () => {
   const _refreshDailyCredits = async () => null as any;
   test('returns null for non-free tier', async () => {
-    const result = await __refreshDailyCredits('acc_test_123', 'tier_6_50');
+    const result = await _refreshDailyCredits('acc_test_123', 'tier_6_50');
     expect(result).toBeNull();
   });
 

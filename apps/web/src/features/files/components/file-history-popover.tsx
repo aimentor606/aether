@@ -4,7 +4,6 @@ import { useState, useMemo, useCallback } from 'react';
 import {
   GitCommitHorizontal,
   History,
-  Loader2,
   ChevronDown,
   ChevronRight,
   User,
@@ -25,7 +24,10 @@ import { cn } from '@/lib/utils';
 import { useFileHistory, useFileCommitDiff } from '../hooks/use-file-history';
 import type { GitCommit } from '../types';
 import { createTwoFilesPatch } from 'diff';
-import { useDiffHighlight, renderHighlightedLine } from '@/hooks/use-diff-highlight';
+import {
+  useDiffHighlight,
+  renderHighlightedLine,
+} from '@/hooks/use-diff-highlight';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -64,7 +66,13 @@ function formatFullDate(timestamp: number): string {
 // Compact Diff View
 // ---------------------------------------------------------------------------
 
-function CompactDiffLines({ patch, filename }: { patch: string; filename: string }) {
+function CompactDiffLines({
+  patch,
+  filename,
+}: {
+  patch: string;
+  filename: string;
+}) {
   const diffLines = useMemo(() => {
     const lines = patch.split('\n');
     const startIdx = lines.findIndex((l) => l.startsWith('@@'));
@@ -74,7 +82,13 @@ function CompactDiffLines({ patch, filename }: { patch: string; filename: string
   const codeLines = useMemo(
     () =>
       diffLines.map((line) => {
-        if (line.startsWith('@@') || line.startsWith('+++') || line.startsWith('---') || line === '') return '';
+        if (
+          line.startsWith('@@') ||
+          line.startsWith('+++') ||
+          line.startsWith('---') ||
+          line === ''
+        )
+          return '';
         return line.length > 0 ? line.substring(1) : '';
       }),
     [diffLines],
@@ -110,7 +124,12 @@ function CompactDiffLines({ patch, filename }: { patch: string; filename: string
           const html = renderHighlightedLine(highlightedTokens, codeLines[i]);
           return (
             <div key={i} className={cls}>
-              <span className={cn(isAdd && 'text-emerald-600 dark:text-emerald-400', isDel && 'text-red-600 dark:text-red-400')}>
+              <span
+                className={cn(
+                  isAdd && 'text-emerald-600 dark:text-emerald-400',
+                  isDel && 'text-red-600 dark:text-red-400',
+                )}
+              >
                 {prefix}
               </span>
               <span dangerouslySetInnerHTML={{ __html: html }} />
@@ -119,7 +138,14 @@ function CompactDiffLines({ patch, filename }: { patch: string; filename: string
         }
 
         return (
-          <div key={i} className={cn(cls, isAdd && 'text-emerald-600 dark:text-emerald-400', isDel && 'text-red-600 dark:text-red-400')}>
+          <div
+            key={i}
+            className={cn(
+              cls,
+              isAdd && 'text-emerald-600 dark:text-emerald-400',
+              isDel && 'text-red-600 dark:text-red-400',
+            )}
+          >
             {line || ' '}
           </div>
         );
@@ -132,11 +158,31 @@ function CompactDiffLines({ patch, filename }: { patch: string; filename: string
 // Compact Commit Diff
 // ---------------------------------------------------------------------------
 
-function CompactCommitDiff({ filePath, commitHash }: { filePath: string; commitHash: string }) {
-  const { data: diff, isLoading, error } = useFileCommitDiff(filePath, commitHash);
+function CompactCommitDiff({
+  filePath,
+  commitHash,
+}: {
+  filePath: string;
+  commitHash: string;
+}) {
+  const {
+    data: diff,
+    isLoading,
+    error,
+  } = useFileCommitDiff(filePath, commitHash);
 
-  if (isLoading) return <div className="p-2"><Skeleton className="h-16 w-full" /></div>;
-  if (error || !diff) return <div className="p-2 text-[10px] text-muted-foreground">Failed to load diff</div>;
+  if (isLoading)
+    return (
+      <div className="p-2">
+        <Skeleton className="h-16 w-full" />
+      </div>
+    );
+  if (error || !diff)
+    return (
+      <div className="p-2 text-[10px] text-muted-foreground">
+        Failed to load diff
+      </div>
+    );
 
   const statusIcon = {
     added: <FilePlus2 className="size-3 text-emerald-500" />,
@@ -145,20 +191,26 @@ function CompactCommitDiff({ filePath, commitHash }: { filePath: string; commitH
     renamed: <FileSymlink className="size-3 text-orange-500" />,
   }[diff.status];
 
-  const patchContent = diff.patch || (
-    diff.before !== undefined && diff.after !== undefined
+  const patchContent =
+    diff.patch ||
+    (diff.before !== undefined && diff.after !== undefined
       ? createTwoFilesPatch(filePath, filePath, diff.before, diff.after, '', '')
-      : ''
-  );
+      : '');
 
   return (
     <div className="border-t border-border/30 bg-muted/20">
       <div className="flex items-center gap-1.5 px-2 py-1 border-b border-border/20">
         {statusIcon}
-        <span className="text-[10px] font-medium capitalize text-muted-foreground">{diff.status}</span>
+        <span className="text-[10px] font-medium capitalize text-muted-foreground">
+          {diff.status}
+        </span>
         <div className="flex items-center gap-1 ml-auto text-[10px]">
-          {diff.additions > 0 && <span className="text-emerald-500">+{diff.additions}</span>}
-          {diff.deletions > 0 && <span className="text-red-500">-{diff.deletions}</span>}
+          {diff.additions > 0 && (
+            <span className="text-emerald-500">+{diff.additions}</span>
+          )}
+          {diff.deletions > 0 && (
+            <span className="text-red-500">-{diff.deletions}</span>
+          )}
         </div>
       </div>
       {patchContent ? (
@@ -166,7 +218,9 @@ function CompactCommitDiff({ filePath, commitHash }: { filePath: string; commitH
           <CompactDiffLines patch={patchContent} filename={filePath} />
         </div>
       ) : (
-        <div className="p-2 text-[10px] text-muted-foreground text-center">No diff</div>
+        <div className="p-2 text-[10px] text-muted-foreground text-center">
+          No diff
+        </div>
       )}
     </div>
   );
@@ -176,35 +230,60 @@ function CompactCommitDiff({ filePath, commitHash }: { filePath: string; commitH
 // Compact Commit Row
 // ---------------------------------------------------------------------------
 
-function CompactCommitRow({ commit, filePath }: { commit: GitCommit; filePath: string }) {
+function CompactCommitRow({
+  commit,
+  filePath,
+}: {
+  commit: GitCommit;
+  filePath: string;
+}) {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const handleCopyHash = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(commit.hash);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [commit.hash]);
+  const handleCopyHash = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(commit.hash);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    },
+    [commit.hash],
+  );
 
   return (
-    <div className={cn('rounded-lg border overflow-hidden transition-colors', expanded ? 'border-primary/30 bg-primary/5' : 'border-border/40 hover:border-border/60')}>
+    <div
+      className={cn(
+        'rounded-lg border overflow-hidden transition-colors',
+        expanded
+          ? 'border-primary/30 bg-primary/5'
+          : 'border-border/40 hover:border-border/60',
+      )}
+    >
       <button
         onClick={() => setExpanded(!expanded)}
         className="flex items-start gap-2 w-full px-2.5 py-2 text-left cursor-pointer hover:bg-muted/20"
       >
         <div className="flex items-center gap-1 mt-0.5 shrink-0">
-          {expanded ? <ChevronDown className="size-3 text-muted-foreground/50" /> : <ChevronRight className="size-3 text-muted-foreground/50" />}
+          {expanded ? (
+            <ChevronDown className="size-3 text-muted-foreground/50" />
+          ) : (
+            <ChevronRight className="size-3 text-muted-foreground/50" />
+          )}
           <GitCommitHorizontal className="size-3.5 text-primary/70" />
         </div>
         <div className="flex-1 min-w-0 space-y-0.5">
-          <p className="text-xs font-medium text-foreground leading-snug line-clamp-1">{commit.subject}</p>
+          <p className="text-xs font-medium text-foreground leading-snug line-clamp-1">
+            {commit.subject}
+          </p>
           <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
             <span className="flex items-center gap-0.5">
               <User className="size-2.5" />
               {commit.author}
             </span>
-            <span className="flex items-center gap-0.5" title={formatFullDate(commit.timestamp)}>
+            <span
+              className="flex items-center gap-0.5"
+              title={formatFullDate(commit.timestamp)}
+            >
               <Clock className="size-2.5" />
               {formatRelativeDate(commit.timestamp)}
             </span>
@@ -217,11 +296,17 @@ function CompactCommitRow({ commit, filePath }: { commit: GitCommit; filePath: s
           className="font-mono shrink-0"
           title="Copy hash"
         >
-          {copied ? <Check className="size-2.5 text-emerald-500" /> : <Copy className="size-2.5" />}
+          {copied ? (
+            <Check className="size-2.5 text-emerald-500" />
+          ) : (
+            <Copy className="size-2.5" />
+          )}
           {commit.shortHash}
         </Button>
       </button>
-      {expanded && <CompactCommitDiff filePath={filePath} commitHash={commit.hash} />}
+      {expanded && (
+        <CompactCommitDiff filePath={filePath} commitHash={commit.hash} />
+      )}
     </div>
   );
 }
@@ -235,7 +320,10 @@ interface FileHistoryPopoverContentProps {
   onClose: () => void;
 }
 
-export function FileHistoryPopoverContent({ filePath, onClose }: FileHistoryPopoverContentProps) {
+export function FileHistoryPopoverContent({
+  filePath,
+  onClose,
+}: FileHistoryPopoverContentProps) {
   const { data: history, isLoading, error } = useFileHistory(filePath);
 
   const fileName = filePath.split('/').pop() || '';
@@ -252,7 +340,12 @@ export function FileHistoryPopoverContent({ filePath, onClose }: FileHistoryPopo
             {totalCommits} commit{totalCommits !== 1 ? 's' : ''}
           </span>
         )}
-        <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={onClose}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 shrink-0"
+          onClick={onClose}
+        >
           <X className="h-3.5 w-3.5" />
         </Button>
       </div>
@@ -271,7 +364,8 @@ export function FileHistoryPopoverContent({ filePath, onClose }: FileHistoryPopo
           <div className="flex flex-col items-center justify-center gap-2 p-6 text-center">
             <AlertCircle className="h-6 w-6 text-muted-foreground/30" />
             <p className="text-xs text-muted-foreground">
-              {error instanceof Error && error.message.includes('not a git repository')
+              {error instanceof Error &&
+              error.message.includes('not a git repository')
                 ? 'Not a git repository'
                 : 'Failed to load history'}
             </p>

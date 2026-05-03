@@ -24,7 +24,12 @@ import {
 } from '@/components/ui/tooltip';
 import type { Deployment } from '@/hooks/deployments/use-deployments';
 import type { DeploymentGroup as DeploymentGroupType } from '@/hooks/deployments/use-deployments';
-import { DeploymentCard, statusConfig, formatRelativeTime, isFreestyleKeyError } from './deployment-card';
+import {
+  DeploymentCard,
+  statusConfig,
+  formatRelativeTime,
+  isFreestyleKeyError,
+} from './deployment-card';
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
@@ -99,13 +104,22 @@ export function DeploymentGroup({
                   {group.domain}
                 </h3>
                 <Badge variant={status.variant} className="text-xs">
-                  <span className={cn('inline-block w-1.5 h-1.5 rounded-full mr-1', status.dotColor)} />
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'inline-block w-1.5 h-1.5 rounded-full mr-1',
+                      status.dotColor,
+                    )}
+                  />
                   {status.label}
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
                   v{latestDeployment.version}
                 </Badge>
-                <Badge variant="outline" className="text-xs text-muted-foreground">
+                <Badge
+                  variant="outline"
+                  className="text-xs text-muted-foreground"
+                >
                   {versionCount} {versionCount === 1 ? 'version' : 'versions'}
                 </Badge>
               </div>
@@ -118,7 +132,9 @@ export function DeploymentGroup({
                 )}
                 {latestDeployment.sourceRef && (
                   <>
-                    <span className="truncate max-w-[200px]">{latestDeployment.sourceRef}</span>
+                    <span className="truncate max-w-[200px]">
+                      {latestDeployment.sourceRef}
+                    </span>
                     <span className="text-border">|</span>
                   </>
                 )}
@@ -141,7 +157,9 @@ export function DeploymentGroup({
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">Open live URL</TooltipContent>
+                <TooltipContent side="bottom" className="text-xs">
+                  Open live URL
+                </TooltipContent>
               </Tooltip>
             )}
             <Tooltip>
@@ -150,11 +168,13 @@ export function DeploymentGroup({
                   onClick={() => onViewLogs(latestDeployment)}
                   variant="ghost"
                   size="icon"
-                  >
+                >
                   <ScrollText className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">View logs</TooltipContent>
+              <TooltipContent side="bottom" className="text-xs">
+                View logs
+              </TooltipContent>
             </Tooltip>
             {canRedeploy && (
               <Tooltip>
@@ -163,11 +183,13 @@ export function DeploymentGroup({
                     onClick={() => onEditRedeploy(latestDeployment)}
                     variant="ghost"
                     size="icon"
-                    >
+                  >
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">Edit &amp; Redeploy</TooltipContent>
+                <TooltipContent side="bottom" className="text-xs">
+                  Edit &amp; Redeploy
+                </TooltipContent>
               </Tooltip>
             )}
             {canRedeploy && (
@@ -178,11 +200,18 @@ export function DeploymentGroup({
                     disabled={isRedeployPending}
                     variant="ghost"
                     size="icon"
-                    >
-                    <RotateCcw className={cn('h-4 w-4', isRedeployPending && 'animate-spin')} />
+                  >
+                    <RotateCcw
+                      className={cn(
+                        'h-4 w-4',
+                        isRedeployPending && 'animate-spin',
+                      )}
+                    />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">Redeploy</TooltipContent>
+                <TooltipContent side="bottom" className="text-xs">
+                  Redeploy
+                </TooltipContent>
               </Tooltip>
             )}
             {(latestDeployment.status === 'active' || isInProgress) && (
@@ -194,11 +223,13 @@ export function DeploymentGroup({
                     variant="ghost"
                     size="icon"
                     className="hover:text-orange-500 hover:bg-orange-500/10"
-                    >
+                  >
                     <Square className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">Stop</TooltipContent>
+                <TooltipContent side="bottom" className="text-xs">
+                  Stop
+                </TooltipContent>
               </Tooltip>
             )}
             <Tooltip>
@@ -209,11 +240,13 @@ export function DeploymentGroup({
                   variant="ghost"
                   size="icon"
                   className="hover:text-red-500 hover:bg-red-500/10"
-                  >
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">Delete</TooltipContent>
+              <TooltipContent side="bottom" className="text-xs">
+                Delete
+              </TooltipContent>
             </Tooltip>
           </div>
         </div>
@@ -238,18 +271,21 @@ export function DeploymentGroup({
           <div className="mt-3 pl-16 space-y-2.5">
             <div className="flex items-center gap-2 text-sm text-red-500 dark:text-red-400 bg-red-500/5 rounded-lg px-3 py-2">
               <AlertCircle className="h-4 w-4 shrink-0" />
-              <span className="flex-1 line-clamp-2">{latestDeployment.error}</span>
-              {isFreestyleKeyError(latestDeployment.error) && onConfigureApiKey && (
-                <Button
-                  onClick={onConfigureApiKey}
-                  variant="muted"
-                  size="xs"
-                  className="shrink-0 hover:text-red-500 hover:bg-red-500/10"
+              <span className="flex-1 line-clamp-2">
+                {latestDeployment.error}
+              </span>
+              {isFreestyleKeyError(latestDeployment.error) &&
+                onConfigureApiKey && (
+                  <Button
+                    onClick={onConfigureApiKey}
+                    variant="muted"
+                    size="xs"
+                    className="shrink-0 hover:text-red-500 hover:bg-red-500/10"
                   >
-                  <Settings className="h-3 w-3" />
-                  Configure
-                </Button>
-              )}
+                    <Settings className="h-3 w-3" />
+                    Configure
+                  </Button>
+                )}
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -268,7 +304,12 @@ export function DeploymentGroup({
                 disabled={isRedeployPending}
                 className="h-8 gap-1.5 text-xs cursor-pointer"
               >
-                <RotateCcw className={cn('h-3.5 w-3.5', isRedeployPending && 'animate-spin')} />
+                <RotateCcw
+                  className={cn(
+                    'h-3.5 w-3.5',
+                    isRedeployPending && 'animate-spin',
+                  )}
+                />
                 {isRedeployPending ? 'Redeploying...' : 'Redeploy'}
               </Button>
             </div>

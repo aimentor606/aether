@@ -1,0 +1,25 @@
+{{- if and .Values.ssl.enabled .Values.ssl.certManager }}
+{{- $fullname := include "aether.fullname" . }}
+{{- $env := .Values.ssl.environment }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $fullname }}-tls
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+spec:
+  secretName: {{ $fullname }}-tls
+  issuerRef:
+    {{- if eq $env "dev" }}
+    name: {{ $fullname }}-selfsigned
+    {{- else }}
+    name: {{ $fullname }}-letsencrypt-{{ $env }}
+    {{- end }}
+    kind: ClusterIssuer
+  dnsNames:
+    - {{ .Values.global.domain }}
+    {{- if .Values.ssl.extraDnsNames }}
+    {{- toYaml .Values.ssl.extraDnsNames | nindent 4 }}
+    {{- end }}
+{{- end }}

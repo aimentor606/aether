@@ -1,7 +1,11 @@
-"use client";
+'use client';
 
 import React, { useMemo, useState } from 'react';
-import { useTriggers, useDeleteTrigger, type Trigger } from '@/hooks/scheduled-tasks';
+import {
+  useTriggers,
+  useDeleteTrigger,
+  type Trigger,
+} from '@/hooks/scheduled-tasks';
 import { Button } from '@/components/ui/button';
 import { FilterBar, FilterBarItem } from '@/components/ui/tabs';
 import { PageSearchBar } from '@/components/ui/page-search-bar';
@@ -12,7 +16,6 @@ import {
   AlertCircle,
   Calendar,
   Plus,
-  Search,
   Clock,
   CheckCircle2,
   Timer,
@@ -75,7 +78,13 @@ function describeCron(expr: string): string {
       }
       return `At ${hour.padStart(2, '0')}:${min.padStart(2, '0')}${suffix}`;
     }
-    if (sec === '0' && min === '0' && hour === '0' && !day.includes('*') && month === '*') {
+    if (
+      sec === '0' &&
+      min === '0' &&
+      hour === '0' &&
+      !day.includes('*') &&
+      month === '*'
+    ) {
       return `Monthly on day ${day}`;
     }
 
@@ -121,27 +130,52 @@ const TaskListItem = ({
   isDeleting: boolean;
 }) => {
   const actionType = trigger.action_type ?? 'prompt';
-  const actionIcon = actionType === 'command' ? <Terminal className="h-3 w-3" /> : actionType === 'http' ? <Globe className="h-3 w-3" /> : <MessageSquare className="h-3 w-3" />;
+  const actionIcon =
+    actionType === 'command' ? (
+      <Terminal className="h-3 w-3" />
+    ) : actionType === 'http' ? (
+      <Globe className="h-3 w-3" />
+    ) : (
+      <MessageSquare className="h-3 w-3" />
+    );
 
   return (
     <SpotlightCard
       className={cn(
-        "transition-colors cursor-pointer group",
-        isSelected ? "bg-muted" : "bg-card"
+        'transition-colors cursor-pointer group',
+        isSelected ? 'bg-muted' : 'bg-card',
       )}
     >
-      <div onClick={onClick} className="flex items-center justify-between p-5">
+      <div
+        onClick={onClick}
+        className="flex items-center justify-between p-5"
+        role="button"
+        tabIndex={0}
+        aria-label="View task details"
+      >
         <div className="flex items-center gap-4 flex-1 min-w-0">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-card border border-border/50 shrink-0">
-              {trigger.type === 'cron' ? <Timer className="h-5 w-5 text-foreground" /> : <Webhook className="h-5 w-5 text-foreground" />}
-            </div>
+          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-card border border-border/50 shrink-0">
+            {trigger.type === 'cron' ? (
+              <Timer className="h-5 w-5 text-foreground" />
+            ) : (
+              <Webhook className="h-5 w-5 text-foreground" />
+            )}
+          </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <h3 className="font-medium text-foreground truncate">{trigger.name}</h3>
-              <Badge variant={trigger.isActive ? "highlight" : "secondary"} className="text-xs">
+              <h3 className="font-medium text-foreground truncate">
+                {trigger.name}
+              </h3>
+              <Badge
+                variant={trigger.isActive ? 'highlight' : 'secondary'}
+                className="text-xs"
+              >
                 {trigger.isActive ? 'Active' : 'Paused'}
               </Badge>
-              <Badge variant="outline" className="text-xs flex items-center gap-1">
+              <Badge
+                variant="outline"
+                className="text-xs flex items-center gap-1"
+              >
                 {actionIcon}
                 <span className="capitalize">{actionType}</span>
               </Badge>
@@ -155,10 +189,14 @@ const TaskListItem = ({
         </div>
         <div className="ml-4 flex items-center gap-3 shrink-0">
           <div className="flex-col items-end gap-1 hidden sm:flex">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                <span>{trigger.type === 'cron' ? `Next: ${trigger.isActive ? formatRelativeTime(trigger.nextRunAt) : '--'}` : 'On demand'}</span>
-              </div>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              <span>
+                {trigger.type === 'cron'
+                  ? `Next: ${trigger.isActive ? formatRelativeTime(trigger.nextRunAt) : '--'}`
+                  : 'On demand'}
+              </span>
+            </div>
             {trigger.lastRunAt && (
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <CheckCircle2 className="h-3 w-3 text-emerald-500" />
@@ -172,9 +210,9 @@ const TaskListItem = ({
             variant="ghost"
             size="icon-sm"
             className={cn(
-              "opacity-0 group-hover:opacity-100 focus:opacity-100",
-              "text-muted-foreground hover:text-red-500 hover:bg-red-500/10",
-              isDeleting && "opacity-100 text-red-500"
+              'opacity-0 group-hover:opacity-100 focus:opacity-100',
+              'text-muted-foreground hover:text-red-500 hover:bg-red-500/10',
+              isDeleting && 'opacity-100 text-red-500',
             )}
             title="Delete trigger"
           >
@@ -191,9 +229,12 @@ const EmptyState = ({ onCreateClick }: { onCreateClick: () => void }) => (
     <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4">
       <Calendar className="h-6 w-6 text-muted-foreground" />
     </div>
-    <h3 className="text-base font-semibold text-foreground mb-2">Create a trigger</h3>
+    <h3 className="text-base font-semibold text-foreground mb-2">
+      Create a trigger
+    </h3>
     <p className="text-sm text-muted-foreground text-center max-w-sm mb-6">
-      Automate with triggers. Schedule cron jobs, set up webhooks, run commands, or call HTTP endpoints — all from one place.
+      Automate with triggers. Schedule cron jobs, set up webhooks, run commands,
+      or call HTTP endpoints — all from one place.
     </p>
     <Button onClick={onCreateClick} size="sm">
       <Plus className="h-4 w-4 mr-2" />
@@ -226,7 +267,9 @@ export function ScheduledTasksPage() {
   const [selectedTrigger, setSelectedTrigger] = useState<Trigger | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'cron' | 'webhook'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'cron' | 'webhook'>(
+    'all',
+  );
   const deleteMutation = useDeleteTrigger();
 
   const panelOpen = !!selectedTrigger;
@@ -246,7 +289,9 @@ export function ScheduledTasksPage() {
       filtered = filtered.filter(
         (t) =>
           t.name.toLowerCase().includes(q) ||
-          (t.cronExpr ? describeCron(t.cronExpr).toLowerCase().includes(q) : false) ||
+          (t.cronExpr
+            ? describeCron(t.cronExpr).toLowerCase().includes(q)
+            : false) ||
           (t.webhook?.path?.toLowerCase().includes(q) ?? false) ||
           t.prompt.toLowerCase().includes(q),
       );
@@ -289,9 +334,7 @@ export function ScheduledTasksPage() {
   // Keep selected trigger in sync with refetched data
   React.useEffect(() => {
     if (selectedTrigger) {
-      const updated = triggers.find(
-        (t) => t.id === selectedTrigger.id,
-      );
+      const updated = triggers.find((t) => t.id === selectedTrigger.id);
       if (updated) {
         setSelectedTrigger(updated);
       } else {
@@ -308,7 +351,7 @@ export function ScheduledTasksPage() {
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-               Failed to load triggers. Please try refreshing the page.
+              Failed to load triggers. Please try refreshing the page.
             </AlertDescription>
           </Alert>
         </div>
@@ -321,10 +364,10 @@ export function ScheduledTasksPage() {
       {/* Hero / PageHeader — collapses when panel is open */}
       <div
         className={cn(
-          "overflow-hidden transition-colors duration-500 ease-in-out",
+          'overflow-hidden transition-colors duration-500 ease-in-out',
           panelOpen
-            ? "max-h-0 opacity-0 py-0"
-            : "max-h-[300px] opacity-100 py-3 sm:py-4"
+            ? 'max-h-0 opacity-0 py-0'
+            : 'max-h-[300px] opacity-100 py-3 sm:py-4',
         )}
       >
         <div className="container mx-auto max-w-7xl px-3 sm:px-4">
@@ -398,7 +441,9 @@ export function ScheduledTasksPage() {
                     <TaskListItem
                       key={trigger.triggerId}
                       trigger={trigger}
-                      isSelected={selectedTrigger?.triggerId === trigger.triggerId}
+                      isSelected={
+                        selectedTrigger?.triggerId === trigger.triggerId
+                      }
                       onClick={() => handleTriggerClick(trigger)}
                       onDelete={(e) => handleDelete(e, trigger)}
                       isDeleting={deleteMutation.isPending}
@@ -413,14 +458,16 @@ export function ScheduledTasksPage() {
         {/* Detail Panel */}
         <div
           className={cn(
-            "h-screen transition-colors duration-300 ease-in-out bg-background",
-            "fixed 2xl:relative top-0 right-0",
-            "z-40 2xl:z-auto",
-            selectedTrigger ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden",
-            selectedTrigger && "border-l",
+            'h-screen transition-colors duration-300 ease-in-out bg-background',
+            'fixed 2xl:relative top-0 right-0',
+            'z-40 2xl:z-auto',
             selectedTrigger
-              ? "w-full min-[400px]:w-[90vw] min-[500px]:w-[85vw] sm:w-[480px] md:w-[540px] lg:w-[600px] xl:w-[640px] 2xl:w-[580px]"
-              : "w-0 border-none"
+              ? 'overflow-y-auto overflow-x-hidden'
+              : 'overflow-hidden',
+            selectedTrigger && 'border-l',
+            selectedTrigger
+              ? 'w-full min-[400px]:w-[90vw] min-[500px]:w-[85vw] sm:w-[480px] md:w-[540px] lg:w-[600px] xl:w-[640px] 2xl:w-[580px]'
+              : 'w-0 border-none',
           )}
         >
           {selectedTrigger && (

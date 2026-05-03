@@ -149,6 +149,7 @@ export default function Home() {
               </Button>
               <button
                 onClick={handleCopy}
+                aria-label="Copy install command"
                 className="group flex items-center gap-2.5 h-9 px-4 rounded-full bg-foreground/[0.03] border border-foreground/[0.06] hover:bg-foreground/[0.06] hover:border-foreground/[0.1] transition-colors cursor-pointer animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both"
               >
                 <span className="font-mono text-[11px] text-muted-foreground/35 select-none">
@@ -462,6 +463,7 @@ export default function Home() {
         >
           <button
             onClick={handleCopy}
+            aria-label="Copy install command"
             className="group hidden sm:flex items-center gap-2 h-8 px-3 rounded-full hover:bg-foreground/[0.04] transition-colors cursor-pointer"
           >
             <span className="font-mono text-[11px] text-muted-foreground/40 select-none">

@@ -1,0 +1,267 @@
+# Aether K8S Helm Chart — default values (dev/test)
+# For production, use values-production.yaml overrides.
+
+global:
+  namespace: aether
+  domain: aether.dev
+
+# ── Aether API ──────────────────────────────────────────────────────────────
+api:
+  image: ghcr.io/aether/api:latest
+  replicas: 2
+  port: 8008
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+  pdb:
+    enabled: true
+    minAvailable: 1
+
+# ── LiteLLM Proxy ───────────────────────────────────────────────────────────
+litellm:
+  enabled: true
+  image: ghcr.io/berriai/litellm:v1.83.10-stable
+  replicas: 2
+  port: 4000
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+  # model_list entries for config.yaml — override per environment
+  modelList: []
+  litellmSettings:
+    drop_params: true
+    request_timeout: 600
+    callbacks:
+      - openmeter
+  routerSettings:
+    num_retries: 3
+    timeout: 600
+
+# ── Kong Ingress Controller ─────────────────────────────────────────────────
+kong:
+  enabled: true
+  # DB-less mode — declarative config via KongPlugin/KongConsumer CRDs
+  ingressController:
+    enabled: true
+    installCRDs: false
+  env:
+    database: "off"
+    router_flavor: expressions
+  proxy:
+    type: LoadBalancer
+    http:
+      enabled: true
+      servicePort: 80
+      containerPort: 8000
+    tls:
+      enabled: true
+      servicePort: 443
+      containerPort: 8443
+  # Kong reads TLS cert from K8S Secret (created by cert-manager or manually)
+  # The Secret is mounted automatically by KIC from Ingress tls: blocks.
+
+# ── CloudNativePG ───────────────────────────────────────────────────────────
+cnpg:
+  enabled: true
+  instances: 3
+  storage: 50Gi
+  storageClass: ""
+  postgresVersion: "16"
+  # Bootstrap: databases created on first install
+  bootstrapDatabases:
+    - name: aether
+      owner: aether
+    - name: litellm
+      owner: litellm
+    - name: openmeter
+      owner: openmeter
+  backup:
+    enabled: false
+    s3:
+      bucket: ""
+      region: us-east-1
+      endpoint: ""
+      accessKey: ""
+      secretKey: ""
+  pooler:
+    enabled: true
+    instances: 2
+    mode: transaction
+    port: 5432
+
+# ── Redis ───────────────────────────────────────────────────────────────────
+redis:
+  enabled: true
+  storage: 5Gi
+  storageClass: ""
+  port: 6379
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# ── Strimzi Kafka ───────────────────────────────────────────────────────────
+kafka:
+  enabled: true
+  replicas: 3
+  storage: 20Gi
+  storageClass: ""
+  version: "3.9.0"
+  # OpenMeter event topic
+  topic:
+    name: openmeter-events
+    partitions: 6
+    replicationFactor: 3
+
+# ── ClickHouse ──────────────────────────────────────────────────────────────
+clickhouse:
+  enabled: true
+  storage: 50Gi
+  storageClass: ""
+  shards: 1
+  replicas: 2
+  version: "24.8"
+
+# ── OpenMeter ───────────────────────────────────────────────────────────────
+openmeter:
+  enabled: false
+  image: ghcr.io/openmeterio/openmeter:latest
+  replicas: 1
+  port: 8888
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+# ── Observability ─────────────────────────────────────────────────────────────
+# Chart dependency values live at top-level alias keys (victoriametrics, victorialogs, etc.)
+# Custom template values (OTEL Collector) live under observability.
+
+# VictoriaMetrics — metrics TSDB + VMAgent + VMAlert
+victoriametrics:
+  enabled: true
+  server:
+    retentionPeriod: 30d
+    persistentVolume:
+      size: 10Gi
+      storageClass: ""
+  vmagent:
+    enabled: true
+    extraArgs:
+      promscrape.kubernetes.apiServer: ""
+    # VMAgent discovers ServiceMonitors via Kubernetes API
+  vmalert:
+    enabled: true
+    # VMAlert reads PrometheusRule CRDs natively
+
+# VictoriaLogs — log storage
+victorialogs:
+  enabled: true
+  server:
+    retentionPeriod: "30d"
+    persistentVolume:
+      size: 10Gi
+      storageClass: ""
+
+# VictoriaLogs Collector — vlagent DaemonSet
+victorialogscollector: {}
+  # vlagent auto-discovers pod logs via Kubernetes API
+
+# VictoriaTraces — distributed tracing backend
+victoriatraces:
+  enabled: true
+  server:
+    retentionPeriod: "30d"
+    persistentVolume:
+      size: 10Gi
+      storageClass: ""
+
+# Grafana — unified dashboard for metrics, logs, and traces
+grafana:
+  enabled: true
+  plugins:
+    - victorialogs-datasource
+  sidecar:
+    datasources:
+      enabled: true
+      label: grafana_datasource
+      labelValue: "1"
+  dashboardProviders: {}
+  dashboards: {}
+
+# OTEL Collector — receives traces and forwards to VictoriaTraces (custom template)
+observability:
+  otelCollector:
+    enabled: true
+    image: otel/opentelemetry-collector-contrib:0.102.0
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+# ── Backup ──────────────────────────────────────────────────────────────────
+backup:
+  redis:
+    enabled: true
+    schedule: "0 3 * * *"
+    storage: 1Gi
+
+# ── SSL / TLS ───────────────────────────────────────────────────────────────
+ssl:
+  enabled: true
+  certManager: true
+  # Let's Encrypt issuer email (required when environment != dev)
+  issuerEmail: ""
+  # "dev" = self-signed (local dev, no public domain)
+  # "staging" = Let's Encrypt staging (testing, browser warnings)
+  # "prod" = Let's Encrypt production (trusted by browsers)
+  environment: dev
+  # Extra DNS names (SANs) for the certificate
+  extraDnsNames: []
+
+# ── Secrets ─────────────────────────────────────────────────────────────────
+# Leave empty to auto-generate on first install.
+# Set explicitly for production or restore scenarios.
+secrets:
+  postgresPassword: ""
+  jwtSecret: ""
+  redisPassword: ""
+  litellmMasterKey: ""
+  litellmSaltKey: ""
+  defaultApiKey: ""
+  premiumApiKey: ""
+  # LLM provider keys (set per environment)
+  deepseekApiKey: ""
+  qwenApiKey: ""
+  zhipuApiKey: ""
+  # OpenMeter
+  openmeterApiKey: ""
+  clickhousePassword: ""

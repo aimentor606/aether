@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "aether.configName" . }}
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+data:
+  # Public endpoints
+  PUBLIC_HOST: {{ .Values.global.domain | quote }}
+  PUBLIC_ORIGIN: {{ include "aether.publicOrigin" . | quote }}
+  FORWARDED_PROTO: "https"
+
+  # API
+  API_PORT: {{ .Values.api.port | quote }}
+
+  # LiteLLM
+  LITELLM_PORT: {{ .Values.litellm.port | quote }}
+
+  # Redis
+  REDIS_HOST: {{ printf "%s-master" (include "aether.redis.fullname" .) | quote }}
+  REDIS_PORT: {{ .Values.redis.port | quote }}
+
+  # OpenMeter
+  OPENMETER_EVENT_TYPE: "litellm_tokens"
+
+  {{- if .Values.openmeter.enabled }}
+  OPENMETER_API_ENDPOINT: {{ printf "http://%s:%d" (include "aether.openmeter.fullname" .) (.Values.openmeter.port | int) | quote }}
+  {{- end }}

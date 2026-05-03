@@ -1,0 +1,15 @@
+{{- if .Values.kong.enabled }}
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: prometheus
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+config:
+  per_consumer: true
+  status_code_metrics: true
+  latency_metrics: true
+  upstream_health_metrics: true
+plugin: prometheus
+{{- end }}

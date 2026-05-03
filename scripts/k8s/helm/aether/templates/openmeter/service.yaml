@@ -1,0 +1,20 @@
+{{- if .Values.openmeter.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "aether.openmeter.fullname" . }}
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    app.kubernetes.io/component: openmeter
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.openmeter.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "aether.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: openmeter
+{{- end }}

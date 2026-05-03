@@ -1,0 +1,79 @@
+suite: OTEL Collector
+templates:
+  - templates/monitoring/otel-collector.yaml
+tests:
+  - it: renders ConfigMap Deployment and Service when enabled
+    set:
+      observability.otelCollector.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 3
+      - isKind:
+          of: ConfigMap
+        documentIndex: 0
+      - isKind:
+          of: Deployment
+        documentIndex: 1
+      - isKind:
+          of: Service
+        documentIndex: 2
+
+  - it: configures OTLP receivers and exporter to VictoriaTraces
+    set:
+      observability.otelCollector.enabled: true
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "endpoint: 0.0.0.0:4317"
+        documentIndex: 0
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "endpoint: 0.0.0.0:4318"
+        documentIndex: 0
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "victoriatraces:9411"
+        documentIndex: 0
+
+  - it: exposes OTLP ports on the Service
+    set:
+      observability.otelCollector.enabled: true
+    asserts:
+      - equal:
+          path: spec.ports[0].name
+          value: otlp-grpc
+        documentIndex: 2
+      - equal:
+          path: spec.ports[0].port
+          value: 4317
+        documentIndex: 2
+      - equal:
+          path: spec.ports[1].name
+          value: otlp-http
+        documentIndex: 2
+      - equal:
+          path: spec.ports[1].port
+          value: 4318
+        documentIndex: 2
+
+  - it: uses configurable image and replicas
+    set:
+      observability.otelCollector.enabled: true
+      observability.otelCollector.image: otel/opentelemetry-collector-contrib:0.102.0
+      observability.otelCollector.replicas: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+        documentIndex: 1
+      - matchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: "opentelemetry-collector-contrib"
+        documentIndex: 1
+
+  - it: skips when disabled
+    set:
+      observability.otelCollector.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0

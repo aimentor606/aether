@@ -24,7 +24,12 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useFilesStore } from '../store/files-store';
-import { useFileList, useGitStatus, buildGitStatusMap, useServerHealth } from '../hooks';
+import {
+  useFileList,
+  useGitStatus,
+  buildGitStatusMap,
+  useServerHealth,
+} from '../hooks';
 import {
   useFileUpload,
   useFileDelete,
@@ -59,7 +64,10 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useDiagnosticsStore, buildDiagnosticCountsMap } from '@/stores/diagnostics-store';
+import {
+  useDiagnosticsStore,
+  buildDiagnosticCountsMap,
+} from '@/stores/diagnostics-store';
 import { toast } from '@/lib/toast';
 import { openTabAndNavigate } from '@/stores/tab-store';
 
@@ -154,7 +162,10 @@ function TreeNode({
           if (el) {
             el.focus();
             const dotIdx = el.value.lastIndexOf('.');
-            el.setSelectionRange(0, isDir ? el.value.length : (dotIdx > 0 ? dotIdx : el.value.length));
+            el.setSelectionRange(
+              0,
+              isDir ? el.value.length : dotIdx > 0 ? dotIdx : el.value.length,
+            );
           }
         });
       });
@@ -179,27 +190,36 @@ function TreeNode({
   }, [isDir, node.path, toggleDir, openFile]);
 
   // DnD handlers
-  const handleDragStart = useCallback((e: React.DragEvent) => {
-    e.dataTransfer.setData(DRAG_MIME, node.path);
-    e.dataTransfer.setData('text/plain', node.name);
-    e.dataTransfer.effectAllowed = 'move';
-    setIsDragging(true);
-  }, [node.path, node.name]);
+  const handleDragStart = useCallback(
+    (e: React.DragEvent) => {
+      e.dataTransfer.setData(DRAG_MIME, node.path);
+      e.dataTransfer.setData('text/plain', node.name);
+      e.dataTransfer.effectAllowed = 'move';
+      setIsDragging(true);
+    },
+    [node.path, node.name],
+  );
 
   const handleDragEnd = useCallback(() => setIsDragging(false), []);
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    if (!isDir || !e.dataTransfer.types.includes(DRAG_MIME)) return;
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  }, [isDir]);
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      if (!isDir || !e.dataTransfer.types.includes(DRAG_MIME)) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    },
+    [isDir],
+  );
 
-  const handleDragEnter = useCallback((e: React.DragEvent) => {
-    if (!isDir || !e.dataTransfer.types.includes(DRAG_MIME)) return;
-    e.preventDefault();
-    dragCounterRef.current++;
-    setIsDragOver(true);
-  }, [isDir]);
+  const handleDragEnter = useCallback(
+    (e: React.DragEvent) => {
+      if (!isDir || !e.dataTransfer.types.includes(DRAG_MIME)) return;
+      e.preventDefault();
+      dragCounterRef.current++;
+      setIsDragOver(true);
+    },
+    [isDir],
+  );
 
   const handleDragLeave = useCallback(() => {
     if (!isDir) return;
@@ -210,16 +230,24 @@ function TreeNode({
     }
   }, [isDir]);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    if (!isDir) return;
-    e.preventDefault();
-    e.stopPropagation();
-    dragCounterRef.current = 0;
-    setIsDragOver(false);
-    const sourcePath = e.dataTransfer.getData(DRAG_MIME);
-    if (!sourcePath || sourcePath === node.path || node.path.startsWith(sourcePath + '/')) return;
-    onDropMove(sourcePath, node.path);
-  }, [isDir, node.path, onDropMove]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      if (!isDir) return;
+      e.preventDefault();
+      e.stopPropagation();
+      dragCounterRef.current = 0;
+      setIsDragOver(false);
+      const sourcePath = e.dataTransfer.getData(DRAG_MIME);
+      if (
+        !sourcePath ||
+        sourcePath === node.path ||
+        node.path.startsWith(sourcePath + '/')
+      )
+        return;
+      onDropMove(sourcePath, node.path);
+    },
+    [isDir, node.path, onDropMove],
+  );
 
   const paddingLeft = 8 + depth * 16;
 
@@ -230,7 +258,10 @@ function TreeNode({
     >
       {/* Spacer matching the chevron width so the icon stays aligned */}
       <span className="w-3.5 shrink-0" />
-      {getFileIcon(node.name, { isDirectory: isDir, className: 'h-4 w-4 shrink-0' })}
+      {getFileIcon(node.name, {
+        isDirectory: isDir,
+        className: 'h-4 w-4 shrink-0',
+      })}
       <input
         type="text"
         ref={renameInputRef}
@@ -238,7 +269,10 @@ function TreeNode({
         onChange={(e) => setRenameName(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === 'Enter') confirmRename();
-          if (e.key === 'Escape') { setIsRenaming(false); setRenameName(''); }
+          if (e.key === 'Escape') {
+            setIsRenaming(false);
+            setRenameName('');
+          }
         }}
         onBlur={() => confirmRename()}
         className="flex-1 text-sm bg-transparent border border-primary/50 rounded px-1.5 py-0.5 outline-none min-w-0 selection:bg-primary/25 selection:text-foreground"
@@ -280,35 +314,50 @@ function TreeNode({
       {isDir && isExpanded ? (
         <FolderOpen className="h-4 w-4 shrink-0 text-blue-400" />
       ) : (
-        getFileIcon(node.name, { isDirectory: isDir, className: 'h-4 w-4 shrink-0' })
+        getFileIcon(node.name, {
+          isDirectory: isDir,
+          className: 'h-4 w-4 shrink-0',
+        })
       )}
 
       {/* Name */}
-      <span className={cn(
-        'truncate flex-1',
-        gitStatus && gitStatusTextColor[gitStatus],
-        !gitStatus && node.name.startsWith('.') && 'opacity-50',
-      )}>
+      <span
+        className={cn(
+          'truncate flex-1',
+          gitStatus && gitStatusTextColor[gitStatus],
+          !gitStatus && node.name.startsWith('.') && 'opacity-50',
+        )}
+      >
         {node.name}
       </span>
 
       {/* Indicators */}
-      {(gitStatus || (diagCounts && (diagCounts.errors > 0 || diagCounts.warnings > 0))) && (
+      {(gitStatus ||
+        (diagCounts && (diagCounts.errors > 0 || diagCounts.warnings > 0))) && (
         <span className="inline-flex items-center gap-1 shrink-0 pr-2">
           {diagCounts && diagCounts.errors > 0 && (
             <span className="inline-flex items-center gap-0.5 text-red-500/80">
               <CircleAlert className="h-3 w-3" />
-              <span className="text-xs font-medium leading-none">{diagCounts.errors}</span>
+              <span className="text-xs font-medium leading-none">
+                {diagCounts.errors}
+              </span>
             </span>
           )}
           {diagCounts && diagCounts.warnings > 0 && (
             <span className="inline-flex items-center gap-0.5 text-yellow-500/80">
               <AlertTriangle className="h-3 w-3" />
-              <span className="text-xs font-medium leading-none">{diagCounts.warnings}</span>
+              <span className="text-xs font-medium leading-none">
+                {diagCounts.warnings}
+              </span>
             </span>
           )}
           {gitStatus && (
-            <span className={cn('text-xs font-medium leading-none ml-0.5', gitStatusBadgeColor[gitStatus])}>
+            <span
+              className={cn(
+                'text-xs font-medium leading-none ml-0.5',
+                gitStatusBadgeColor[gitStatus],
+              )}
+            >
               {gitStatusLabel[gitStatus]}
             </span>
           )}
@@ -320,23 +369,23 @@ function TreeNode({
   return (
     <>
       <ContextMenu>
-        <ContextMenuTrigger asChild>
-          {rowContent}
-        </ContextMenuTrigger>
+        <ContextMenuTrigger asChild>{rowContent}</ContextMenuTrigger>
         <ContextMenuContent className="w-48">
           <ContextMenuItem onClick={handleClick}>
             <ChevronRight className="mr-2 h-4 w-4" />
             {isDir ? 'Open folder' : 'Open file'}
           </ContextMenuItem>
           {!isDir && (
-            <ContextMenuItem onClick={() => {
-              openTabAndNavigate({
-                id: `file:${node.path}`,
-                title: node.name,
-                type: 'file',
-                href: `/files/${encodeURIComponent(node.path)}`,
-              });
-            }}>
+            <ContextMenuItem
+              onClick={() => {
+                openTabAndNavigate({
+                  id: `file:${node.path}`,
+                  title: node.name,
+                  type: 'file',
+                  href: `/files/${encodeURIComponent(node.path)}`,
+                });
+              }}
+            >
               <ExternalLink className="mr-2 h-4 w-4" />
               Open in new tab
             </ContextMenuItem>
@@ -361,7 +410,9 @@ function TreeNode({
             </ContextMenuItem>
           )}
           {!isDir && (
-            <ContextMenuItem onClick={() => useFilesStore.getState().openHistory(node.path)}>
+            <ContextMenuItem
+              onClick={() => useFilesStore.getState().openHistory(node.path)}
+            >
               <History className="mr-2 h-4 w-4" />
               View History
             </ContextMenuItem>
@@ -373,7 +424,9 @@ function TreeNode({
                 <FilePlus className="mr-2 h-4 w-4" />
                 New File
               </ContextMenuItem>
-              <ContextMenuItem onClick={() => onCreateInDir(node.path, 'folder')}>
+              <ContextMenuItem
+                onClick={() => onCreateInDir(node.path, 'folder')}
+              >
                 <FolderPlus className="mr-2 h-4 w-4" />
                 New Folder
               </ContextMenuItem>
@@ -392,14 +445,21 @@ function TreeNode({
             <Scissors className="mr-2 h-4 w-4" />
             Cut
           </ContextMenuItem>
-          <ContextMenuItem onClick={() => navigator.clipboard.writeText(node.path)}>
+          <ContextMenuItem
+            onClick={() => navigator.clipboard.writeText(node.path)}
+          >
             <Copy className="mr-2 h-4 w-4" />
             Copy path
           </ContextMenuItem>
           <ContextMenuSeparator />
-          <ContextMenuItem onClick={() => {
-            setTimeout(() => { setRenameName(node.name); setIsRenaming(true); }, 100);
-          }}>
+          <ContextMenuItem
+            onClick={() => {
+              setTimeout(() => {
+                setRenameName(node.name);
+                setIsRenaming(true);
+              }, 100);
+            }}
+          >
             <Pencil className="mr-2 h-4 w-4" />
             Rename
           </ContextMenuItem>
@@ -470,7 +530,9 @@ function InlineCreateInput({
   onSubmit: (name: string) => void;
   onCancel: () => void;
 }) {
-  const [name, setName] = useState(type === 'file' ? 'untitled.txt' : 'New Folder');
+  const [name, setName] = useState(
+    type === 'file' ? 'untitled.txt' : 'New Folder',
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   // Guard: ignore blur events until the input has been properly focused.
   // Without this, the context-menu closing causes a stray blur that
@@ -638,13 +700,17 @@ export function FileTree() {
   const copyToClipboard = useFilesStore((s) => s.copyToClipboard);
   const cutToClipboard = useFilesStore((s) => s.cutToClipboard);
   const clearClipboard = useFilesStore((s) => s.clearClipboard);
-  const toggleSearch = useFilesStore((s) => s.toggleSearch);
 
   const { data: health } = useServerHealth();
 
   // Git status
-  const { data: gitStatuses } = useGitStatus({ enabled: health?.healthy === true });
-  const gitStatusMap = useMemo(() => buildGitStatusMap(gitStatuses), [gitStatuses]);
+  const { data: gitStatuses } = useGitStatus({
+    enabled: health?.healthy === true,
+  });
+  const gitStatusMap = useMemo(
+    () => buildGitStatusMap(gitStatuses),
+    [gitStatuses],
+  );
 
   // Diagnostics — uses buildDiagnosticCountsMap to handle abs→rel path matching
   const diagByFile = useDiagnosticsStore((s) => s.byFile);
@@ -673,7 +739,8 @@ export function FileTree() {
   }, [diagCountsLookup]);
 
   // Directory download with progress
-  const { downloadDir, isDownloading: isDirDownloading } = useDirectoryDownload();
+  const { downloadDir, isDownloading: isDirDownloading } =
+    useDirectoryDownload();
 
   // Mutations
   const renameMutation = useFileRename();
@@ -692,7 +759,9 @@ export function FileTree() {
   const [newFileName, setNewFileName] = useState('');
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
-  const [uploadTargetPath, setUploadTargetPath] = useState<string | undefined>(undefined);
+  const [uploadTargetPath, setUploadTargetPath] = useState<string | undefined>(
+    undefined,
+  );
   const fileCreateInputRef = useRef<HTMLInputElement>(null);
   const folderCreateInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -703,14 +772,20 @@ export function FileTree() {
   const pathInputRef2 = useRef<HTMLInputElement>(null);
 
   // Inline create states (inside a specific folder via context menu)
-  const [creatingInDir, setCreatingInDir] = useState<CreatingInDir | null>(null);
+  const [creatingInDir, setCreatingInDir] = useState<CreatingInDir | null>(
+    null,
+  );
 
   useEffect(() => {
     if (isCreatingFile) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           const el = fileCreateInputRef.current;
-          if (el) { el.focus(); const d = el.value.lastIndexOf('.'); el.setSelectionRange(0, d > 0 ? d : el.value.length); }
+          if (el) {
+            el.focus();
+            const d = el.value.lastIndexOf('.');
+            el.setSelectionRange(0, d > 0 ? d : el.value.length);
+          }
         });
       });
     }
@@ -721,25 +796,35 @@ export function FileTree() {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           const el = folderCreateInputRef.current;
-          if (el) { el.focus(); el.setSelectionRange(0, el.value.length); }
+          if (el) {
+            el.focus();
+            el.setSelectionRange(0, el.value.length);
+          }
         });
       });
     }
   }, [isCreatingFolder]);
 
-  const handleRename = useCallback(async (node: FileNode, newName: string) => {
-    if (!newName || newName === node.name) return;
-    const parentPath = node.path.substring(0, node.path.lastIndexOf('/'));
-    const newPath = parentPath ? `${parentPath}/${newName}` : newName;
-    try {
-      await renameMutation.mutateAsync({ from: node.path, to: newPath });
-      toast.success(`Renamed to ${newName}`);
-    } catch (err) {
-      toast.error(`Failed to rename: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    }
-  }, [renameMutation]);
+  const handleRename = useCallback(
+    async (node: FileNode, newName: string) => {
+      if (!newName || newName === node.name) return;
+      const parentPath = node.path.substring(0, node.path.lastIndexOf('/'));
+      const newPath = parentPath ? `${parentPath}/${newName}` : newName;
+      try {
+        await renameMutation.mutateAsync({ from: node.path, to: newPath });
+        toast.success(`Renamed to ${newName}`);
+      } catch (err) {
+        toast.error(
+          `Failed to rename: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
+      }
+    },
+    [renameMutation],
+  );
 
-  const handleDelete = useCallback((node: FileNode) => { setDeleteTarget(node); }, []);
+  const handleDelete = useCallback((node: FileNode) => {
+    setDeleteTarget(node);
+  }, []);
 
   const confirmDelete = useCallback(async () => {
     if (!deleteTarget) return;
@@ -747,69 +832,110 @@ export function FileTree() {
       await deleteMutationHook.mutateAsync({ filePath: deleteTarget.path });
       toast.success(`Deleted ${deleteTarget.name}`);
     } catch (err) {
-      toast.error(`Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(
+        `Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     } finally {
       setDeleteTarget(null);
     }
   }, [deleteTarget, deleteMutationHook]);
 
-  const handleCopy = useCallback((node: FileNode) => {
-    copyToClipboard(node.path, node.name, node.type);
-    toast.success(`Copied "${node.name}"`);
-  }, [copyToClipboard]);
+  const handleCopy = useCallback(
+    (node: FileNode) => {
+      copyToClipboard(node.path, node.name, node.type);
+      toast.success(`Copied "${node.name}"`);
+    },
+    [copyToClipboard],
+  );
 
-  const handleCut = useCallback((node: FileNode) => {
-    cutToClipboard(node.path, node.name, node.type);
-    toast.success(`Cut "${node.name}"`);
-  }, [cutToClipboard]);
+  const handleCut = useCallback(
+    (node: FileNode) => {
+      cutToClipboard(node.path, node.name, node.type);
+      toast.success(`Cut "${node.name}"`);
+    },
+    [cutToClipboard],
+  );
 
-  const handleDropMove = useCallback(async (sourcePath: string, targetDirPath: string) => {
-    const sourceName = sourcePath.split('/').pop() || '';
-    const destPath = targetDirPath ? `${targetDirPath}/${sourceName}` : sourceName;
-    if (sourcePath === destPath) return;
-    try {
-      await renameMutation.mutateAsync({ from: sourcePath, to: destPath });
-      toast.success(`Moved "${sourceName}"`);
-    } catch (err) {
-      toast.error(`Failed to move: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    }
-  }, [renameMutation]);
+  const handleDropMove = useCallback(
+    async (sourcePath: string, targetDirPath: string) => {
+      const sourceName = sourcePath.split('/').pop() || '';
+      const destPath = targetDirPath
+        ? `${targetDirPath}/${sourceName}`
+        : sourceName;
+      if (sourcePath === destPath) return;
+      try {
+        await renameMutation.mutateAsync({ from: sourcePath, to: destPath });
+        toast.success(`Moved "${sourceName}"`);
+      } catch (err) {
+        toast.error(
+          `Failed to move: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
+      }
+    },
+    [renameMutation],
+  );
 
   const handlePaste = useCallback(async () => {
     if (!clipboard) return;
-    const isRootPath = currentPath === '/' || currentPath === '.' || currentPath === '';
+    const isRootPath =
+      currentPath === '/' || currentPath === '.' || currentPath === '';
     const destDir = isRootPath ? '' : currentPath.replace(/\/$/, '');
     const destPath = destDir ? `${destDir}/${clipboard.name}` : clipboard.name;
     try {
       if (clipboard.operation === 'copy') {
         if (clipboard.type === 'file') {
-          await copyMutation.mutateAsync({ sourcePath: clipboard.path, destPath });
+          await copyMutation.mutateAsync({
+            sourcePath: clipboard.path,
+            destPath,
+          });
           toast.success(`Copied "${clipboard.name}" here`);
         } else {
           await mkdirMutation.mutateAsync({ dirPath: destPath });
           toast.success(`Created copy of folder "${clipboard.name}" (empty)`);
         }
       } else {
-        await renameMutation.mutateAsync({ from: clipboard.path, to: destPath });
+        await renameMutation.mutateAsync({
+          from: clipboard.path,
+          to: destPath,
+        });
         toast.success(`Moved "${clipboard.name}" here`);
         clearClipboard();
       }
     } catch (err) {
-      toast.error(`Failed to paste: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(
+        `Failed to paste: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     }
-  }, [clipboard, currentPath, copyMutation, renameMutation, mkdirMutation, clearClipboard]);
+  }, [
+    clipboard,
+    currentPath,
+    copyMutation,
+    renameMutation,
+    mkdirMutation,
+    clearClipboard,
+  ]);
 
-  const isRootPath = currentPath === '/' || currentPath === '.' || currentPath === '';
-  const normalizedCurrentPath = isRootPath ? '' : currentPath.replace(/\/$/, '');
+  const isRootPath =
+    currentPath === '/' || currentPath === '.' || currentPath === '';
+  const normalizedCurrentPath = isRootPath
+    ? ''
+    : currentPath.replace(/\/$/, '');
 
   const handleCreateFile = useCallback(async () => {
-    if (!newFileName.trim()) { setIsCreatingFile(false); return; }
-    const filePath = normalizedCurrentPath ? `${normalizedCurrentPath}/${newFileName.trim()}` : newFileName.trim();
+    if (!newFileName.trim()) {
+      setIsCreatingFile(false);
+      return;
+    }
+    const filePath = normalizedCurrentPath
+      ? `${normalizedCurrentPath}/${newFileName.trim()}`
+      : newFileName.trim();
     try {
       await createMutation.mutateAsync({ filePath });
       toast.success(`Created ${newFileName.trim()}`);
     } catch (err) {
-      toast.error(`Failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(
+        `Failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     } finally {
       setIsCreatingFile(false);
       setNewFileName('');
@@ -817,13 +943,20 @@ export function FileTree() {
   }, [createMutation, normalizedCurrentPath, newFileName]);
 
   const handleCreateFolder = useCallback(async () => {
-    if (!newFolderName.trim()) { setIsCreatingFolder(false); return; }
-    const folderPath = normalizedCurrentPath ? `${normalizedCurrentPath}/${newFolderName.trim()}` : newFolderName.trim();
+    if (!newFolderName.trim()) {
+      setIsCreatingFolder(false);
+      return;
+    }
+    const folderPath = normalizedCurrentPath
+      ? `${normalizedCurrentPath}/${newFolderName.trim()}`
+      : newFolderName.trim();
     try {
       await mkdirMutation.mutateAsync({ dirPath: folderPath });
       toast.success(`Created folder: ${newFolderName.trim()}`);
     } catch (err) {
-      toast.error(`Failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(
+        `Failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     } finally {
       setIsCreatingFolder(false);
       setNewFolderName('');
@@ -832,34 +965,42 @@ export function FileTree() {
 
   // Handlers for creating inside a specific folder (via context menu)
   const expandDir = useFilesStore((s) => s.expandDir);
-  
-  const handleCreateInDir = useCallback((dirPath: string, type: 'file' | 'folder') => {
-    // Expand the folder so the inline input is visible
-    expandDir(dirPath);
-    // Use setTimeout to let the context menu close and folder expand first
-    setTimeout(() => {
-      setCreatingInDir({ dirPath, type });
-    }, 100);
-  }, [expandDir]);
 
-  const handleCreatingInDirSubmit = useCallback(async (name: string) => {
-    if (!creatingInDir) return;
-    const { dirPath, type } = creatingInDir;
-    const fullPath = `${dirPath}/${name}`;
-    try {
-      if (type === 'file') {
-        await createMutation.mutateAsync({ filePath: fullPath });
-        toast.success(`Created ${name}`);
-      } else {
-        await mkdirMutation.mutateAsync({ dirPath: fullPath });
-        toast.success(`Created folder: ${name}`);
+  const handleCreateInDir = useCallback(
+    (dirPath: string, type: 'file' | 'folder') => {
+      // Expand the folder so the inline input is visible
+      expandDir(dirPath);
+      // Use setTimeout to let the context menu close and folder expand first
+      setTimeout(() => {
+        setCreatingInDir({ dirPath, type });
+      }, 100);
+    },
+    [expandDir],
+  );
+
+  const handleCreatingInDirSubmit = useCallback(
+    async (name: string) => {
+      if (!creatingInDir) return;
+      const { dirPath, type } = creatingInDir;
+      const fullPath = `${dirPath}/${name}`;
+      try {
+        if (type === 'file') {
+          await createMutation.mutateAsync({ filePath: fullPath });
+          toast.success(`Created ${name}`);
+        } else {
+          await mkdirMutation.mutateAsync({ dirPath: fullPath });
+          toast.success(`Created folder: ${name}`);
+        }
+      } catch (err) {
+        toast.error(
+          `Failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
+      } finally {
+        setCreatingInDir(null);
       }
-    } catch (err) {
-      toast.error(`Failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      setCreatingInDir(null);
-    }
-  }, [creatingInDir, createMutation, mkdirMutation]);
+    },
+    [creatingInDir, createMutation, mkdirMutation],
+  );
 
   const handleCreatingInDirCancel = useCallback(() => {
     setCreatingInDir(null);
@@ -870,26 +1011,37 @@ export function FileTree() {
     fileInputRef.current?.click();
   }, []);
 
-  const handleFileInputChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    const file = e.target.files[0];
-    try {
-      const targetPath = uploadTargetPath ?? (isRootPath ? undefined : currentPath);
-      await uploadMutation.mutateAsync({ file, targetPath });
-      toast.success(`Uploaded ${file.name}`);
-    } catch (err) {
-      toast.error(`Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      e.target.value = '';
-      setUploadTargetPath(undefined);
-    }
-  }, [uploadMutation, uploadTargetPath, isRootPath, currentPath]);
+  const handleFileInputChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.files || e.target.files.length === 0) return;
+      const file = e.target.files[0];
+      try {
+        const targetPath =
+          uploadTargetPath ?? (isRootPath ? undefined : currentPath);
+        await uploadMutation.mutateAsync({ file, targetPath });
+        toast.success(`Uploaded ${file.name}`);
+      } catch (err) {
+        toast.error(
+          `Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
+      } finally {
+        e.target.value = '';
+        setUploadTargetPath(undefined);
+      }
+    },
+    [uploadMutation, uploadTargetPath, isRootPath, currentPath],
+  );
 
   // Keyboard: Ctrl+V paste
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      )
+        return;
       if ((e.metaKey || e.ctrlKey) && e.key === 'v' && clipboard) {
         e.preventDefault();
         handlePaste();
@@ -907,17 +1059,47 @@ export function FileTree() {
           Explorer
         </span>
         <div className="flex items-center gap-0.5">
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setNewFileName('untitled.txt'); setIsCreatingFile(true); }} title="New file">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => {
+              setNewFileName('untitled.txt');
+              setIsCreatingFile(true);
+            }}
+            title="New file"
+          >
             <FilePlus className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setNewFolderName('New Folder'); setIsCreatingFolder(true); }} title="New folder">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => {
+              setNewFolderName('New Folder');
+              setIsCreatingFolder(true);
+            }}
+            title="New folder"
+          >
             <FolderPlus className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleUpload()} title="Upload">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => handleUpload()}
+            title="Upload"
+          >
             <Upload className="h-3.5 w-3.5" />
           </Button>
           {clipboard && (
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={handlePaste} title={`Paste "${clipboard.name}"`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-primary"
+              onClick={handlePaste}
+              title={`Paste "${clipboard.name}"`}
+            >
               <Clipboard className="h-3.5 w-3.5" />
             </Button>
           )}
@@ -938,7 +1120,8 @@ export function FileTree() {
           </Button>
         )}
         {pathInputActive ? (
-          <input type="text"
+          <input
+            type="text"
             ref={pathInputRef2}
             value={pathInputValue}
             onChange={(e) => setPathInputValue(e.target.value)}
@@ -971,7 +1154,12 @@ export function FileTree() {
       </div>
 
       {/* Hidden file input */}
-      <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileInputChange} />
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
 
       {/* Tree content */}
       <ScrollArea className="flex-1 overflow-hidden min-h-0">
@@ -985,7 +1173,13 @@ export function FileTree() {
                 ref={fileCreateInputRef}
                 value={newFileName}
                 onChange={(e) => setNewFileName(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleCreateFile(); if (e.key === 'Escape') { setIsCreatingFile(false); setNewFileName(''); } }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleCreateFile();
+                  if (e.key === 'Escape') {
+                    setIsCreatingFile(false);
+                    setNewFileName('');
+                  }
+                }}
                 onBlur={() => handleCreateFile()}
                 className="flex-1 text-sm bg-transparent border border-primary/50 rounded px-1.5 py-0.5 outline-none min-w-0"
               />
@@ -999,7 +1193,13 @@ export function FileTree() {
                 ref={folderCreateInputRef}
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleCreateFolder(); if (e.key === 'Escape') { setIsCreatingFolder(false); setNewFolderName(''); } }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleCreateFolder();
+                  if (e.key === 'Escape') {
+                    setIsCreatingFolder(false);
+                    setNewFolderName('');
+                  }
+                }}
                 onBlur={() => handleCreateFolder()}
                 className="flex-1 text-sm bg-transparent border border-primary/50 rounded px-1.5 py-0.5 outline-none min-w-0"
               />
@@ -1032,7 +1232,10 @@ export function FileTree() {
       {clipboard && (
         <div className="flex items-center justify-between gap-1.5 px-3 py-1.5 border-t border-border/50 bg-muted/20 text-xs text-muted-foreground shrink-0">
           <span className="truncate">
-            {clipboard.operation === 'cut' ? 'Move' : 'Copy'}: <span className="font-medium text-foreground/80">{clipboard.name}</span>
+            {clipboard.operation === 'cut' ? 'Move' : 'Copy'}:{' '}
+            <span className="font-medium text-foreground/80">
+              {clipboard.name}
+            </span>
           </span>
           <Button onClick={clearClipboard} variant="muted" size="xs">
             Cancel
@@ -1041,22 +1244,39 @@ export function FileTree() {
       )}
 
       {/* Delete confirmation */}
-      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={() => setDeleteTarget(null)}
+      >
         <AlertDialogContent
           className="sm:max-w-md"
-          onOpenAutoFocus={(e) => { e.preventDefault(); deleteButtonRef.current?.focus(); }}
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+            deleteButtonRef.current?.focus();
+          }}
         >
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {deleteTarget?.type === 'directory' ? 'folder' : 'file'}</AlertDialogTitle>
+            <AlertDialogTitle>
+              Delete {deleteTarget?.type === 'directory' ? 'folder' : 'file'}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <span className="font-semibold text-foreground">&quot;{deleteTarget?.name}&quot;</span>? This action cannot be undone.
+              Are you sure you want to delete{' '}
+              <span className="font-semibold text-foreground">
+                &quot;{deleteTarget?.name}&quot;
+              </span>
+              ? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteMutationHook.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteMutationHook.isPending}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               ref={deleteButtonRef}
-              onClick={(e) => { e.preventDefault(); confirmDelete(); }}
+              onClick={(e) => {
+                e.preventDefault();
+                confirmDelete();
+              }}
               disabled={deleteMutationHook.isPending}
               className="bg-destructive text-white hover:bg-destructive/90"
             >

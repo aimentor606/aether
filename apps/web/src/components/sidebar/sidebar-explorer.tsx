@@ -25,7 +25,12 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { useFilesStore } from '@/features/files/store/files-store';
-import { useFileList, useServerHealth, useGitStatus, buildGitStatusMap } from '@/features/files/hooks';
+import {
+  useFileList,
+  useServerHealth,
+  useGitStatus,
+  buildGitStatusMap,
+} from '@/features/files/hooks';
 import {
   useFileUpload,
   useFileDelete,
@@ -36,13 +41,19 @@ import {
 } from '@/features/files/hooks/use-file-mutations';
 import { useFileEventInvalidation } from '@/features/files/hooks/use-file-events';
 import { downloadFile } from '@/features/files/api/opencode-files';
-import { FileTreeItem, DRAG_MIME } from '@/features/files/components/file-tree-item';
+import {
+  FileTreeItem,
+  DRAG_MIME,
+} from '@/features/files/components/file-tree-item';
 import { FileBreadcrumbs } from '@/features/files/components/file-breadcrumbs';
 import { FileSearch } from '@/features/files/components/file-search';
 import type { FileNode } from '@/features/files/types';
 import { toast } from '@/lib/toast';
 import { useTabStore, openTabAndNavigate } from '@/stores/tab-store';
-import { useDiagnosticsStore, buildDiagnosticCountsMap } from '@/stores/diagnostics-store';
+import {
+  useDiagnosticsStore,
+  buildDiagnosticCountsMap,
+} from '@/stores/diagnostics-store';
 
 // ============================================================================
 // Panel type
@@ -68,7 +79,7 @@ export function SidebarPanelTabs({ active, onChange }: SidebarPanelTabsProps) {
           'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer',
           active === 'sessions'
             ? 'bg-muted text-foreground'
-            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
         )}
       >
         <MessageSquare className="h-3.5 w-3.5" />
@@ -80,7 +91,7 @@ export function SidebarPanelTabs({ active, onChange }: SidebarPanelTabsProps) {
           'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer',
           active === 'files'
             ? 'bg-muted text-foreground'
-            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
         )}
       >
         <FolderTree className="h-3.5 w-3.5" />
@@ -162,7 +173,9 @@ interface SidebarFileBrowserProps {
   openFileAsTab?: boolean;
 }
 
-export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowserProps) {
+export function SidebarFileBrowser({
+  openFileAsTab = false,
+}: SidebarFileBrowserProps) {
   const currentPath = useFilesStore((s) => s.currentPath);
   const navigateToPath = useFilesStore((s) => s.navigateToPath);
   const openFileWithList = useFilesStore((s) => s.openFileWithList);
@@ -188,8 +201,13 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
   });
 
   // Git status
-  const { data: gitStatuses } = useGitStatus({ enabled: health?.healthy === true });
-  const gitStatusMap = useMemo(() => buildGitStatusMap(gitStatuses), [gitStatuses]);
+  const { data: gitStatuses } = useGitStatus({
+    enabled: health?.healthy === true,
+  });
+  const gitStatusMap = useMemo(
+    () => buildGitStatusMap(gitStatuses),
+    [gitStatuses],
+  );
 
   // Hook up SSE file events for real-time updates
   useFileEventInvalidation();
@@ -254,8 +272,11 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
     return { dirs, fileItems };
   }, [files]);
 
-  const isRootPath = currentPath === '/' || currentPath === '.' || currentPath === '';
-  const normalizedCurrentPath = isRootPath ? '' : currentPath.replace(/\/$/, '');
+  const isRootPath =
+    currentPath === '/' || currentPath === '.' || currentPath === '';
+  const normalizedCurrentPath = isRootPath
+    ? ''
+    : currentPath.replace(/\/$/, '');
 
   // Check if file name already exists
   const fileNameExists = useMemo(() => {
@@ -356,7 +377,9 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
         await renameMutation.mutateAsync({ from: node.path, to: newPath });
         toast.success(`Renamed to ${newName}`);
       } catch (err) {
-        toast.error(`Failed to rename: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        toast.error(
+          `Failed to rename: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
       }
     },
     [renameMutation],
@@ -372,7 +395,9 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
         await deleteMutation.mutateAsync({ filePath: node.path });
         toast.success(`Deleted ${node.name}`);
       } catch (err) {
-        toast.error(`Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        toast.error(
+          `Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
       }
     },
     [deleteMutation],
@@ -393,7 +418,9 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
         });
         toast.success(`Uploaded ${file.name}`);
       } catch (err) {
-        toast.error(`Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        toast.error(
+          `Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
       } finally {
         event.target.value = '';
       }
@@ -413,7 +440,9 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
       await mkdirMutation.mutateAsync({ dirPath: folderPath });
       toast.success(`Created folder: ${newFolderName.trim()}`);
     } catch (err) {
-      toast.error(`Failed to create folder: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(
+        `Failed to create folder: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     } finally {
       setIsCreatingFolder(false);
       setNewFolderName('');
@@ -432,7 +461,9 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
       await createMutation.mutateAsync({ filePath });
       toast.success(`Created file: ${newFileName.trim()}`);
     } catch (err) {
-      toast.error(`Failed to create file: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(
+        `Failed to create file: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     } finally {
       setIsCreatingFile(false);
       setNewFileName('');
@@ -460,15 +491,21 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
   const handleDropMove = useCallback(
     async (sourcePath: string, targetDirPath: string) => {
       const sourceName = sourcePath.split('/').pop() || '';
-      const destPath = targetDirPath ? `${targetDirPath}/${sourceName}` : sourceName;
+      const destPath = targetDirPath
+        ? `${targetDirPath}/${sourceName}`
+        : sourceName;
 
       if (sourcePath === destPath) return;
 
       try {
         await renameMutation.mutateAsync({ from: sourcePath, to: destPath });
-        toast.success(`Moved "${sourceName}" to ${targetDirPath.split('/').pop() || 'root'}`);
+        toast.success(
+          `Moved "${sourceName}" to ${targetDirPath.split('/').pop() || 'root'}`,
+        );
       } catch (err) {
-        toast.error(`Failed to move: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        toast.error(
+          `Failed to move: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
       }
     },
     [renameMutation],
@@ -485,8 +522,12 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
       const existingNames = new Set(files.map((f) => f.name.toLowerCase()));
       if (existingNames.has(destName.toLowerCase())) {
         if (clipboard.operation === 'copy') {
-          const ext = destName.includes('.') ? destName.substring(destName.lastIndexOf('.')) : '';
-          const baseName = ext ? destName.substring(0, destName.lastIndexOf('.')) : destName;
+          const ext = destName.includes('.')
+            ? destName.substring(destName.lastIndexOf('.'))
+            : '';
+          const baseName = ext
+            ? destName.substring(0, destName.lastIndexOf('.'))
+            : destName;
           let counter = 0;
           let candidate = `${baseName} (copy)${ext}`;
           while (existingNames.has(candidate.toLowerCase())) {
@@ -495,7 +536,8 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
           }
           destName = candidate;
         } else {
-          const sourceDir = clipboard.path.substring(0, clipboard.path.lastIndexOf('/')) || '.';
+          const sourceDir =
+            clipboard.path.substring(0, clipboard.path.lastIndexOf('/')) || '.';
           const normalizedSourceDir = sourceDir === '' ? '.' : sourceDir;
           const normalizedDestDir = destDir === '' ? '.' : destDir;
           if (normalizedSourceDir === normalizedDestDir) {
@@ -511,28 +553,51 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
     try {
       if (clipboard.operation === 'copy') {
         if (clipboard.type === 'file') {
-          await copyMutation.mutateAsync({ sourcePath: clipboard.path, destPath });
+          await copyMutation.mutateAsync({
+            sourcePath: clipboard.path,
+            destPath,
+          });
           toast.success(`Copied "${clipboard.name}" here`);
         } else {
           await mkdirMutation.mutateAsync({ dirPath: destPath });
-          toast.success(`Created copy of folder "${clipboard.name}" here (empty)`);
+          toast.success(
+            `Created copy of folder "${clipboard.name}" here (empty)`,
+          );
         }
       } else {
-        await renameMutation.mutateAsync({ from: clipboard.path, to: destPath });
+        await renameMutation.mutateAsync({
+          from: clipboard.path,
+          to: destPath,
+        });
         toast.success(`Moved "${clipboard.name}" here`);
         clearClipboard();
       }
     } catch (err) {
-      toast.error(`Failed to paste: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(
+        `Failed to paste: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     }
-  }, [clipboard, normalizedCurrentPath, files, copyMutation, renameMutation, mkdirMutation, clearClipboard]);
+  }, [
+    clipboard,
+    normalizedCurrentPath,
+    files,
+    copyMutation,
+    renameMutation,
+    mkdirMutation,
+    clearClipboard,
+  ]);
 
   // Server not reachable
   if (!health?.healthy) {
     return (
       <div className="flex flex-col items-center justify-center flex-1 gap-3 p-6 text-center">
         <p className="text-xs text-muted-foreground">Server not reachable</p>
-        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => refetch()}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 text-xs"
+          onClick={() => refetch()}
+        >
           <RefreshCw className="h-3 w-3 mr-1" />
           Retry
         </Button>
@@ -548,27 +613,47 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
           <FileBreadcrumbs />
         </div>
         <div className="flex items-center gap-0 shrink-0">
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleUpload} disabled={uploadMutation.isPending} title="Upload file">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={handleUpload}
+            disabled={uploadMutation.isPending}
+            title="Upload file"
+          >
             <Upload className="h-3 w-3" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6"
-            onClick={() => { setIsCreatingFile(true); setNewFileName('untitled.txt'); }}
+            className="h-8 w-8"
+            onClick={() => {
+              setIsCreatingFile(true);
+              setNewFileName('untitled.txt');
+            }}
             disabled={createMutation.isPending}
             title="New file"
           >
             <FilePlus className="h-3 w-3" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setIsCreatingFolder(true); setNewFolderName('New Folder'); }} disabled={mkdirMutation.isPending} title="New folder">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => {
+              setIsCreatingFolder(true);
+              setNewFolderName('New Folder');
+            }}
+            disabled={mkdirMutation.isPending}
+            title="New folder"
+          >
             <FolderPlus className="h-3 w-3" />
           </Button>
           {clipboard && (
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 text-primary"
+              className="h-8 w-8 text-primary"
               onClick={handlePaste}
               disabled={copyMutation.isPending || renameMutation.isPending}
               title={`Paste "${clipboard.name}" (${clipboard.operation})`}
@@ -579,23 +664,44 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
           <Button
             variant="ghost"
             size="icon"
-            className={cn('h-6 w-6', showHidden ? 'text-primary' : '')}
+            className={cn('h-8 w-8', showHidden ? 'text-primary' : '')}
             onClick={toggleHidden}
             title={showHidden ? 'Hide dotfiles' : 'Show dotfiles'}
           >
-            {showHidden ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+            {showHidden ? (
+              <Eye className="h-3 w-3" />
+            ) : (
+              <EyeOff className="h-3 w-3" />
+            )}
           </Button>
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={toggleSearch} title="Search files">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={toggleSearch}
+            title="Search files"
+          >
             <Search className="h-3 w-3" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => refetch()} title="Refresh">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => refetch()}
+            title="Refresh"
+          >
             <RefreshCw className="h-3 w-3" />
           </Button>
         </div>
       </div>
 
       {/* Hidden file input for uploads */}
-      <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileInputChange} />
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
 
       {/* Search overlay */}
       {isSearchOpen && <FileSearch />}
@@ -612,8 +718,15 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
 
         {error && !isLoading && (
           <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
-            <p className="text-xs text-muted-foreground">Failed to load files</p>
-            <Button variant="outline" size="sm" className="h-7 text-xs mt-2" onClick={() => refetch()}>
+            <p className="text-xs text-muted-foreground">
+              Failed to load files
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs mt-2"
+              onClick={() => refetch()}
+            >
               Retry
             </Button>
           </div>
@@ -643,7 +756,10 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
                       onChange={(e) => setNewFolderName(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') handleCreateFolder();
-                        if (e.key === 'Escape') { setIsCreatingFolder(false); setNewFolderName(''); }
+                        if (e.key === 'Escape') {
+                          setIsCreatingFolder(false);
+                          setNewFolderName('');
+                        }
                       }}
                       onBlur={handleCreateFolder}
                       className="flex-1 text-sm bg-transparent border border-primary rounded px-1.5 py-0.5 outline-none selection:bg-primary/15 selection:text-foreground"
@@ -662,16 +778,25 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
                         value={newFileName}
                         onChange={(e) => setNewFileName(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !fileNameExists) handleCreateFile();
-                          if (e.key === 'Escape') { setIsCreatingFile(false); setNewFileName(''); }
+                          if (e.key === 'Enter' && !fileNameExists)
+                            handleCreateFile();
+                          if (e.key === 'Escape') {
+                            setIsCreatingFile(false);
+                            setNewFileName('');
+                          }
                         }}
                         onBlur={() => {
                           if (!fileNameExists) handleCreateFile();
-                          else { setIsCreatingFile(false); setNewFileName(''); }
+                          else {
+                            setIsCreatingFile(false);
+                            setNewFileName('');
+                          }
                         }}
                         className={cn(
                           'flex-1 text-sm bg-transparent border rounded px-1.5 py-0.5 outline-none selection:bg-primary/15 selection:text-foreground',
-                          fileNameExists ? 'border-red-500/60' : 'border-primary',
+                          fileNameExists
+                            ? 'border-red-500/60'
+                            : 'border-primary',
                         )}
                       />
                     </div>
@@ -696,7 +821,10 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
                     onDropMove={handleDropMove}
                     siblingNames={siblingNames}
                     gitStatus={gitStatusMap.get(node.path)}
-                    isCut={clipboard?.operation === 'cut' && clipboard.path === node.path}
+                    isCut={
+                      clipboard?.operation === 'cut' &&
+                      clipboard.path === node.path
+                    }
                     diagnosticCounts={diagnosticCountsMap.get(node.path)}
                   />
                 ))}
@@ -715,7 +843,10 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
                     onDropMove={handleDropMove}
                     siblingNames={siblingNames}
                     gitStatus={gitStatusMap.get(node.path)}
-                    isCut={clipboard?.operation === 'cut' && clipboard.path === node.path}
+                    isCut={
+                      clipboard?.operation === 'cut' &&
+                      clipboard.path === node.path
+                    }
                     diagnosticCounts={diagnosticCountsMap.get(node.path)}
                   />
                 ))}
@@ -723,7 +854,9 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
                 {/* Empty directory */}
                 {files.length === 0 && !isCreatingFolder && !isCreatingFile && (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <p className="text-xs text-muted-foreground">Empty directory</p>
+                    <p className="text-xs text-muted-foreground">
+                      Empty directory
+                    </p>
                   </div>
                 )}
               </div>
@@ -766,7 +899,9 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
                   <ContextMenuSeparator />
                   <ContextMenuItem
                     onClick={handlePaste}
-                    disabled={copyMutation.isPending || renameMutation.isPending}
+                    disabled={
+                      copyMutation.isPending || renameMutation.isPending
+                    }
                   >
                     <Clipboard className="mr-2 h-4 w-4" />
                     Paste{' '}
@@ -791,7 +926,9 @@ export function SidebarFileBrowser({ openFileAsTab = false }: SidebarFileBrowser
         <div className="flex items-center justify-between gap-2 px-2 py-1 border-t border-border/40 bg-muted/30 text-[11px] text-muted-foreground shrink-0">
           <span className="truncate">
             {clipboard.operation === 'cut' ? 'Moving' : 'Copying'}:{' '}
-            <span className="font-medium text-foreground">{clipboard.name}</span>
+            <span className="font-medium text-foreground">
+              {clipboard.name}
+            </span>
           </span>
           <button
             onClick={clearClipboard}

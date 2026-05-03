@@ -1,0 +1,55 @@
+{{- if .Values.ssl.enabled }}
+{{- if .Values.ssl.certManager }}
+{{- $fullname := include "aether.fullname" . }}
+{{- $env := .Values.ssl.environment }}
+
+{{- if eq $env "dev" }}
+# Self-signed issuer for local development (no public domain needed)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ $fullname }}-selfsigned
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+---
+{{- else }}
+# Let's Encrypt staging issuer (rate-limit tolerant, browser warnings)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ $fullname }}-letsencrypt-staging
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: {{ .Values.ssl.issuerEmail | quote }}
+    privateKeySecretRef:
+      name: {{ $fullname }}-letsencrypt-staging-key
+    solvers:
+      - http01:
+          ingress:
+            class: kong
+---
+# Let's Encrypt production issuer (trusted by browsers)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ $fullname }}-letsencrypt-prod
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: {{ .Values.ssl.issuerEmail | quote }}
+    privateKeySecretRef:
+      name: {{ $fullname }}-letsencrypt-prod-key
+    solvers:
+      - http01:
+          ingress:
+            class: kong
+{{- end }}
+{{- end }}
+{{- end }}

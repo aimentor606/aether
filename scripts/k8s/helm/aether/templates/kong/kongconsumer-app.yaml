@@ -1,0 +1,28 @@
+{{- if .Values.kong.enabled }}
+apiVersion: configuration.konghq.com/v1
+kind: KongConsumer
+metadata:
+  name: app-client-01
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+  annotations:
+    kubernetes.io/ingress.class: kong
+username: app-client-01
+custom_id: client-001
+credentials:
+  - app-client-01-keyauth
+---
+apiVersion: configuration.konghq.com/v1
+kind: Secret
+metadata:
+  name: app-client-01-keyauth
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    konghq.com/credential: keyauth
+stringData:
+  key: {{ .Values.secrets.defaultApiKey | default "CHANGE_ME" }}
+  tags: prod-key
+type: Opaque
+{{- end }}

@@ -38,12 +38,10 @@ import {
 import { createClient } from '@/lib/supabase/client';
 import { toast } from '@/lib/toast';
 import { isBillingEnabled } from '@/lib/config';
-import { backendApi } from '@/lib/api-client';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Switch } from '@/components/ui/switch';
 
 import { useIsMobile } from '@/hooks/utils';
-import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useAccountDeletionStatus,

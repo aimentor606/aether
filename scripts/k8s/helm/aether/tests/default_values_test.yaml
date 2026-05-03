@@ -1,0 +1,27 @@
+suite: Default values smoke test
+values:
+  - ../values.yaml
+templates:
+  - templates/monitoring/servicemonitor-api.yaml
+  - templates/monitoring/servicemonitor-kong.yaml
+  - templates/monitoring/prometheusrules.yaml
+  - templates/monitoring/otel-collector.yaml
+  - templates/monitoring/grafana-datasources.yaml
+tests:
+  - it: renders all monitoring templates with default values
+    asserts:
+      - hasDocuments:
+          count: 1
+        template: templates/monitoring/servicemonitor-api.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/monitoring/servicemonitor-kong.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/monitoring/prometheusrules.yaml
+      - hasDocuments:
+          count: 3
+        template: templates/monitoring/otel-collector.yaml
+      - hasDocuments:
+          count: 1
+        template: templates/monitoring/grafana-datasources.yaml

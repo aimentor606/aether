@@ -18,7 +18,8 @@ import { cn } from '@/lib/utils';
 function PasswordAuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const returnUrl = searchParams.get('returnUrl') || searchParams.get('redirect');
+  const returnUrl =
+    searchParams.get('returnUrl') || searchParams.get('redirect');
   const { user, isLoading } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
@@ -37,9 +38,9 @@ function PasswordAuthContent() {
 
   const handleAuth = async (prevState: any, formData: FormData) => {
     setErrorMessage(null);
-    
+
     try {
-      const result = isSignUp 
+      const result = isSignUp
         ? await signUpWithPassword(prevState, formData)
         : await signInWithPassword(prevState, formData);
 
@@ -60,7 +61,7 @@ function PasswordAuthContent() {
         // Server-side redirect happened, client will follow
         return;
       }
-      
+
       const errorMsg = error?.message || 'An unexpected error occurred';
       setErrorMessage(errorMsg);
       toast.error(errorMsg);
@@ -105,10 +106,10 @@ function PasswordAuthContent() {
                     setErrorMessage(null);
                   }}
                   className={cn(
-                    "px-6 py-2 rounded-full text-sm font-medium transition-colors",
+                    'px-6 py-2 rounded-full text-sm font-medium transition-colors',
                     !isSignUp
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
                   Sign in
@@ -120,10 +121,10 @@ function PasswordAuthContent() {
                     setErrorMessage(null);
                   }}
                   className={cn(
-                    "px-6 py-2 rounded-full text-sm font-medium transition-colors",
+                    'px-6 py-2 rounded-full text-sm font-medium transition-colors',
                     isSignUp
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
                   Sign up
@@ -134,10 +135,9 @@ function PasswordAuthContent() {
                 {isSignUp ? 'Create Account' : 'Sign in'}
               </h1>
               <p className="text-base md:text-lg text-center text-muted-foreground font-medium text-balance leading-relaxed tracking-tight mt-2 mb-6">
-                {isSignUp 
+                {isSignUp
                   ? 'Enter your email and password to create your account'
-                  : 'Enter your email and password to access your account'
-                }
+                  : 'Enter your email and password to access your account'}
               </p>
             </div>
           </div>
@@ -146,7 +146,10 @@ function PasswordAuthContent() {
           <div className="relative z-10 flex justify-center px-6 pb-24">
             <div className="w-full max-w-md rounded-xl bg-[#F3F4F6] dark:bg-[#F9FAFB]/[0.02] border border-border p-8">
               {errorMessage && (
-                <div className="mb-6 p-4 rounded-lg flex items-center gap-3 bg-destructive/10 border border-destructive/20 text-destructive">
+                <div
+                  role="alert"
+                  className="mb-6 p-4 rounded-lg flex items-center gap-3 bg-destructive/10 border border-destructive/20 text-destructive"
+                >
                   <AlertCircle className="h-5 w-5 flex-shrink-0 text-destructive" />
                   <span className="text-sm font-medium">{errorMessage}</span>
                 </div>
@@ -173,7 +176,9 @@ function PasswordAuthContent() {
                     placeholder="Password"
                     className="h-12 rounded-full bg-background border-border"
                     required
-                    autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                    autoComplete={
+                      isSignUp ? 'new-password' : 'current-password'
+                    }
                   />
                 </div>
 
@@ -194,13 +199,21 @@ function PasswordAuthContent() {
                 {returnUrl && (
                   <input type="hidden" name="returnUrl" value={returnUrl} />
                 )}
-                <input type="hidden" name="origin" value={typeof window !== 'undefined' ? window.location.origin : ''} />
+                <input
+                  type="hidden"
+                  name="origin"
+                  value={
+                    typeof window !== 'undefined' ? window.location.origin : ''
+                  }
+                />
 
                 <div className="space-y-4 pt-4">
                   <SubmitButton
                     formAction={handleAuth}
                     className="w-full h-12 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-md"
-                    pendingText={isSignUp ? 'Creating account...' : 'Signing in...'}
+                    pendingText={
+                      isSignUp ? 'Creating account...' : 'Signing in...'
+                    }
                   >
                     {isSignUp ? 'Create account' : 'Sign in'}
                   </SubmitButton>

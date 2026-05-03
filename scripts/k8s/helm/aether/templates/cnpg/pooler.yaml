@@ -1,0 +1,20 @@
+{{- if and .Values.cnpg.enabled .Values.cnpg.pooler.enabled }}
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: {{ include "aether.cnpg.fullname" . }}-pooler
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+spec:
+  cluster:
+    name: {{ include "aether.cnpg.fullname" . }}
+  instances: {{ .Values.cnpg.pooler.instances }}
+  type: rw
+  pgbouncer:
+    poolMode: {{ .Values.cnpg.pooler.mode }}
+    port: {{ .Values.cnpg.pooler.port }}
+    parameters:
+      max_client_conn: "200"
+      default_pool_size: "25"
+{{- end }}

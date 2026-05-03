@@ -1,0 +1,41 @@
+{{- if .Values.kong.enabled }}
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: rate-limiting-control
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+config:
+  minute: 10000
+  policy: redis
+  redis_host: {{ printf "%s-master" (include "aether.redis.fullname" .) }}
+  redis_port: {{ .Values.redis.port }}
+  fault_tolerant: true
+configFrom:
+  redis_password:
+    secretKeyRef:
+      name: {{ include "aether.secretName" . }}
+      key: REDIS_PASSWORD
+plugin: rate-limiting
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: rate-limiting-llm
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+config:
+  minute: 1000
+  policy: redis
+  redis_host: {{ printf "%s-master" (include "aether.redis.fullname" .) }}
+  redis_port: {{ .Values.redis.port }}
+  fault_tolerant: true
+configFrom:
+  redis_password:
+    secretKeyRef:
+      name: {{ include "aether.secretName" . }}
+      key: REDIS_PASSWORD
+plugin: rate-limiting
+{{- end }}

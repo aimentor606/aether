@@ -52,7 +52,11 @@ export function FilePreviewModal() {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
         return;
       }
 
@@ -81,13 +85,23 @@ export function FilePreviewModal() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, goBackToBrowser, nextFile, prevFile, hasNext, hasPrev, historyPath]);
+  }, [
+    isOpen,
+    goBackToBrowser,
+    nextFile,
+    prevFile,
+    hasNext,
+    hasPrev,
+    historyPath,
+  ]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      return () => { document.body.style.overflow = ''; };
+      return () => {
+        document.body.style.overflow = '';
+      };
     }
   }, [isOpen]);
 
@@ -133,12 +147,18 @@ export function FilePreviewModal() {
               size="icon"
               className="h-8 w-8 shrink-0"
               onClick={goBackToBrowser}
+              aria-label="Close preview"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-2 min-w-0">
-              {getFileIcon(fileName, { className: 'h-4 w-4 shrink-0', variant: 'monochrome' })}
-              <span className="text-sm font-medium truncate max-w-[300px]">{fileName}</span>
+              {getFileIcon(fileName, {
+                className: 'h-4 w-4 shrink-0',
+                variant: 'monochrome',
+              })}
+              <span className="text-sm font-medium truncate max-w-[300px]">
+                {fileName}
+              </span>
             </div>
             {filePathList.length > 1 && (
               <span className="text-xs text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full shrink-0 tabular-nums">
@@ -154,10 +174,15 @@ export function FilePreviewModal() {
               size="icon"
               className={cn(
                 'h-8 w-8',
-                historyPath ? 'text-foreground bg-muted' : 'text-muted-foreground hover:text-foreground',
+                historyPath
+                  ? 'text-foreground bg-muted'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
-              onClick={() => setHistoryPath(historyPath ? null : selectedFilePath)}
+              onClick={() =>
+                setHistoryPath(historyPath ? null : selectedFilePath)
+              }
               title="History"
+              aria-label="File history"
             >
               <History className="h-4 w-4" />
             </Button>
@@ -167,6 +192,7 @@ export function FilePreviewModal() {
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
               onClick={handleDownload}
               title="Download"
+              aria-label="Download file"
             >
               <Download className="h-4 w-4" />
             </Button>
@@ -176,6 +202,7 @@ export function FilePreviewModal() {
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
               onClick={handleOpenInTab}
               title="Open in tab"
+              aria-label="Open in new tab"
             >
               <ExternalLink className="h-4 w-4" />
             </Button>
@@ -186,6 +213,7 @@ export function FilePreviewModal() {
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
               onClick={goBackToBrowser}
               title="Close (Esc)"
+              aria-label="Close preview"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -200,6 +228,7 @@ export function FilePreviewModal() {
               onClick={prevFile}
               className="absolute left-3 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-md hover:bg-background flex items-center justify-center transition-colors cursor-pointer hover:scale-105"
               title="Previous file"
+              aria-label="Previous file"
             >
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -211,6 +240,7 @@ export function FilePreviewModal() {
               onClick={nextFile}
               className="absolute right-3 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-md hover:bg-background flex items-center justify-center transition-colors cursor-pointer hover:scale-105"
               title="Next file"
+              aria-label="Next file"
             >
               <ChevronRight className="h-5 w-5 text-foreground" />
             </button>

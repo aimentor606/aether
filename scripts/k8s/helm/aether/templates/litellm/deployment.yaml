@@ -1,0 +1,135 @@
+{{- if .Values.litellm.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "aether.litellm.fullname" . }}
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    app.kubernetes.io/component: litellm
+spec:
+  replicas: {{ .Values.litellm.replicas }}
+  selector:
+    matchLabels:
+      {{- include "aether.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: litellm
+  template:
+    metadata:
+      labels:
+        {{- include "aether.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: litellm
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/litellm/configmap.yaml") . | sha256sum }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: litellm
+          image: {{ .Values.litellm.image }}
+          command: ["litellm", "--config", "/etc/litellm/config.yaml", "--port", {{ .Values.litellm.port | quote }}]
+          ports:
+            - name: http
+              containerPort: {{ .Values.litellm.port }}
+          env:
+            - name: LITELLM_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aether.secretName" . }}
+                  key: LITELLM_MASTER_KEY
+            - name: LITELLM_SALT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aether.secretName" . }}
+                  key: LITELLM_SALT_KEY
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aether.cnpg.fullname" . }}-app
+                  key: uri
+                  {{- /* The CNPG app secret uses the first bootstrap DB user.
+                       For litellm-specific connection, we construct below. */ -}}
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "aether.configName" . }}
+                  key: REDIS_HOST
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aether.secretName" . }}
+                  key: REDIS_PASSWORD
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "aether.configName" . }}
+                  key: REDIS_PORT
+            {{- if .Values.secrets.deepseekApiKey }}
+            - name: DEEPSEEK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aether.secretName" . }}
+                  key: DEEPSEEK_API_KEY
+            {{- end }}
+            {{- if .Values.secrets.qwenApiKey }}
+            - name: QWEN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aether.secretName" . }}
+                  key: QWEN_API_KEY
+            {{- end }}
+            {{- if .Values.secrets.zhipuApiKey }}
+            - name: ZHIPU_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aether.secretName" . }}
+                  key: ZHIPU_API_KEY
+            {{- end }}
+            {{- if .Values.openmeter.enabled }}
+            - name: OPENMETER_API_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "aether.configName" . }}
+                  key: OPENMETER_API_ENDPOINT
+            - name: OPENMETER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aether.secretName" . }}
+                  key: OPENMETER_API_KEY
+                  optional: true
+            - name: OPENMETER_EVENT_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "aether.configName" . }}
+                  key: OPENMETER_EVENT_TYPE
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/litellm
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /health/liveliness
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep 5"]
+          resources:
+            {{- toYaml .Values.litellm.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "aether.litellm.fullname" . }}-config
+{{- end }}

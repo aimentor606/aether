@@ -772,19 +772,24 @@ function ToolKeysPane({
 
     setSaving(true);
     const base = getActiveOpenCodeUrl();
+    let failed = false;
     try {
       for (const [key, value] of toSave) {
-        await authenticatedFetch(`${base}/env/${encodeURIComponent(key)}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ value: value.trim() }),
-        }).catch(() => {});
+        try {
+          await authenticatedFetch(`${base}/env/${encodeURIComponent(key)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: value.trim() }),
+          });
+        } catch {
+          failed = true;
+        }
       }
     } catch {
-      /* continue */
+      failed = true;
     }
     setSaving(false);
-    setSaved(true);
+    if (!failed) setSaved(true);
     setModalOpen(false);
   }, [values]);
 
@@ -998,6 +1003,7 @@ function PipedreamPane({
 
     setSaving(true);
     const base = getActiveOpenCodeUrl();
+    let failed = false;
     try {
       const entries = [
         ...PD_KEYS.map((k) => [k.key, (values[k.key] || '').trim()] as const),
@@ -1005,17 +1011,21 @@ function PipedreamPane({
       ];
       for (const [key, value] of entries) {
         if (!value) continue;
-        await authenticatedFetch(`${base}/env/${encodeURIComponent(key)}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ value }),
-        }).catch(() => {});
+        try {
+          await authenticatedFetch(`${base}/env/${encodeURIComponent(key)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value }),
+          });
+        } catch {
+          failed = true;
+        }
       }
     } catch {
-      /* continue */
+      failed = true;
     }
     setSaving(false);
-    setSaved(true);
+    if (!failed) setSaved(true);
     setModalOpen(false);
   }, [values, allFilled]);
 

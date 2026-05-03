@@ -1,0 +1,58 @@
+suite: PrometheusRules
+templates:
+  - templates/monitoring/prometheusrules.yaml
+tests:
+  - it: renders all three alerts when victoriametrics enabled
+    set:
+      victoriametrics.enabled: true
+    asserts:
+      - isKind:
+          of: PrometheusRule
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.labels["app.kubernetes.io/part-of"]
+          value: observability
+      - lengthEqual:
+          path: spec.groups[0].rules
+          count: 3
+
+  - it: includes PodRestartLoop alert
+    set:
+      victoriametrics.enabled: true
+    asserts:
+      - equal:
+          path: spec.groups[0].rules[0].alert
+          value: PodRestartLoop
+      - equal:
+          path: spec.groups[0].rules[0].labels.severity
+          value: warning
+
+  - it: includes HighMemoryUsage alert
+    set:
+      victoriametrics.enabled: true
+    asserts:
+      - equal:
+          path: spec.groups[0].rules[1].alert
+          value: HighMemoryUsage
+      - equal:
+          path: spec.groups[0].rules[1].labels.severity
+          value: warning
+
+  - it: includes High5xxRate critical alert
+    set:
+      victoriametrics.enabled: true
+    asserts:
+      - equal:
+          path: spec.groups[0].rules[2].alert
+          value: High5xxRate
+      - equal:
+          path: spec.groups[0].rules[2].labels.severity
+          value: critical
+
+  - it: skips when victoriametrics disabled
+    set:
+      victoriametrics.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0

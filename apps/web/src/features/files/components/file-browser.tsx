@@ -32,7 +32,12 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useFilesStore } from '../store/files-store';
-import { useFileList, useServerHealth, useGitStatus, buildGitStatusMap } from '../hooks';
+import {
+  useFileList,
+  useServerHealth,
+  useGitStatus,
+  buildGitStatusMap,
+} from '../hooks';
 import {
   useFileUpload,
   useFileDelete,
@@ -50,7 +55,10 @@ import { FileTreeItem, DRAG_MIME } from './file-tree-item';
 import { FileSearch } from './file-search';
 import { cn } from '@/lib/utils';
 import { toast } from '@/lib/toast';
-import { useDiagnosticsStore, buildDiagnosticCountsMap } from '@/stores/diagnostics-store';
+import {
+  useDiagnosticsStore,
+  buildDiagnosticCountsMap,
+} from '@/stores/diagnostics-store';
 
 /** Drop target for the ".." (parent directory) row */
 function ParentDropTarget({
@@ -139,8 +147,13 @@ export function FileBrowser() {
   });
 
   // Git status
-  const { data: gitStatuses } = useGitStatus({ enabled: health?.healthy === true });
-  const gitStatusMap = useMemo(() => buildGitStatusMap(gitStatuses), [gitStatuses]);
+  const { data: gitStatuses } = useGitStatus({
+    enabled: health?.healthy === true,
+  });
+  const gitStatusMap = useMemo(
+    () => buildGitStatusMap(gitStatuses),
+    [gitStatuses],
+  );
 
   // Mutations
   const uploadMutation = useFileUpload();
@@ -265,8 +278,11 @@ export function FileBrowser() {
     return map;
   }, [files, diagCountsLookup]);
 
-  const isRootPath = currentPath === '/' || currentPath === '.' || currentPath === '';
-  const normalizedCurrentPath = isRootPath ? '' : currentPath.replace(/\/$/, '');
+  const isRootPath =
+    currentPath === '/' || currentPath === '.' || currentPath === '';
+  const normalizedCurrentPath = isRootPath
+    ? ''
+    : currentPath.replace(/\/$/, '');
 
   // Build file list for prev/next navigation in viewer
   const handleFileClick = useCallback(
@@ -311,10 +327,17 @@ export function FileBrowser() {
   }, []);
 
   // Directory download with progress toast
-  const { downloadDir, isDownloading: isDirDownloading, downloadingPaths } = useDirectoryDownload();
-  const handleDownloadDirectory = useCallback((node: FileNode) => {
-    downloadDir(node.path, node.name);
-  }, [downloadDir]);
+  const {
+    downloadDir,
+    isDownloading: isDirDownloading,
+    downloadingPaths,
+  } = useDirectoryDownload();
+  const handleDownloadDirectory = useCallback(
+    (node: FileNode) => {
+      downloadDir(node.path, node.name);
+    },
+    [downloadDir],
+  );
 
   // Rename a file/folder (called from inline input in FileTreeItem)
   const handleRename = useCallback(
@@ -328,7 +351,9 @@ export function FileBrowser() {
         await renameMutation.mutateAsync({ from: node.path, to: newPath });
         toast.success(`Renamed to ${newName}`);
       } catch (err) {
-        toast.error(`Failed to rename: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        toast.error(
+          `Failed to rename: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
       }
     },
     [renameMutation],
@@ -347,7 +372,9 @@ export function FileBrowser() {
       await deleteMutation.mutateAsync({ filePath: deleteTarget.path });
       toast.success(`Deleted ${deleteTarget.name}`);
     } catch (err) {
-      toast.error(`Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(
+        `Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     } finally {
       setDeleteTarget(null);
     }
@@ -370,7 +397,9 @@ export function FileBrowser() {
         });
         toast.success(`Uploaded ${file.name}`);
       } catch (err) {
-        toast.error(`Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        toast.error(
+          `Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
       } finally {
         event.target.value = '';
       }
@@ -393,7 +422,9 @@ export function FileBrowser() {
       await mkdirMutation.mutateAsync({ dirPath: folderPath });
       toast.success(`Created folder: ${newFolderName.trim()}`);
     } catch (err) {
-      toast.error(`Failed to create folder: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(
+        `Failed to create folder: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     } finally {
       setIsCreatingFolder(false);
       setNewFolderName('');
@@ -415,7 +446,9 @@ export function FileBrowser() {
       await createMutation.mutateAsync({ filePath });
       toast.success(`Created file: ${newFileName.trim()}`);
     } catch (err) {
-      toast.error(`Failed to create file: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(
+        `Failed to create file: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     } finally {
       setIsCreatingFile(false);
       setNewFileName('');
@@ -443,15 +476,21 @@ export function FileBrowser() {
   const handleDropMove = useCallback(
     async (sourcePath: string, targetDirPath: string) => {
       const sourceName = sourcePath.split('/').pop() || '';
-      const destPath = targetDirPath ? `${targetDirPath}/${sourceName}` : sourceName;
+      const destPath = targetDirPath
+        ? `${targetDirPath}/${sourceName}`
+        : sourceName;
 
       if (sourcePath === destPath) return;
 
       try {
         await renameMutation.mutateAsync({ from: sourcePath, to: destPath });
-        toast.success(`Moved "${sourceName}" to ${targetDirPath.split('/').pop() || 'root'}`);
+        toast.success(
+          `Moved "${sourceName}" to ${targetDirPath.split('/').pop() || 'root'}`,
+        );
       } catch (err) {
-        toast.error(`Failed to move: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        toast.error(
+          `Failed to move: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        );
       }
     },
     [renameMutation],
@@ -470,8 +509,12 @@ export function FileBrowser() {
       if (existingNames.has(destName.toLowerCase())) {
         if (clipboard.operation === 'copy') {
           // Generate "name (copy)", "name (copy 2)", etc.
-          const ext = destName.includes('.') ? destName.substring(destName.lastIndexOf('.')) : '';
-          const baseName = ext ? destName.substring(0, destName.lastIndexOf('.')) : destName;
+          const ext = destName.includes('.')
+            ? destName.substring(destName.lastIndexOf('.'))
+            : '';
+          const baseName = ext
+            ? destName.substring(0, destName.lastIndexOf('.'))
+            : destName;
           let counter = 0;
           let candidate = `${baseName} (copy)${ext}`;
           while (existingNames.has(candidate.toLowerCase())) {
@@ -481,7 +524,8 @@ export function FileBrowser() {
           destName = candidate;
         } else {
           // For move/cut, if source and dest dirs are the same, the item is already there
-          const sourceDir = clipboard.path.substring(0, clipboard.path.lastIndexOf('/')) || '.';
+          const sourceDir =
+            clipboard.path.substring(0, clipboard.path.lastIndexOf('/')) || '.';
           const normalizedSourceDir = sourceDir === '' ? '.' : sourceDir;
           const normalizedDestDir = destDir === '' ? '.' : destDir;
           if (normalizedSourceDir === normalizedDestDir) {
@@ -509,26 +553,47 @@ export function FileBrowser() {
           // would require recursive read+upload, which the API doesn't natively support).
           // Best approach: create empty dir with same name for copy
           await mkdirMutation.mutateAsync({ dirPath: destPath });
-          toast.success(`Created copy of folder "${clipboard.name}" here (empty)`);
-          toast('Note: directory contents are not copied', { description: 'Copy individual files to move them.' });
+          toast.success(
+            `Created copy of folder "${clipboard.name}" here (empty)`,
+          );
+          toast('Note: directory contents are not copied', {
+            description: 'Copy individual files to move them.',
+          });
         }
       } else {
         // Cut = move via rename
-        await renameMutation.mutateAsync({ from: clipboard.path, to: destPath });
+        await renameMutation.mutateAsync({
+          from: clipboard.path,
+          to: destPath,
+        });
         toast.success(`Moved "${clipboard.name}" here`);
         clearClipboard();
       }
     } catch (err) {
-      toast.error(`Failed to paste: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(
+        `Failed to paste: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      );
     }
-  }, [clipboard, normalizedCurrentPath, files, copyMutation, renameMutation, mkdirMutation, clearClipboard]);
+  }, [
+    clipboard,
+    normalizedCurrentPath,
+    files,
+    copyMutation,
+    renameMutation,
+    mkdirMutation,
+    clearClipboard,
+  ]);
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't intercept when user is typing in inputs
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
         return;
       }
 
@@ -560,8 +625,15 @@ export function FileBrowser() {
             </code>
           </p>
           <p className="text-sm text-muted-foreground mt-1">
-            Make sure <code className="text-xs bg-muted px-1.5 py-0.5 rounded">opencode serve</code> or{' '}
-            <code className="text-xs bg-muted px-1.5 py-0.5 rounded">opencode web</code> is running.
+            Make sure{' '}
+            <code className="text-xs bg-muted px-1.5 py-0.5 rounded">
+              opencode serve
+            </code>{' '}
+            or{' '}
+            <code className="text-xs bg-muted px-1.5 py-0.5 rounded">
+              opencode web
+            </code>{' '}
+            is running.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -585,6 +657,7 @@ export function FileBrowser() {
             onClick={handleUpload}
             disabled={uploadMutation.isPending}
             title="Upload file"
+            aria-label="Upload file"
           >
             <Upload className="h-3.5 w-3.5" />
           </Button>
@@ -598,6 +671,7 @@ export function FileBrowser() {
             }}
             disabled={createMutation.isPending}
             title="New file"
+            aria-label="New file"
           >
             <FilePlus className="h-3.5 w-3.5" />
           </Button>
@@ -611,6 +685,7 @@ export function FileBrowser() {
             }}
             disabled={mkdirMutation.isPending}
             title="New folder"
+            aria-label="New folder"
           >
             <FolderPlus className="h-3.5 w-3.5" />
           </Button>
@@ -622,6 +697,7 @@ export function FileBrowser() {
               onClick={handlePaste}
               disabled={copyMutation.isPending || renameMutation.isPending}
               title={`Paste "${clipboard.name}" (${clipboard.operation})`}
+              aria-label={`Paste ${clipboard.name}`}
             >
               <Clipboard className="h-3.5 w-3.5" />
             </Button>
@@ -632,6 +708,7 @@ export function FileBrowser() {
             className="h-7 w-7"
             onClick={toggleSearch}
             title="Search files (Ctrl+P)"
+            aria-label="Search files"
           >
             <Search className="h-3.5 w-3.5" />
           </Button>
@@ -641,6 +718,7 @@ export function FileBrowser() {
             className="h-7 w-7"
             onClick={() => refetch()}
             title="Refresh"
+            aria-label="Refresh files"
           >
             <RefreshCw className="h-3.5 w-3.5" />
           </Button>
@@ -649,12 +727,15 @@ export function FileBrowser() {
             size="icon"
             className="h-7 w-7"
             onClick={() => {
-              const dirName = isRootPath ? 'workspace' : (currentPath.split('/').filter(Boolean).pop() || 'directory');
+              const dirName = isRootPath
+                ? 'workspace'
+                : currentPath.split('/').filter(Boolean).pop() || 'directory';
               const dirPath = isRootPath ? '/workspace' : currentPath;
               downloadDir(dirPath, dirName);
             }}
             disabled={isDirDownloading(isRootPath ? '/workspace' : currentPath)}
             title="Download current directory as zip"
+            aria-label="Download directory as zip"
           >
             {isDirDownloading(isRootPath ? '/workspace' : currentPath) ? (
               <RefreshCw className="h-3.5 w-3.5 animate-spin" />
@@ -727,7 +808,8 @@ export function FileBrowser() {
                         value={newFolderName}
                         onChange={(e) => setNewFolderName(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !folderNameExists) handleCreateFolder();
+                          if (e.key === 'Enter' && !folderNameExists)
+                            handleCreateFolder();
                           if (e.key === 'Escape') {
                             setIsCreatingFolder(false);
                             setNewFolderName('');
@@ -767,7 +849,8 @@ export function FileBrowser() {
                         value={newFileName}
                         onChange={(e) => setNewFileName(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !fileNameExists) handleCreateFile();
+                          if (e.key === 'Enter' && !fileNameExists)
+                            handleCreateFile();
                           if (e.key === 'Escape') {
                             setIsCreatingFile(false);
                             setNewFileName('');
@@ -811,7 +894,10 @@ export function FileBrowser() {
                     onDropMove={handleDropMove}
                     siblingNames={siblingNames}
                     gitStatus={gitStatusMap.get(node.path)}
-                    isCut={clipboard?.operation === 'cut' && clipboard.path === node.path}
+                    isCut={
+                      clipboard?.operation === 'cut' &&
+                      clipboard.path === node.path
+                    }
                     diagnosticCounts={diagnosticCountsMap.get(node.path)}
                   />
                 ))}
@@ -831,7 +917,10 @@ export function FileBrowser() {
                     onDropMove={handleDropMove}
                     siblingNames={siblingNames}
                     gitStatus={gitStatusMap.get(node.path)}
-                    isCut={clipboard?.operation === 'cut' && clipboard.path === node.path}
+                    isCut={
+                      clipboard?.operation === 'cut' &&
+                      clipboard.path === node.path
+                    }
                     diagnosticCounts={diagnosticCountsMap.get(node.path)}
                   />
                 ))}
@@ -884,7 +973,9 @@ export function FileBrowser() {
                   <ContextMenuSeparator />
                   <ContextMenuItem
                     onClick={handlePaste}
-                    disabled={copyMutation.isPending || renameMutation.isPending}
+                    disabled={
+                      copyMutation.isPending || renameMutation.isPending
+                    }
                   >
                     <Clipboard className="mr-2 h-4 w-4" />
                     Paste{' '}
@@ -909,7 +1000,9 @@ export function FileBrowser() {
         <div className="flex items-center justify-between gap-2 px-3 py-1.5 border-t bg-muted/30 text-xs text-muted-foreground shrink-0">
           <span className="truncate">
             {clipboard.operation === 'cut' ? 'Moving' : 'Copying'}:{' '}
-            <span className="font-medium text-foreground">{clipboard.name}</span>
+            <span className="font-medium text-foreground">
+              {clipboard.name}
+            </span>
           </span>
           <button
             onClick={clearClipboard}
@@ -921,7 +1014,10 @@ export function FileBrowser() {
       )}
 
       {/* Delete confirmation dialog */}
-      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={() => setDeleteTarget(null)}
+      >
         <AlertDialogContent
           className="sm:max-w-md"
           onOpenAutoFocus={(e) => {

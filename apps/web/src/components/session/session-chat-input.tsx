@@ -2598,6 +2598,7 @@ export function SessionChatInput({
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className="inline-flex items-center justify-center h-8 w-8 rounded-xl transition-colors text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
+                    aria-label="Attach files"
                   >
                     <Paperclip className="h-4 w-4" strokeWidth={2} />
                   </button>
@@ -2683,6 +2684,7 @@ export function SessionChatInput({
                         size="sm"
                         onClick={onStop}
                         className="flex-shrink-0 h-8 w-8 rounded-full p-0"
+                        aria-label="Stop"
                       >
                         <div className="w-3 h-3 rounded-[3px] bg-current" />
                       </Button>
@@ -2720,6 +2722,7 @@ export function SessionChatInput({
                       }
                       onClick={handleSubmit}
                       className="flex-shrink-0 h-8 w-8 rounded-full p-0"
+                      aria-label="Send message"
                     >
                       {disabled ? (
                         <div className="size-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />

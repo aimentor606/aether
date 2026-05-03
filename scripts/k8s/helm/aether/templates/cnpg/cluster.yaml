@@ -1,0 +1,72 @@
+{{- if .Values.cnpg.enabled }}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "aether.cnpg.fullname" . }}
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgres
+spec:
+  instances: {{ .Values.cnpg.instances }}
+
+  imageName: {{ printf "ghcr.io/cloudnative-pg/postgresql:%s" .Values.cnpg.postgresVersion }}
+
+  storage:
+    size: {{ .Values.cnpg.storage | quote }}
+    {{- if .Values.cnpg.storageClass }}
+    storageClass: {{ .Values.cnpg.storageClass | quote }}
+    {{- end }}
+
+  {{- with .Values.cnpg.bootstrapDatabases }}
+  bootstrap:
+    initdb:
+      databases:
+        {{- range . }}
+        - {{ .name }}
+        {{- end }}
+      ownerMaps:
+        {{- range . }}
+        - database: {{ .name }}
+          owner: {{ .owner }}
+        {{- end }}
+      postInitSQL:
+        - GRANT ALL PRIVILEGES ON DATABASE aether TO aether;
+        - GRANT ALL PRIVILEGES ON DATABASE litellm TO litellm;
+  {{- end }}
+
+  managed:
+    roles:
+      {{- range .Values.cnpg.bootstrapDatabases }}
+      - name: {{ .owner }}
+        ensure: present
+        login: true
+        createdb: false
+        superuser: false
+        passwordSecret:
+          name: {{ include "aether.cnpg.fullname" $ }}-{{ .owner }}-creds
+      {{- end }}
+
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: {{ include "aether.cnpg.fullname" . }}-superuser
+
+  affinity:
+    podAntiAffinityType: preferred
+    topologyKey: kubernetes.io/hostname
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "2"
+      memory: 1Gi
+
+  postgresql:
+    parameters:
+      max_connections: "200"
+      shared_buffers: "256MB"
+      effective_cache_size: "768MB"
+      wal_level: logical
+      max_wal_senders: "10"

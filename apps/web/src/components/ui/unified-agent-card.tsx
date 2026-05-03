@@ -675,7 +675,13 @@ export const UnifiedAgentCard: React.FC<UnifiedAgentCardProps> = ({
     };
 
     return (
-      <div className={cardClassName} onClick={() => onClick?.(data)}>
+      <div
+        className={cardClassName}
+        onClick={() => onClick?.(data)}
+        role="button"
+        tabIndex={0}
+        aria-label="View agent details"
+      >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="relative p-6 flex flex-col flex-1">
           <div className="flex items-start justify-between mb-4">

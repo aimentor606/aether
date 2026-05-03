@@ -1,0 +1,44 @@
+apiVersion: v2
+name: aether
+description: Aether autonomous company operating system — self-hosted full-stack deployment
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+
+dependencies:
+  - name: ingress
+    alias: kong
+    version: "2.46.0"
+    repository: https://charts.konghq.com
+    condition: kong.enabled
+
+  # ── Observability ────────────────────────────────────────────────────────
+  - name: victoria-metrics-single
+    alias: victoriametrics
+    version: "0.37.0"
+    repository: https://victoriametrics.github.io/helm-charts/
+    condition: victoriametrics.enabled
+
+  - name: victoria-logs-single
+    alias: victorialogs
+    version: "0.3.3"
+    repository: https://victoriametrics.github.io/helm-charts/
+    condition: victorialogs.enabled
+
+  - name: victoria-logs-collector
+    alias: victorialogscollector
+    version: "0.0.7"
+    repository: https://victoriametrics.github.io/helm-charts/
+    condition: victorialogs.enabled
+
+  - name: victoria-traces-single
+    alias: victoriatraces
+    version: "0.12.4"
+    repository: https://victoriametrics.github.io/helm-charts/
+    condition: victoriatraces.enabled
+
+  - name: grafana
+    alias: grafana
+    version: "10.5.15"
+    repository: https://grafana.github.io/helm-charts/
+    condition: grafana.enabled

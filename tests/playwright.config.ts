@@ -2,6 +2,19 @@ import { defineConfig, devices } from '@playwright/test';
 
 const baseURL = process.env.E2E_BASE_URL || 'http://localhost:13737';
 const apiURL = process.env.E2E_API_URL || 'http://localhost:13738/v1';
+const isCI = !!process.env.CI;
+
+const reporters: NonNullable<Parameters<typeof defineConfig>[0]>['reporter'] = [
+  ['list'],
+  ['html', { open: 'never', outputFolder: '../test-results/html' }],
+];
+
+if (isCI) {
+  reporters.push(
+    ['junit', { outputFile: '../test-results/junit.xml' }],
+    ['blob'],
+  );
+}
 
 export default defineConfig({
   testDir: './e2e/specs',
@@ -12,9 +25,9 @@ export default defineConfig({
     timeout: 30_000,
   },
   fullyParallel: false,
-  retries: process.env.CI ? 2 : 0,
-  workers: 1, // sequential — tests depend on prior state
-  reporter: [['list'], ['html', { open: 'never', outputFolder: '../test-results/html' }]],
+  retries: isCI ? 2 : 1,
+  workers: 1,
+  reporter: reporters,
   outputDir: '../test-results/artifacts',
   use: {
     baseURL,

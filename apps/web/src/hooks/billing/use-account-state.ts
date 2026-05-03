@@ -2,13 +2,13 @@
 
 /**
  * Unified Account State Hook
- * 
+ *
  * Single source of truth for all billing data:
  * - Credits (total, daily, monthly, extra)
  * - Subscription (tier, status, billing period)
  * - Available models
  * - Limits (projects, threads, concurrent runs)
- * 
+ *
  * Replaces: useSubscription, useCreditBalance, useBillingStatus, useScheduledChanges
  */
 
@@ -25,6 +25,8 @@ import {
   PurchaseCreditsRequest,
   TokenUsage,
   ScheduleDowngradeRequest,
+  MeteredUsageResponse,
+  MeteredUsageTotalResponse,
 } from '@/lib/api/billing';
 
 // =============================================================================
@@ -34,9 +36,18 @@ import {
 export const accountStateKeys = {
   all: ['account-state'] as const,
   state: () => [...accountStateKeys.all, 'state'] as const,
-  usageHistory: (days?: number) => [...accountStateKeys.all, 'usage-history', { days }] as const,
-  transactions: (limit?: number, offset?: number) => [...accountStateKeys.all, 'transactions', { limit, offset }] as const,
+  usageHistory: (days?: number) =>
+    [...accountStateKeys.all, 'usage-history', { days }] as const,
+  transactions: (limit?: number, offset?: number) =>
+    [...accountStateKeys.all, 'transactions', { limit, offset }] as const,
   trial: () => [...accountStateKeys.all, 'trial'] as const,
+  meteredUsage: (params?: {
+    from?: string;
+    to?: string;
+    windowSize?: string;
+  }) => [...accountStateKeys.all, 'metered-usage', params] as const,
+  meteredUsageTotal: (params?: { from?: string }) =>
+    [...accountStateKeys.all, 'metered-usage-total', params] as const,
 };
 
 // =============================================================================
@@ -49,33 +60,37 @@ let pendingSkipCache = false;
 let activeRefetchPromise: Promise<void> | null = null;
 const REFETCH_DEBOUNCE_MS = 200;
 
-export function invalidateAccountState(queryClient: ReturnType<typeof useQueryClient>, refetch = false, skipCache = false) {
+export function invalidateAccountState(
+  queryClient: ReturnType<typeof useQueryClient>,
+  refetch = false,
+  skipCache = false,
+) {
   // Invalidate the query cache (marks data as stale)
   queryClient.invalidateQueries({ queryKey: accountStateKeys.state() });
-  
+
   if (!refetch) return;
-  
+
   // Track if any caller wants skipCache (most aggressive wins)
   if (skipCache) {
     pendingSkipCache = true;
   }
-  
+
   // If there's already an active refetch in progress, just queue the skipCache preference
   if (activeRefetchPromise) {
     return;
   }
-  
+
   // Clear any pending debounce timeout
   if (refetchTimeout) {
     clearTimeout(refetchTimeout);
   }
-  
+
   // Debounce to batch multiple rapid calls into one
   refetchTimeout = setTimeout(() => {
     const shouldSkipCache = pendingSkipCache;
     pendingSkipCache = false;
     refetchTimeout = null;
-    
+
     // Create a single promise that all callers will share
     activeRefetchPromise = (async () => {
       try {
@@ -88,7 +103,7 @@ export function invalidateAccountState(queryClient: ReturnType<typeof useQueryCl
           queryClient.setQueryData(accountStateKeys.state(), freshData);
         } else {
           // Normal refetch - React Query handles deduplication
-          await queryClient.refetchQueries({ 
+          await queryClient.refetchQueries({
             queryKey: accountStateKeys.state(),
             type: 'active',
           });
@@ -114,14 +129,14 @@ interface UseAccountStateOptions {
 
 /**
  * Unified hook for all account billing state.
- * 
+ *
  * This replaces:
  * - useSubscription()
  * - useCreditBalance()
- * - useBillingStatus() 
+ * - useBillingStatus()
  * - useScheduledChanges()
  * - useAvailableModels() (models are now in account state)
- * 
+ *
  * The data is cached for 10 minutes and only refetched when:
  * - A mutation occurs (upgrade, downgrade, purchase, etc.)
  * - User explicitly refreshes
@@ -129,7 +144,7 @@ interface UseAccountStateOptions {
  */
 export function useAccountState(options?: UseAccountStateOptions) {
   const enabled = options?.enabled ?? true;
-  
+
   return useQuery<AccountState>({
     queryKey: accountStateKeys.state(),
     queryFn: () => billingApi.getAccountState(options?.skipCache ?? false),
@@ -142,13 +157,15 @@ export function useAccountState(options?: UseAccountStateOptions) {
     refetchOnMount: options?.refetchOnMount ?? true,
     refetchOnReconnect: true,
     structuralSharing: true,
-    retry: enabled ? (failureCount, error) => {
-      const message = (error as Error).message || '';
-      if (message.includes('401') || message.includes('403')) {
-        return false;
-      }
-      return failureCount < 2;
-    } : false,
+    retry: enabled
+      ? (failureCount, error) => {
+          const message = (error as Error).message || '';
+          if (message.includes('401') || message.includes('403')) {
+            return false;
+          }
+          return failureCount < 2;
+        }
+      : false,
   });
 }
 
@@ -180,9 +197,9 @@ export function useAccountStateWithStreaming(isStreaming: boolean = false) {
 
 export function useCreateCheckoutSession() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (request: CreateCheckoutSessionRequest) => 
+    mutationFn: (request: CreateCheckoutSessionRequest) =>
       billingApi.createCheckoutSession(request),
     onSuccess: (data) => {
       // Invalidate and refetch on upgrade/update - checkout redirects user anyway
@@ -198,7 +215,8 @@ export function useCreateCheckoutSession() {
 
 export function useCreatePortalSession() {
   return useMutation({
-    mutationFn: (params: CreatePortalSessionRequest) => billingApi.createPortalSession(params),
+    mutationFn: (params: CreatePortalSessionRequest) =>
+      billingApi.createPortalSession(params),
     onSuccess: (data) => {
       const portalUrl = data?.portal_url || (data as any)?.url;
       if (portalUrl) {
@@ -208,16 +226,20 @@ export function useCreatePortalSession() {
       }
     },
     onError: (error: any) => {
-      toast.error(error?.message || 'Failed to open subscription portal. Please try again.');
+      toast.error(
+        error?.message ||
+          'Failed to open subscription portal. Please try again.',
+      );
     },
   });
 }
 
 export function useCancelSubscription() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (request?: CancelSubscriptionRequest) => billingApi.cancelSubscription(request),
+    mutationFn: (request?: CancelSubscriptionRequest) =>
+      billingApi.cancelSubscription(request),
     onSuccess: (response) => {
       invalidateAccountState(queryClient, true); // Refetch to show updated state
       if (response.success) {
@@ -234,7 +256,7 @@ export function useCancelSubscription() {
 
 export function useReactivateSubscription() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: () => billingApi.reactivateSubscription(),
     onSuccess: (response) => {
@@ -253,9 +275,10 @@ export function useReactivateSubscription() {
 
 export function usePurchaseCredits() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (request: PurchaseCreditsRequest) => billingApi.purchaseCredits(request),
+    mutationFn: (request: PurchaseCreditsRequest) =>
+      billingApi.purchaseCredits(request),
     onSuccess: (data) => {
       // Will redirect to checkout - invalidation happens on return via backend
       if (data.checkout_url) {
@@ -267,7 +290,7 @@ export function usePurchaseCredits() {
 
 export function useDeductTokenUsage() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (usage: TokenUsage) => billingApi.deductTokenUsage(usage),
     onSuccess: () => {
@@ -279,9 +302,10 @@ export function useDeductTokenUsage() {
 
 export function useScheduleDowngrade() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (request: ScheduleDowngradeRequest) => billingApi.scheduleDowngrade(request),
+    mutationFn: (request: ScheduleDowngradeRequest) =>
+      billingApi.scheduleDowngrade(request),
     onSuccess: (response) => {
       invalidateAccountState(queryClient, true); // Refetch to show scheduled change
       if (response.success) {
@@ -298,7 +322,7 @@ export function useScheduleDowngrade() {
 
 export function useCancelScheduledChange() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: () => billingApi.cancelScheduledChange(),
     onSuccess: (response) => {
@@ -317,7 +341,7 @@ export function useCancelScheduledChange() {
 
 export function useSyncSubscription() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: () => billingApi.syncSubscription(),
     onSuccess: () => {
@@ -350,6 +374,26 @@ export function useTransactions(limit = 50, offset = 0) {
   });
 }
 
+export function useMeteredUsage(params?: {
+  from?: string;
+  to?: string;
+  windowSize?: string;
+}) {
+  return useQuery<MeteredUsageResponse | null>({
+    queryKey: accountStateKeys.meteredUsage(params),
+    queryFn: () => billingApi.getMeteredUsage(params),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useMeteredUsageTotal(params?: { from?: string }) {
+  return useQuery<MeteredUsageTotalResponse | null>({
+    queryKey: accountStateKeys.meteredUsageTotal(params),
+    queryFn: () => billingApi.getMeteredUsageTotal(params),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 // =============================================================================
 // TRIAL HOOKS
 // =============================================================================
@@ -365,9 +409,9 @@ export function useTrialStatus(options?: { enabled?: boolean }) {
 
 export function useStartTrial() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (request: { success_url: string; cancel_url: string }) => 
+    mutationFn: (request: { success_url: string; cancel_url: string }) =>
       billingApi.startTrial(request),
     onSuccess: (data) => {
       invalidateAccountState(queryClient);
@@ -380,7 +424,7 @@ export function useStartTrial() {
 
 export function useCancelTrial() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: () => billingApi.cancelTrial(),
     onSuccess: (response) => {
@@ -399,60 +443,69 @@ export function useCancelTrial() {
 export const accountStateSelectors = {
   /** Check if user can run agents (has credits) */
   canRun: (state: AccountState | undefined) => state?.credits?.can_run ?? false,
-  
+
   /** Get total credits (converted from dollars to credits using 1$ = 100 credits) */
-  totalCredits: (state: AccountState | undefined) => dollarsToCredits(state?.credits?.total ?? 0),
-  
+  totalCredits: (state: AccountState | undefined) =>
+    dollarsToCredits(state?.credits?.total ?? 0),
+
   /** Get daily credits (converted from dollars to credits using 1$ = 100 credits) */
-  dailyCredits: (state: AccountState | undefined) => dollarsToCredits(state?.credits?.daily ?? 0),
-  
+  dailyCredits: (state: AccountState | undefined) =>
+    dollarsToCredits(state?.credits?.daily ?? 0),
+
   /** Get monthly credits (converted from dollars to credits using 1$ = 100 credits) */
-  monthlyCredits: (state: AccountState | undefined) => dollarsToCredits(state?.credits?.monthly ?? 0),
-  
+  monthlyCredits: (state: AccountState | undefined) =>
+    dollarsToCredits(state?.credits?.monthly ?? 0),
+
   /** Get extra/non-expiring credits (converted from dollars to credits using 1$ = 100 credits) */
-  extraCredits: (state: AccountState | undefined) => dollarsToCredits(state?.credits?.extra ?? 0),
-  
+  extraCredits: (state: AccountState | undefined) =>
+    dollarsToCredits(state?.credits?.extra ?? 0),
+
   /** Get tier monthly credits limit (converted from dollars to credits using 1$ = 100 credits) */
-  tierMonthlyCredits: (state: AccountState | undefined) => dollarsToCredits(state?.tier?.monthly_credits ?? 0),
-  
+  tierMonthlyCredits: (state: AccountState | undefined) =>
+    dollarsToCredits(state?.tier?.monthly_credits ?? 0),
+
   /** Get tier key */
-  tierKey: (state: AccountState | undefined) => state?.subscription?.tier_key ?? 'none',
-  
+  tierKey: (state: AccountState | undefined) =>
+    state?.subscription?.tier_key ?? 'none',
+
   /** Get tier display name */
-  tierDisplayName: (state: AccountState | undefined) => 
+  tierDisplayName: (state: AccountState | undefined) =>
     state?.subscription?.tier_display_name ?? 'No Plan',
-  
+
   /** Get plan name for TierBadge (e.g., 'Plus', 'Pro', 'Ultra', 'Basic') */
   planName: (state: AccountState | undefined) => {
     if (!state?.subscription) return 'Basic';
     const tierKey = state.subscription.tier_key || state.tier?.name;
     if (!tierKey || tierKey === 'none' || tierKey === 'free') return 'Basic';
-    
+
     if (tierKey === 'pro') return 'Pro';
     return 'Basic';
   },
-  
+
   /** Check if on trial */
-  isTrial: (state: AccountState | undefined) => state?.subscription?.is_trial ?? false,
-  
+  isTrial: (state: AccountState | undefined) =>
+    state?.subscription?.is_trial ?? false,
+
   /** Check if subscription is cancelled */
-  isCancelled: (state: AccountState | undefined) => state?.subscription?.is_cancelled ?? false,
-  
-  
+  isCancelled: (state: AccountState | undefined) =>
+    state?.subscription?.is_cancelled ?? false,
+
   /** Get scheduled change info */
-  scheduledChange: (state: AccountState | undefined) => state?.subscription?.scheduled_change,
-  
+  scheduledChange: (state: AccountState | undefined) =>
+    state?.subscription?.scheduled_change,
+
   /** Check if has scheduled change */
-  hasScheduledChange: (state: AccountState | undefined) => 
+  hasScheduledChange: (state: AccountState | undefined) =>
     state?.subscription?.has_scheduled_change ?? false,
-  
+
   /** Get commitment info */
-  commitment: (state: AccountState | undefined) => state?.subscription?.commitment,
-  
+  commitment: (state: AccountState | undefined) =>
+    state?.subscription?.commitment,
+
   /** Check if can purchase credits */
-  canPurchaseCredits: (state: AccountState | undefined) => 
+  canPurchaseCredits: (state: AccountState | undefined) =>
     state?.subscription?.can_purchase_credits ?? false,
-    
+
   /** Get daily credits info (with converted daily_amount) */
   dailyCreditsInfo: (state: AccountState | undefined) => {
     const dailyRefresh = state?.credits?.daily_refresh;
@@ -463,4 +516,3 @@ export const accountStateSelectors = {
     };
   },
 };
-

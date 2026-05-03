@@ -1,4 +1,5 @@
 export { AuthPage } from './auth.page';
+export { ActivateTrialPage, CheckoutPage, NewInstanceModal, CreditPurchaseModal } from './billing.page';
 export { DashboardPage } from './dashboard.page';
 export { InstancesPage, InstanceDetailPage, InstanceBackupsPage } from './instances.page';
 export { SessionPage } from './session.page';

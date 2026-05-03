@@ -44,10 +44,7 @@ import { EntityList } from '@/components/shared/EntityList';
 import { useSearch } from '@/lib/utils/search';
 import { useAvailableModels } from '@/lib/models';
 import type { Agent, Model } from '@/api/types';
-import {
-  AppBubble,
-  IntegrationsPageContent,
-} from '@/components/settings/IntegrationsPage';
+import { AppBubble, IntegrationsPageContent } from '@/components/settings/IntegrationsPage';
 import { ComposioAppsContent } from '@/components/settings/integrations/ComposioAppsList';
 import { ComposioAppDetailContent } from '@/components/settings/integrations/ComposioAppDetail';
 import { ComposioConnectorContent } from '@/components/settings/integrations/ComposioConnector';
@@ -208,7 +205,7 @@ export function AgentDrawer({
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
         isOpeningRef.current = false;
-      }, 500);
+      }, 500) as unknown as number;
       Keyboard.dismiss();
       loadAgents();
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -291,15 +288,22 @@ export function AgentDrawer({
         style={({ pressed }) => [
           styles.integrationsContainer,
           {
-            backgroundColor: pressed 
-              ? isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'
-              : isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+            backgroundColor: pressed
+              ? isDark
+                ? 'rgba(255,255,255,0.06)'
+                : 'rgba(0,0,0,0.04)'
+              : isDark
+                ? 'rgba(255,255,255,0.03)'
+                : 'rgba(0,0,0,0.02)',
             borderColor: colors.border,
           },
-        ]}
-      >
+        ]}>
         <View style={styles.integrationsRow}>
-          <View style={[styles.integrationsIcon, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' }]}>
+          <View
+            style={[
+              styles.integrationsIcon,
+              { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
+            ]}>
             {hasFreeTier ? (
               <Lock size={18} color={colors.muted} strokeWidth={2} />
             ) : (
@@ -333,8 +337,7 @@ export function AgentDrawer({
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     hasFreeTier ? handleUpgradeRequired() : onCreateAgent();
-                  }}
-                >
+                  }}>
                   {hasFreeTier ? (
                     <Sparkles size={16} color={colors.accent} />
                   ) : (
@@ -354,8 +357,7 @@ export function AgentDrawer({
                     backgroundColor: pressed ? colors.card : 'transparent',
                     borderColor: colors.border,
                   },
-                ]}
-              >
+                ]}>
                 <AgentAvatar agent={selectedAgent} size={40} />
                 <View style={styles.workerInfo}>
                   <Text style={[styles.workerName, { color: colors.text }]} numberOfLines={1}>
@@ -378,8 +380,7 @@ export function AgentDrawer({
                     backgroundColor: pressed ? colors.card : 'transparent',
                     borderColor: colors.border,
                   },
-                ]}
-              >
+                ]}>
                 <View style={[styles.workerPlaceholder, { backgroundColor: colors.card }]}>
                   <Sparkles size={18} color={colors.muted} />
                 </View>
@@ -402,8 +403,7 @@ export function AgentDrawer({
                     onOpenWorkerConfig(selectedAgentId, 'instructions');
                     onClose?.();
                   }
-                }}
-              >
+                }}>
                 <Brain size={18} color={colors.text} />
               </BottomSheetTouchable>
               <BottomSheetTouchable
@@ -414,8 +414,7 @@ export function AgentDrawer({
                     onOpenWorkerConfig(selectedAgentId, 'tools');
                     onClose?.();
                   }
-                }}
-              >
+                }}>
                 <Wrench size={18} color={colors.text} />
               </BottomSheetTouchable>
               <BottomSheetTouchable
@@ -426,8 +425,7 @@ export function AgentDrawer({
                     onOpenWorkerConfig(selectedAgentId, 'integrations');
                     onClose?.();
                   }
-                }}
-              >
+                }}>
                 <Server size={18} color={colors.text} />
               </BottomSheetTouchable>
               <BottomSheetTouchable
@@ -438,8 +436,7 @@ export function AgentDrawer({
                     onOpenWorkerConfig(selectedAgentId, 'triggers');
                     onClose?.();
                   }
-                }}
-              >
+                }}>
                 <Zap size={18} color={colors.text} />
               </BottomSheetTouchable>
             </View>
@@ -484,8 +481,7 @@ export function AgentDrawer({
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               hasFreeTier ? handleUpgradeRequired() : onCreateAgent();
-            }}
-          >
+            }}>
             {hasFreeTier ? (
               <Sparkles size={16} color={colors.accent} />
             ) : (
@@ -538,8 +534,7 @@ export function AgentDrawer({
       style={{
         zIndex: 50,
         elevation: Platform.OS === 'android' ? 10 : undefined,
-      }}
-    >
+      }}>
       {/* Composio views with FlatList */}
       {['composio', 'composio-detail', 'composio-connector'].includes(currentView) ? (
         currentView === 'composio' ? (
@@ -591,7 +586,10 @@ export function AgentDrawer({
             selectedComposioApp &&
             selectedComposioProfile &&
             selectedAgent && (
-              <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(200)} style={{ flex: 1 }}>
+              <Animated.View
+                entering={FadeIn.duration(300)}
+                exiting={FadeOut.duration(200)}
+                style={{ flex: 1 }}>
                 <ComposioToolsContent
                   app={selectedComposioApp}
                   profile={selectedComposioProfile}
@@ -603,7 +601,10 @@ export function AgentDrawer({
               </Animated.View>
             )}
           {currentView === 'customMcp-tools' && customMcpConfig && (
-            <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(200)} style={{ flex: 1 }}>
+            <Animated.View
+              entering={FadeIn.duration(300)}
+              exiting={FadeOut.duration(200)}
+              style={{ flex: 1 }}>
               <CustomMcpToolsContent
                 serverName={customMcpConfig.serverName}
                 url={customMcpConfig.url}
@@ -612,7 +613,9 @@ export function AgentDrawer({
                 onComplete={(enabledTools) => {
                   Alert.alert(
                     t('integrations.customMcp.toolsConfigured'),
-                    t('integrations.customMcp.toolsConfiguredMessage', { count: enabledTools.length })
+                    t('integrations.customMcp.toolsConfiguredMessage', {
+                      count: enabledTools.length,
+                    })
                   );
                   setCurrentView('integrations');
                 }}
@@ -625,8 +628,7 @@ export function AgentDrawer({
         <BottomSheetScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
+          keyboardShouldPersistTaps="handled">
           {currentView === 'main' && (
             <Animated.View entering={FadeIn.duration(250)} exiting={FadeOut.duration(150)}>
               {renderMainView()}

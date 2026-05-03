@@ -24,6 +24,9 @@ mock.module('../config', () => ({
     JUSTAVPS_PROXY_DOMAIN: 'aether.cloud',
   },
   SANDBOX_VERSION: 'test-v1',
+  AETHER_MARKUP: 1.2,
+  PLATFORM_FEE_MARKUP: 0.1,
+  getToolCost: (_toolName: string, _resultCount: number = 0) => 0.01,
 }));
 
 mock.module('../router/config/litellm-config', () => ({

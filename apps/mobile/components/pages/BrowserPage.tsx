@@ -38,7 +38,9 @@ export function BrowserPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: B
   const webViewRef = useRef<WebView>(null);
 
   // Restore persisted state from tab store
-  const savedState = useTabStore((s) => s.tabStateById[page.id]) as { savedUrl?: string; savedDisplay?: string } | undefined;
+  const savedState = useTabStore((s) => s.tabStateById[page.id]) as
+    | { savedUrl?: string; savedDisplay?: string }
+    | undefined;
 
   const [urlInput, setUrlInput] = useState(savedState?.savedDisplay || '');
   const [currentUrl, setCurrentUrl] = useState(savedState?.savedUrl || '');
@@ -67,11 +69,14 @@ export function BrowserPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: B
   const initialPort = (page as any).metadata?.port as number | undefined;
   const initialUrl = (page as any).metadata?.url as string | undefined;
 
-  const getProxyUrl = useCallback((port: number, path?: string): string => {
-    if (!sandboxId) return '';
-    const base = getSandboxPortUrl(sandboxId, String(port));
-    return path ? `${base}${path}` : base;
-  }, [sandboxId]);
+  const getProxyUrl = useCallback(
+    (port: number, path?: string): string => {
+      if (!sandboxId) return '';
+      const base = getSandboxPortUrl(sandboxId, String(port));
+      return path ? `${base}${path}` : base;
+    },
+    [sandboxId]
+  );
 
   // Resolve initial URL
   const resolvedInitialUrl = React.useMemo(() => {
@@ -90,18 +95,21 @@ export function BrowserPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: B
         setUrlInput(formatDisplayUrl(resolvedInitialUrl));
       }
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedInitialUrl]);
 
-  const handleNavigationChange = useCallback((nav: WebViewNavigation) => {
-    setCanGoBack(nav.canGoBack);
-    setCanGoForward(nav.canGoForward);
-    setCurrentUrl(nav.url);
-    if (!isEditing) {
-      setUrlInput(formatDisplayUrl(nav.url));
-    }
-    setIsLoading(nav.loading);
-  }, [isEditing]);
+  const handleNavigationChange = useCallback(
+    (nav: WebViewNavigation) => {
+      setCanGoBack(nav.canGoBack);
+      setCanGoForward(nav.canGoForward);
+      setCurrentUrl(nav.url);
+      if (!isEditing) {
+        setUrlInput(formatDisplayUrl(nav.url));
+      }
+      setIsLoading(nav.loading);
+    },
+    [isEditing]
+  );
 
   const handleGoBack = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -170,24 +178,51 @@ export function BrowserPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: B
 
         {/* Nav buttons */}
         <Pressable onPress={handleGoBack} disabled={!canGoBack} hitSlop={6} className="p-1">
-          <Icon as={ArrowLeft} size={16} style={{ color: canGoBack ? fgColor : mutedColor }} strokeWidth={2.2} />
+          <Icon
+            as={ArrowLeft}
+            size={16}
+            style={{ color: canGoBack ? fgColor : mutedColor } as any}
+            strokeWidth={2.2}
+          />
         </Pressable>
-        <Pressable onPress={handleGoForward} disabled={!canGoForward} hitSlop={6} className="p-1 mr-1">
-          <Icon as={ArrowRight} size={16} style={{ color: canGoForward ? fgColor : mutedColor }} strokeWidth={2.2} />
+        <Pressable
+          onPress={handleGoForward}
+          disabled={!canGoForward}
+          hitSlop={6}
+          className="mr-1 p-1">
+          <Icon
+            as={ArrowRight}
+            size={16}
+            style={{ color: canGoForward ? fgColor : mutedColor } as any}
+            strokeWidth={2.2}
+          />
         </Pressable>
 
         {/* URL bar */}
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: inputBg, height: 32, maxHeight: 32, borderRadius: 8, paddingHorizontal: 10, marginHorizontal: 4, overflow: 'hidden' }}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: inputBg,
+            height: 32,
+            maxHeight: 32,
+            borderRadius: 8,
+            paddingHorizontal: 10,
+            marginHorizontal: 4,
+            overflow: 'hidden',
+          }}>
           {!isLoading && (
-            <Icon as={Globe} size={12} style={{ color: mutedColor }} strokeWidth={2} />
+            <Icon as={Globe} size={12} style={{ color: mutedColor } as any} strokeWidth={2} />
           )}
-          {isLoading && (
-            <ActivityIndicator size={10} color={mutedColor} />
-          )}
+          {isLoading && <ActivityIndicator size={10} color={mutedColor} />}
           <TextInput
             value={urlInput}
             onChangeText={setUrlInput}
-            onFocus={() => { setIsEditing(true); setUrlInput(currentUrl); }}
+            onFocus={() => {
+              setIsEditing(true);
+              setUrlInput(currentUrl);
+            }}
             onBlur={() => setIsEditing(false)}
             onSubmitEditing={handleUrlSubmit}
             placeholder="Enter URL or port..."
@@ -214,16 +249,26 @@ export function BrowserPage({ page, onBack, onOpenDrawer, onOpenRightDrawer }: B
 
         {/* Refresh / Stop */}
         <Pressable onPress={isLoading ? handleStop : handleRefresh} hitSlop={6} className="p-1">
-          <Icon as={isLoading ? X : RefreshCw} size={15} style={{ color: fgColor }} strokeWidth={2.2} />
+          <Icon
+            as={isLoading ? X : RefreshCw}
+            size={15}
+            style={{ color: fgColor } as any}
+            strokeWidth={2.2}
+          />
         </Pressable>
 
         {/* Open external */}
         <Pressable onPress={handleOpenExternal} hitSlop={6} className="p-1">
-          <Icon as={ExternalLink} size={15} style={{ color: mutedColor }} strokeWidth={2.2} />
+          <Icon
+            as={ExternalLink}
+            size={15}
+            style={{ color: mutedColor } as any}
+            strokeWidth={2.2}
+          />
         </Pressable>
 
         {/* Right drawer */}
-        <Pressable onPress={onOpenRightDrawer} hitSlop={8} className="p-1 ml-1">
+        <Pressable onPress={onOpenRightDrawer} hitSlop={8} className="ml-1 p-1">
           <Ionicons name="apps-outline" size={18} color={fgColor} />
         </Pressable>
       </View>

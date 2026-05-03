@@ -6,6 +6,7 @@ import Animated, {
   withSpring,
   interpolate,
   useDerivedValue,
+  type SharedValue,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useColorScheme } from 'nativewind';
@@ -27,7 +28,8 @@ const SPRING_CONFIG = {
 };
 
 // Android hit slop for better touch targets
-const ANDROID_HIT_SLOP = Platform.OS === 'android' ? { top: 12, bottom: 12, left: 12, right: 12 } : undefined;
+const ANDROID_HIT_SLOP =
+  Platform.OS === 'android' ? { top: 12, bottom: 12, left: 12, right: 12 } : undefined;
 
 interface QuickActionBarProps {
   actions?: QuickAction[];
@@ -38,7 +40,7 @@ interface QuickActionBarProps {
 interface ModeItemProps {
   action: QuickAction;
   index: number;
-  animatedIndex: Animated.SharedValue<number>;
+  animatedIndex: SharedValue<number>;
   onPress: () => void;
   isLast: boolean;
 }
@@ -76,13 +78,11 @@ const ModeItem = React.memo(({ action, index, animatedIndex, onPress, isLast }: 
         marginRight: isLast ? 0 : ITEM_SPACING,
         alignItems: 'center',
         justifyContent: 'center',
-      }}
-    >
+      }}>
       <Animated.View style={[{ alignItems: 'center', justifyContent: 'center' }, animatedStyle]}>
         <View
-          className="bg-muted/50 rounded-2xl py-2.5 flex-row items-center"
-          style={{ paddingHorizontal: 12 }}
-        >
+          className="flex-row items-center rounded-2xl bg-muted/50 py-2.5"
+          style={{ paddingHorizontal: 12 }}>
           <Icon
             as={action.icon}
             size={18}
@@ -90,9 +90,7 @@ const ModeItem = React.memo(({ action, index, animatedIndex, onPress, isLast }: 
             strokeWidth={2}
             style={{ marginRight: 6, flexShrink: 0 }}
           />
-          <Text className="text-sm font-roobert-medium text-foreground">
-            {translatedLabel}
-          </Text>
+          <Text className="font-roobert-medium text-sm text-foreground">{translatedLabel}</Text>
         </View>
       </Animated.View>
     </Pressable>
@@ -110,7 +108,7 @@ export function QuickActionBar({
 
   // Find the index of the selected action
   const selectedIndex = React.useMemo(() => {
-    const index = actions.findIndex(a => a.id === selectedActionId);
+    const index = actions.findIndex((a) => a.id === selectedActionId);
     return index >= 0 ? index : 0;
   }, [actions, selectedActionId]);
 
@@ -136,8 +134,8 @@ export function QuickActionBar({
     if (itemPositions.current[index] !== undefined && itemWidths.current[index] !== undefined) {
       const itemX = itemPositions.current[index];
       const itemWidth = itemWidths.current[index];
-      const itemCenter = itemX + (itemWidth / 2);
-      const offset = itemCenter - (SCREEN_WIDTH / 2);
+      const itemCenter = itemX + itemWidth / 2;
+      const offset = itemCenter - SCREEN_WIDTH / 2;
       scrollViewRef.current?.scrollTo({ x: Math.max(0, offset), animated: true });
     }
   }, []);
@@ -153,25 +151,28 @@ export function QuickActionBar({
   }, [selectedIndex, animatedIndex, scrollToIndex, selectedActionId]);
 
   // Handle tap - INSTANT animation, then notify parent
-  const handleItemPress = React.useCallback((index: number, actionId: string) => {
-    // Skip if same item
-    if (actionId === selectedActionId) return;
+  const handleItemPress = React.useCallback(
+    (index: number, actionId: string) => {
+      // Skip if same item
+      if (actionId === selectedActionId) return;
 
-    // Mark this as our tap (so useEffect doesn't double-animate)
-    lastPressedRef.current = actionId;
+      // Mark this as our tap (so useEffect doesn't double-animate)
+      lastPressedRef.current = actionId;
 
-    // 1. Haptic - instant feedback
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      // 1. Haptic - instant feedback
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    // 2. Animate IMMEDIATELY - don't wait for React state
-    animatedIndex.value = withSpring(index, SPRING_CONFIG);
+      // 2. Animate IMMEDIATELY - don't wait for React state
+      animatedIndex.value = withSpring(index, SPRING_CONFIG);
 
-    // 3. Scroll to center
-    scrollToIndex(index);
+      // 3. Scroll to center
+      scrollToIndex(index);
 
-    // 4. Notify parent (this triggers React state update, but animation already started)
-    onActionPress?.(actionId);
-  }, [onActionPress, selectedActionId, animatedIndex, scrollToIndex]);
+      // 4. Notify parent (this triggers React state update, but animation already started)
+      onActionPress?.(actionId);
+    },
+    [onActionPress, selectedActionId, animatedIndex, scrollToIndex]
+  );
 
   return (
     <View className="w-full overflow-hidden">
@@ -185,16 +186,14 @@ export function QuickActionBar({
           alignItems: 'center',
         }}
         decelerationRate="fast"
-        scrollEventThrottle={16}
-      >
+        scrollEventThrottle={16}>
         {actions.map((action, index) => (
           <View
             key={action.id}
             onLayout={(event) => {
               const { width, x } = event.nativeEvent.layout;
               measureItem(index, width, x);
-            }}
-          >
+            }}>
             <ModeItem
               action={action}
               index={index}

@@ -7,6 +7,7 @@
  */
 import { describe, test, expect, mock, beforeEach } from 'bun:test';
 import { createTestConfig } from './billing/mocks';
+import { dbMockState, resetDbMockState } from './db-mock-state';
 
 // ─── Mocks (MUST be before any require() calls) ─────────────────────────────
 
@@ -25,40 +26,63 @@ mock.module('../middleware/tenant-config-loader', () => ({
   getCacheMetrics: () => ({ hits: 0, misses: 0, evictions: 0, expirations: 0, size: 0 }),
 }));
 
-// ─── In-memory feature flag store ───────────────────────────────────────────
-
-const featureFlagStore = new Map<string, any>();
-let flagIdCounter = 1;
-
-function resetStore() {
-  featureFlagStore.clear();
-  flagIdCounter = 1;
-}
-
+// Combined ../shared/db mock — handles BOTH feature flag queries (admin routes)
+// AND account resolution queries (resolve-account-strict).
 mock.module('../shared/db', () => ({
-  hasDatabase: true,
+  get hasDatabase() { return dbMockState.hasDatabase; },
   db: {
-    select: () => ({
-      from: () => ({
-        where: () => ({
-          orderBy: async () => Array.from(featureFlagStore.values()),
-          limit: async () => {
-            if (featureFlagStore.size > 0) {
-              const entries = Array.from(featureFlagStore.entries());
-              return [{ ...entries[0][1], id: entries[0][0] }];
-            }
-            return [];
-          },
-        }),
+    select: (shape?: Record<string, unknown>) => ({
+      from: (table?: { __name?: string } & Record<string, unknown>) => ({
+        where: (_clause?: unknown) => {
+          const isAccountQuery = shape && ('tier' in shape || 'email' in shape || 'accountId' in shape);
+          return {
+            orderBy: async () => Array.from(dbMockState.featureFlags.values()),
+            limit: async (_n?: number) => {
+              if (isAccountQuery && shape) {
+                if ('tier' in shape) {
+                  return dbMockState.creditAccountsTier ? [{ tier: dbMockState.creditAccountsTier }] : [];
+                }
+                if ('email' in shape) {
+                  return dbMockState.customerEmail ? [{ email: dbMockState.customerEmail }] : [];
+                }
+                if ('accountId' in shape && table) {
+                  const tableName = String(table.__name || '');
+                  if (tableName.includes('account_members')) {
+                    return dbMockState.memberAccountId ? [{ accountId: dbMockState.memberAccountId }] : [];
+                  }
+                  if (tableName.includes('account_user')) {
+                    return dbMockState.legacyAccountId ? [{ accountId: dbMockState.legacyAccountId }] : [];
+                  }
+                }
+                return [];
+              }
+              // Feature flag path
+              if (dbMockState.featureFlags.size > 0) {
+                const entries = Array.from(dbMockState.featureFlags.entries());
+                return [{ ...entries[0][1], id: entries[0][0] }];
+              }
+              return [];
+            },
+          };
+        },
       }),
     }),
-    insert: () => ({
+    insert: (table?: { __name?: string } & Record<string, unknown>) => ({
       values: (data: any) => ({
         returning: async () => {
-          const id = `flag-${flagIdCounter++}`;
+          const id = `flag-${dbMockState.flagIdCounter++}`;
           const flag = { id, ...data, createdAt: new Date(), updatedAt: new Date() };
-          featureFlagStore.set(id, flag);
+          dbMockState.featureFlags.set(id, flag);
           return [flag];
+        },
+        onConflictDoNothing: async () => {
+          const tableName = String(table?.__name || '');
+          if (tableName.includes('accounts')) {
+            dbMockState.accountsInsertCalls += 1;
+          }
+          if (tableName.includes('account_members')) {
+            dbMockState.accountMembersInsertCalls += 1;
+          }
         },
       }),
     }),
@@ -66,9 +90,9 @@ mock.module('../shared/db', () => ({
       set: (data: any) => ({
         where: () => ({
           returning: async () => {
-            for (const [id, flag] of featureFlagStore) {
+            for (const [id, flag] of dbMockState.featureFlags) {
               const updated = { ...flag, ...data, updatedAt: new Date() };
-              featureFlagStore.set(id, updated);
+              dbMockState.featureFlags.set(id, updated);
               return [updated];
             }
             return [];
@@ -82,43 +106,11 @@ mock.module('../shared/db', () => ({
   },
 }));
 
-mock.module('@aether/db', () => ({
-  featureFlags: {
-    id: 'id', accountId: 'accountId', verticalId: 'verticalId',
-    featureName: 'featureName', enabled: 'enabled', config: 'config',
-    createdAt: 'createdAt', updatedAt: 'updatedAt',
-  },
-  sandboxes: {
-    sandboxId: 'sandboxId', externalId: 'externalId', name: 'name',
-    provider: 'provider', baseUrl: 'baseUrl', status: 'status',
-    metadata: 'metadata', createdAt: 'createdAt', updatedAt: 'updatedAt',
-    lastUsedAt: 'lastUsedAt', accountId: 'accountId',
-  },
-  accounts: { accountId: 'accountId', name: 'name' },
-  platformUserRoles: {
-    id: 'id', accountId: 'accountId', userId: 'userId',
-    role: 'role', createdAt: 'createdAt',
-  },
-  creditAccounts: {
-    accountId: 'accountId', balance: 'balance', expiringCredits: 'expiringCredits',
-    nonExpiringCredits: 'nonExpiringCredits', tier: 'tier',
-  },
-  creditLedger: { id: 'id', accountId: 'accountId', amount: 'amount', type: 'type' },
-  creditUsage: { id: 'id', accountId: 'accountId', amount: 'amount' },
-  creditPurchases: { id: 'id', accountId: 'accountId', amount: 'amount' },
-  billingCustomers: { id: 'id', accountId: 'accountId', email: 'email' },
-  accountDeletionRequests: { id: 'id', accountId: 'accountId', status: 'status' },
-}));
-
-mock.module('../providers/registry', () => ({
-  buildProviderKeySchema: () => ({
-    llm: { title: 'LLM', description: 'LLM keys', keys: [{ key: 'OPENAI_API_KEY', label: 'OpenAI', secret: true }] },
-  }),
-  ALL_SANDBOX_ENV_KEYS: new Set(['OPENAI_API_KEY', 'ANTHROPIC_API_KEY']),
-  PROVIDER_REGISTRY: {},
-  LLM_PROVIDERS: [],
-  TOOL_PROVIDERS: [],
-}));
+// NOTE: @aether/db is NOT mocked here. The admin routes use dynamic import
+// (await import('@aether/db')) and the mock db from ../shared/db ignores
+// .from() arguments, so real Drizzle table objects work fine.
+// Mocking @aether/db globally breaks other test files (platform, api-keys)
+// that need real createDb and Drizzle table objects for DB operations.
 
 // ─── Require after mocks ────────────────────────────────────────────────────
 
@@ -137,7 +129,7 @@ function createAdminTestApp() {
 
 describe('Admin Routes', () => {
   beforeEach(() => {
-    resetStore();
+    resetDbMockState();
   });
 
   describe('Feature Flags', () => {

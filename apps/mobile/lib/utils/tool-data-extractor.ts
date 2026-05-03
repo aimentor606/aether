@@ -1,6 +1,6 @@
 /**
  * Tool Data Extractor
- * 
+ *
  * Extracts structured tool call and tool result data from UnifiedMessage objects
  * Matches the frontend implementation for consistency
  */
@@ -26,11 +26,12 @@ export interface ToolResultData {
   success: boolean;
   output: any;
   error?: string | null;
+  timestamp?: string;
 }
 
 /**
  * Extract tool call data from assistant message metadata
- * 
+ *
  * @param assistantMessage - The assistant message containing tool calls
  * @param toolCallId - Optional tool call ID to find specific tool call
  * @returns Tool call data or null if not found
@@ -40,17 +41,17 @@ export function extractToolCall(
   toolCallId?: string
 ): ToolCallData | null {
   if (!assistantMessage) return null;
-  
+
   const metadata = safeJsonParse<ParsedMetadata>(assistantMessage.metadata, {});
   const toolCalls = metadata.tool_calls || [];
-  
+
   if (toolCalls.length === 0) return null;
-  
+
   // If toolCallId provided, find specific tool call
   if (toolCallId) {
-    const toolCall = toolCalls.find(tc => tc.tool_call_id === toolCallId);
+    const toolCall = toolCalls.find((tc) => tc.tool_call_id === toolCallId);
     if (!toolCall || !toolCall.function_name) return null;
-    
+
     // Parse arguments if string
     let args: Record<string, any> | string = toolCall.arguments || {};
     if (typeof args === 'string') {
@@ -60,7 +61,7 @@ export function extractToolCall(
         // Keep as string if partial JSON
       }
     }
-    
+
     return {
       tool_call_id: toolCall.tool_call_id || '',
       function_name: toolCall.function_name,
@@ -68,17 +69,17 @@ export function extractToolCall(
       source: toolCall.source || 'native',
     };
   }
-  
+
   // Return first tool call if no ID specified
   if (toolCalls.length === 0) {
     return null;
   }
-  
+
   const toolCall = toolCalls[0];
   if (!toolCall || !toolCall.function_name) {
     return null;
   }
-  
+
   let args: Record<string, any> | string = toolCall.arguments || {};
   if (typeof args === 'string') {
     try {
@@ -87,7 +88,7 @@ export function extractToolCall(
       // Keep as string if partial JSON
     }
   }
-  
+
   return {
     tool_call_id: toolCall.tool_call_id || '',
     function_name: toolCall.function_name,
@@ -98,18 +99,18 @@ export function extractToolCall(
 
 /**
  * Extract tool result data from tool message metadata
- * 
+ *
  * @param toolMessage - The tool message containing result
  * @returns Tool result data or null if not found
  */
 export function extractToolResult(toolMessage: UnifiedMessage | null): ToolResultData | null {
   if (!toolMessage) return null;
-  
+
   const metadata = safeJsonParse<ParsedMetadata>(toolMessage.metadata, {});
   const result = metadata.result;
-  
+
   if (!result) return null;
-  
+
   return {
     success: result.success !== undefined ? result.success : true,
     output: result.output !== undefined ? result.output : null,
@@ -120,15 +121,17 @@ export function extractToolResult(toolMessage: UnifiedMessage | null): ToolResul
 /**
  * Extract tool call data directly from tool message metadata
  * This handles the "new format" where function_name, arguments, etc. are in the tool message itself
- * 
+ *
  * @param toolMessage - The tool message that might contain tool call data
  * @returns Tool call data or null if not found
  */
-export function extractToolCallFromToolMessage(toolMessage: UnifiedMessage | null): ToolCallData | null {
+export function extractToolCallFromToolMessage(
+  toolMessage: UnifiedMessage | null
+): ToolCallData | null {
   if (!toolMessage) return null;
-  
+
   const metadata = safeJsonParse<ParsedMetadata>(toolMessage.metadata, {});
-  
+
   // Check if tool message has function_name and tool_call_id directly
   if (metadata.function_name && metadata.tool_call_id) {
     let args: Record<string, any> | string = metadata.arguments || {};
@@ -139,7 +142,7 @@ export function extractToolCallFromToolMessage(toolMessage: UnifiedMessage | nul
         // Keep as string if partial JSON
       }
     }
-    
+
     return {
       tool_call_id: metadata.tool_call_id,
       function_name: metadata.function_name,
@@ -147,13 +150,13 @@ export function extractToolCallFromToolMessage(toolMessage: UnifiedMessage | nul
       source: (metadata as any).source || 'native',
     };
   }
-  
+
   return null;
 }
 
 /**
  * Extract both tool call and tool result from message pair
- * 
+ *
  * @param assistantMessage - Assistant message with tool call
  * @param toolMessage - Tool message with result
  * @returns Object with toolCall and toolResult
@@ -171,22 +174,22 @@ export function extractToolData(
     const toolMetadata = safeJsonParse<ParsedMetadata>(toolMessage.metadata, {});
     toolCallId = toolMetadata.tool_call_id;
   }
-  
+
   // Extract tool call - try from assistant message first
   let toolCall = extractToolCall(assistantMessage, toolCallId);
-  
+
   // Fallback: try to extract tool call data directly from tool message
   // This handles the "new format" where function_name, arguments are in tool message metadata
   if (!toolCall && toolMessage) {
     toolCall = extractToolCallFromToolMessage(toolMessage);
   }
-  
+
   // Extract tool result
   let toolResult: ToolResultData | null = null;
   if (toolMessage) {
     toolResult = extractToolResult(toolMessage);
   }
-  
+
   return { toolCall, toolResult };
 }
 
@@ -206,12 +209,12 @@ export function extractToolCallAndResult(
 } {
   log.log('[extractToolCallAndResult] assistantMessage:', assistantMessage?.message_id || 'null');
   log.log('[extractToolCallAndResult] toolMessage:', toolMessage?.message_id || 'null');
-  
+
   const { toolCall, toolResult } = extractToolData(assistantMessage, toolMessage);
-  
+
   log.log('[extractToolCallAndResult] Extracted toolCall:', toolCall?.function_name || 'null');
   log.log('[extractToolCallAndResult] Extracted toolResult:', toolResult ? 'has result' : 'null');
-  
+
   return {
     toolCall,
     toolResult,
@@ -220,4 +223,3 @@ export function extractToolCallAndResult(
     toolTimestamp: toolMessage?.created_at,
   };
 }
-

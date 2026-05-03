@@ -200,12 +200,6 @@ async function resolveLatestImageId(): Promise<string | null> {
   }
 }
 
-/** Bust the cached image so the next create picks up a freshly built image. */
-export function invalidateImageCache(): void {
-  cachedImageId = null;
-  cachedImageExpiry = 0;
-}
-
 export interface ServerTypeWithPricing {
   name: string;
   description: string;

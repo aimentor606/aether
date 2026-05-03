@@ -38,6 +38,7 @@ export const mockRegistry = {
   getScheduledDeletions: null as (() => Promise<any[]>) | null,
 
   deductCredits: null as ((...args: any[]) => Promise<any>) | null,
+  getTransactionsSummary: null as ((...args: any[]) => Promise<any>) | null,
   supabaseFromBuilder: null as ((table: string) => Record<string, any>) | null,
 };
 
@@ -75,6 +76,8 @@ export function createTestConfig(overrides: Record<string, any> = {}) {
     LITELLM_MASTER_KEY: '',
     LITELLM_TIMEOUT_MS: 60000,
     LITELLM_NUM_RETRIES: 3,
+    OPENMETER_URL: 'http://localhost:8888',
+    OPENMETER_API_KEY: 'test-key',
     FRONTEND_URL: 'http://localhost:3000',
     CORS_ALLOWED_ORIGINS: '',
     INTEGRATION_AUTH_PROVIDER: '',
@@ -481,6 +484,10 @@ mock.module('../../shared/stripe', () => ({
 
 mock.module('../../config', () => ({
   config: createTestConfig(),
+  SANDBOX_VERSION: 'test',
+  AETHER_MARKUP: 1.2,
+  PLATFORM_FEE_MARKUP: 0.1,
+  getToolCost: (_toolName: string, _resultCount: number = 0) => 0.01,
 }));
 
 mock.module('../../billing/repositories/credit-accounts', () => ({
@@ -505,7 +512,10 @@ mock.module('../../billing/repositories/transactions', () => ({
   insertLedgerEntry: async (data: any) =>
     mockRegistry.insertLedgerEntry ? mockRegistry.insertLedgerEntry(data) : { id: 'ledger_test', ...data },
   getTransactions: async () => ({ rows: [], total: 0 }),
-  getTransactionsSummary: async () => ({ totalCredits: 0, totalDebits: 0, count: 0 }),
+  getTransactionsSummary: async (...args: any[]) =>
+    mockRegistry.getTransactionsSummary ? mockRegistry.getTransactionsSummary(...args) : { totalCredits: 0, totalDebits: 0, count: 0 },
+  getUsageRecords: async () => ({ rows: [], total: 0 }),
+  insertPurchase: async () => null,
   getPurchaseByPaymentIntent: async (id: string) =>
     mockRegistry.getPurchaseByPaymentIntent ? mockRegistry.getPurchaseByPaymentIntent(id) : null,
   updatePurchaseStatus: async (...args: any[]) =>

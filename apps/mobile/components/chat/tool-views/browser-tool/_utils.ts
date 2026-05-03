@@ -37,7 +37,7 @@ export function extractBrowserUrl(content: string | undefined): string | null {
 export function getBrowserOperation(toolName: string): string {
   const operations: Record<string, string> = {
     'browser-act': 'Browser Action',
-    'browser_act': 'Browser Action',
+    browser_act: 'Browser Action',
     'browser-navigate-to': 'Navigate',
     'browser-click-element': 'Click Element',
     'browser-input-text': 'Input Text',
@@ -63,9 +63,10 @@ export function extractBrowserData(
   toolMessage: UnifiedMessage,
   assistantMessage: UnifiedMessage | null
 ): BrowserData {
-  const args = typeof toolCall.arguments === 'object' ? toolCall.arguments : JSON.parse(toolCall.arguments);
-  const toolName = toolCall.function?.name || '';
-  
+  const args =
+    typeof toolCall.arguments === 'object' ? toolCall.arguments : JSON.parse(toolCall.arguments);
+  const toolName = toolCall.function_name || '';
+
   let url = args?.url || null;
   let screenshotUrl: string | null = null;
   let screenshotBase64: string | null = null;
@@ -74,17 +75,14 @@ export function extractBrowserData(
   let resultData: Record<string, any> | null = null;
 
   if (toolResult?.output) {
-    const output = typeof toolResult.output === 'string' 
-      ? parseContent(toolResult.output) 
-      : toolResult.output;
-    
+    const output =
+      typeof toolResult.output === 'string' ? parseContent(toolResult.output) : toolResult.output;
+
     screenshotUrl = output?.image_url || null;
     messageId = output?.message_id || null;
-    
+
     if (output && typeof output === 'object') {
-      resultData = Object.fromEntries(
-        Object.entries(output).filter(([k]) => k !== 'message_id')
-      );
+      resultData = Object.fromEntries(Object.entries(output).filter(([k]) => k !== 'message_id'));
     }
   }
 
@@ -93,16 +91,18 @@ export function extractBrowserData(
     try {
       const parsed = JSON.parse(content);
       const innerContent = parsed?.content || content;
-      
+
       if (typeof innerContent === 'string') {
-        const toolResultMatch = innerContent.match(/ToolResult\([^)]*output='([\s\S]*?)'(?:\s*,|\s*\))/);
+        const toolResultMatch = innerContent.match(
+          /ToolResult\([^)]*output='([\s\S]*?)'(?:\s*,|\s*\))/
+        );
         if (toolResultMatch) {
           const outputString = toolResultMatch[1];
           try {
             const cleanedOutput = outputString
               .replace(/\\n/g, '\n')
               .replace(/\\"/g, '"')
-              .replace(/\\u([0-9a-fA-F]{4})/g, (_match, grp) => 
+              .replace(/\\u([0-9a-fA-F]{4})/g, (_match, grp) =>
                 String.fromCharCode(parseInt(grp, 16))
               );
             const outputJson = JSON.parse(cleanedOutput);
@@ -138,7 +138,6 @@ export function extractBrowserData(
     screenshotBase64,
     messageId,
     parameters,
-    result: resultData
+    result: resultData,
   };
 }
-

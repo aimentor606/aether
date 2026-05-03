@@ -20,21 +20,32 @@ const parseContent = (content: any): any => {
   return content;
 };
 
-export function extractSheetsData({ toolCall, toolResult }: { toolCall: ToolCallData; toolResult?: ToolResultData }): SheetsData {
-  const toolName = toolCall.function?.name || '';
-  
+export function extractSheetsData({
+  toolCall,
+  toolResult,
+}: {
+  toolCall: ToolCallData;
+  toolResult?: ToolResultData;
+}): SheetsData {
+  const toolName = toolCall.function_name || '';
+
   let filePath: string | null = null;
   let headers: string[] = [];
   let rows: any[][] = [];
-  
+
   if (toolResult?.output) {
-    const output = typeof toolResult.output === 'string' 
-      ? parseContent(toolResult.output) 
-      : toolResult.output;
-    
+    const output =
+      typeof toolResult.output === 'string' ? parseContent(toolResult.output) : toolResult.output;
+
     if (output && typeof output === 'object') {
-      filePath = output.created || output.updated || output.file_path || output.formatted || output.chart_saved || null;
-      
+      filePath =
+        output.created ||
+        output.updated ||
+        output.file_path ||
+        output.formatted ||
+        output.chart_saved ||
+        null;
+
       if (output.result_preview) {
         headers = output.result_preview.headers || [];
         rows = output.result_preview.rows || [];
@@ -44,30 +55,29 @@ export function extractSheetsData({ toolCall, toolResult }: { toolCall: ToolCall
       }
     }
   }
-  
+
   const action = getActionName(toolName || '');
   const fileName = filePath ? filePath.split('/').pop() || null : null;
-  
+
   return {
     filePath,
     fileName,
     action,
     headers,
     rows,
-    success: toolResult?.success ?? true
+    success: toolResult?.success ?? true,
   };
 }
 
 function getActionName(toolName: string): string {
   const name = toolName.toLowerCase().replace(/_/g, '-');
-  
+
   if (name.includes('create')) return 'Created';
   if (name.includes('update')) return 'Updated';
   if (name.includes('view')) return 'Viewing';
   if (name.includes('analyze')) return 'Analyzed';
   if (name.includes('visualize')) return 'Visualized';
   if (name.includes('format')) return 'Formatted';
-  
+
   return 'Sheet';
 }
-

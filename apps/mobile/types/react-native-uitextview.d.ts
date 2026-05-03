@@ -2,5 +2,9 @@ declare module 'react-native-uitextview' {
   import type { ForwardRefExoticComponent, RefAttributes } from 'react';
   import type { TextProps } from 'react-native';
 
-  export const UITextView: ForwardRefExoticComponent<TextProps & RefAttributes<any>>;
+  interface UITextViewProps extends TextProps {
+    uiTextView?: boolean;
+  }
+
+  export const UITextView: ForwardRefExoticComponent<UITextViewProps & RefAttributes<any>>;
 }

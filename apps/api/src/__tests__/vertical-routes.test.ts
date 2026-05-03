@@ -117,6 +117,7 @@ mock.module('@aether/vertical-advisor', () => ({
 mock.module('../shared/resolve-account', () => ({
   resolveAccountId: async (userId: string) => `resolved_account_for_${userId}`,
   resolveAccountIdStrict: async (userId: string) => `resolved_account_for_${userId}`,
+  reconcileResolvedAccount: async () => {},
 }));
 
 // Import routes AFTER mocks are set up

@@ -41,7 +41,7 @@ export interface ApifyActorDetails {
       FAILED?: number;
       ABORTED?: number;
       SUCCEEDED?: number;
-      "TIMED-OUT"?: number;
+      'TIMED-OUT'?: number;
     };
   };
   pricingInfos?: Array<{
@@ -137,7 +137,9 @@ export function extractApifySearchData(
       return defaultReturn;
     }
 
-    const args = toolCall.arguments || {};
+    const rawArgs = toolCall.arguments || {};
+    const args =
+      typeof rawArgs === 'string' ? (JSON.parse(rawArgs) as Record<string, any>) : rawArgs;
     const query: string = args.query || '';
 
     let output: any = null;
@@ -210,7 +212,9 @@ export function extractApifyActorDetails(
       return defaultReturn;
     }
 
-    const args = toolCall.arguments || {};
+    const rawArgs = toolCall.arguments || {};
+    const args =
+      typeof rawArgs === 'string' ? (JSON.parse(rawArgs) as Record<string, any>) : rawArgs;
     const actor_id: string = args.actor_id || '';
 
     let output: any = null;
@@ -238,10 +242,10 @@ export function extractApifyActorDetails(
     if (output && typeof output === 'object' && output !== null) {
       const inputSchema = output.inputSchema || output.input_schema;
       const imageUrl = output.imageUrl || output.image_url || output.pictureUrl;
-      
+
       const title = output.title || inputSchema?.title || output.name || '';
       const description = output.description || inputSchema?.description || '';
-      
+
       return {
         actor_id: output.actor_id || output.id || actor_id,
         id: output.id || output.actor_id,
@@ -314,7 +318,9 @@ export function extractApifyRunData(
       return defaultReturn;
     }
 
-    const args = toolCall.arguments || {};
+    const rawArgs = toolCall.arguments || {};
+    const args =
+      typeof rawArgs === 'string' ? (JSON.parse(rawArgs) as Record<string, any>) : rawArgs;
     const run_input = args.run_input;
 
     let output: any = null;
@@ -401,9 +407,13 @@ export function extractApifyApprovalData(
     }
 
     const functionName = toolCall.function_name || '';
-    
+
     // Only extract if it's an approval-related function
-    if (!functionName.includes('approval') && !functionName.includes('request_apify_approval') && !functionName.includes('approve_apify_request')) {
+    if (
+      !functionName.includes('approval') &&
+      !functionName.includes('request_apify_approval') &&
+      !functionName.includes('approve_apify_request')
+    ) {
       return null;
     }
 
@@ -487,7 +497,9 @@ export function extractApifyRunResultsData(
       return defaultReturn;
     }
 
-    const args = toolCall.arguments || {};
+    const rawArgs = toolCall.arguments || {};
+    const args =
+      typeof rawArgs === 'string' ? (JSON.parse(rawArgs) as Record<string, any>) : rawArgs;
     const run_id: string = args.run_id || '';
 
     let output: any = null;
@@ -537,4 +549,3 @@ export function extractApifyRunResultsData(
     return defaultReturn;
   }
 }
-

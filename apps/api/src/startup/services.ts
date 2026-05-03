@@ -4,6 +4,7 @@ import { ensureSchema } from '../ensure-schema';
 import { ensureLocalSandboxRegistered, startLocalSandboxSelfHeal } from './local-sandbox';
 import { startSandboxHealthMonitor } from '../platform/services/sandbox-health';
 import { startProvisionPoller } from '../platform/services/sandbox-provision-poller';
+import { migrateExistingKeys } from '../router/services/litellm-keys';
 
 let schemaReady = false;
 export function isSchemaReady() { return schemaReady; }
@@ -30,6 +31,10 @@ function startServices(startDeps: {
   if (config.isJustAVPSEnabled()) {
     startProvisionPoller();
   }
+
+  migrateExistingKeys().catch((err) =>
+    appLogger.error('[startup] LiteLLM key migration failed', err),
+  );
 }
 
 export function initServices(startDeps: Parameters<typeof startServices>[0]): void {

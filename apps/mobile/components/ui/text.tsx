@@ -6,7 +6,7 @@ import { Platform, Text as RNText, type Role } from 'react-native';
 
 const textVariants = cva(
   cn(
-    'text-foreground text-base',
+    'text-base text-foreground',
     Platform.select({
       web: 'select-text',
     })
@@ -16,24 +16,30 @@ const textVariants = cva(
       variant: {
         default: 'font-roobert',
         h1: cn(
-          'text-center text-4xl tracking-tight font-roobert-bold',
+          'text-center font-roobert-bold text-4xl tracking-tight',
           Platform.select({ web: 'scroll-m-20 text-balance' })
         ),
         h2: cn(
-          'border-border border-b pb-2 text-3xl tracking-tight font-roobert-semibold',
+          'border-b border-border pb-2 font-roobert-semibold text-3xl tracking-tight',
           Platform.select({ web: 'scroll-m-20 first:mt-0' })
         ),
-        h3: cn('text-2xl tracking-tight font-roobert-semibold', Platform.select({ web: 'scroll-m-20' })),
-        h4: cn('text-xl tracking-tight font-roobert-semibold', Platform.select({ web: 'scroll-m-20' })),
-        p: 'mt-3 leading-7 sm:mt-6 font-roobert',
-        blockquote: 'mt-4 border-l-2 pl-3 italic sm:mt-6 sm:pl-6 font-roobert',
-        code: cn(
-          'bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-roobert-semibold'
+        h3: cn(
+          'font-roobert-semibold text-2xl tracking-tight',
+          Platform.select({ web: 'scroll-m-20' })
         ),
-        lead: 'text-muted-foreground text-xl font-roobert',
-        large: 'text-lg font-roobert-semibold',
-        small: 'text-sm leading-none font-roobert-medium',
-        muted: 'text-muted-foreground text-sm font-roobert',
+        h4: cn(
+          'font-roobert-semibold text-xl tracking-tight',
+          Platform.select({ web: 'scroll-m-20' })
+        ),
+        p: 'mt-3 font-roobert leading-7 sm:mt-6',
+        blockquote: 'mt-4 border-l-2 pl-3 font-roobert italic sm:mt-6 sm:pl-6',
+        code: cn(
+          'relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono font-roobert-semibold text-sm'
+        ),
+        lead: 'font-roobert text-xl text-muted-foreground',
+        large: 'font-roobert-semibold text-lg',
+        small: 'font-roobert-medium text-sm leading-none',
+        muted: 'font-roobert text-sm text-muted-foreground',
       },
     },
     defaultVariants: {
@@ -64,26 +70,24 @@ const ARIA_LEVEL: Partial<Record<TextVariant, string>> = {
 
 const TextClassContext = React.createContext<string | undefined>(undefined);
 
-function Text({
-  className,
-  asChild = false,
-  variant = 'default',
-  ...props
-}: React.ComponentProps<typeof RNText> &
-  TextVariantProps &
-  React.RefAttributes<RNText> & {
-    asChild?: boolean;
-  }) {
+const Text = React.forwardRef<
+  RNText,
+  React.ComponentProps<typeof RNText> &
+    TextVariantProps & {
+      asChild?: boolean;
+    }
+>(({ className, asChild = false, variant = 'default', ...props }, ref) => {
   const textClass = React.useContext(TextClassContext);
   const Component = asChild ? Slot.Text : RNText;
   return (
     <Component
+      ref={ref as React.Ref<any>}
       className={cn(textVariants({ variant }), textClass, className)}
-      role={variant ? ROLE[variant] : undefined}
-      aria-level={variant ? ARIA_LEVEL[variant] : undefined}
+      role={variant ? ROLE[variant as TextVariant] : undefined}
+      aria-level={variant ? ARIA_LEVEL[variant as TextVariant] : undefined}
       {...props}
     />
   );
-}
+}) as any;
 
 export { Text, TextClassContext };

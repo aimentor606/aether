@@ -2,9 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { View, ScrollView, Linking, Pressable, Image as RNImage } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { Search, ExternalLink, Globe, CheckCircle2, AlertCircle, ImageIcon, ChevronLeft, ChevronRight } from 'lucide-react-native';
+import {
+  Search,
+  ExternalLink,
+  Globe,
+  CheckCircle2,
+  AlertCircle,
+  ImageIcon,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react-native';
 import type { ToolViewProps } from '../types';
-import { extractWebSearchData, cleanUrl, getFavicon, extractQueriesFromToolCall, getResultType } from './_utils';
+import {
+  extractWebSearchData,
+  cleanUrl,
+  getFavicon,
+  extractQueriesFromToolCall,
+  getResultType,
+} from './_utils';
 import { ToolViewCard, StatusBadge, LoadingState } from '../shared';
 import { getToolMetadata } from '../tool-metadata';
 import { DeepSearchLoadingState } from './DeepSearchLoadingState';
@@ -33,13 +48,7 @@ function Favicon({ url, size = 18 }: { url: string; size?: number }) {
   }, [url]);
 
   if (hasError) {
-    return (
-      <Icon
-        as={Globe}
-        size={size}
-        className="text-muted-foreground"
-      />
-    );
+    return <Icon as={Globe} size={size} className="text-muted-foreground" />;
   }
 
   return (
@@ -51,8 +60,19 @@ function Favicon({ url, size = 18 }: { url: string; size?: number }) {
   );
 }
 
-export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isStreaming, assistantTimestamp, toolTimestamp }: ToolViewProps) {
-  const { query, results, images, success, isBatch, batchResults } = extractWebSearchData(toolCall, toolResult, isSuccess);
+export function WebSearchToolView({
+  toolCall,
+  toolResult,
+  isSuccess = true,
+  isStreaming,
+  assistantTimestamp,
+  toolTimestamp,
+}: ToolViewProps) {
+  const { query, results, images, success, isBatch, batchResults } = extractWebSearchData(
+    toolCall,
+    toolResult,
+    isSuccess
+  );
   const queriesArray = extractQueriesFromToolCall(toolCall);
   const isLoading = isStreaming && results.length === 0 && images.length === 0;
   const [currentQueryIndex, setCurrentQueryIndex] = useState(0);
@@ -76,7 +96,8 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
 
   const name = toolCall.function_name.replace(/_/g, '-').toLowerCase();
   const toolMetadata = getToolMetadata(name, toolCall.arguments);
-  const actualIsSuccess = toolResult?.success !== undefined ? toolResult.success : (success && isSuccess);
+  const actualIsSuccess =
+    toolResult?.success !== undefined ? toolResult.success : success && isSuccess;
 
   // Reset to first query when batch results change
   useEffect(() => {
@@ -87,22 +108,29 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
 
   const handleOpenUrl = (url: string | any) => {
     // Safety: ensure url is a string before opening (API may return objects)
-    const resolvedUrl = typeof url === 'string' ? url
-      : (typeof url === 'object' && url !== null) ? (url.url || url.src || url.href || '') : '';
+    const resolvedUrl =
+      typeof url === 'string'
+        ? url
+        : typeof url === 'object' && url !== null
+          ? url.url || url.src || url.href || ''
+          : '';
     if (!resolvedUrl) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Linking.openURL(resolvedUrl);
   };
 
-  const currentResults = isBatch && batchResults && batchResults[currentQueryIndex]
-    ? batchResults[currentQueryIndex].results
-    : results;
-  const currentImages = isBatch && batchResults && batchResults[currentQueryIndex]?.images
-    ? batchResults[currentQueryIndex].images
-    : images;
-  const currentQuery = isBatch && batchResults && batchResults[currentQueryIndex]
-    ? batchResults[currentQueryIndex].query
-    : query;
+  const currentResults =
+    isBatch && batchResults && batchResults[currentQueryIndex]
+      ? batchResults[currentQueryIndex].results
+      : results;
+  const currentImages =
+    isBatch && batchResults && batchResults[currentQueryIndex]?.images
+      ? batchResults[currentQueryIndex].images
+      : images;
+  const currentQuery =
+    isBatch && batchResults && batchResults[currentQueryIndex]
+      ? batchResults[currentQueryIndex].query
+      : query;
 
   if (isLoading) {
     // Check for batch queries - either from queriesArray or from query being a JSON array
@@ -115,7 +143,9 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
         try {
           const parsed = JSON.parse(trimmed);
           if (Array.isArray(parsed) && parsed.length > 1) {
-            effectiveQueries = parsed.filter((q: any) => typeof q === 'string' && q.trim().length > 0);
+            effectiveQueries = parsed.filter(
+              (q: any) => typeof q === 'string' && q.trim().length > 0
+            );
           }
         } catch {
           // Not valid JSON
@@ -141,9 +171,8 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
               label={hasBatchQueries ? `${effectiveQueries.length} queries` : 'Searching'}
             />
           ),
-        }}
-      >
-        <View className="flex-1 w-full">
+        }}>
+        <View className="w-full flex-1">
           {hasBatchQueries ? (
             <DeepSearchLoadingState queries={effectiveQueries} />
           ) : (
@@ -178,23 +207,26 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
               label={actualIsSuccess ? 'Completed' : 'Failed'}
             />
           ),
-        }}
-      >
-        <View className="flex-1 w-full items-center justify-center py-12 px-6">
-          <View className="bg-muted/30 rounded-2xl items-center justify-center mb-6" style={{ width: 80, height: 80 }}>
+        }}>
+        <View className="w-full flex-1 items-center justify-center px-6 py-12">
+          <View
+            className="mb-6 items-center justify-center rounded-2xl bg-muted/30"
+            style={{ width: 80, height: 80 }}>
             <Icon as={Search} size={40} className="text-muted-foreground" />
           </View>
-          <Text className="text-xl font-roobert-semibold mb-2 text-foreground">
+          <Text className="mb-2 font-roobert-semibold text-xl text-foreground">
             No Results Found
           </Text>
           {currentQuery && (
-            <View className="bg-card border border-border rounded-2xl px-4 py-3 mt-3 w-full">
-              <Text className="text-sm font-roobert text-foreground/60 text-center" numberOfLines={2}>
+            <View className="mt-3 w-full rounded-2xl border border-border bg-card px-4 py-3">
+              <Text
+                className="text-center font-roobert text-sm text-foreground/60"
+                numberOfLines={2}>
                 {currentQuery}
               </Text>
             </View>
           )}
-          <Text className="text-sm font-roobert text-muted-foreground mt-3 text-center">
+          <Text className="mt-3 text-center font-roobert text-sm text-muted-foreground">
             Try refining your search query
           </Text>
         </View>
@@ -215,49 +247,54 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
         showStatus: true,
       }}
       footer={
-        <View className="flex-row items-center justify-between w-full">
+        <View className="w-full flex-row items-center justify-between">
           {currentQuery && (
-            <Text className="text-xs text-muted-foreground flex-1" numberOfLines={1}>
+            <Text className="flex-1 text-xs text-muted-foreground" numberOfLines={1}>
               {currentQuery}
             </Text>
           )}
           {(toolTimestamp || assistantTimestamp) && !isStreaming && (
-            <Text className="text-xs text-muted-foreground ml-2">
-              {toolTimestamp ? formatTimestamp(toolTimestamp) : assistantTimestamp ? formatTimestamp(assistantTimestamp) : ''}
+            <Text className="ml-2 text-xs text-muted-foreground">
+              {toolTimestamp
+                ? formatTimestamp(toolTimestamp)
+                : assistantTimestamp
+                  ? formatTimestamp(assistantTimestamp)
+                  : ''}
             </Text>
           )}
         </View>
-      }
-    >
-      <ScrollView className="flex-1 w-full" showsVerticalScrollIndicator={false}>
-        <View className="px-4 py-4 gap-6">
+      }>
+      <ScrollView className="w-full flex-1" showsVerticalScrollIndicator={false}>
+        <View className="gap-6 px-4 py-4">
           {/* Navigation Header - At the absolute top */}
           {isBatch && batchResults && batchResults.length > 1 && (
-            <View className="flex-row items-center justify-between pb-4 mb-4 border-b border-border">
-              <View className="flex-1 min-w-0">
-                <View className="flex-row items-center gap-2 mb-1">
-                  <Text className="text-xs font-roobert-medium text-muted-foreground">
+            <View className="mb-4 flex-row items-center justify-between border-b border-border pb-4">
+              <View className="min-w-0 flex-1">
+                <View className="mb-1 flex-row items-center gap-2">
+                  <Text className="font-roobert-medium text-xs text-muted-foreground">
                     Query {currentQueryIndex + 1} of {batchResults.length}
                   </Text>
                   <Icon
                     as={batchResults[currentQueryIndex].success ? CheckCircle2 : AlertCircle}
                     size={12}
-                    className={batchResults[currentQueryIndex].success ? 'text-primary' : 'text-destructive'}
+                    className={
+                      batchResults[currentQueryIndex].success ? 'text-primary' : 'text-destructive'
+                    }
                   />
                   {batchResults[currentQueryIndex].results.length > 0 && (
-                    <View className="bg-muted px-1.5 py-0.5 rounded">
-                      <Text className="text-xs font-roobert-medium text-muted-foreground">
+                    <View className="rounded bg-muted px-1.5 py-0.5">
+                      <Text className="font-roobert-medium text-xs text-muted-foreground">
                         {batchResults[currentQueryIndex].results.length}
                       </Text>
                     </View>
                   )}
                 </View>
-                <Text className="text-sm font-roobert-medium text-foreground" numberOfLines={1}>
+                <Text className="font-roobert-medium text-sm text-foreground" numberOfLines={1}>
                   {batchResults[currentQueryIndex].query}
                 </Text>
               </View>
 
-              <View className="flex-row items-center gap-1 ml-3">
+              <View className="ml-3 flex-row items-center gap-1">
                 <Pressable
                   onPress={() => {
                     if (currentQueryIndex > 0) {
@@ -266,8 +303,7 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
                     }
                   }}
                   disabled={currentQueryIndex === 0}
-                  className={`h-8 w-8 items-center justify-center rounded-lg ${currentQueryIndex === 0 ? 'opacity-30' : 'active:bg-muted'}`}
-                >
+                  className={`h-8 w-8 items-center justify-center rounded-lg ${currentQueryIndex === 0 ? 'opacity-30' : 'active:bg-muted'}`}>
                   <Icon as={ChevronLeft} size={18} className="text-foreground" />
                 </Pressable>
                 <Pressable
@@ -278,8 +314,7 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
                     }
                   }}
                   disabled={currentQueryIndex === batchResults.length - 1}
-                  className={`h-8 w-8 items-center justify-center rounded-lg ${currentQueryIndex === batchResults.length - 1 ? 'opacity-30' : 'active:bg-muted'}`}
-                >
+                  className={`h-8 w-8 items-center justify-center rounded-lg ${currentQueryIndex === batchResults.length - 1 ? 'opacity-30' : 'active:bg-muted'}`}>
                   <Icon as={ChevronRight} size={18} className="text-foreground" />
                 </Pressable>
               </View>
@@ -290,11 +325,11 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
             <View className="gap-3">
               <View className="flex-row items-center gap-2">
                 <Icon as={ImageIcon} size={16} className="text-foreground/50" />
-                <Text className="text-sm font-roobert-medium text-foreground/70">
+                <Text className="font-roobert-medium text-sm text-foreground/70">
                   Images ({currentImages.length})
                 </Text>
                 {isBatch && batchResults && (
-                  <Text className="text-xs font-roobert text-muted-foreground">
+                  <Text className="font-roobert text-xs text-muted-foreground">
                     (Query {currentQueryIndex + 1})
                   </Text>
                 )}
@@ -302,22 +337,25 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
               <View className="flex-row flex-wrap gap-3">
                 {currentImages.slice(0, 6).map((imageEntry, idx) => {
                   // Resolve to string URL (safety for objects leaking through)
-                  const imageUrl = typeof imageEntry === 'string' ? imageEntry
-                    : (typeof imageEntry === 'object' && imageEntry !== null) ? (imageEntry.url || imageEntry.src || '') : '';
+                  const imageUrl =
+                    typeof imageEntry === 'string'
+                      ? imageEntry
+                      : typeof imageEntry === 'object' && imageEntry !== null
+                        ? (imageEntry as any).url || (imageEntry as any).src || ''
+                        : '';
                   if (!imageUrl) return null;
                   return (
                     <Pressable
                       key={idx}
                       onPress={() => handleOpenUrl(imageUrl)}
                       className="relative overflow-hidden rounded-xl border border-border"
-                      style={{ width: '47%', aspectRatio: 1 }}
-                    >
+                      style={{ width: '47%', aspectRatio: 1 }}>
                       <RNImage
                         source={{ uri: imageUrl }}
                         style={{ width: '100%', height: '100%' }}
                         resizeMode="cover"
                       />
-                      <View className="absolute top-2 right-2 bg-black/60 rounded-lg p-1.5">
+                      <View className="absolute right-2 top-2 rounded-lg bg-black/60 p-1.5">
                         <Icon as={ExternalLink} size={12} className="text-white" />
                       </View>
                     </Pressable>
@@ -325,7 +363,7 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
                 })}
               </View>
               {currentImages.length > 6 && (
-                <Text className="text-xs font-roobert text-muted-foreground text-center mt-1">
+                <Text className="mt-1 text-center font-roobert text-xs text-muted-foreground">
                   +{currentImages.length - 6} more images
                 </Text>
               )}
@@ -336,8 +374,8 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
             // Batch mode: display current query results
             <View className="gap-4">
               {batchResults[currentQueryIndex]?.answer && (
-                <View className="bg-muted/50 border border-border rounded-xl p-3">
-                  <Text className="text-sm font-roobert text-foreground leading-relaxed">
+                <View className="rounded-xl border border-border bg-muted/50 p-3">
+                  <Text className="font-roobert text-sm leading-relaxed text-foreground">
                     {batchResults[currentQueryIndex].answer}
                   </Text>
                 </View>
@@ -351,31 +389,34 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
                       <Pressable
                         key={`batch-${currentQueryIndex}-result-${idx}`}
                         onPress={() => handleOpenUrl(result.url)}
-                        className="bg-card border border-border rounded-xl p-3.5 gap-2 active:opacity-70"
-                      >
+                        className="gap-2 rounded-xl border border-border bg-card p-3.5 active:opacity-70">
                         <View className="flex-row items-start gap-2.5">
                           <Favicon url={result.url} size={18} />
                           <View className="flex-1 gap-1">
-                            <View className="flex-row items-center gap-1.5 mb-0.5">
-                              <View className="flex-row items-center justify-center gap-1 px-1.5 py-0.5 min-h-[16px] border border-border rounded-md">
-                                <Icon as={ResultTypeIcon} size={10} className="text-muted-foreground opacity-70" />
-                                <Text className="text-[10px] font-roobert text-muted-foreground" style={{ lineHeight: 14, includeFontPadding: false }}>
+                            <View className="mb-0.5 flex-row items-center gap-1.5">
+                              <View className="min-h-[16px] flex-row items-center justify-center gap-1 rounded-md border border-border px-1.5 py-0.5">
+                                <Icon
+                                  as={ResultTypeIcon}
+                                  size={10}
+                                  className="text-muted-foreground opacity-70"
+                                />
+                                <Text
+                                  className="font-roobert text-[10px] text-muted-foreground"
+                                  style={{ lineHeight: 14, includeFontPadding: false }}>
                                   {resultTypeLabel}
                                 </Text>
                               </View>
                             </View>
                             <Text
-                              className="text-sm font-roobert-medium text-primary"
-                              numberOfLines={2}
-                            >
+                              className="font-roobert-medium text-sm text-primary"
+                              numberOfLines={2}>
                               {result.title}
                             </Text>
                             <View className="flex-row items-center gap-1.5">
                               <Icon as={Globe} size={11} className="text-muted-foreground" />
                               <Text
-                                className="text-xs font-roobert text-muted-foreground flex-1"
-                                numberOfLines={1}
-                              >
+                                className="flex-1 font-roobert text-xs text-muted-foreground"
+                                numberOfLines={1}>
                                 {cleanUrl(result.url)}
                               </Text>
                             </View>
@@ -385,9 +426,8 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
 
                         {result.snippet && (
                           <Text
-                            className="text-xs font-roobert text-foreground/60 mt-1"
-                            numberOfLines={2}
-                          >
+                            className="mt-1 font-roobert text-xs text-foreground/60"
+                            numberOfLines={2}>
                             {result.snippet}
                           </Text>
                         )}
@@ -396,64 +436,68 @@ export function WebSearchToolView({ toolCall, toolResult, isSuccess = true, isSt
                   })}
                 </View>
               ) : (
-                <Text className="text-sm font-roobert text-muted-foreground italic py-4 text-center">
+                <Text className="py-4 text-center font-roobert text-sm italic text-muted-foreground">
                   No results found for this query
                 </Text>
               )}
             </View>
-          ) : currentResults.length > 0 && (
-            // Single query mode
-            <View className="gap-4">
-              {currentResults.map((result: any, idx: number) => {
-                const { icon: ResultTypeIcon, label: resultTypeLabel } = getResultType(result);
-                return (
-                  <Pressable
-                    key={idx}
-                    onPress={() => handleOpenUrl(result.url)}
-                    className="bg-card border border-border rounded-xl p-3.5 gap-2 active:opacity-70"
-                  >
-                    <View className="flex-row items-start gap-2.5">
-                      <Favicon url={result.url} size={18} />
-                      <View className="flex-1 gap-1">
-                        <View className="flex-row items-center gap-1.5 mb-0.5">
-                          <View className="flex-row items-center justify-center gap-1 px-1.5 py-0.5 min-h-[16px] border border-border rounded-md">
-                            <Icon as={ResultTypeIcon} size={10} className="text-muted-foreground opacity-70" />
-                            <Text className="text-[10px] font-roobert text-muted-foreground" style={{ lineHeight: 14, includeFontPadding: false }}>
-                              {resultTypeLabel}
+          ) : (
+            currentResults.length > 0 && (
+              // Single query mode
+              <View className="gap-4">
+                {currentResults.map((result: any, idx: number) => {
+                  const { icon: ResultTypeIcon, label: resultTypeLabel } = getResultType(result);
+                  return (
+                    <Pressable
+                      key={idx}
+                      onPress={() => handleOpenUrl(result.url)}
+                      className="gap-2 rounded-xl border border-border bg-card p-3.5 active:opacity-70">
+                      <View className="flex-row items-start gap-2.5">
+                        <Favicon url={result.url} size={18} />
+                        <View className="flex-1 gap-1">
+                          <View className="mb-0.5 flex-row items-center gap-1.5">
+                            <View className="min-h-[16px] flex-row items-center justify-center gap-1 rounded-md border border-border px-1.5 py-0.5">
+                              <Icon
+                                as={ResultTypeIcon}
+                                size={10}
+                                className="text-muted-foreground opacity-70"
+                              />
+                              <Text
+                                className="font-roobert text-[10px] text-muted-foreground"
+                                style={{ lineHeight: 14, includeFontPadding: false }}>
+                                {resultTypeLabel}
+                              </Text>
+                            </View>
+                          </View>
+                          <Text
+                            className="font-roobert-medium text-sm text-primary"
+                            numberOfLines={2}>
+                            {result.title}
+                          </Text>
+                          <View className="flex-row items-center gap-1.5">
+                            <Icon as={Globe} size={11} className="text-muted-foreground" />
+                            <Text
+                              className="flex-1 font-roobert text-xs text-muted-foreground"
+                              numberOfLines={1}>
+                              {cleanUrl(result.url)}
                             </Text>
                           </View>
                         </View>
-                        <Text
-                          className="text-sm font-roobert-medium text-primary"
-                          numberOfLines={2}
-                        >
-                          {result.title}
-                        </Text>
-                        <View className="flex-row items-center gap-1.5">
-                          <Icon as={Globe} size={11} className="text-muted-foreground" />
-                          <Text
-                            className="text-xs font-roobert text-muted-foreground flex-1"
-                            numberOfLines={1}
-                          >
-                            {cleanUrl(result.url)}
-                          </Text>
-                        </View>
+                        <Icon as={ExternalLink} size={14} className="text-muted-foreground" />
                       </View>
-                      <Icon as={ExternalLink} size={14} className="text-muted-foreground" />
-                    </View>
 
-                    {result.snippet && (
-                      <Text
-                        className="text-xs font-roobert text-foreground/60 mt-1"
-                        numberOfLines={2}
-                      >
-                        {result.snippet}
-                      </Text>
-                    )}
-                  </Pressable>
-                );
-              })}
-            </View>
+                      {result.snippet && (
+                        <Text
+                          className="mt-1 font-roobert text-xs text-foreground/60"
+                          numberOfLines={2}>
+                          {result.snippet}
+                        </Text>
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )
           )}
         </View>
       </ScrollView>

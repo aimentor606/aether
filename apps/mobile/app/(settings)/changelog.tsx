@@ -87,18 +87,21 @@ export default function ChangelogScreen() {
     <ScrollView
       className="flex-1 bg-background"
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
-    >
-      <View className="px-5 pt-2 pb-4">
+      contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
+      <View className="px-5 pb-4 pt-2">
         {/* Header */}
-        <Text className="text-2xl font-roobert-semibold text-foreground">Changelog</Text>
+        <Text className="font-roobert-semibold text-2xl text-foreground">Changelog</Text>
         <View className="mt-1 flex-row items-center">
           <Text className="font-roobert text-sm text-muted-foreground">
-            Running <Text className="font-roobert-semibold text-foreground">v{currentVersion || '...'}</Text>
+            Running{' '}
+            <Text className="font-roobert-semibold text-foreground">
+              v{currentVersion || '...'}
+            </Text>
           </Text>
           {latestVersion && updateAvailable && (
             <Text className="font-roobert text-sm text-muted-foreground">
-              {' · Latest: '}<Text className="font-roobert-semibold text-foreground">v{latestVersion}</Text>
+              {' · Latest: '}
+              <Text className="font-roobert-semibold text-foreground">v{latestVersion}</Text>
             </Text>
           )}
         </View>
@@ -108,10 +111,15 @@ export default function ChangelogScreen() {
           <Pressable
             onPress={handleUpdate}
             className="mt-4 flex-row items-center justify-center self-start rounded-xl px-5 py-2.5 active:opacity-90"
-            style={{ backgroundColor: isDark ? '#F8F8F8' : '#121215' }}
-          >
-            <Icon as={ArrowDownToLine} size={15} className={isDark ? 'text-[#121215]' : 'text-[#F8F8F8]'} strokeWidth={2.5} />
-            <Text className={`ml-2 font-roobert-semibold text-sm ${isDark ? 'text-[#121215]' : 'text-[#F8F8F8]'}`}>
+            style={{ backgroundColor: isDark ? '#F8F8F8' : '#121215' }}>
+            <Icon
+              as={ArrowDownToLine}
+              size={15}
+              className={isDark ? 'text-[#121215]' : 'text-[#F8F8F8]'}
+              strokeWidth={2.5}
+            />
+            <Text
+              className={`ml-2 font-roobert-semibold text-sm ${isDark ? 'text-[#121215]' : 'text-[#F8F8F8]'}`}>
               Update to v{latestVersion}
             </Text>
           </Pressable>
@@ -133,16 +141,16 @@ export default function ChangelogScreen() {
             className="mt-4 rounded-2xl border px-4 py-3.5"
             style={{
               borderColor: isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.08)',
-            }}
-          >
-            <View className="flex-row items-center mb-2">
+            }}>
+            <View className="mb-2 flex-row items-center">
               <ActivityIndicator size="small" />
               <View className="ml-3 flex-1">
                 <Text className="font-roobert-medium text-[15px] text-foreground">
                   Updating to v{latestVersion}
                 </Text>
                 <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">
-                  {phaseLabel}{phaseMessage ? ` — ${phaseMessage}` : ''}
+                  {phaseLabel}
+                  {phaseMessage ? ` — ${phaseMessage}` : ''}
                 </Text>
               </View>
               <Text className="font-roobert text-xs tabular-nums text-muted-foreground">
@@ -150,9 +158,10 @@ export default function ChangelogScreen() {
               </Text>
             </View>
             <View
-              className="h-1.5 rounded-full overflow-hidden"
-              style={{ backgroundColor: isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.06)' }}
-            >
+              className="h-1.5 overflow-hidden rounded-full"
+              style={{
+                backgroundColor: isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.06)',
+              }}>
               <View
                 className="h-full rounded-full"
                 style={{
@@ -171,13 +180,16 @@ export default function ChangelogScreen() {
             style={{
               borderColor: isDark ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.15)',
               backgroundColor: isDark ? 'rgba(239,68,68,0.05)' : 'rgba(239,68,68,0.03)',
-            }}
-          >
+            }}>
             <View className="flex-row items-center">
               <Icon as={X} size={16} className="text-destructive" strokeWidth={2.5} />
               <View className="ml-3 flex-1">
-                <Text className="font-roobert-medium text-[15px] text-destructive">Update failed</Text>
-                <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">{updateError.message}</Text>
+                <Text className="font-roobert-medium text-[15px] text-destructive">
+                  Update failed
+                </Text>
+                <Text className="mt-0.5 font-roobert text-xs text-muted-foreground">
+                  {updateError.message}
+                </Text>
               </View>
               <Pressable onPress={handleRetry} className="active:opacity-70">
                 <Text className="font-roobert-medium text-xs text-primary">Try again</Text>
@@ -190,7 +202,7 @@ export default function ChangelogScreen() {
       {/* Changelog entries */}
       <View className="px-5" style={{ gap: 16 }}>
         {isLoading && (
-          <View className="py-12 items-center">
+          <View className="items-center py-12">
             <ActivityIndicator size="small" />
           </View>
         )}
@@ -231,31 +243,36 @@ function VersionCard({
   isDark: boolean;
 }) {
   const borderColor = isLatest
-    ? isDark ? 'rgba(219,39,119,0.35)' : 'rgba(219,39,119,0.25)'
-    : isDark ? 'rgba(248,248,248,0.08)' : 'rgba(18,18,21,0.08)';
+    ? isDark
+      ? 'rgba(219,39,119,0.35)'
+      : 'rgba(219,39,119,0.25)'
+    : isDark
+      ? 'rgba(248,248,248,0.08)'
+      : 'rgba(18,18,21,0.08)';
 
   const bgColor = isLatest
-    ? isDark ? 'rgba(219,39,119,0.04)' : 'rgba(219,39,119,0.02)'
+    ? isDark
+      ? 'rgba(219,39,119,0.04)'
+      : 'rgba(219,39,119,0.02)'
     : undefined;
 
   return (
     <View
-      className="rounded-2xl border px-4 pt-4 pb-3"
-      style={{ borderColor, backgroundColor: bgColor }}
-    >
+      className="rounded-2xl border px-4 pb-3 pt-4"
+      style={{ borderColor, backgroundColor: bgColor }}>
       {/* Version header */}
-      <View className="flex-row items-center mb-2">
-        <Text className="font-roobert-semibold text-lg text-foreground">
-          v{entry.version}
-        </Text>
+      <View className="mb-2 flex-row items-center">
+        <Text className="font-roobert-semibold text-lg text-foreground">v{entry.version}</Text>
         {isCurrent && (
           <View className="ml-2 rounded-full bg-emerald-400/15 px-2 py-0.5">
-            <Text className="text-[10px] font-roobert-medium text-emerald-600 dark:text-emerald-400">Current</Text>
+            <Text className="font-roobert-medium text-[10px] text-emerald-600 dark:text-emerald-400">
+              Current
+            </Text>
           </View>
         )}
         {isLatest && (
           <View className="ml-2 rounded-full bg-primary/15 px-2 py-0.5">
-            <Text className="text-[10px] font-roobert-medium text-primary">Latest</Text>
+            <Text className="font-roobert-medium text-[10px] text-primary">Latest</Text>
           </View>
         )}
         {!!entry.date && (
@@ -267,14 +284,12 @@ function VersionCard({
 
       {/* Title */}
       {!!entry.title && (
-        <Text className="font-roobert-medium text-[14px] text-foreground mb-1">
-          {entry.title}
-        </Text>
+        <Text className="mb-1 font-roobert-medium text-[14px] text-foreground">{entry.title}</Text>
       )}
 
       {/* Description */}
       {!!entry.description && (
-        <Text className="font-roobert text-xs text-muted-foreground mb-3 leading-[18px]">
+        <Text className="mb-3 font-roobert text-xs leading-[18px] text-muted-foreground">
           {entry.description}
         </Text>
       )}
@@ -297,10 +312,10 @@ function ChangeRow({ change }: { change: ChangelogChange }) {
 
   return (
     <View className="flex-row items-start py-1">
-      <View className="mt-0.5 mr-2.5">
-        <Icon as={ChangeIcon} size={13} style={{ color }} strokeWidth={2.2} />
+      <View className="mr-2.5 mt-0.5">
+        <Icon as={ChangeIcon} size={13} style={{ color } as any} strokeWidth={2.2} />
       </View>
-      <Text className="flex-1 font-roobert text-[13px] text-foreground/90 leading-[18px]">
+      <Text className="flex-1 font-roobert text-[13px] leading-[18px] text-foreground/90">
         {change.text}
       </Text>
     </View>

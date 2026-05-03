@@ -155,7 +155,12 @@ function detectActiveFormats(text: string, cursorPos: number): ActiveFormats {
 /**
  * Check if cursor is within balanced markers
  */
-function isWithinMarkers(text: string, cursorPos: number, openMarker: string, closeMarker: string): boolean {
+function isWithinMarkers(
+  text: string,
+  cursorPos: number,
+  openMarker: string,
+  closeMarker: string
+): boolean {
   // Get line boundaries
   const beforeCursor = text.substring(0, cursorPos);
   const lastNewlineIndex = beforeCursor.lastIndexOf('\n');
@@ -334,43 +339,42 @@ interface ToolButtonProps {
   label?: string;
 }
 
-const ToolButton = React.memo(({ icon: IconComponent, onPress, isActive = false, label }: ToolButtonProps) => {
-  const scale = useSharedValue(1);
+const ToolButton = React.memo(
+  ({ icon: IconComponent, onPress, isActive = false, label }: ToolButtonProps) => {
+    const scale = useSharedValue(1);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
 
-  return (
-    <AnimatedPressable
-      onPressIn={() => {
-        scale.value = withSpring(0.9, { damping: 15, stiffness: 400 });
-      }}
-      onPressOut={() => {
-        scale.value = withSpring(1, { damping: 15, stiffness: 400 });
-      }}
-      onPress={onPress}
-      className={`h-9 w-9 items-center justify-center rounded-xl ${isActive ? 'bg-primary/10' : ''}`}
-      style={animatedStyle}
-      accessibilityLabel={label}
-      accessibilityRole="button"
-    >
-      <Icon
-        as={IconComponent}
-        size={18}
-        className={isActive ? 'text-primary' : 'text-foreground'}
-        strokeWidth={2}
-      />
-    </AnimatedPressable>
-  );
-});
+    return (
+      <AnimatedPressable
+        onPressIn={() => {
+          scale.value = withSpring(0.9, { damping: 15, stiffness: 400 });
+        }}
+        onPressOut={() => {
+          scale.value = withSpring(1, { damping: 15, stiffness: 400 });
+        }}
+        onPress={onPress}
+        className={`h-9 w-9 items-center justify-center rounded-xl ${isActive ? 'bg-primary/10' : ''}`}
+        style={animatedStyle}
+        accessibilityLabel={label}
+        accessibilityRole="button">
+        <Icon
+          as={IconComponent as any}
+          size={18}
+          className={isActive ? 'text-primary' : 'text-foreground'}
+          strokeWidth={2}
+        />
+      </AnimatedPressable>
+    );
+  }
+);
 
 ToolButton.displayName = 'ToolButton';
 
 // Divider component
-const ToolbarDivider = () => (
-  <View className="mx-1.5 h-5 w-[1px] bg-border/60" />
-);
+const ToolbarDivider = () => <View className="mx-1.5 h-5 w-[1px] bg-border/60" />;
 
 // Text type dropdown component
 interface TextTypeDropdownProps {
@@ -406,46 +410,33 @@ const TextTypeDropdown = React.memo(({ selectedType, onSelect }: TextTypeDropdow
         }}
         onPress={() => setIsOpen(true)}
         className="flex-row items-center gap-1 rounded-xl px-2.5 py-1.5"
-        style={animatedStyle}
-      >
-        <Text className="font-roobert-medium text-sm text-foreground">
-          {selectedItem.label}
-        </Text>
-        <Icon
-          as={ChevronDown}
-          size={14}
-          className="text-foreground/60"
-          strokeWidth={2}
-        />
+        style={animatedStyle}>
+        <Text className="font-roobert-medium text-sm text-foreground">{selectedItem.label}</Text>
+        <Icon as={ChevronDown} size={14} className="text-foreground/60" strokeWidth={2} />
       </AnimatedPressable>
 
       <Modal
         visible={isOpen}
         transparent
         animationType="fade"
-        onRequestClose={() => setIsOpen(false)}
-      >
-        <Pressable
-          className="flex-1 justify-start"
-          onPress={() => setIsOpen(false)}
-        >
+        onRequestClose={() => setIsOpen(false)}>
+        <Pressable className="flex-1 justify-start" onPress={() => setIsOpen(false)}>
           <Pressable
-            className="mt-24 mx-4 rounded-2xl border border-border bg-card p-1 shadow-lg"
+            className="mx-4 mt-24 rounded-2xl border border-border bg-card p-1 shadow-lg"
             style={{
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: isDark ? 0.3 : 0.1,
               shadowRadius: 12,
               elevation: 8,
-            }}
-          >
+            }}>
             {TEXT_TYPES.map((type) => (
               <Pressable
                 key={type.id}
                 onPress={() => handleSelect(type.id)}
-                className={`flex-row items-center gap-3 rounded-xl px-3 py-2.5 ${selectedType === type.id ? 'bg-primary/10' : 'active:bg-muted'
-                  }`}
-              >
+                className={`flex-row items-center gap-3 rounded-xl px-3 py-2.5 ${
+                  selectedType === type.id ? 'bg-primary/10' : 'active:bg-muted'
+                }`}>
                 <Icon
                   as={type.icon}
                   size={18}
@@ -453,9 +444,9 @@ const TextTypeDropdown = React.memo(({ selectedType, onSelect }: TextTypeDropdow
                   strokeWidth={2}
                 />
                 <Text
-                  className={`flex-1 font-roobert-medium text-sm ${selectedType === type.id ? 'text-primary' : 'text-foreground'
-                    }`}
-                >
+                  className={`flex-1 font-roobert-medium text-sm ${
+                    selectedType === type.id ? 'text-primary' : 'text-foreground'
+                  }`}>
                   {type.label}
                 </Text>
                 {selectedType === type.id && (
@@ -474,152 +465,145 @@ TextTypeDropdown.displayName = 'TextTypeDropdown';
 
 /**
  * MarkdownToolbar Component
- * 
+ *
  * A WYSIWYG-style markdown formatting toolbar for the chat input.
  * Provides quick access to common markdown formatting options.
  * Shows active state for text styles based on cursor position.
  */
-export const MarkdownToolbar = React.memo(({ onFormat, isVisible, text = '', selection }: MarkdownToolbarProps) => {
-  const [showTableModal, setShowTableModal] = React.useState(false);
-  const [showCodeBlockModal, setShowCodeBlockModal] = React.useState(false);
+export const MarkdownToolbar = React.memo(
+  ({ onFormat, isVisible, text = '', selection }: MarkdownToolbarProps) => {
+    const [showTableModal, setShowTableModal] = React.useState(false);
+    const [showCodeBlockModal, setShowCodeBlockModal] = React.useState(false);
 
-  // Detect active formats based on cursor position
-  const activeFormats = React.useMemo(() => {
-    const cursorPos = selection?.start ?? 0;
-    return detectActiveFormats(text, cursorPos);
-  }, [text, selection?.start]);
+    // Detect active formats based on cursor position
+    const activeFormats = React.useMemo(() => {
+      const cursorPos = selection?.start ?? 0;
+      return detectActiveFormats(text, cursorPos);
+    }, [text, selection?.start]);
 
-  const handleTextTypeChange = React.useCallback((type: TextType) => {
-    const textType = TEXT_TYPES.find((t) => t.id === type);
-    if (textType && textType.prefix) {
-      onFormat('heading', textType.prefix);
-    }
-  }, [onFormat]);
+    const handleTextTypeChange = React.useCallback(
+      (type: TextType) => {
+        const textType = TEXT_TYPES.find((t) => t.id === type);
+        if (textType && textType.prefix) {
+          onFormat('heading', textType.prefix);
+        }
+      },
+      [onFormat]
+    );
 
-  const handleTableInsert = React.useCallback((tableMarkdown: string) => {
-    // Insert the table markdown at the current cursor position
-    onFormat('table', tableMarkdown);
-  }, [onFormat]);
+    const handleTableInsert = React.useCallback(
+      (tableMarkdown: string) => {
+        // Insert the table markdown at the current cursor position
+        onFormat('table', tableMarkdown);
+      },
+      [onFormat]
+    );
 
-  const handleCodeBlockInsert = React.useCallback((codeBlockMarkdown: string) => {
-    // Insert the code block markdown at the current cursor position
-    onFormat('code-block', codeBlockMarkdown);
-  }, [onFormat]);
+    const handleCodeBlockInsert = React.useCallback(
+      (codeBlockMarkdown: string) => {
+        // Insert the code block markdown at the current cursor position
+        onFormat('code-block', codeBlockMarkdown);
+      },
+      [onFormat]
+    );
 
-  if (!isVisible) return null;
+    if (!isVisible) return null;
 
-  return (
-    <Animated.View
-      entering={FadeIn.duration(150)}
-      exiting={FadeOut.duration(100)}
-      className="border-b border-border bg-card/50"
-    >
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 8, paddingVertical: 6 }}
-        keyboardShouldPersistTaps="always"
-      >
-        <View className="flex-row items-center gap-0.5">
-          {/* Text Type Dropdown - shows detected heading */}
-          <TextTypeDropdown
-            selectedType={activeFormats.heading}
-            onSelect={handleTextTypeChange}
-          />
+    return (
+      <Animated.View
+        entering={FadeIn.duration(150)}
+        exiting={FadeOut.duration(100)}
+        className="border-b border-border bg-card/50">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 8, paddingVertical: 6 }}
+          keyboardShouldPersistTaps="always">
+          <View className="flex-row items-center gap-0.5">
+            {/* Text Type Dropdown - shows detected heading */}
+            <TextTypeDropdown
+              selectedType={activeFormats.heading}
+              onSelect={handleTextTypeChange}
+            />
 
-          <ToolbarDivider />
+            <ToolbarDivider />
 
-          {/* Text Formatting - with active states */}
-          <ToolButton
-            icon={Bold}
-            onPress={() => onFormat('bold')}
-            isActive={activeFormats.bold}
-            label="Bold"
-          />
-          <ToolButton
-            icon={Italic}
-            onPress={() => onFormat('italic')}
-            isActive={activeFormats.italic}
-            label="Italic"
-          />
-          <ToolButton
-            icon={Strikethrough}
-            onPress={() => onFormat('strikethrough')}
-            isActive={activeFormats.strikethrough}
-            label="Strikethrough"
-          />
-          <ToolButton
-            icon={Code}
-            onPress={() => onFormat('code')}
-            isActive={activeFormats.code}
-            label="Inline Code"
-          />
+            {/* Text Formatting - with active states */}
+            <ToolButton
+              icon={Bold}
+              onPress={() => onFormat('bold')}
+              isActive={activeFormats.bold}
+              label="Bold"
+            />
+            <ToolButton
+              icon={Italic}
+              onPress={() => onFormat('italic')}
+              isActive={activeFormats.italic}
+              label="Italic"
+            />
+            <ToolButton
+              icon={Strikethrough}
+              onPress={() => onFormat('strikethrough')}
+              isActive={activeFormats.strikethrough}
+              label="Strikethrough"
+            />
+            <ToolButton
+              icon={Code}
+              onPress={() => onFormat('code')}
+              isActive={activeFormats.code}
+              label="Inline Code"
+            />
 
-          <ToolbarDivider />
+            <ToolbarDivider />
 
-          {/* Lists */}
-          <ToolButton
-            icon={List}
-            onPress={() => onFormat('bullet-list')}
-            label="Bullet List"
-          />
-          <ToolButton
-            icon={ListOrdered}
-            onPress={() => onFormat('numbered-list')}
-            label="Numbered List"
-          />
-          <ToolButton
-            icon={ListChecks}
-            onPress={() => onFormat('checklist')}
-            label="Checklist"
-          />
+            {/* Lists */}
+            <ToolButton icon={List} onPress={() => onFormat('bullet-list')} label="Bullet List" />
+            <ToolButton
+              icon={ListOrdered}
+              onPress={() => onFormat('numbered-list')}
+              label="Numbered List"
+            />
+            <ToolButton icon={ListChecks} onPress={() => onFormat('checklist')} label="Checklist" />
 
-          <ToolbarDivider />
+            <ToolbarDivider />
 
-          {/* Block Elements */}
-          <ToolButton
-            icon={Quote}
-            onPress={() => onFormat('quote')}
-            label="Quote"
-          />
-          <ToolButton
-            icon={CodeSquare}
-            onPress={() => setShowCodeBlockModal(true)}
-            label="Code Block"
-          />
-          <ToolButton
-            icon={Minus}
-            onPress={() => onFormat('horizontal-rule')}
-            label="Horizontal Rule"
-          />
+            {/* Block Elements */}
+            <ToolButton icon={Quote} onPress={() => onFormat('quote')} label="Quote" />
+            <ToolButton
+              icon={CodeSquare}
+              onPress={() => setShowCodeBlockModal(true)}
+              label="Code Block"
+            />
+            <ToolButton
+              icon={Minus}
+              onPress={() => onFormat('horizontal-rule')}
+              label="Horizontal Rule"
+            />
 
-          <ToolbarDivider />
+            <ToolbarDivider />
 
-          {/* Table */}
-          <ToolButton
-            icon={Table}
-            onPress={() => setShowTableModal(true)}
-            label="Table"
-          />
-        </View>
-      </ScrollView>
+            {/* Table */}
+            <ToolButton icon={Table} onPress={() => setShowTableModal(true)} label="Table" />
+          </View>
+        </ScrollView>
 
-      {/* Table Editor Modal */}
-      <TableEditorModal
-        visible={showTableModal}
-        onClose={() => setShowTableModal(false)}
-        onInsert={handleTableInsert}
-      />
+        {/* Table Editor Modal */}
+        <TableEditorModal
+          visible={showTableModal}
+          onClose={() => setShowTableModal(false)}
+          onInsert={handleTableInsert}
+        />
 
-      {/* Code Block Editor Modal */}
-      <CodeBlockEditorModal
-        visible={showCodeBlockModal}
-        onClose={() => setShowCodeBlockModal(false)}
-        onInsert={handleCodeBlockInsert}
-      />
-    </Animated.View>
-  );
-});
+        {/* Code Block Editor Modal */}
+        <CodeBlockEditorModal
+          visible={showCodeBlockModal}
+          onClose={() => setShowCodeBlockModal(false)}
+          onInsert={handleCodeBlockInsert}
+        />
+      </Animated.View>
+    );
+  }
+);
 
 MarkdownToolbar.displayName = 'MarkdownToolbar';
 
@@ -665,14 +649,18 @@ export function insertMarkdownFormat(
 
       if (isAlreadyWrapped) {
         // Unwrap: remove the markers
-        const newText = beforeSelection.slice(0, -prefix.length) + selectedText + afterSelection.slice(suffix.length);
+        const newText =
+          beforeSelection.slice(0, -prefix.length) +
+          selectedText +
+          afterSelection.slice(suffix.length);
         const newCursorPosition = selectionStart - prefix.length;
         const newSelectionEnd = newCursorPosition + selectedText.length;
         return { newText, newCursorPosition, newSelectionEnd };
       } else {
         // Wrap selected text
         const newText = beforeSelection + prefix + selectedText + suffix + afterSelection;
-        const newCursorPosition = selectionStart + prefix.length + selectedText.length + suffix.length;
+        const newCursorPosition =
+          selectionStart + prefix.length + selectedText.length + suffix.length;
         return { newText, newCursorPosition, newSelectionEnd: newCursorPosition };
       }
     } else {
@@ -714,19 +702,28 @@ export function insertMarkdownFormat(
       const prefix = needsNewlineBefore ? '\n```\n' : '```\n';
       const suffix = '\n```\n\n';
       const newText = beforeSelection + prefix + selectedText + suffix + afterSelection;
-      const newCursorPosition = selectionStart + prefix.length + selectedText.length + suffix.length;
+      const newCursorPosition =
+        selectionStart + prefix.length + selectedText.length + suffix.length;
       return { newText, newCursorPosition, newSelectionEnd: newCursorPosition };
     } else {
       if (currentLineBeforeSelection.length === 0) {
         const block = '```\n\n```\n\n';
         const newText = beforeSelection + block + afterSelection;
         // Cursor after the entire block (after the newlines)
-        return { newText, newCursorPosition: selectionStart + block.length, newSelectionEnd: selectionStart + block.length };
+        return {
+          newText,
+          newCursorPosition: selectionStart + block.length,
+          newSelectionEnd: selectionStart + block.length,
+        };
       } else {
         const block = '\n```\n\n```\n\n';
         const newText = beforeSelection + block + afterSelection;
         // Cursor after the entire block (after the newlines)
-        return { newText, newCursorPosition: selectionStart + block.length, newSelectionEnd: selectionStart + block.length };
+        return {
+          newText,
+          newCursorPosition: selectionStart + block.length,
+          newSelectionEnd: selectionStart + block.length,
+        };
       }
     }
   }
@@ -735,7 +732,10 @@ export function insertMarkdownFormat(
   if (format === 'quote') {
     if (hasSelection) {
       // Prefix each line of selection with >
-      const quotedText = selectedText.split('\n').map(line => '> ' + line).join('\n');
+      const quotedText = selectedText
+        .split('\n')
+        .map((line) => '> ' + line)
+        .join('\n');
       const needsNewlineBefore = currentLineBeforeSelection.length > 0;
       const prefix = needsNewlineBefore ? '\n' : '';
       const newText = beforeSelection + prefix + quotedText + afterSelection;
@@ -744,10 +744,18 @@ export function insertMarkdownFormat(
     } else {
       if (currentLineBeforeSelection.length === 0) {
         const newText = beforeSelection + '> ' + afterSelection;
-        return { newText, newCursorPosition: selectionStart + 2, newSelectionEnd: selectionStart + 2 };
+        return {
+          newText,
+          newCursorPosition: selectionStart + 2,
+          newSelectionEnd: selectionStart + 2,
+        };
       } else {
         const newText = beforeSelection + '\n> ' + afterSelection;
-        return { newText, newCursorPosition: selectionStart + 3, newSelectionEnd: selectionStart + 3 };
+        return {
+          newText,
+          newCursorPosition: selectionStart + 3,
+          newSelectionEnd: selectionStart + 3,
+        };
       }
     }
   }
@@ -763,10 +771,18 @@ export function insertMarkdownFormat(
     } else {
       if (currentLineBeforeSelection.length === 0) {
         const newText = beforeSelection + extra + afterSelection;
-        return { newText, newCursorPosition: selectionStart + extra.length, newSelectionEnd: selectionStart + extra.length };
+        return {
+          newText,
+          newCursorPosition: selectionStart + extra.length,
+          newSelectionEnd: selectionStart + extra.length,
+        };
       } else {
         const newText = beforeSelection + '\n' + extra + afterSelection;
-        return { newText, newCursorPosition: selectionStart + extra.length + 1, newSelectionEnd: selectionStart + extra.length + 1 };
+        return {
+          newText,
+          newCursorPosition: selectionStart + extra.length + 1,
+          newSelectionEnd: selectionStart + extra.length + 1,
+        };
       }
     }
   }
@@ -779,7 +795,10 @@ export function insertMarkdownFormat(
     case 'bullet-list':
       if (hasSelection) {
         // Convert each line to a bullet point
-        const bulletedText = selectedText.split('\n').map(line => '- ' + line).join('\n');
+        const bulletedText = selectedText
+          .split('\n')
+          .map((line) => '- ' + line)
+          .join('\n');
         const needsNewlineBefore = currentLineBeforeSelection.length > 0;
         const prefix = needsNewlineBefore ? '\n' : '';
         const newText = beforeSelection + prefix + bulletedText + afterSelection;
@@ -816,7 +835,10 @@ export function insertMarkdownFormat(
 
     case 'checklist':
       if (hasSelection) {
-        const checklistText = selectedText.split('\n').map(line => '- [ ] ' + line).join('\n');
+        const checklistText = selectedText
+          .split('\n')
+          .map((line) => '- [ ] ' + line)
+          .join('\n');
         const needsNewlineBefore = currentLineBeforeSelection.length > 0;
         const prefix = needsNewlineBefore ? '\n' : '';
         const newText = beforeSelection + prefix + checklistText + afterSelection;
@@ -844,7 +866,9 @@ export function insertMarkdownFormat(
 
     case 'table':
       // If extra contains custom table markdown, use it; otherwise use template
-      const tableTemplate = extra || `| Header 1 | Header 2 |
+      const tableTemplate =
+        extra ||
+        `| Header 1 | Header 2 |
 | -------- | -------- |
 | Cell 1   | Cell 2   |`;
       if (currentLineBeforeSelection.length === 0) {

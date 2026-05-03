@@ -5,4 +5,4 @@ export { QuickActionOptionCard } from './QuickActionOptionCard';
 export { ModeThreadListView } from './ModeThreadListView';
 export { QUICK_ACTIONS } from './quickActions';
 export * from './quickActionViews';
-export type { QuickAction } from '../shared/types';
+export type { QuickAction } from './quickActions';

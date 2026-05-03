@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - PORT=3000
+      - PORT=3001
       - TZ=${TZ:-Asia/Shanghai}
       - PROXY_BASE_URL=${FORWARDED_PROTO:-https}://${PUBLIC_HOST}
       # Trust Kong's X-Forwarded-* headers (fixes trailing-slash redirect URLs)
@@ -16,12 +16,12 @@ services:
       - SESSION_SECRET=${SESSION_SECRET:?SESSION_SECRET is required}
       
       # Database Connection (Use dedicated user)
-      - DATABASE_HOST=postgres
+      - DATABASE_HOST=supabase-db
       - DATABASE_PORT=5432
       - DATABASE_USER=${NEWAPI_DB_USER:-newapi}
       - DATABASE_PASSWORD=${NEWAPI_DB_PASSWORD:?NEWAPI_DB_PASSWORD is required}
       - DATABASE_NAME=${NEWAPI_DB_DATABASE:-newapi}
-      - SQL_DSN=postgres://${NEWAPI_DB_USER:-newapi}:${NEWAPI_DB_PASSWORD:?NEWAPI_DB_PASSWORD is required}@postgres:5432/${NEWAPI_DB_DATABASE:-newapi}
+      - SQL_DSN=postgres://${NEWAPI_DB_USER:-newapi}:${NEWAPI_DB_PASSWORD:?NEWAPI_DB_PASSWORD is required}@supabase-db:5432/${NEWAPI_DB_DATABASE:-newapi}
       
       # Redis Connection
       - REDIS_CONN_STRING=redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379
@@ -37,14 +37,14 @@ services:
           cpus: "2"
     volumes:
       - ./config/newapi:/app/newapi/config:ro
-      - /data/logs/newapi:/app/newapi/logs
-      - /data/uploads/newapi:/app/newapi/uploads
+      - ${DATA_ROOT:-/data}/logs/newapi:/app/newapi/logs
+      - ${DATA_ROOT:-/data}/uploads/newapi:/app/newapi/uploads
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3001:3001"
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://localhost:3000/api/status | grep -o '\"success\":\\s*true' || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:3001/api/status | grep -o '\"success\":\\s*true' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

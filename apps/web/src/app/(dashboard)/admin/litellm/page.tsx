@@ -16,7 +16,12 @@ export default function LiteLLMAdminPage() {
     <div className="flex flex-col h-full w-full">
       {/* Header */}
       <div className="border-b px-6 py-4">
-        <h1 className="text-xl font-semibold" data-testid="admin-litellm-heading">LiteLLM Management</h1>
+        <h1
+          className="text-xl font-semibold"
+          data-testid="admin-litellm-heading"
+        >
+          LiteLLM Management
+        </h1>
         <p className="text-sm text-muted-foreground">
           Model catalog, proxy health, and provider status
         </p>

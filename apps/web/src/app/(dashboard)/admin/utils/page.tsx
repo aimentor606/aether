@@ -146,7 +146,10 @@ export default function AdminUtilsPage() {
               <Settings className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight" data-testid="admin-utils-heading">
+              <h1
+                className="text-2xl font-semibold tracking-tight"
+                data-testid="admin-utils-heading"
+              >
                 Admin Utils
               </h1>
               <p className="text-sm text-muted-foreground">

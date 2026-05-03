@@ -221,7 +221,10 @@ function SandboxesTab() {
           value={statusFilter || 'all'}
           onValueChange={(v) => setStatusFilter(v === 'all' ? '' : v)}
         >
-          <SelectTrigger className="h-8 w-[130px] text-sm" data-testid="sandbox-status-filter">
+          <SelectTrigger
+            className="h-8 w-[130px] text-sm"
+            data-testid="sandbox-status-filter"
+          >
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -904,7 +907,10 @@ export default function AdminSandboxesPage() {
       <div className="max-w-6xl mx-auto p-6 space-y-5">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2" data-testid="admin-sandboxes-heading">
+            <h1
+              className="text-2xl font-semibold tracking-tight flex items-center gap-2"
+              data-testid="admin-sandboxes-heading"
+            >
               <Server className="h-6 w-6" />
               Sandboxes
             </h1>

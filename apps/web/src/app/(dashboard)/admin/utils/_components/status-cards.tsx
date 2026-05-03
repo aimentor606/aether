@@ -17,7 +17,11 @@ interface MaintenanceCardProps {
   'data-testid'?: string;
 }
 
-export function MaintenanceCard({ enabled, onClick, ...rest }: MaintenanceCardProps) {
+export function MaintenanceCard({
+  enabled,
+  onClick,
+  ...rest
+}: MaintenanceCardProps) {
   return (
     <Card
       className="cursor-pointer hover:border-primary/50 transition-colors p-4"

@@ -89,7 +89,10 @@ export default function NotificationManagementPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight" data-testid="admin-notifications-heading">
+                <h1
+                  className="text-2xl font-semibold tracking-tight"
+                  data-testid="admin-notifications-heading"
+                >
                   Notification Management
                 </h1>
                 <Badge variant="outline" className="text-xs">
@@ -172,7 +175,11 @@ export default function NotificationManagementPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Select value={workflowId} onValueChange={setWorkflowId} data-testid="workflow-select">
+                <Select
+                  value={workflowId}
+                  onValueChange={setWorkflowId}
+                  data-testid="workflow-select"
+                >
                   <SelectTrigger>
                     <SelectValue
                       placeholder={

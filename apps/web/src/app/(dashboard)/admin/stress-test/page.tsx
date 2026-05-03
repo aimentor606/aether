@@ -136,7 +136,10 @@ export default function AdminStressTestPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2" data-testid="admin-stress-test-heading">
+            <h1
+              className="text-2xl font-semibold tracking-tight flex items-center gap-2"
+              data-testid="admin-stress-test-heading"
+            >
               <Zap className="h-6 w-6 text-yellow-500" />
               Stress Test - Admin
             </h1>
@@ -332,7 +335,11 @@ export default function AdminStressTestPage() {
 
               <div className="flex gap-2">
                 {!state.isRunning ? (
-                  <Button onClick={handleStart} className="gap-2" data-testid="start-test-button">
+                  <Button
+                    onClick={handleStart}
+                    className="gap-2"
+                    data-testid="start-test-button"
+                  >
                     <Play className="h-4 w-4" />
                     Start Test
                   </Button>

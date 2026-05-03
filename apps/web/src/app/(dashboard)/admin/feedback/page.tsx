@@ -1,6 +1,11 @@
 'use client';
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@aether/ui/primitives';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from '@aether/ui/primitives';
 import { AdminFeedbackTable } from '@/components/admin/admin-feedback-table';
 import {
   FeedbackStatsCards,
@@ -18,7 +23,10 @@ export default function AdminFeedbackPage() {
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight" data-testid="admin-feedback-heading">
+            <h1
+              className="text-2xl font-semibold tracking-tight"
+              data-testid="admin-feedback-heading"
+            >
               Feedback Analytics
             </h1>
             <p className="text-sm text-muted-foreground mt-1">

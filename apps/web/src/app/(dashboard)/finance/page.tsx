@@ -35,7 +35,9 @@ export default function FinancePage() {
     <div className="flex flex-col h-full w-full" data-testid="finance-page">
       {/* Header */}
       <div className="border-b px-6 py-4">
-        <h1 className="text-xl font-semibold" data-testid="finance-heading">Finance</h1>
+        <h1 className="text-xl font-semibold" data-testid="finance-heading">
+          Finance
+        </h1>
         <p className="text-sm text-muted-foreground">
           Manage invoices, expenses, budgets, and ledgers
         </p>
@@ -65,7 +67,10 @@ export default function FinancePage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-6" data-testid="finance-tab-content">
+      <div
+        className="flex-1 overflow-auto p-6"
+        data-testid="finance-tab-content"
+      >
         {activeTab === 'invoices' && (
           <FinanceDataTable<InvoiceRecord>
             columns={invoiceColumns}

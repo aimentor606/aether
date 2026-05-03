@@ -1,0 +1,10 @@
+/.devenv/
+/.direnv/
+/.pre-commit-config.yaml
+/build/
+/config.yaml
+/tmp/
+
+# Go workspace file
+go.work
+go.work.sum

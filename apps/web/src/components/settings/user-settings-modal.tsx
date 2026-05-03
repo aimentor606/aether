@@ -14,7 +14,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useUserPreferencesStore } from '@/stores/user-preferences-store';
-import { X, Info, Bell, Camera, Upload } from 'lucide-react';
+import {
+  X,
+  Trash2,
+  ExternalLink,
+  Info,
+  Plug,
+  Bell,
+  Mail,
+  Smartphone,
+  AppWindow,
+  Key,
+  Camera,
+  Upload,
+} from 'lucide-react';
 import { AetherLoader } from '@/components/ui/aether-loader';
 import { cn } from '@/lib/utils';
 import {

@@ -1,0 +1,33 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "aether.fullname" . }}-grafana-datasources
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+    grafana_datasource: "1"
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: VictoriaMetrics
+        type: prometheus
+        access: proxy
+        url: http://{{ include "aether.fullname" . }}-victoriametrics:8428
+        isDefault: true
+        editable: false
+
+      - name: VictoriaLogs
+        type: victorialogs-datasource
+        access: proxy
+        url: http://{{ include "aether.fullname" . }}-victorialogs:9428
+        editable: false
+
+      - name: VictoriaTraces
+        type: jaeger
+        access: proxy
+        url: http://{{ include "aether.fullname" . }}-victoriatraces:16686
+        editable: false
+{{- end }}

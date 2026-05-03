@@ -58,6 +58,29 @@ clickhouse:
 openmeter:
   enabled: false
 
+# ── Observability — production overrides ──────────────────────────────────────
+victoriametrics:
+  server:
+    retentionPeriod: 90d
+    persistentVolume:
+      size: 50Gi
+
+victorialogs:
+  server:
+    retentionPeriod: "90d"
+    persistentVolume:
+      size: 50Gi
+
+victoriatraces:
+  server:
+    retentionPeriod: "30d"
+    persistentVolume:
+      size: 30Gi
+
+observability:
+  otelCollector:
+    replicas: 2
+
 # SSL — switch to Let's Encrypt production issuer
 ssl:
   enabled: true

@@ -74,7 +74,11 @@ helm install aether helm/aether \
 | `redis.enabled` | `true` | Enable Redis |
 | `kafka.enabled` | `true` | Enable Kafka |
 | `openmeter.enabled` | `false` | Enable OpenMeter |
-| `monitoring.enabled` | `true` | Enable ServiceMonitors |
+| `victoriametrics.enabled` | `true` | Enable metrics (VM + VMAgent + VMAlert) |
+| `victorialogs.enabled` | `true` | Enable logs (VL + collector) |
+| `victoriatraces.enabled` | `true` | Enable distributed tracing |
+| `grafana.enabled` | `true` | Enable Grafana dashboards |
+| `observability.otelCollector.enabled` | `true` | Enable OTEL trace collector |
 | `ssl.enabled` | `true` | Enable HTTPS |
 | `ssl.environment` | `dev` | SSL mode: dev/staging/prod |
 | `ssl.issuerEmail` | `""` | Let's Encrypt email |
@@ -172,7 +176,7 @@ scripts/k8s/
 ├── Makefile                          # Convenience commands
 ├── README.md                         # This file
 ├── helm/aether/                      # Main Helm Chart
-│   ├── Chart.yaml                    # Dependencies: kong/ingress
+│   ├── Chart.yaml                    # Dependencies: kong, VM, VL, VT, grafana
 │   ├── values.yaml                   # Dev defaults
 │   ├── values-production.yaml        # Production overrides
 │   ├── templates/
@@ -188,7 +192,7 @@ scripts/k8s/
 │   │   ├── clickhouse/               # ClickHouse Installation
 │   │   ├── openmeter/                # OpenMeter (optional)
 │   │   ├── cert-manager/             # ClusterIssuer + Certificate
-│   │   ├── monitoring/               # ServiceMonitors + PrometheusRules
+│   │   ├── monitoring/               # ServiceMonitors + PrometheusRules + OTEL + Grafana datasources
 │   │   └── backup/                   # Redis backup CronJob
 │   └── docs/
 │       ├── ARCHITECTURE.md

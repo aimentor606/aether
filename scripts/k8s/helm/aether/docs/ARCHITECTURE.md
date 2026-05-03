@@ -155,22 +155,53 @@ POSTGRES_PASSWORD: {{ randAlphaNum 32 | b64enc }}
 | Kong rate-limiting | `aether-secrets` | `REDIS_PASSWORD` (via configFrom) |
 | Kong consumers | Per-consumer Secret | `key` |
 
-## Monitoring
+## Observability
 
-### ServiceMonitors
+### Stack
+
+| Component | Chart | Purpose |
+|-----------|-------|---------|
+| VictoriaMetrics | `victoria-metrics-single` | Metrics TSDB + VMAgent + VMAlert |
+| VictoriaLogs | `victoria-logs-single` | Log storage |
+| VictoriaLogs Collector | `victoria-logs-collector` | DaemonSet log collector |
+| VictoriaTraces | `victoria-traces-single` | Distributed tracing backend |
+| OTEL Collector | custom template | Trace ingestion (OTLP → VT) |
+| Grafana | `grafana` | Dashboards (metrics + logs + traces) |
+
+### Metrics (VMAgent → VictoriaMetrics)
+
+VMAgent reads ServiceMonitor CRDs natively — no Prometheus Operator needed.
 
 | Target | Port | Path | Interval |
 |--------|------|------|----------|
 | Aether API | http | /metrics | 30s |
 | Kong proxy | metrics | /metrics | 30s |
 
-### PrometheusRules
+### Alerting (VMAlert)
+
+VMAlert reads PrometheusRule CRDs natively.
 
 | Alert | Condition | Severity |
 |-------|-----------|----------|
 | PodRestartLoop | >5 restarts/hour | warning |
 | HighMemoryUsage | >90% memory limit | warning |
 | High5xxRate | >5% of requests | critical |
+
+### Logs (vlagent → VictoriaLogs)
+
+vlagent DaemonSet auto-discovers pod logs via Kubernetes API. No manual configuration needed.
+
+### Traces (OTEL Collector → VictoriaTraces)
+
+Applications send OTLP traces to the OTEL Collector (gRPC :4317, HTTP :4318), which exports to VictoriaTraces via OTLP/HTTP.
+
+### Grafana Datasources
+
+| Datasource | Type | Backend |
+|-----------|------|---------|
+| VictoriaMetrics | Prometheus | `victoriametrics:8428` |
+| VictoriaLogs | victorialogs-datasource (plugin) | `victorialogs:9428` |
+| VictoriaTraces | Jaeger | `victoriatraces:16686` |
 
 ## Backup
 

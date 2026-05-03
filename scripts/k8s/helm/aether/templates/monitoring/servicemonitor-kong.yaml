@@ -1,4 +1,4 @@
-{{- if and .Values.monitoring.enabled .Values.kong.enabled }}
+{{- if and .Values.victoriametrics.enabled .Values.kong.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -7,7 +7,7 @@ metadata:
   labels:
     {{- include "aether.labels" . | nindent 4 }}
     app.kubernetes.io/component: kong
-    release: prometheus
+    app.kubernetes.io/part-of: observability
 spec:
   selector:
     matchLabels:

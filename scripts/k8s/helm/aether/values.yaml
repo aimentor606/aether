@@ -157,10 +157,75 @@ openmeter:
       cpu: "1"
       memory: 512Mi
 
-# ── Monitoring ──────────────────────────────────────────────────────────────
-monitoring:
+# ── Observability ─────────────────────────────────────────────────────────────
+# Chart dependency values live at top-level alias keys (victoriametrics, victorialogs, etc.)
+# Custom template values (OTEL Collector) live under observability.
+
+# VictoriaMetrics — metrics TSDB + VMAgent + VMAlert
+victoriametrics:
   enabled: true
-  # Prometheus Operator ServiceMonitors + PrometheusRules
+  server:
+    retentionPeriod: 30d
+    persistentVolume:
+      size: 10Gi
+      storageClass: ""
+  vmagent:
+    enabled: true
+    extraArgs:
+      promscrape.kubernetes.apiServer: ""
+    # VMAgent discovers ServiceMonitors via Kubernetes API
+  vmalert:
+    enabled: true
+    # VMAlert reads PrometheusRule CRDs natively
+
+# VictoriaLogs — log storage
+victorialogs:
+  enabled: true
+  server:
+    retentionPeriod: "30d"
+    persistentVolume:
+      size: 10Gi
+      storageClass: ""
+
+# VictoriaLogs Collector — vlagent DaemonSet
+victorialogscollector: {}
+  # vlagent auto-discovers pod logs via Kubernetes API
+
+# VictoriaTraces — distributed tracing backend
+victoriatraces:
+  enabled: true
+  server:
+    retentionPeriod: "30d"
+    persistentVolume:
+      size: 10Gi
+      storageClass: ""
+
+# Grafana — unified dashboard for metrics, logs, and traces
+grafana:
+  enabled: true
+  plugins:
+    - victorialogs-datasource
+  sidecar:
+    datasources:
+      enabled: true
+      label: grafana_datasource
+      labelValue: "1"
+  dashboardProviders: {}
+  dashboards: {}
+
+# OTEL Collector — receives traces and forwards to VictoriaTraces (custom template)
+observability:
+  otelCollector:
+    enabled: true
+    image: otel/opentelemetry-collector-contrib:0.102.0
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
 
 # ── Backup ──────────────────────────────────────────────────────────────────
 backup:

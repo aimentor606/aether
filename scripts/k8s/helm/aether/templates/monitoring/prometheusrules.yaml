@@ -1,4 +1,4 @@
-{{- if .Values.monitoring.enabled }}
+{{- if .Values.victoriametrics.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -6,7 +6,7 @@ metadata:
   namespace: {{ include "aether.namespace" . }}
   labels:
     {{- include "aether.labels" . | nindent 4 }}
-    release: prometheus
+    app.kubernetes.io/part-of: observability
 spec:
   groups:
     - name: aether.rules

@@ -1,0 +1,90 @@
+{{- if .Values.observability.otelCollector.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "aether.fullname" . }}-otel-collector
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    app.kubernetes.io/component: otel-collector
+data:
+  config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+
+    exporters:
+      otlphttp:
+        endpoint: http://{{ include "aether.fullname" . }}-victoriatraces:9411/api/traces
+        tls:
+          insecure: true
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          exporters: [otlphttp]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "aether.fullname" . }}-otel-collector
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    app.kubernetes.io/component: otel-collector
+spec:
+  replicas: {{ .Values.observability.otelCollector.replicas }}
+  selector:
+    matchLabels:
+      {{- include "aether.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: otel-collector
+  template:
+    metadata:
+      labels:
+        {{- include "aether.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: otel-collector
+    spec:
+      containers:
+        - name: collector
+          image: {{ .Values.observability.otelCollector.image }}
+          args: ["--config", "/etc/otel/config.yaml"]
+          ports:
+            - name: otlp-grpc
+              containerPort: 4317
+            - name: otlp-http
+              containerPort: 4318
+          resources:
+            {{- toYaml .Values.observability.otelCollector.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/otel
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "aether.fullname" . }}-otel-collector
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "aether.fullname" . }}-otel-collector
+  namespace: {{ include "aether.namespace" . }}
+  labels:
+    {{- include "aether.labels" . | nindent 4 }}
+    app.kubernetes.io/component: otel-collector
+spec:
+  selector:
+    {{- include "aether.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: otel-collector
+  ports:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: otlp-grpc
+    - name: otlp-http
+      port: 4318
+      targetPort: otlp-http
+{{- end }}

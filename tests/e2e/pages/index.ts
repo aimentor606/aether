@@ -14,6 +14,7 @@ export { SkillsPage } from './skills.page';
 export { TerminalPage } from './terminal.page';
 export { TunnelOverviewPage, TunnelDetailPage } from './tunnel.page';
 export { UsagePage, ChangelogPage } from './usage.page';
+export { UsageDashboardPage } from './usage-dashboard.page';
 export { FinancePage } from './finance.page';
 export { WorkspacePage } from './workspace.page';
 export { AdminAnalyticsPage, AdminSandboxPoolPage, AdminSandboxesPage, AdminStatelessPage, AdminStressTestPage } from './admin-complex.page';

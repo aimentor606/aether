@@ -9,11 +9,9 @@ export class SettingsProvidersPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByRole('heading', { name: 'LLM Providers' });
-    this.addProviderButton = page.getByRole('button', { name: /Add Provider/i });
-    this.providerList = page.locator('[data-testid="provider-list"]').or(
-      page.locator('[class*="provider"]'),
-    );
+    this.heading = page.getByTestId('providers-heading');
+    this.addProviderButton = page.getByTestId('add-provider-button');
+    this.providerList = page.getByTestId('provider-list');
     this.emptyState = page.getByText(/No providers connected/i);
   }
 

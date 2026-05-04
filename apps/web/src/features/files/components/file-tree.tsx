@@ -1052,7 +1052,7 @@ export function FileTree() {
   }, [clipboard, handlePaste]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" data-testid="file-tree">
       {/* Tree header */}
       <div className="flex items-center justify-between px-3 py-2 shrink-0">
         <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60 select-none">

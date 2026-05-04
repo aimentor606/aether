@@ -89,7 +89,10 @@ export default function NotificationManagementPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight">
+                <h1
+                  className="text-2xl font-semibold tracking-tight"
+                  data-testid="admin-notifications-heading"
+                >
                   Notification Management
                 </h1>
                 <Badge variant="outline" className="text-xs">
@@ -120,6 +123,7 @@ export default function NotificationManagementPage() {
               }
               size="default"
               className="gap-2 min-w-[120px]"
+              data-testid="send-notification-button"
             >
               {admin.triggerWorkflow.isPending ? (
                 <>
@@ -148,6 +152,7 @@ export default function NotificationManagementPage() {
                 checked={broadcast}
                 onCheckedChange={setBroadcast}
                 className="data-[state=checked]:bg-primary"
+                data-testid="broadcast-switch"
               />
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-muted-foreground" />
@@ -170,7 +175,11 @@ export default function NotificationManagementPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Select value={workflowId} onValueChange={setWorkflowId}>
+                <Select
+                  value={workflowId}
+                  onValueChange={setWorkflowId}
+                  data-testid="workflow-select"
+                >
                   <SelectTrigger>
                     <SelectValue
                       placeholder={
@@ -314,6 +323,7 @@ export default function NotificationManagementPage() {
               <CardContent className="space-y-3">
                 <Textarea
                   id="payload"
+                  data-testid="notification-payload"
                   placeholder={
                     broadcast
                       ? '{"announcement": "New feature!", "action_url": "/features"}'

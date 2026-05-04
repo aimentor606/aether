@@ -24,7 +24,12 @@ export default function ProvidersPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold">LLM Providers</h1>
+            <h1
+              className="text-lg sm:text-xl font-semibold"
+              data-testid="providers-heading"
+            >
+              LLM Providers
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
               Connect model providers that power your agent.
             </p>
@@ -32,6 +37,7 @@ export default function ProvidersPage() {
           <Button
             variant="outline"
             size="sm"
+            data-testid="add-provider-button"
             onClick={() => openProviderModal('providers')}
           >
             <Plus className="h-4 w-4" />
@@ -44,14 +50,18 @@ export default function ProvidersPage() {
             <AetherLoader size="small" />
           </div>
         ) : connectedProviders.length > 0 ? (
-          <ProviderList
-            connectedProviders={connectedProviders}
-            onDisconnected={() => refetch()}
-            showConnectButton={false}
-          />
+          <div data-testid="provider-list">
+            <ProviderList
+              connectedProviders={connectedProviders}
+              onDisconnected={() => refetch()}
+              showConnectButton={false}
+            />
+          </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-border/60 py-16 flex flex-col items-center gap-4">
-            <p className="text-sm text-muted-foreground/60">No providers connected yet</p>
+            <p className="text-sm text-muted-foreground/60">
+              No providers connected yet
+            </p>
             <Button
               variant="outline"
               size="sm"

@@ -12,13 +12,13 @@ export class TerminalPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.newTerminalButton = page.getByRole('button', { name: /New Terminal/i });
+    this.newTerminalButton = page.getByTestId('new-terminal-button');
     this.emptyState = page.getByText(/No terminal sessions/i);
     this.loadingState = page.getByText(/Loading terminals/i);
-    this.terminalContainer = page.locator('.xterm').first();
+    this.terminalContainer = page.getByTestId('terminal-container').first();
     this.tabBar = page.locator('[class*="tab"]').filter({ has: page.locator('[class*="dot"]') });
-    this.terminalTabs = page.locator('[role="tab"]').filter({ hasText: /terminal/i });
-    this.refreshButton = page.getByRole('button').filter({ has: page.locator('[data-lucide="rotate-cw"], svg[class*="rotate"]') });
+    this.terminalTabs = page.getByTestId('terminal-tab');
+    this.refreshButton = page.getByTestId('terminal-refresh');
   }
 
   async gotoViaId(terminalId: string) {

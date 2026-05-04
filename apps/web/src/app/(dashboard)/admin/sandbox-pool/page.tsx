@@ -164,7 +164,7 @@ export default function SandboxPoolAdminPage() {
                 <Server className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">
+                <h1 className="text-2xl font-bold tracking-tight" data-testid="admin-sandbox-pool-heading">
                   Sandbox Pool
                 </h1>
                 <p className="text-sm text-muted-foreground">
@@ -173,7 +173,7 @@ export default function SandboxPoolAdminPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {health && getHealthBadge(healthData?.status ?? 'unknown')}
+              {health && <div data-testid="pool-health-badge">{getHealthBadge(healthData?.status ?? 'unknown')}</div>}
             </div>
           </div>
         </div>
@@ -204,7 +204,7 @@ export default function SandboxPoolAdminPage() {
           )}
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
+            <Card data-testid="pool-stat-card">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -311,10 +311,11 @@ export default function SandboxPoolAdminPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-3" data-testid="quick-actions">
                   <button
                     onClick={handleReplenish}
                     disabled={isAnyMutating}
+                    data-testid="replenish-button"
                     className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border bg-card hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
@@ -330,6 +331,7 @@ export default function SandboxPoolAdminPage() {
                   <button
                     onClick={handleCleanup}
                     disabled={isAnyMutating}
+                    data-testid="cleanup-button"
                     className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border bg-card hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
@@ -345,6 +347,7 @@ export default function SandboxPoolAdminPage() {
                   <button
                     onClick={handleRestart}
                     disabled={isAnyMutating}
+                    data-testid="restart-button"
                     className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border bg-card hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
@@ -367,6 +370,7 @@ export default function SandboxPoolAdminPage() {
                       type="number"
                       min={1}
                       max={20}
+                      data-testid="force-create-input"
                       value={createCount}
                       onChange={(e) =>
                         setCreateCount(
@@ -381,6 +385,7 @@ export default function SandboxPoolAdminPage() {
                     <Button
                       onClick={handleForceCreate}
                       disabled={isAnyMutating}
+                      data-testid="force-create-button"
                     >
                       {pool.forceCreate.isPending ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -478,6 +483,7 @@ export default function SandboxPoolAdminPage() {
                     <Server className="w-5 h-5 text-secondary" />
                     Pooled Sandboxes
                   </CardTitle>
+                  </CardTitle>
                   <CardDescription>
                     {sandboxesData?.count ?? sandboxesData?.total ?? 0}{' '}
                     sandboxes currently available in the pool
@@ -488,7 +494,7 @@ export default function SandboxPoolAdminPage() {
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent data-testid="pooled-sandboxes">
               {sandboxesLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />

@@ -142,7 +142,10 @@ export default function AccessRequestsPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+            <h1
+              className="text-2xl font-semibold tracking-tight flex items-center gap-2"
+              data-testid="admin-access-requests-heading"
+            >
               <UserPlus className="h-6 w-6" />
               Access Requests
             </h1>
@@ -153,19 +156,28 @@ export default function AccessRequestsPage() {
 
           {/* Summary cards */}
           <div className="flex gap-3">
-            <div className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg px-4 py-2 text-center min-w-[80px]">
+            <div
+              className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg px-4 py-2 text-center min-w-[80px]"
+              data-testid="access-summary-card"
+            >
               <p className="text-lg font-semibold text-amber-500">
                 {summary.pending}
               </p>
               <p className="text-[11px] text-muted-foreground">Pending</p>
             </div>
-            <div className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg px-4 py-2 text-center min-w-[80px]">
+            <div
+              className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg px-4 py-2 text-center min-w-[80px]"
+              data-testid="access-summary-card"
+            >
               <p className="text-lg font-semibold text-green-500">
                 {summary.approved}
               </p>
               <p className="text-[11px] text-muted-foreground">Approved</p>
             </div>
-            <div className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg px-4 py-2 text-center min-w-[80px]">
+            <div
+              className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-lg px-4 py-2 text-center min-w-[80px]"
+              data-testid="access-summary-card"
+            >
               <p className="text-lg font-semibold text-red-500">
                 {summary.rejected}
               </p>
@@ -215,7 +227,10 @@ export default function AccessRequestsPage() {
             </p>
           </div>
         ) : (
-          <div className="border border-foreground/[0.08] rounded-xl overflow-hidden">
+          <div
+            className="border border-foreground/[0.08] rounded-xl overflow-hidden"
+            data-testid="access-requests-table"
+          >
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">

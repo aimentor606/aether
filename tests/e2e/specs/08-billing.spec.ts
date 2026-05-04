@@ -1,17 +1,10 @@
-import { test, expect } from '@playwright/test';
-import { getAccessToken, apiBase } from '../helpers/auth';
-
-let token: string;
-
-test.beforeAll(async () => {
-  token = await getAccessToken();
-});
+import { test, expect } from '../fixtures';
 
 test.describe('08 — Billing Endpoints', () => {
-  test('GET /v1/billing/account-state returns 200 with account info', async () => {
-    const res = await fetch(`${apiBase}/billing/account-state`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/billing/account-state returns 200 with account info', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/billing/account-state');
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -29,10 +22,10 @@ test.describe('08 — Billing Endpoints', () => {
     }
   });
 
-  test('GET /v1/billing/account-state/minimal returns 200 with minimal state', async () => {
-    const res = await fetch(`${apiBase}/billing/account-state/minimal`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/billing/account-state/minimal returns 200 with minimal state', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/billing/account-state/minimal');
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -42,10 +35,10 @@ test.describe('08 — Billing Endpoints', () => {
     }
   });
 
-  test('GET /v1/billing/tier-configurations returns 200 with available tiers', async () => {
-    const res = await fetch(`${apiBase}/billing/tier-configurations`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/billing/tier-configurations returns 200 with available tiers', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/billing/tier-configurations');
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -58,10 +51,10 @@ test.describe('08 — Billing Endpoints', () => {
     }
   });
 
-  test('GET /v1/billing/credit-breakdown returns 200 with credit breakdown', async () => {
-    const res = await fetch(`${apiBase}/billing/credit-breakdown`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/billing/credit-breakdown returns 200 with credit breakdown', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/billing/credit-breakdown');
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -71,10 +64,10 @@ test.describe('08 — Billing Endpoints', () => {
     }
   });
 
-  test('GET /v1/billing/transactions returns 200 with transaction list', async () => {
-    const res = await fetch(`${apiBase}/billing/transactions`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/billing/transactions returns 200 with transaction list', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/billing/transactions');
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -88,10 +81,10 @@ test.describe('08 — Billing Endpoints', () => {
     }
   });
 
-  test('GET /v1/billing/transactions/summary returns 200 with summary', async () => {
-    const res = await fetch(`${apiBase}/billing/transactions/summary`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/billing/transactions/summary returns 200 with summary', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/billing/transactions/summary');
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -101,10 +94,8 @@ test.describe('08 — Billing Endpoints', () => {
     }
   });
 
-  test('GET /v1/billing/usage-history returns 200', async () => {
-    const res = await fetch(`${apiBase}/billing/usage-history`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/billing/usage-history returns 200', async ({ apiFetch }) => {
+    const res = await apiFetch('/billing/usage-history');
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -114,10 +105,10 @@ test.describe('08 — Billing Endpoints', () => {
     }
   });
 
-  test('GET /v1/billing/metered-usage returns 200 with metered usage data', async () => {
-    const res = await fetch(`${apiBase}/billing/metered-usage`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/billing/metered-usage returns 200 with metered usage data', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/billing/metered-usage');
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -127,10 +118,10 @@ test.describe('08 — Billing Endpoints', () => {
     }
   });
 
-  test('GET /v1/billing/metered-usage/total returns 200 with totals', async () => {
-    const res = await fetch(`${apiBase}/billing/metered-usage/total`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/billing/metered-usage/total returns 200 with totals', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/billing/metered-usage/total');
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -140,10 +131,10 @@ test.describe('08 — Billing Endpoints', () => {
     }
   });
 
-  test('GET /v1/billing/auto-topup/settings returns 200', async () => {
-    const res = await fetch(`${apiBase}/billing/auto-topup/settings`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/billing/auto-topup/settings returns 200', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/billing/auto-topup/settings');
     expect(res.status).toBe(200);
 
     const body = await res.json();

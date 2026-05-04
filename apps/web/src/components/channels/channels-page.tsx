@@ -142,6 +142,7 @@ function ChannelCard({
       <SpotlightCard className="bg-card border border-border/50">
         <div
           className="p-4 flex items-start gap-3 cursor-pointer group"
+          data-testid="channel-card"
           onClick={() => onSettings(channel)}
           role="button"
           tabIndex={0}
@@ -354,7 +355,10 @@ export function ChannelsPage() {
       <div className="container mx-auto max-w-7xl px-3 sm:px-4 py-3 sm:py-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 fill-mode-both">
         <PageHeader icon={Radio}>
           <div className="space-y-2 sm:space-y-4">
-            <div className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
+            <div
+              className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight"
+              data-testid="channels-heading"
+            >
               <span className="text-primary">Channels</span>
             </div>
           </div>
@@ -386,6 +390,7 @@ export function ChannelsPage() {
                 size="sm"
                 className="gap-1.5"
                 onClick={() => openSetupDialog()}
+                data-testid="add-channel-button"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add Channel
@@ -416,6 +421,12 @@ export function ChannelsPage() {
                 <MessageSquare className="h-6 w-6 text-muted-foreground" />
               </div>
               <h3 className="text-base font-semibold mb-1">No channels yet</h3>
+            </div>
+
+            <div
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg mx-auto"
+              data-testid="channels-empty"
+            >
               <p className="text-sm text-muted-foreground max-w-sm mx-auto">
                 Connect a messaging platform so users can talk to your agent
                 directly.
@@ -425,6 +436,7 @@ export function ChannelsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg mx-auto">
               <button
                 onClick={() => openSetupDialog('telegram')}
+                data-testid="telegram-setup"
                 className="flex items-center gap-3 p-4 rounded-2xl border border-border/50 bg-card hover:bg-muted/50 transition-colors cursor-pointer text-left group"
               >
                 <div className="w-10 h-10 rounded-xl bg-muted border border-border/50 flex items-center justify-center shrink-0 group-hover:border-primary/30 transition-colors">
@@ -439,6 +451,7 @@ export function ChannelsPage() {
               </button>
               <button
                 onClick={() => openSetupDialog('slack')}
+                data-testid="slack-setup"
                 className="flex items-center gap-3 p-4 rounded-2xl border border-border/50 bg-card hover:bg-muted/50 transition-colors cursor-pointer text-left group"
               >
                 <div className="w-10 h-10 rounded-xl bg-muted border border-border/50 flex items-center justify-center shrink-0 group-hover:border-primary/30 transition-colors">

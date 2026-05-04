@@ -1,17 +1,12 @@
-import { test, expect } from '@playwright/test';
-import { getAccessToken, apiBase } from '../helpers/auth';
-
-let token: string;
-
-test.beforeAll(async () => {
-  token = await getAccessToken();
-});
+import { test, expect } from '../fixtures';
 
 test.describe('10 — Router AI Service Endpoints', () => {
   // ─── Health (no auth required) ────────────────────────────────────────────
 
-  test('GET /v1/router/health returns 200 with service info', async () => {
-    const res = await fetch(`${apiBase}/router/health`);
+  test('GET /v1/router/health returns 200 with service info', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/router/health');
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -24,13 +19,11 @@ test.describe('10 — Router AI Service Endpoints', () => {
 
   // ─── Web Search (apiKeyAuth) ──────────────────────────────────────────────
 
-  test('POST /v1/router/web-search returns 200 or 400/500 depending on config', async () => {
-    const res = await fetch(`${apiBase}/router/web-search`, {
+  test('POST /v1/router/web-search returns 200 or 400/500 depending on config', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/router/web-search', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({ query: 'test query' }),
     });
 
@@ -46,13 +39,11 @@ test.describe('10 — Router AI Service Endpoints', () => {
     }
   });
 
-  test('POST /v1/router/web-search with missing query returns 400', async () => {
-    const res = await fetch(`${apiBase}/router/web-search`, {
+  test('POST /v1/router/web-search with missing query returns 400', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/router/web-search', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({}),
     });
 
@@ -65,13 +56,11 @@ test.describe('10 — Router AI Service Endpoints', () => {
 
   // ─── Image Search (apiKeyAuth) ────────────────────────────────────────────
 
-  test('POST /v1/router/image-search returns 200 or 500 depending on config', async () => {
-    const res = await fetch(`${apiBase}/router/image-search`, {
+  test('POST /v1/router/image-search returns 200 or 500 depending on config', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/router/image-search', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({ query: 'test images' }),
     });
 
@@ -87,13 +76,11 @@ test.describe('10 — Router AI Service Endpoints', () => {
     }
   });
 
-  test('POST /v1/router/image-search with missing query returns 400', async () => {
-    const res = await fetch(`${apiBase}/router/image-search`, {
+  test('POST /v1/router/image-search with missing query returns 400', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/router/image-search', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({}),
     });
 
@@ -106,10 +93,10 @@ test.describe('10 — Router AI Service Endpoints', () => {
 
   // ─── LiteLLM Admin (apiKeyAuth) ───────────────────────────────────────────
 
-  test('GET /v1/router/litellm-admin/models returns 200 with model list', async () => {
-    const res = await fetch(`${apiBase}/router/litellm-admin/models`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/router/litellm-admin/models returns 200 with model list', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/router/litellm-admin/models');
 
     // Models come from internal registry, should always work
     expect(res.status).toBe(200);
@@ -119,10 +106,10 @@ test.describe('10 — Router AI Service Endpoints', () => {
     expect(body).toHaveProperty('data');
   });
 
-  test('GET /v1/router/litellm-admin/health returns 200 with health status', async () => {
-    const res = await fetch(`${apiBase}/router/litellm-admin/health`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/router/litellm-admin/health returns 200 with health status', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/router/litellm-admin/health');
 
     // Always returns 200 — wraps LiteLLM health in success/unhealthy
     expect(res.status).toBe(200);
@@ -138,10 +125,10 @@ test.describe('10 — Router AI Service Endpoints', () => {
     }
   });
 
-  test('GET /v1/router/litellm-admin/model/info returns 200 or 502', async () => {
-    const res = await fetch(`${apiBase}/router/litellm-admin/model/info`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/router/litellm-admin/model/info returns 200 or 502', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/router/litellm-admin/model/info');
 
     // 200 if LiteLLM is running, 502 if not
     expect([200, 502]).toContain(res.status);
@@ -155,10 +142,10 @@ test.describe('10 — Router AI Service Endpoints', () => {
 
   // ─── Credentials (combinedAuth) ───────────────────────────────────────────
 
-  test('GET /v1/control/credentials returns 200 or 502 depending on LiteLLM', async () => {
-    const res = await fetch(`${apiBase}/control/credentials`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/control/credentials returns 200 or 502 depending on LiteLLM', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/control/credentials');
 
     // 200 with credentials, 502 if LiteLLM gateway unavailable
     expect([200, 500, 502]).toContain(res.status);

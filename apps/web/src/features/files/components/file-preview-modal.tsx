@@ -137,7 +137,10 @@ export function FilePreviewModal() {
       />
 
       {/* Modal container */}
-      <div className="fixed inset-0 z-50 flex flex-col pointer-events-none animate-in fade-in-0 zoom-in-95 duration-200">
+      <div
+        className="fixed inset-0 z-50 flex flex-col pointer-events-none animate-in fade-in-0 zoom-in-95 duration-200"
+        data-testid="file-preview"
+      >
         {/* Top bar - floating */}
         <div className="pointer-events-auto mx-auto mt-3 flex items-center justify-between gap-4 px-4 h-12 bg-background/90 backdrop-blur-xl border border-border/50 rounded-xl shadow-lg max-w-3xl w-[calc(100%-2rem)]">
           {/* Left: back + file info */}

@@ -27,16 +27,18 @@ export function WorkspaceItemCard({
   index = 0,
   onClick,
   actions,
+  ...rest
 }: {
   item: WorkspaceCardItem;
   index?: number;
   onClick?: () => void;
   /** Optional slot for buttons rendered in the bottom-right */
   actions?: React.ReactNode;
-}) {
+} & { 'data-testid'?: string }) {
   return (
     <motion.div
       layout
+      {...rest}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96 }}
@@ -61,7 +63,10 @@ export function WorkspaceItemCard({
               >
                 {item.name}
               </h3>
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
+              <Badge
+                variant="secondary"
+                className="text-[10px] px-1.5 py-0 shrink-0"
+              >
                 {item.kindLabel}
               </Badge>
             </div>
@@ -79,9 +84,7 @@ export function WorkspaceItemCard({
             </p>
           </div>
 
-          {actions && (
-            <div className="flex justify-end">{actions}</div>
-          )}
+          {actions && <div className="flex justify-end">{actions}</div>}
         </div>
       </SpotlightCard>
     </motion.div>

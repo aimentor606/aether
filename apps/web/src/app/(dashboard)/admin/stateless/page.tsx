@@ -305,7 +305,10 @@ export default function StatelessAdminPage() {
                 <Activity className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">
+                <h1
+                  className="text-2xl font-bold tracking-tight"
+                  data-testid="admin-stateless-heading"
+                >
                   Monitoring
                 </h1>
                 <p className="text-sm text-muted-foreground">
@@ -314,24 +317,28 @@ export default function StatelessAdminPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <HealthBadges
-                health={health}
-                backpressure={backpressure}
-                alertCount={alertCount}
-              />
+              <div data-testid="health-badges">
+                <HealthBadges
+                  health={health}
+                  backpressure={backpressure}
+                  alertCount={alertCount}
+                />
+              </div>
             </div>
           </div>
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/50">
-            <QuickActions
-              onSweep={handleSweep}
-              onFlush={handleFlush}
-              onPurgeDLQ={handleDLQPurge}
-              onResetBreakers={handleResetCircuitBreakers}
-              isSweeping={sweepMutation.isPending}
-              isFlushing={flushMutation.isPending}
-              isPurging={dlqPurgeMutation.isPending}
-              isResetting={resetCircuitBreakersMutation.isPending}
-            />
+            <div data-testid="stateless-quick-actions">
+              <QuickActions
+                onSweep={handleSweep}
+                onFlush={handleFlush}
+                onPurgeDLQ={handleDLQPurge}
+                onResetBreakers={handleResetCircuitBreakers}
+                isSweeping={sweepMutation.isPending}
+                isFlushing={flushMutation.isPending}
+                isPurging={dlqPurgeMutation.isPending}
+                isResetting={resetCircuitBreakersMutation.isPending}
+              />
+            </div>
             <div className="flex items-center gap-3">
               <span className="text-xs text-muted-foreground">
                 {lastRefresh.toLocaleTimeString()}
@@ -390,7 +397,7 @@ export default function StatelessAdminPage() {
           )}
 
           {/* Stats Cards */}
-          <StatCardGrid columns={4}>
+          <StatCardGrid columns={4} data-testid="stateless-stat-card">
             <StatCard
               title="Active Runs"
               value={

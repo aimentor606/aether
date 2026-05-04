@@ -441,7 +441,12 @@ export default function APIKeysPage() {
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold">API Keys</h1>
+            <h1
+              className="text-lg sm:text-xl font-semibold"
+              data-testid="api-keys-heading"
+            >
+              API Keys
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
               Manage keys for programmatic access to your sandbox.
             </p>
@@ -769,12 +774,12 @@ export default function APIKeysPage() {
               onOpenChange={setIsCreateDialogOpen}
             >
               <DialogTrigger asChild>
-                <Button size="sm">
+                <Button size="sm" data-testid="create-key-button">
                   <Plus className="w-4 h-4 mr-1.5" />
                   Create Key
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-sm">
+              <DialogContent className="max-w-sm" data-testid="key-dialog">
                 <DialogHeader>
                   <DialogTitle>New API Key</DialogTitle>
                 </DialogHeader>
@@ -931,6 +936,7 @@ export default function APIKeysPage() {
                 {userKeys.map((apiKey: APIKeyResponse) => (
                   <div
                     key={apiKey.key_id}
+                    data-testid="api-key-row"
                     className={cn(
                       'px-4 py-3.5 flex items-center gap-3',
                       isKeyExpired(apiKey.expires_at) ? 'bg-yellow-500/5' : '',
@@ -979,6 +985,7 @@ export default function APIKeysPage() {
                             <Button
                               variant="ghost"
                               size="sm"
+                              data-testid="revoke-key-button"
                               className="text-muted-foreground hover:text-destructive"
                             >
                               <Trash2 className="w-3.5 h-3.5" />

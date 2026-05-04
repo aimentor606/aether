@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
 import { X, Check, Loader2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -17,7 +23,7 @@ import Image from 'next/image';
 // ─── Tier metadata (display-only) ────────────────────────────────────────────
 
 const TIER_META: Record<string, { subtitle: string }> = {
-  pro:   { subtitle: 'Great starting point for most workloads' },
+  pro: { subtitle: 'Great starting point for most workloads' },
   power: { subtitle: 'For heavier agents and parallel tasks' },
   ultra: { subtitle: 'Maximum compute for demanding pipelines' },
 };
@@ -31,12 +37,20 @@ export interface NewInstanceModalProps {
   title?: string;
 }
 
-export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewInstanceModalProps) {
+export function NewInstanceModal({
+  open,
+  onOpenChange,
+  returnUrl,
+  title,
+}: NewInstanceModalProps) {
   useAuth();
   const dialogRef = useRef<HTMLDivElement>(null);
   const defaultApplied = useRef(false);
 
-  const defaultReturnUrl = typeof window !== 'undefined' ? `${window.location.origin}/instances?subscription=success` : '/instances';
+  const defaultReturnUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/instances?subscription=success`
+      : '/instances';
   const resolvedReturnUrl = returnUrl || defaultReturnUrl;
 
   const location = INSTANCE_CONFIG.fallbackRegion; // EU-only
@@ -44,14 +58,21 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { data: serverTypesData, isLoading: typesLoading } = useServerTypes(location);
-  const serverTypes = useMemo(() => serverTypesData?.serverTypes ?? [], [serverTypesData?.serverTypes]);
+  const { data: serverTypesData, isLoading: typesLoading } =
+    useServerTypes(location);
+  const serverTypes = useMemo(
+    () => serverTypesData?.serverTypes ?? [],
+    [serverTypesData?.serverTypes],
+  );
 
   // Set default selection once when types load — never overwrite user choice.
   useEffect(() => {
     if (!serverTypes.length || defaultApplied.current) return;
     defaultApplied.current = true;
-    const def = serverTypes.find((t) => t.name === 'pro')?.name ?? serverTypes[0]?.name ?? null;
+    const def =
+      serverTypes.find((t) => t.name === 'pro')?.name ??
+      serverTypes[0]?.name ??
+      null;
     setSelected(def);
   }, [serverTypes]);
 
@@ -65,7 +86,12 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !isLoading) { e.preventDefault(); onOpenChange(false); } };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isLoading) {
+        e.preventDefault();
+        onOpenChange(false);
+      }
+    };
     document.addEventListener('keydown', onKey);
     dialogRef.current?.focus();
     return () => document.removeEventListener('keydown', onKey);
@@ -75,7 +101,9 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [open]);
 
   const selectedType = serverTypes.find((t) => t.name === selected) || null;
@@ -84,7 +112,9 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
     try {
       setIsLoading(true);
       setError(null);
-      const base = resolvedReturnUrl.startsWith('http') ? resolvedReturnUrl : `${window.location.origin}${resolvedReturnUrl}`;
+      const base = resolvedReturnUrl.startsWith('http')
+        ? resolvedReturnUrl
+        : `${window.location.origin}${resolvedReturnUrl}`;
       const sep = base.includes('?') ? '&' : '?';
       const response = await createCheckoutSession({
         tier_key: 'pro',
@@ -94,8 +124,14 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
         ...(selected ? { server_type: selected } : {}),
         location,
       });
-      if (response.url || response.checkout_url) { window.location.href = response.url || response.checkout_url!; return; }
-      if (response.status === 'subscription_created' || response.status === 'no_change') {
+      if (response.url || response.checkout_url) {
+        window.location.href = response.url || response.checkout_url!;
+        return;
+      }
+      if (
+        response.status === 'subscription_created' ||
+        response.status === 'no_change'
+      ) {
         toast.success(response.message || 'Your Aether is on its way');
         onOpenChange(false);
         window.location.href = '/instances';
@@ -116,11 +152,21 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
 
   if (!open || !isBillingEnabled()) return null;
 
-  const price = selectedType ? `$${selectedType.priceMonthlyMarkup.toFixed(0)}` : '–';
+  const price = selectedType
+    ? `$${selectedType.priceMonthlyMarkup.toFixed(0)}`
+    : '–';
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !isLoading && onOpenChange(false)} />
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      data-testid="new-instance-modal"
+    >
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={() => !isLoading && onOpenChange(false)}
+      />
 
       <div
         ref={dialogRef}
@@ -128,17 +174,32 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
         className="relative bg-background rounded-2xl border border-border overflow-hidden flex flex-col max-h-[90vh] w-full max-w-[460px] outline-none animate-in fade-in-0 zoom-in-[0.97] duration-150"
       >
         {/* Close */}
-        <Button onClick={() => onOpenChange(false)} variant="ghost" size="icon-sm" className="absolute top-3.5 right-3.5 z-10" aria-label="Close">
+        <Button
+          onClick={() => onOpenChange(false)}
+          variant="ghost"
+          size="icon-sm"
+          className="absolute top-3.5 right-3.5 z-10"
+          aria-label="Close"
+          data-testid="modal-close"
+        >
           <X className="size-4" />
         </Button>
 
         {/* Scrollable content */}
         <div className="flex-1 min-h-0 overflow-y-auto">
-
           {/* Hero */}
           <div className="flex flex-col items-center pt-7 pb-5 px-6 border-b border-border bg-neutral-50/50 dark:bg-neutral-950/50">
-            <Image src="/aether-computer.png" alt="Aether Computer" width={140} height={140} className="object-contain mb-4" priority />
-            <h2 className="text-xl font-semibold tracking-tight text-foreground text-center">{title || 'Your Aether'}</h2>
+            <Image
+              src="/aether-computer.png"
+              alt="Aether Computer"
+              width={140}
+              height={140}
+              className="object-contain mb-4"
+              priority
+            />
+            <h2 className="text-xl font-semibold tracking-tight text-foreground text-center">
+              {title || 'Your Aether'}
+            </h2>
             <p className="text-sm text-muted-foreground mt-1 text-center max-w-[280px]">
               One machine. All your tools. Agents that run themselves.
             </p>
@@ -146,7 +207,9 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
 
           {/* Tier selection */}
           <div className="px-5 pt-5 pb-4">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Choose your machine</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
+              Choose your machine
+            </p>
 
             {typesLoading ? (
               <div className="space-y-2.5">
@@ -155,7 +218,12 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
                 <Skeleton className="h-[72px] w-full rounded-xl" />
               </div>
             ) : (
-              <RadioGroup value={selected ?? undefined} onValueChange={setSelected} className="gap-2.5">
+              <RadioGroup
+                value={selected ?? undefined}
+                onValueChange={setSelected}
+                className="gap-2.5"
+                data-testid="tier-options"
+              >
                 {serverTypes.map((t) => {
                   const isSelected = selected === t.name;
                   const isRecommended = t.name === 'pro';
@@ -185,14 +253,20 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
                           {t.cores} vCPU · {t.memory} GB
                         </span>
                         {meta && (
-                          <span className="text-[11px] text-muted-foreground/70 block mt-0.5">{meta.subtitle}</span>
+                          <span className="text-[11px] text-muted-foreground/70 block mt-0.5">
+                            {meta.subtitle}
+                          </span>
                         )}
                       </div>
 
                       {/* Price */}
                       <div className="text-right shrink-0">
-                        <span className="text-lg font-semibold tabular-nums text-foreground">${t.priceMonthlyMarkup.toFixed(0)}</span>
-                        <span className="text-[11px] text-muted-foreground">/mo</span>
+                        <span className="text-lg font-semibold tabular-nums text-foreground">
+                          ${t.priceMonthlyMarkup.toFixed(0)}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          /mo
+                        </span>
                       </div>
                     </label>
                   );
@@ -204,7 +278,9 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
           {/* Includes */}
           <div className="px-5 pb-5">
             <div className="rounded-lg bg-muted/40 px-4 py-3">
-              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2">Every plan includes</p>
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                Every plan includes
+              </p>
               <div className="grid grid-cols-2 gap-x-3 gap-y-1">
                 {[
                   'Always-on cloud computer',
@@ -216,7 +292,9 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
                 ].map((f) => (
                   <div key={f} className="flex items-start gap-1.5 py-0.5">
                     <Check className="size-3 text-muted-foreground/50 shrink-0 mt-[1px]" />
-                    <span className="text-[11px] text-muted-foreground leading-tight">{f}</span>
+                    <span className="text-[11px] text-muted-foreground leading-tight">
+                      {f}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -235,13 +313,29 @@ export function NewInstanceModal({ open, onOpenChange, returnUrl, title }: NewIn
         <div className="shrink-0 border-t border-border px-5 py-4 flex items-center justify-between gap-4">
           <div>
             <div className="flex items-baseline gap-0.5">
-              <span className="text-xl font-semibold tabular-nums text-foreground">{price}</span>
+              <span className="text-xl font-semibold tabular-nums text-foreground">
+                {price}
+              </span>
               <span className="text-xs text-muted-foreground">/mo</span>
             </div>
-            <p className="text-[11px] text-muted-foreground/60 mt-0.5">Cancel anytime</p>
+            <p className="text-[11px] text-muted-foreground/60 mt-0.5">
+              Cancel anytime
+            </p>
           </div>
-          <Button className="h-11 px-7 text-sm font-semibold" disabled={isLoading || !selected} onClick={handleCta}>
-            {isLoading ? <Loader2 className="size-4 animate-spin" /> : <>Get Your Aether<ArrowRight className="size-3.5 ml-1.5" /></>}
+          <Button
+            className="h-11 px-7 text-sm font-semibold"
+            disabled={isLoading || !selected}
+            onClick={handleCta}
+            data-testid="instance-cta"
+          >
+            {isLoading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <>
+                Get Your Aether
+                <ArrowRight className="size-3.5 ml-1.5" />
+              </>
+            )}
           </Button>
         </div>
       </div>

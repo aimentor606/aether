@@ -3,15 +3,26 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowDownToLine, Loader2, GitCommit, Tag } from 'lucide-react';
-import { getAllVersions, type VersionEntry, type VersionChannel } from '@/lib/platform-client';
-import { useGlobalSandboxUpdate, detectChannel } from '@/hooks/platform/use-global-sandbox-update';
+import {
+  getAllVersions,
+  type VersionEntry,
+  type VersionChannel,
+} from '@/lib/platform-client';
+import {
+  useGlobalSandboxUpdate,
+  detectChannel,
+} from '@/hooks/platform/use-global-sandbox-update';
 import { useSandboxConnectionStore } from '@/stores/sandbox-connection-store';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/ui/tooltip';
 import { FilterBar, FilterBarItem } from '@/components/ui/tabs';
 import { useUpdateDialogStore } from '@/stores/update-dialog-store';
 import { UnifiedMarkdown } from '@/components/markdown/unified-markdown';
@@ -29,7 +40,10 @@ function parseVersionType(version: string): VersionType {
   return 'patch';
 }
 
-function normalizeReleaseTitle(title: string | undefined, version: string): string | undefined {
+function normalizeReleaseTitle(
+  title: string | undefined,
+  version: string,
+): string | undefined {
   if (!title) return title;
   if (version.startsWith('dev-')) return title;
   const escaped = version.replace(/\./g, '\\.');
@@ -46,7 +60,11 @@ function normalizeReleaseTitle(title: string | undefined, version: string): stri
   return normalized.trim() || title;
 }
 
-function normalizeReleaseBody(body: string | undefined, version: string, title?: string): string | undefined {
+function normalizeReleaseBody(
+  body: string | undefined,
+  version: string,
+  title?: string,
+): string | undefined {
   if (!body) return body;
   const normalizedTitle = normalizeReleaseTitle(title, version)?.trim();
   if (!normalizedTitle) return body;
@@ -73,14 +91,29 @@ function normalizeReleaseBody(body: string | undefined, version: string, title?:
 
 function ChannelBadge({ channel }: { channel: VersionChannel }) {
   if (channel === 'dev') {
-    return <Badge variant="warning" size="sm">dev</Badge>;
+    return (
+      <Badge variant="warning" size="sm">
+        dev
+      </Badge>
+    );
   }
-  return <Badge variant="success" size="sm">stable</Badge>;
+  return (
+    <Badge variant="success" size="sm">
+      stable
+    </Badge>
+  );
 }
 
 // ─── Version entry card ───────────────────────────────────────────────────
 
-function VersionEntryCard({ entry, isCurrent, isLatestInChannel, onInstall, isInstalling, showInstall }: {
+function VersionEntryCard({
+  entry,
+  isCurrent,
+  isLatestInChannel,
+  onInstall,
+  isInstalling,
+  showInstall,
+}: {
   entry: VersionEntry;
   isCurrent: boolean;
   isLatestInChannel: boolean;
@@ -99,9 +132,19 @@ function VersionEntryCard({ entry, isCurrent, isLatestInChannel, onInstall, isIn
 
   const displayVersion = isDevVersion ? entry.version : `v${entry.version}`;
   const displayTitle = normalizeReleaseTitle(entry.title, entry.version);
-  const displayBody = normalizeReleaseBody(entry.body, entry.version, entry.title);
-  const canExpandBody = Boolean(displayBody && displayBody.length > (isDev ? 220 : 420));
-  const collapsedHeightClass = isDev ? 'max-h-32' : isMajor ? 'max-h-72' : 'max-h-56';
+  const displayBody = normalizeReleaseBody(
+    entry.body,
+    entry.version,
+    entry.title,
+  );
+  const canExpandBody = Boolean(
+    displayBody && displayBody.length > (isDev ? 220 : 420),
+  );
+  const collapsedHeightClass = isDev
+    ? 'max-h-32'
+    : isMajor
+      ? 'max-h-72'
+      : 'max-h-56';
   const fadeOverlayClass = isCurrent
     ? 'from-emerald-500/[0.02] via-emerald-500/[0.018]'
     : isMajor
@@ -111,26 +154,35 @@ function VersionEntryCard({ entry, isCurrent, isLatestInChannel, onInstall, isIn
         : 'from-card via-card/90';
 
   return (
-    <Card className={cn(
-      'transition-colors overflow-hidden',
-      // Major: prominent accent border
-      isMajor && 'border-l-4 border-l-primary border-primary/30 bg-primary/[0.02]',
-      // Current version: green highlight
-      isCurrent && !isMajor && 'border-emerald-500/30 bg-emerald-500/[0.02]',
-      // Minor: subtle highlight
-      isMinor && !isCurrent && 'border-border/60',
-      // Dev: minimal styling
-      isDev && !isCurrent && !isLatestInChannel && 'border-border/40 bg-muted/20',
-      // Patch: default
-      versionType === 'patch' && !isCurrent && 'border-border/50',
-      // Compact padding for dev/patch
-      isDev ? 'py-3' : isMajor ? 'py-6' : 'py-4',
-    )}>
-      <CardHeader className={cn(
-        'flex flex-row items-start justify-between gap-4',
-        // Reduce gap for card's default gap-6
-        isMajor ? 'pb-0' : 'pb-0',
-      )}>
+    <Card
+      className={cn(
+        'transition-colors overflow-hidden',
+        // Major: prominent accent border
+        isMajor &&
+          'border-l-4 border-l-primary border-primary/30 bg-primary/[0.02]',
+        // Current version: green highlight
+        isCurrent && !isMajor && 'border-emerald-500/30 bg-emerald-500/[0.02]',
+        // Minor: subtle highlight
+        isMinor && !isCurrent && 'border-border/60',
+        // Dev: minimal styling
+        isDev &&
+          !isCurrent &&
+          !isLatestInChannel &&
+          'border-border/40 bg-muted/20',
+        // Patch: default
+        versionType === 'patch' && !isCurrent && 'border-border/50',
+        // Compact padding for dev/patch
+        isDev ? 'py-3' : isMajor ? 'py-6' : 'py-4',
+      )}
+      data-testid="version-card"
+    >
+      <CardHeader
+        className={cn(
+          'flex flex-row items-start justify-between gap-4',
+          // Reduce gap for card's default gap-6
+          isMajor ? 'pb-0' : 'pb-0',
+        )}
+      >
         <div className="flex items-center gap-2 flex-wrap min-w-0">
           <div className="flex items-center gap-1.5">
             {isDevVersion ? (
@@ -138,10 +190,12 @@ function VersionEntryCard({ entry, isCurrent, isLatestInChannel, onInstall, isIn
             ) : (
               <Tag className="h-3.5 w-3.5 text-muted-foreground/60 flex-shrink-0" />
             )}
-            <span className={cn(
-              'font-mono font-semibold text-foreground',
-              isMajor ? 'text-xl' : isDev ? 'text-sm' : 'text-lg',
-            )}>
+            <span
+              className={cn(
+                'font-mono font-semibold text-foreground',
+                isMajor ? 'text-xl' : isDev ? 'text-sm' : 'text-lg',
+              )}
+            >
               {displayVersion}
             </span>
           </div>
@@ -149,20 +203,28 @@ function VersionEntryCard({ entry, isCurrent, isLatestInChannel, onInstall, isIn
           <ChannelBadge channel={entry.channel} />
 
           {isMajor && (
-            <Badge variant="highlight" size="sm">Major Release</Badge>
+            <Badge variant="highlight" size="sm">
+              Major Release
+            </Badge>
           )}
 
           {isCurrent && (
-            <Badge variant="success" size="sm">Current</Badge>
+            <Badge variant="success" size="sm">
+              Current
+            </Badge>
           )}
 
           {isLatestInChannel && !isCurrent && (
-            <Badge variant="new" size="sm">Latest</Badge>
+            <Badge variant="new" size="sm">
+              Latest
+            </Badge>
           )}
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-xs text-muted-foreground/60 font-mono">{entry.date}</span>
+          <span className="text-xs text-muted-foreground/60 font-mono">
+            {entry.date}
+          </span>
           {!isCurrent && showInstall && onInstall && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -181,24 +243,26 @@ function VersionEntryCard({ entry, isCurrent, isLatestInChannel, onInstall, isIn
                   Install
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
-                Install {displayVersion}
-              </TooltipContent>
+              <TooltipContent>Install {displayVersion}</TooltipContent>
             </Tooltip>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className={cn(
-        isMajor ? 'pt-0' : 'pt-0',
-        // Reduce spacing between header and content
-        !entry.title && !entry.body ? 'pb-0' : '',
-      )}>
+      <CardContent
+        className={cn(
+          isMajor ? 'pt-0' : 'pt-0',
+          // Reduce spacing between header and content
+          !entry.title && !entry.body ? 'pb-0' : '',
+        )}
+      >
         {displayTitle && (
-          <h3 className={cn(
-            'font-medium text-foreground',
-            isMajor ? 'text-base mb-2' : 'text-sm mb-1',
-          )}>
+          <h3
+            className={cn(
+              'font-medium text-foreground',
+              isMajor ? 'text-base mb-2' : 'text-sm mb-1',
+            )}
+          >
             {displayTitle}
           </h3>
         )}
@@ -207,31 +271,37 @@ function VersionEntryCard({ entry, isCurrent, isLatestInChannel, onInstall, isIn
         {displayBody && (
           <div className="mt-2">
             <div className="relative">
-              <div className={cn(
-                'prose prose-sm dark:prose-invert max-w-none',
-                'text-muted-foreground',
-                '[&_h1]:text-base [&_h1]:font-semibold [&_h1]:text-foreground/90 [&_h1]:mt-3 [&_h1]:mb-1.5',
-                '[&_h2]:text-sm [&_h2]:font-semibold [&_h2]:text-foreground/90 [&_h2]:mt-3 [&_h2]:mb-1',
-                '[&_h3]:text-sm [&_h3]:font-medium [&_h3]:text-foreground/80 [&_h3]:mt-2 [&_h3]:mb-1',
-                '[&_p]:text-xs [&_p]:text-muted-foreground [&_p]:leading-relaxed [&_p]:my-1',
-                '[&_ul]:text-xs [&_ul]:my-1 [&_ul]:pl-4',
-                '[&_ol]:text-xs [&_ol]:my-1 [&_ol]:pl-4',
-                '[&_li]:text-xs [&_li]:text-muted-foreground [&_li]:my-0.5',
-                '[&_code]:text-xs [&_code]:px-1 [&_code]:py-0.5 [&_code]:bg-muted [&_code]:rounded',
-                '[&_pre]:text-xs [&_pre]:my-2',
-                '[&_a]:text-primary [&_a]:no-underline hover:[&_a]:underline',
-                '[&_strong]:text-foreground/90 [&_strong]:font-semibold',
-                '[&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-3 [&_blockquote]:my-2 [&_blockquote]:text-xs',
-                !expanded && canExpandBody && `${collapsedHeightClass} overflow-hidden`,
-              )}>
+              <div
+                className={cn(
+                  'prose prose-sm dark:prose-invert max-w-none',
+                  'text-muted-foreground',
+                  '[&_h1]:text-base [&_h1]:font-semibold [&_h1]:text-foreground/90 [&_h1]:mt-3 [&_h1]:mb-1.5',
+                  '[&_h2]:text-sm [&_h2]:font-semibold [&_h2]:text-foreground/90 [&_h2]:mt-3 [&_h2]:mb-1',
+                  '[&_h3]:text-sm [&_h3]:font-medium [&_h3]:text-foreground/80 [&_h3]:mt-2 [&_h3]:mb-1',
+                  '[&_p]:text-xs [&_p]:text-muted-foreground [&_p]:leading-relaxed [&_p]:my-1',
+                  '[&_ul]:text-xs [&_ul]:my-1 [&_ul]:pl-4',
+                  '[&_ol]:text-xs [&_ol]:my-1 [&_ol]:pl-4',
+                  '[&_li]:text-xs [&_li]:text-muted-foreground [&_li]:my-0.5',
+                  '[&_code]:text-xs [&_code]:px-1 [&_code]:py-0.5 [&_code]:bg-muted [&_code]:rounded',
+                  '[&_pre]:text-xs [&_pre]:my-2',
+                  '[&_a]:text-primary [&_a]:no-underline hover:[&_a]:underline',
+                  '[&_strong]:text-foreground/90 [&_strong]:font-semibold',
+                  '[&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-3 [&_blockquote]:my-2 [&_blockquote]:text-xs',
+                  !expanded &&
+                    canExpandBody &&
+                    `${collapsedHeightClass} overflow-hidden`,
+                )}
+              >
                 <UnifiedMarkdown content={displayBody} />
               </div>
 
               {!expanded && canExpandBody && (
-                <div className={cn(
-                  'pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t to-transparent',
-                  fadeOverlayClass,
-                )} />
+                <div
+                  className={cn(
+                    'pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t to-transparent',
+                    fadeOverlayClass,
+                  )}
+                />
               )}
             </div>
 
@@ -274,21 +344,27 @@ function VersionEntryCard({ entry, isCurrent, isLatestInChannel, onInstall, isIn
 
 type FilterOption = 'all' | 'stable' | 'dev';
 
-function FilterTabs({ value, onChange, showDev }: { value: FilterOption; onChange: (v: FilterOption) => void; showDev: boolean }) {
+function FilterTabs({
+  value,
+  onChange,
+  showDev,
+}: {
+  value: FilterOption;
+  onChange: (v: FilterOption) => void;
+  showDev: boolean;
+}) {
   const options: { key: FilterOption; label: string }[] = showDev
     ? [
         { key: 'all', label: 'All' },
         { key: 'stable', label: 'Stable' },
         { key: 'dev', label: 'Dev' },
       ]
-    : [
-        { key: 'stable', label: 'Stable' },
-      ];
+    : [{ key: 'stable', label: 'Stable' }];
 
   if (!showDev) return null;
 
   return (
-    <FilterBar>
+    <FilterBar data-testid="version-filter">
       {options.map((opt) => (
         <FilterBarItem
           key={opt.key}
@@ -307,7 +383,8 @@ function FilterTabs({ value, onChange, showDev }: { value: FilterOption; onChang
 export default function ChangelogPage() {
   const currentVersion = useSandboxConnectionStore((s) => s.sandboxVersion);
   const currentChannel = detectChannel(currentVersion);
-  const { updateAvailable, latestVersion, isUpdating } = useGlobalSandboxUpdate();
+  const { updateAvailable, latestVersion, isUpdating } =
+    useGlobalSandboxUpdate();
 
   // Dev mode: hidden by default, persisted in localStorage
   const [showDev, setShowDev] = useState(() => {
@@ -336,9 +413,12 @@ export default function ChangelogPage() {
   const openDialog = useUpdateDialogStore((s) => s.openDialog);
 
   // Install a specific version via the update dialog
-  const handleInstall = useCallback((version: string) => {
-    openDialog(version);
-  }, [openDialog]);
+  const handleInstall = useCallback(
+    (version: string) => {
+      openDialog(version);
+    },
+    [openDialog],
+  );
 
   // Update to latest via the update dialog (no target version = latest)
   const handleUpdate = useCallback(() => {
@@ -372,29 +452,46 @@ export default function ChangelogPage() {
         <div className="mb-8">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-foreground mb-2">Versions</h1>
-              <p className="text-sm text-muted-foreground">
+              <h1
+                className="text-2xl font-semibold text-foreground mb-2"
+                data-testid="changelog-heading"
+              >
+                Versions
+              </h1>
+              <p
+                className="text-sm text-muted-foreground"
+                data-testid="current-version"
+              >
                 {currentVersion ? (
                   <>
                     Running{' '}
                     <span className="font-mono font-medium text-foreground">
-                      {currentVersion.startsWith('dev-') ? currentVersion : `v${currentVersion}`}
+                      {currentVersion.startsWith('dev-')
+                        ? currentVersion
+                        : `v${currentVersion}`}
                     </span>
                     {currentChannel === 'dev' && (
-                      <Badge variant="warning" size="sm" className="ml-1.5">dev</Badge>
+                      <Badge variant="warning" size="sm" className="ml-1.5">
+                        dev
+                      </Badge>
                     )}
                   </>
                 ) : (
                   'Version history for Aether Computer'
                 )}
-                {latestVersion && currentVersion && latestVersion !== currentVersion && (
-                  <>
-                    {' '}&middot; Latest:{' '}
-                    <span className="font-mono font-medium text-primary">
-                      {latestVersion.startsWith('dev-') ? latestVersion : `v${latestVersion}`}
-                    </span>
-                  </>
-                )}
+                {latestVersion &&
+                  currentVersion &&
+                  latestVersion !== currentVersion && (
+                    <>
+                      {' '}
+                      &middot; Latest:{' '}
+                      <span className="font-mono font-medium text-primary">
+                        {latestVersion.startsWith('dev-')
+                          ? latestVersion
+                          : `v${latestVersion}`}
+                      </span>
+                    </>
+                  )}
               </p>
 
               {/* Update button */}
@@ -402,7 +499,10 @@ export default function ChangelogPage() {
                 <div className="mt-4">
                   <Button onClick={handleUpdate}>
                     <ArrowDownToLine className="h-4 w-4" />
-                    Update to {latestVersion?.startsWith('dev-') ? latestVersion : `v${latestVersion}`}
+                    Update to{' '}
+                    {latestVersion?.startsWith('dev-')
+                      ? latestVersion
+                      : `v${latestVersion}`}
                   </Button>
                 </div>
               )}
@@ -414,6 +514,7 @@ export default function ChangelogPage() {
               size="xs"
               onClick={toggleDev}
               className="mt-1.5 text-muted-foreground/55 hover:text-foreground"
+              data-testid="dev-toggle"
             >
               {showDev ? 'Hide dev builds' : 'Dev builds'}
             </Button>
@@ -446,21 +547,25 @@ export default function ChangelogPage() {
           <div className="space-y-3">
             {filteredVersions.map((entry, index) => {
               const isLatestInChannel =
-                (entry.channel === 'stable' && entry.version === latestStable) ||
+                (entry.channel === 'stable' &&
+                  entry.version === latestStable) ||
                 (entry.channel === 'dev' && entry.version === latestDev);
 
               const versionType = parseVersionType(entry.version);
               const prevEntry = filteredVersions[index - 1];
-              const prevVersionType = prevEntry ? parseVersionType(prevEntry.version) : null;
+              const prevVersionType = prevEntry
+                ? parseVersionType(prevEntry.version)
+                : null;
 
               // Add separator before major releases (unless it's the first item)
-              const showSeparator = index > 0 && versionType === 'major' && prevVersionType !== 'major';
+              const showSeparator =
+                index > 0 &&
+                versionType === 'major' &&
+                prevVersionType !== 'major';
 
               return (
                 <div key={entry.version}>
-                  {showSeparator && (
-                    <Separator className="my-6" />
-                  )}
+                  {showSeparator && <Separator className="my-6" />}
                   <VersionEntryCard
                     entry={entry}
                     isCurrent={currentVersion === entry.version}

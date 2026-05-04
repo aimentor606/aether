@@ -54,7 +54,7 @@ export function FinanceDataTable<T extends FinanceRecord>({
   className,
 }: FinanceDataTableProps<T>) {
   return (
-    <div className={cn('rounded-md border', className)}>
+    <div className={cn('rounded-md border', className)} data-testid="finance-table">
       <Table>
         <TableHeader>
           <TableRow>
@@ -70,7 +70,7 @@ export function FinanceDataTable<T extends FinanceRecord>({
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
-            <TableRow>
+            <TableRow data-testid="finance-empty">
               <TableCell className="text-center text-muted-foreground py-8">
                 {emptyMessage}
               </TableCell>
@@ -79,6 +79,7 @@ export function FinanceDataTable<T extends FinanceRecord>({
             data.map((row, rowIdx) => (
               <TableRow
                 key={String((row as unknown as { id: string }).id ?? rowIdx)}
+                data-testid="finance-row"
                 className={onRowClick ? 'cursor-pointer' : undefined}
                 onClick={() => onRowClick?.(row)}
               >

@@ -1,5 +1,4 @@
-import { test, expect } from '@playwright/test';
-import { loginToDashboard } from '../helpers/browser-login';
+import { test, expect } from '../fixtures';
 import { ownerEmail, ownerPassword } from '../helpers/auth';
 
 test.describe('19 — Accessibility Compliance', () => {
@@ -105,28 +104,24 @@ test.describe('19 — Accessibility Compliance', () => {
 
   // ─── Dashboard heading hierarchy ───────────────────────────────────────────
 
-  test('dashboard page has proper heading hierarchy after login', async ({ page }) => {
-    await loginToDashboard(page);
-
+  test('dashboard page has proper heading hierarchy after login', async ({ authenticatedPage }) => {
     // The dashboard should have at least one heading element.
     // Check for any h1 or the first heading present.
-    const heading = page.locator('h1, h2, h3').first();
+    const heading = authenticatedPage.locator('h1, h2, h3').first();
     await expect(heading).toBeVisible({ timeout: 10_000 });
 
     // Verify there is a page-level heading (h1 preferred)
-    const h1Count = await page.locator('h1').count();
-    const h2Count = await page.locator('h2').count();
+    const h1Count = await authenticatedPage.locator('h1').count();
+    const h2Count = await authenticatedPage.locator('h2').count();
     // At minimum one heading should exist on the page
     expect(h1Count + h2Count).toBeGreaterThanOrEqual(1);
   });
 
   // ─── Sidebar navigation keyboard accessibility ─────────────────────────────
 
-  test('sidebar navigation links are keyboard accessible', async ({ page }) => {
-    await loginToDashboard(page);
-
+  test('sidebar navigation links are keyboard accessible', async ({ authenticatedPage }) => {
     // Find the nav element in the sidebar
-    const nav = page.locator('nav').first();
+    const nav = authenticatedPage.locator('nav').first();
     await expect(nav).toBeVisible({ timeout: 10_000 });
 
     // All buttons/links inside nav should be focusable
@@ -136,25 +131,23 @@ test.describe('19 — Accessibility Compliance', () => {
 
     // Tab into the nav and verify first interactive element receives focus
     // First, click somewhere neutral to reset focus
-    await page.click('body');
-    await page.keyboard.press('Tab');
+    await authenticatedPage.click('body');
+    await authenticatedPage.keyboard.press('Tab');
 
     // Verify that after tabbing, some element on the page has focus
-    const focusedElement = page.locator(':focus');
+    const focusedElement = authenticatedPage.locator(':focus');
     await expect(focusedElement).toBeVisible({ timeout: 5_000 });
   });
 
   // ─── Deployment card status dots ───────────────────────────────────────────
 
-  test('deployment status dot spans have aria-hidden="true"', async ({ page }) => {
-    await loginToDashboard(page);
-
+  test('deployment status dot spans have aria-hidden="true"', async ({ authenticatedPage }) => {
     // Navigate to deployments (may be gated by feature flag)
-    await page.goto('/deployments');
-    await page.waitForTimeout(2_000);
+    await authenticatedPage.goto('/deployments');
+    await authenticatedPage.waitForTimeout(2_000);
 
     // If the page loaded (not 404), check status dots
-    const statusDots = page.locator('span[aria-hidden="true"].rounded-full');
+    const statusDots = authenticatedPage.locator('span[aria-hidden="true"].rounded-full');
 
     if (await statusDots.first().isVisible({ timeout: 5_000 }).catch(() => false)) {
       const count = await statusDots.count();
@@ -167,7 +160,7 @@ test.describe('19 — Accessibility Compliance', () => {
     } else {
       // Deployments page may not be enabled; verify the concept via a different route
       // Check that any decorative dot on the page uses aria-hidden
-      const allAriaHiddenDots = page.locator('span[aria-hidden="true"]');
+      const allAriaHiddenDots = authenticatedPage.locator('span[aria-hidden="true"]');
       const dotCount = await allAriaHiddenDots.count();
       // If deployments page is not available, this test passes vacuously
       expect(dotCount).toBeGreaterThanOrEqual(0);
@@ -176,14 +169,12 @@ test.describe('19 — Accessibility Compliance', () => {
 
   // ─── API Keys status badge dots ────────────────────────────────────────────
 
-  test('API keys status badge dots have aria-hidden="true"', async ({ page }) => {
-    await loginToDashboard(page);
-
-    await page.goto('/settings/api-keys');
-    await page.waitForTimeout(3_000);
+  test('API keys status badge dots have aria-hidden="true"', async ({ authenticatedPage }) => {
+    await authenticatedPage.goto('/settings/api-keys');
+    await authenticatedPage.waitForTimeout(3_000);
 
     // The StatusBadge component renders decorative dots with aria-hidden="true"
-    const statusDots = page.locator('span[aria-hidden="true"].rounded-full');
+    const statusDots = authenticatedPage.locator('span[aria-hidden="true"].rounded-full');
 
     if (await statusDots.first().isVisible({ timeout: 5_000 }).catch(() => false)) {
       const count = await statusDots.count();
@@ -195,7 +186,7 @@ test.describe('19 — Accessibility Compliance', () => {
       }
     } else {
       // Page loaded but no keys present — verify h1 heading exists for page identity
-      const heading = page.locator('h1');
+      const heading = authenticatedPage.locator('h1');
       await expect(heading).toBeVisible({ timeout: 5_000 });
     }
   });
@@ -235,19 +226,17 @@ test.describe('19 — Accessibility Compliance', () => {
 
   // ─── Tab through main navigation shows visible focus ───────────────────────
 
-  test('tab through main navigation — focus ring is visible', async ({ page }) => {
-    await loginToDashboard(page);
-
+  test('tab through main navigation — focus ring is visible', async ({ authenticatedPage }) => {
     // Click neutral area to reset focus
-    await page.click('body');
+    await authenticatedPage.click('body');
 
     // Tab a few times to reach interactive elements
     for (let i = 0; i < 5; i++) {
-      await page.keyboard.press('Tab');
+      await authenticatedPage.keyboard.press('Tab');
     }
 
     // Verify a focused element exists with visible outline/ring styling
-    const focused = page.locator(':focus-visible, :focus');
+    const focused = authenticatedPage.locator(':focus-visible, :focus');
     await expect(focused.first()).toBeVisible({ timeout: 5_000 });
 
     // Verify the focused element has either an outline or ring style
@@ -293,26 +282,22 @@ test.describe('19 — Accessibility Compliance', () => {
 
   // ─── API Keys page h1 heading ──────────────────────────────────────────────
 
-  test('API keys page has h1 heading for page identity', async ({ page }) => {
-    await loginToDashboard(page);
+  test('API keys page has h1 heading for page identity', async ({ authenticatedPage }) => {
+    await authenticatedPage.goto('/settings/api-keys');
+    await authenticatedPage.waitForTimeout(3_000);
 
-    await page.goto('/settings/api-keys');
-    await page.waitForTimeout(3_000);
-
-    const h1 = page.locator('h1');
+    const h1 = authenticatedPage.locator('h1');
     await expect(h1).toBeVisible({ timeout: 10_000 });
     await expect(h1).toContainText('API Keys');
   });
 
   // ─── Sonner toast uses accessible alerts ───────────────────────────────────
 
-  test('toast notifications use accessible sonner with role="status"', async ({ page }) => {
-    await loginToDashboard(page);
-
+  test('toast notifications use accessible sonner with role="status"', async ({ authenticatedPage }) => {
     // Sonner toasts render into a [data-sonner-toaster] element
     // They use role="status" (aria-live region) by default
     // Verify the toaster container exists in the DOM
-    const toaster = page.locator('[data-sonner-toaster]');
+    const toaster = authenticatedPage.locator('[data-sonner-toaster]');
     await expect(toaster).toBeAttached({ timeout: 10_000 });
 
     // The toaster should have aria attributes for live regions

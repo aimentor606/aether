@@ -27,7 +27,6 @@ import { ExportTranscriptDialog } from '@/components/session/export-transcript-d
 import { DiffDialog } from '@/components/session/diff-dialog';
 import { CompactDialog } from '@/components/session/compact-dialog';
 
-
 import { DiagnosticsDialog } from '@/components/session/diagnostics-panel';
 // Worktree indicator — disabled for now
 // import { useOpenCodeSession, useOpenCodeCurrentProject } from '@/hooks/opencode/use-opencode-sessions';
@@ -57,7 +56,6 @@ export function SessionSiteHeader({
   const [compactOpen, setCompactOpen] = useState(false);
   const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
 
-
   // Worktree detection — disabled for now
   const worktreeInfo = null;
 
@@ -85,6 +83,7 @@ export function SessionSiteHeader({
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
+                        data-testid="more-actions"
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>

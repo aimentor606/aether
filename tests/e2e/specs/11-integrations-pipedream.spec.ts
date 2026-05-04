@@ -1,30 +1,13 @@
-import { test, expect } from '@playwright/test';
-import { getAccessToken, apiBase } from '../helpers/auth';
-
-let token: string;
-
-test.beforeAll(async () => {
-  token = await getAccessToken();
-});
-
-const authHeaders = () => ({
-  Authorization: `Bearer ${token}`,
-  'Content-Type': 'application/json',
-});
-
-/**
- * Many Pipedream endpoints depend on external service configuration.
- * Accept 200 (success), 500 (provider misconfigured), or 401 (wrong auth strategy).
- */
-const acceptableStatuses = [200, 500, 503] as const;
+import { test, expect } from '../fixtures';
+import { apiBase } from '../helpers/auth';
 
 test.describe('11 — Pipedream Integration Endpoints', () => {
   // ── Supabase-authenticated endpoints ──────────────────────────────────────
 
-  test('GET /v1/pipedream/apps returns apps list or provider error', async () => {
-    const res = await fetch(`${apiBase}/pipedream/apps`, {
-      headers: authHeaders(),
-    });
+  test('GET /v1/pipedream/apps returns apps list or provider error', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/pipedream/apps');
     expect([200, 500, 503]).toContain(res.status);
 
     if (res.status === 200) {
@@ -34,10 +17,11 @@ test.describe('11 — Pipedream Integration Endpoints', () => {
     }
   });
 
-  test('POST /v1/pipedream/connect-token returns token or provider error', async () => {
-    const res = await fetch(`${apiBase}/pipedream/connect-token`, {
+  test('POST /v1/pipedream/connect-token returns token or provider error', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/pipedream/connect-token', {
       method: 'POST',
-      headers: authHeaders(),
       body: JSON.stringify({}),
     });
     expect([200, 500, 503]).toContain(res.status);
@@ -48,10 +32,10 @@ test.describe('11 — Pipedream Integration Endpoints', () => {
     }
   });
 
-  test('GET /v1/pipedream/connections returns connections array or provider error', async () => {
-    const res = await fetch(`${apiBase}/pipedream/connections`, {
-      headers: authHeaders(),
-    });
+  test('GET /v1/pipedream/connections returns connections array or provider error', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/pipedream/connections');
     expect([200, 500, 503]).toContain(res.status);
 
     if (res.status === 200) {
@@ -65,55 +49,51 @@ test.describe('11 — Pipedream Integration Endpoints', () => {
   // These require aether_sb_* tokens, so Supabase JWT will be rejected (401).
   // We still test them to verify the route exists and auth middleware is active.
 
-  test('GET /v1/pipedream/token requires sandbox auth', async () => {
-    const res = await fetch(`${apiBase}/pipedream/token`, {
-      headers: authHeaders(),
-    });
+  test('GET /v1/pipedream/token requires sandbox auth', async ({ apiFetch }) => {
+    const res = await apiFetch('/pipedream/token');
     // apiKeyAuth rejects Supabase JWT with 401
     expect([401, 500, 503]).toContain(res.status);
   });
 
-  test('GET /v1/pipedream/list requires sandbox auth', async () => {
-    const res = await fetch(`${apiBase}/pipedream/list`, {
-      headers: authHeaders(),
-    });
+  test('GET /v1/pipedream/list requires sandbox auth', async ({ apiFetch }) => {
+    const res = await apiFetch('/pipedream/list');
     expect([401, 500, 503]).toContain(res.status);
   });
 
-  test('GET /v1/pipedream/search-apps requires sandbox auth', async () => {
-    const res = await fetch(`${apiBase}/pipedream/search-apps?q=slack`, {
-      headers: authHeaders(),
-    });
+  test('GET /v1/pipedream/search-apps requires sandbox auth', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/pipedream/search-apps?q=slack');
     expect([401, 500, 503]).toContain(res.status);
   });
 
-  test('GET /v1/pipedream/actions requires sandbox auth', async () => {
-    const res = await fetch(`${apiBase}/pipedream/actions?app=slack`, {
-      headers: authHeaders(),
-    });
+  test('GET /v1/pipedream/actions requires sandbox auth', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/pipedream/actions?app=slack');
     expect([401, 500, 503]).toContain(res.status);
   });
 
-  test('GET /v1/pipedream/triggers/available requires sandbox auth', async () => {
-    const res = await fetch(`${apiBase}/pipedream/triggers/available?app=slack`, {
-      headers: authHeaders(),
-    });
+  test('GET /v1/pipedream/triggers/available requires sandbox auth', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/pipedream/triggers/available?app=slack');
     expect([401, 500, 503]).toContain(res.status);
   });
 
-  test('GET /v1/pipedream/triggers/deployed requires sandbox auth', async () => {
-    const res = await fetch(`${apiBase}/pipedream/triggers/deployed`, {
-      headers: authHeaders(),
-    });
+  test('GET /v1/pipedream/triggers/deployed requires sandbox auth', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/pipedream/triggers/deployed');
     expect([401, 500, 503]).toContain(res.status);
   });
 
   // ── Credentials CRUD (combinedAuth — JWT accepted) ────────────────────────
 
-  test('GET /v1/pipedream/credentials returns credential status', async () => {
-    const res = await fetch(`${apiBase}/pipedream/credentials`, {
-      headers: authHeaders(),
-    });
+  test('GET /v1/pipedream/credentials returns credential status', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/pipedream/credentials');
     expect([200, 500, 503]).toContain(res.status);
 
     if (res.status === 200) {
@@ -124,11 +104,12 @@ test.describe('11 — Pipedream Integration Endpoints', () => {
     }
   });
 
-  test('PUT /v1/pipedream/credentials saves and DELETE removes credentials', async () => {
+  test('PUT /v1/pipedream/credentials saves and DELETE removes credentials', async ({
+    apiFetch,
+  }) => {
     // PUT — save test credentials
-    const putRes = await fetch(`${apiBase}/pipedream/credentials`, {
+    const putRes = await apiFetch('/pipedream/credentials', {
       method: 'PUT',
-      headers: authHeaders(),
       body: JSON.stringify({
         client_id: 'test_client_id',
         client_secret: 'test_client_secret',
@@ -143,18 +124,15 @@ test.describe('11 — Pipedream Integration Endpoints', () => {
       expect(putBody.success).toBe(true);
 
       // GET — verify credentials now show as configured
-      const getRes = await fetch(`${apiBase}/pipedream/credentials`, {
-        headers: authHeaders(),
-      });
+      const getRes = await apiFetch('/pipedream/credentials');
       expect(getRes.status).toBe(200);
       const getBody = await getRes.json();
       expect(getBody.configured).toBe(true);
       expect(getBody.source).toBe('account');
 
       // DELETE — cleanup
-      const deleteRes = await fetch(`${apiBase}/pipedream/credentials`, {
+      const deleteRes = await apiFetch('/pipedream/credentials', {
         method: 'DELETE',
-        headers: authHeaders(),
       });
       expect(deleteRes.status).toBe(200);
       const deleteBody = await deleteRes.json();
@@ -162,10 +140,11 @@ test.describe('11 — Pipedream Integration Endpoints', () => {
     }
   });
 
-  test('PUT /v1/pipedream/credentials rejects invalid payload with 400', async () => {
-    const res = await fetch(`${apiBase}/pipedream/credentials`, {
+  test('PUT /v1/pipedream/credentials rejects invalid payload with 400', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/pipedream/credentials', {
       method: 'PUT',
-      headers: authHeaders(),
       body: JSON.stringify({ client_id: '' }),
     });
     // Zod validation returns 400; if auth fails first it may be 401/500

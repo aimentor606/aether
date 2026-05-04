@@ -130,7 +130,10 @@ export default function FeatureFlagsPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+          <h1
+            className="text-2xl font-bold flex items-center gap-2"
+            data-testid="admin-feature-flags-heading"
+          >
             <Flag className="h-6 w-6" /> Feature Flags
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -138,10 +141,19 @@ export default function FeatureFlagsPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => flags.refetch()}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => flags.refetch()}
+            data-testid="refresh-flags-button"
+          >
             <RefreshCw className="h-4 w-4 mr-1" /> Refresh
           </Button>
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
+          <Button
+            size="sm"
+            onClick={() => setCreateOpen(true)}
+            data-testid="add-flag-button"
+          >
             <Plus className="h-4 w-4 mr-1" /> Add Flag
           </Button>
         </div>
@@ -156,7 +168,7 @@ export default function FeatureFlagsPage() {
           <p className="text-sm">Click "Add Flag" to create one.</p>
         </div>
       ) : (
-        <div className="border rounded-lg">
+        <div className="border rounded-lg" data-testid="feature-flags-table">
           <Table>
             <TableHeader>
               <TableRow>
@@ -220,7 +232,7 @@ export default function FeatureFlagsPage() {
 
       {/* Create dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent>
+        <DialogContent data-testid="create-flag-dialog">
           <DialogHeader>
             <DialogTitle>Create Feature Flag</DialogTitle>
             <DialogDescription>

@@ -2559,6 +2559,7 @@ export function SessionChatInput({
               )}
               <textarea
                 ref={textareaRef}
+                data-testid="chat-input"
                 value={text}
                 onChange={handleInput}
                 onKeyDown={handleKeyDown}
@@ -2596,6 +2597,7 @@ export function SessionChatInput({
                 <TooltipTrigger asChild>
                   <button
                     type="button"
+                    data-testid="attach-button"
                     onClick={() => fileInputRef.current?.click()}
                     className="inline-flex items-center justify-center h-8 w-8 rounded-xl transition-colors text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
                     aria-label="Attach files"
@@ -2685,6 +2687,7 @@ export function SessionChatInput({
                         onClick={onStop}
                         className="flex-shrink-0 h-8 w-8 rounded-full p-0"
                         aria-label="Stop"
+                        data-testid="stop-button"
                       >
                         <div className="w-3 h-3 rounded-[3px] bg-current" />
                       </Button>
@@ -2723,6 +2726,7 @@ export function SessionChatInput({
                       onClick={handleSubmit}
                       className="flex-shrink-0 h-8 w-8 rounded-full p-0"
                       aria-label="Send message"
+                      data-testid="send-button"
                     >
                       {disabled ? (
                         <div className="size-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />

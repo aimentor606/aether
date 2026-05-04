@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 import { ownerEmail, ownerPassword, apiBase, getAccessTokenFromPage } from '../helpers/auth';
 import { waitForSandboxReady } from '../helpers/wait';
 

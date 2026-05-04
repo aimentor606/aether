@@ -70,6 +70,7 @@ export function FinanceStatusBadge({ status, entity, className }: FinanceStatusB
         variantStyles[variant],
         className,
       )}
+      data-testid="status-badge"
     >
       {status}
     </span>

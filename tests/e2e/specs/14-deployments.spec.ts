@@ -1,12 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 import { getAccessToken, apiBase } from '../helpers/auth';
-
-const apiUrl = apiBase;
-
-const headers = (token: string) => ({
-  Authorization: `Bearer ${token}`,
-  'Content-Type': 'application/json',
-});
 
 interface DeploymentData {
   deploymentId?: string;
@@ -26,33 +19,27 @@ interface ApiResponse<T = unknown> {
   offset?: number;
 }
 
-let token: string;
 let createdDeploymentId: string | null = null;
 
+// afterAll does not receive fixtures — use raw fetch for cleanup
+test.afterAll(async () => {
+  if (!createdDeploymentId) return;
+  try {
+    const token = await getAccessToken();
+    await fetch(`${apiBase}/deployments/${createdDeploymentId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    // best-effort cleanup
+  }
+});
+
 test.describe('14 — Deployment Endpoints', () => {
-  test.beforeAll(async () => {
-    token = await getAccessToken();
-  });
-
-  test.afterAll(async () => {
-    // Cleanup: delete the test deployment if it was created
-    if (!createdDeploymentId) return;
-    try {
-      await fetch(`${apiUrl}/deployments/${createdDeploymentId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-    } catch {
-      // best-effort cleanup
-    }
-  });
-
   // ── List deployments ───────────────────────────────────────────────────────
 
-  test('GET /v1/deployments returns 200 with envelope', async () => {
-    const res = await fetch(`${apiUrl}/deployments`, {
-      headers: headers(token),
-    });
+  test('GET /v1/deployments returns 200 with envelope', async ({ apiFetch }) => {
+    const res = await apiFetch('/deployments');
     expect(res.status).toBe(200);
 
     const body = (await res.json()) as ApiResponse<DeploymentData[]>;
@@ -66,10 +53,11 @@ test.describe('14 — Deployment Endpoints', () => {
 
   // ── Create deployment ──────────────────────────────────────────────────────
 
-  test('POST /v1/deployments creates a code deployment or returns 400/503', async () => {
-    const res = await fetch(`${apiUrl}/deployments`, {
+  test('POST /v1/deployments creates a code deployment or returns 400/503', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/deployments', {
       method: 'POST',
-      headers: headers(token),
       body: JSON.stringify({
         source_type: 'code',
         code: 'export default { fetch: () => new Response("e2e-test") }',
@@ -92,10 +80,11 @@ test.describe('14 — Deployment Endpoints', () => {
     }
   });
 
-  test('POST /v1/deployments rejects invalid source_type with 400', async () => {
-    const res = await fetch(`${apiUrl}/deployments`, {
+  test('POST /v1/deployments rejects invalid source_type with 400', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/deployments', {
       method: 'POST',
-      headers: headers(token),
       body: JSON.stringify({
         source_type: 'invalid',
         domains: ['test.aether.dev'],
@@ -106,19 +95,17 @@ test.describe('14 — Deployment Endpoints', () => {
 
   // ── Get deployment by ID ───────────────────────────────────────────────────
 
-  test('GET /v1/deployments/:id returns deployment or 404', async () => {
+  test('GET /v1/deployments/:id returns deployment or 404', async ({
+    apiFetch,
+  }) => {
     if (!createdDeploymentId) {
       // Try a non-existent ID to verify 404 handling
-      const res = await fetch(`${apiUrl}/deployments/00000000-0000-0000-0000-000000000000`, {
-        headers: headers(token),
-      });
+      const res = await apiFetch('/deployments/00000000-0000-0000-0000-000000000000');
       expect([200, 404]).toContain(res.status);
       return;
     }
 
-    const res = await fetch(`${apiUrl}/deployments/${createdDeploymentId}`, {
-      headers: headers(token),
-    });
+    const res = await apiFetch(`/deployments/${createdDeploymentId}`);
     expect(res.status).toBe(200);
 
     const body = (await res.json()) as ApiResponse<DeploymentData>;
@@ -130,19 +117,19 @@ test.describe('14 — Deployment Endpoints', () => {
 
   // ── Stop deployment ────────────────────────────────────────────────────────
 
-  test('POST /v1/deployments/:id/stop stops the deployment or returns 404', async () => {
+  test('POST /v1/deployments/:id/stop stops the deployment or returns 404', async ({
+    apiFetch,
+  }) => {
     if (!createdDeploymentId) {
-      const res = await fetch(`${apiUrl}/deployments/00000000-0000-0000-0000-000000000000/stop`, {
+      const res = await apiFetch('/deployments/00000000-0000-0000-0000-000000000000/stop', {
         method: 'POST',
-        headers: headers(token),
       });
       expect([200, 404]).toContain(res.status);
       return;
     }
 
-    const res = await fetch(`${apiUrl}/deployments/${createdDeploymentId}/stop`, {
+    const res = await apiFetch(`/deployments/${createdDeploymentId}/stop`, {
       method: 'POST',
-      headers: headers(token),
     });
     expect([200, 404]).toContain(res.status);
 
@@ -155,22 +142,22 @@ test.describe('14 — Deployment Endpoints', () => {
 
   // ── Redeploy ───────────────────────────────────────────────────────────────
 
-  test('POST /v1/deployments/:id/redeploy redeploys or returns 404', async () => {
+  test('POST /v1/deployments/:id/redeploy redeploys or returns 404', async ({
+    apiFetch,
+  }) => {
     if (!createdDeploymentId) {
-      const res = await fetch(
-        `${apiUrl}/deployments/00000000-0000-0000-0000-000000000000/redeploy`,
+      const res = await apiFetch(
+        '/deployments/00000000-0000-0000-0000-000000000000/redeploy',
         {
           method: 'POST',
-          headers: headers(token),
         },
       );
       expect([201, 404]).toContain(res.status);
       return;
     }
 
-    const res = await fetch(`${apiUrl}/deployments/${createdDeploymentId}/redeploy`, {
+    const res = await apiFetch(`/deployments/${createdDeploymentId}/redeploy`, {
       method: 'POST',
-      headers: headers(token),
     });
     // Redeploy creates a new deployment record (201) or 404 if original not found
     expect([201, 404]).toContain(res.status);
@@ -184,7 +171,8 @@ test.describe('14 — Deployment Endpoints', () => {
       // Clean up the redeployed version too
       if (body.data!.deploymentId) {
         try {
-          await fetch(`${apiUrl}/deployments/${body.data!.deploymentId}`, {
+          const token = await getAccessToken();
+          await fetch(`${apiBase}/deployments/${body.data!.deploymentId}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` },
           });
@@ -197,30 +185,29 @@ test.describe('14 — Deployment Endpoints', () => {
 
   // ── Logs ───────────────────────────────────────────────────────────────────
 
-  test('GET /v1/deployments/:id/logs returns logs or 404', async () => {
+  test('GET /v1/deployments/:id/logs returns logs or 404', async ({
+    apiFetch,
+  }) => {
     if (!createdDeploymentId) {
-      const res = await fetch(`${apiUrl}/deployments/00000000-0000-0000-0000-000000000000/logs`, {
-        headers: headers(token),
-      });
+      const res = await apiFetch('/deployments/00000000-0000-0000-0000-000000000000/logs');
       expect([200, 404, 502]).toContain(res.status);
       return;
     }
 
-    const res = await fetch(`${apiUrl}/deployments/${createdDeploymentId}/logs`, {
-      headers: headers(token),
-    });
+    const res = await apiFetch(`/deployments/${createdDeploymentId}/logs`);
     // May return 200 (logs or empty), 404 (not found), or 502 (Freestyle not configured)
     expect([200, 404, 502]).toContain(res.status);
   });
 
   // ── Delete deployment ──────────────────────────────────────────────────────
 
-  test('DELETE /v1/deployments/:id deletes the deployment or returns 404', async () => {
+  test('DELETE /v1/deployments/:id deletes the deployment or returns 404', async ({
+    apiFetch,
+  }) => {
     const targetId = createdDeploymentId ?? '00000000-0000-0000-0000-000000000000';
 
-    const res = await fetch(`${apiUrl}/deployments/${targetId}`, {
+    const res = await apiFetch(`/deployments/${targetId}`, {
       method: 'DELETE',
-      headers: headers(token),
     });
     expect([200, 404]).toContain(res.status);
 

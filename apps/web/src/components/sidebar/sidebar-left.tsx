@@ -1,7 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { useEffect, useLayoutEffect, useState, useCallback, useRef } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useCallback,
+  useRef,
+} from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -27,7 +33,11 @@ import {
 import posthog from 'posthog-js';
 
 import { SessionList } from '@/components/sidebar/session-list';
-import { useLegacyThreads, useMigrateAllLegacyThreads, useMigrateAllStatus } from '@/hooks/legacy/use-legacy-threads';
+import {
+  useLegacyThreads,
+  useMigrateAllLegacyThreads,
+  useMigrateAllStatus,
+} from '@/hooks/legacy/use-legacy-threads';
 import { useGlobalSandboxUpdate } from '@/hooks/platform/use-global-sandbox-update';
 import { useUpdateDialogStore } from '@/stores/update-dialog-store';
 
@@ -70,12 +80,23 @@ import { useAdminRole } from '@/hooks/admin';
 import { useDocumentModalStore } from '@/stores/use-document-modal-store';
 import { isBillingEnabled } from '@/lib/config';
 
-import { useCreateOpenCodeSession, useOpenCodeSessions } from '@/hooks/opencode/use-opencode-sessions';
-import { useAetherProjects, type AetherProject } from '@/hooks/aether/use-aether-projects';
+import {
+  useCreateOpenCodeSession,
+  useOpenCodeSessions,
+} from '@/hooks/opencode/use-opencode-sessions';
+import {
+  useAetherProjects,
+  type AetherProject,
+} from '@/hooks/aether/use-aether-projects';
 import { openTabAndNavigate } from '@/stores/tab-store';
 import { useServerStore } from '@/stores/server-store';
 import { useOpenCodePendingStore } from '@/stores/opencode-pending-store';
-import { buildInstancePath, getCurrentInstanceIdFromPathname, getActiveInstanceIdFromCookie, normalizeAppPathname } from '@/lib/instance-routes';
+import {
+  buildInstancePath,
+  getCurrentInstanceIdFromPathname,
+  getActiveInstanceIdFromCookie,
+  normalizeAppPathname,
+} from '@/lib/instance-routes';
 import { createClient } from '@/lib/supabase/client';
 import { useSandbox } from '@/hooks/platform/use-sandbox';
 import { reactivateSandbox, listSandboxes } from '@/lib/platform-client';
@@ -97,7 +118,14 @@ interface CollapsedIconButtonProps {
   isActive?: boolean;
 }
 
-function CollapsedIconButton({ icon, label, onClick, flyoutContent, disabled, isActive }: CollapsedIconButtonProps) {
+function CollapsedIconButton({
+  icon,
+  label,
+  onClick,
+  flyoutContent,
+  disabled,
+  isActive,
+}: CollapsedIconButtonProps) {
   const [flyoutOpen, setFlyoutOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
@@ -109,13 +137,24 @@ function CollapsedIconButton({ icon, label, onClick, flyoutContent, disabled, is
   }, []);
 
   const cancelClose = useCallback(() => {
-    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null;
+    }
   }, []);
 
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   // Position flyout to the right of the button
-  const [pos, setPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [pos, setPos] = useState<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
   useLayoutEffect(() => {
     if (flyoutOpen && btnRef.current) {
       const r = btnRef.current.getBoundingClientRect();
@@ -126,7 +165,9 @@ function CollapsedIconButton({ icon, label, onClick, flyoutContent, disabled, is
   // Close on Escape
   useEffect(() => {
     if (!flyoutOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setFlyoutOpen(false); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFlyoutOpen(false);
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [flyoutOpen]);
@@ -135,7 +176,11 @@ function CollapsedIconButton({ icon, label, onClick, flyoutContent, disabled, is
   useEffect(() => {
     if (!flyoutOpen) return;
     const onDown = (e: PointerEvent) => {
-      if (btnRef.current?.contains(e.target as Node) || flyoutRef.current?.contains(e.target as Node)) return;
+      if (
+        btnRef.current?.contains(e.target as Node) ||
+        flyoutRef.current?.contains(e.target as Node)
+      )
+        return;
       setFlyoutOpen(false);
     };
     window.addEventListener('pointerdown', onDown, true);
@@ -162,23 +207,33 @@ function CollapsedIconButton({ icon, label, onClick, flyoutContent, disabled, is
           onClick={onClick}
           disabled={disabled}
           className={btnClass}
-          onMouseEnter={() => { cancelClose(); setFlyoutOpen(true); }}
+          onMouseEnter={() => {
+            cancelClose();
+            setFlyoutOpen(true);
+          }}
           onMouseLeave={scheduleClose}
         >
           {icon}
         </button>
-        {flyoutOpen && typeof document !== 'undefined' && createPortal(
-          <div
-            ref={flyoutRef}
-            style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 10001 }}
-            className="w-[260px] max-h-[60vh] overflow-hidden flex flex-col rounded-xl border bg-popover text-popover-foreground shadow-lg animate-in fade-in-0 zoom-in-[0.98] slide-in-from-left-1 duration-100"
-            onMouseEnter={cancelClose}
-            onMouseLeave={scheduleClose}
-          >
-            {flyoutContent}
-          </div>,
-          document.body,
-        )}
+        {flyoutOpen &&
+          typeof document !== 'undefined' &&
+          createPortal(
+            <div
+              ref={flyoutRef}
+              style={{
+                position: 'fixed',
+                top: pos.top,
+                left: pos.left,
+                zIndex: 10001,
+              }}
+              className="w-[260px] max-h-[60vh] overflow-hidden flex flex-col rounded-xl border bg-popover text-popover-foreground shadow-lg animate-in fade-in-0 zoom-in-[0.98] slide-in-from-left-1 duration-100"
+              onMouseEnter={cancelClose}
+              onMouseLeave={scheduleClose}
+            >
+              {flyoutContent}
+            </div>,
+            document.body,
+          )}
       </>
     );
   }
@@ -221,14 +276,18 @@ function SessionsFlyout() {
   }, [sessions]);
 
   const getPendingCount = (id: string) => {
-    return Object.values(permissions).filter((p) => p.sessionID === id).length
-      + Object.values(questions).filter((q) => q.sessionID === id).length;
+    return (
+      Object.values(permissions).filter((p) => p.sessionID === id).length +
+      Object.values(questions).filter((q) => q.sessionID === id).length
+    );
   };
 
   return (
     <div className="overflow-y-auto py-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       {rootSessions.length === 0 ? (
-        <div className="px-3 py-8 text-center text-xs text-muted-foreground">No sessions yet</div>
+        <div className="px-3 py-8 text-center text-xs text-muted-foreground">
+          No sessions yet
+        </div>
       ) : (
         rootSessions.map((session) => {
           const active = pathname === `/sessions/${session.id}`;
@@ -252,8 +311,14 @@ function SessionsFlyout() {
                   : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground',
               )}
             >
-              <ThreadIcon iconName={(session as any).icon} className="flex-shrink-0" size={14} />
-              <span className="flex-1 truncate text-left">{session.title || 'Untitled'}</span>
+              <ThreadIcon
+                iconName={(session as any).icon}
+                className="flex-shrink-0"
+                size={14}
+              />
+              <span className="flex-1 truncate text-left">
+                {session.title || 'Untitled'}
+              </span>
               {pending > 0 && (
                 <span className="flex-shrink-0 h-4 min-w-4 px-1 rounded-full bg-amber-500/15 text-amber-500 text-[10px] font-semibold flex items-center justify-center">
                   {pending}
@@ -276,13 +341,18 @@ function ProjectsFlyout() {
 
   const sorted = React.useMemo(() => {
     if (!projects || !Array.isArray(projects)) return [];
-    return [...projects].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    return [...projects].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    );
   }, [projects]);
 
   return (
     <div className="overflow-y-auto py-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       {sorted.length === 0 ? (
-        <div className="px-3 py-8 text-center text-xs text-muted-foreground">No projects yet</div>
+        <div className="px-3 py-8 text-center text-xs text-muted-foreground">
+          No projects yet
+        </div>
       ) : (
         sorted.map((project) => (
           <button
@@ -299,7 +369,9 @@ function ProjectsFlyout() {
           >
             <span className="flex-1 truncate text-left">{project.name}</span>
             {(project.sessionCount ?? 0) > 0 && (
-              <span className="text-[10px] text-muted-foreground/40 tabular-nums">{project.sessionCount}</span>
+              <span className="text-[10px] text-muted-foreground/40 tabular-nums">
+                {project.sessionCount}
+              </span>
             )}
           </button>
         ))
@@ -328,7 +400,15 @@ const changeTypeColor: Record<string, string> = {
 };
 
 function SidebarUpdateIndicator({ collapsed }: { collapsed: boolean }) {
-  const { updateAvailable, latestVersion, currentChannel, changelog, update, isUpdating, updateResult } = useGlobalSandboxUpdate();
+  const {
+    updateAvailable,
+    latestVersion,
+    currentChannel,
+    changelog,
+    update,
+    isUpdating,
+    updateResult,
+  } = useGlobalSandboxUpdate();
   const openDialog = useUpdateDialogStore((s) => s.openDialog);
   const router = useRouter();
   const [dismissed, setDismissed] = React.useState(false);
@@ -346,17 +426,25 @@ function SidebarUpdateIndicator({ collapsed }: { collapsed: boolean }) {
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();
     setDismissed(true);
-    try { localStorage.setItem(dismissKey, 'true'); } catch {}
+    try {
+      localStorage.setItem(dismissKey, 'true');
+    } catch {}
   };
 
   const navigateToChangelog = () => {
     openTabAndNavigate(
-      { id: 'page:/changelog', title: 'Changelog', type: 'page', href: '/changelog' },
+      {
+        id: 'page:/changelog',
+        title: 'Changelog',
+        type: 'page',
+        href: '/changelog',
+      },
       router,
     );
   };
 
-  if (!mounted || !updateAvailable || dismissed || updateResult?.success) return null;
+  if (!mounted || !updateAvailable || dismissed || updateResult?.success)
+    return null;
 
   // ── Collapsed state: icon with pulse dot ──
   if (collapsed) {
@@ -391,7 +479,9 @@ function SidebarUpdateIndicator({ collapsed }: { collapsed: boolean }) {
           {currentChannel === 'dev' ? 'New dev build' : 'New Aether version'}
         </span>
         <span className="flex-1" />
-        <span className="text-[10px] text-muted-foreground flex-shrink-0">v{latestVersion}</span>
+        <span className="text-[10px] text-muted-foreground flex-shrink-0">
+          v{latestVersion}
+        </span>
         <button
           onClick={handleDismiss}
           className="p-0.5 rounded hover:bg-muted/80 transition-colors cursor-pointer flex-shrink-0"
@@ -406,11 +496,14 @@ function SidebarUpdateIndicator({ collapsed }: { collapsed: boolean }) {
         <div className="px-3 pb-1.5 space-y-0.5">
           {previewChanges.map((change, i) => {
             const Icon = changeTypeIcon[change.type] ?? Zap;
-            const color = changeTypeColor[change.type] ?? 'text-muted-foreground';
+            const color =
+              changeTypeColor[change.type] ?? 'text-muted-foreground';
             return (
               <div key={i} className="flex items-start gap-1.5">
                 <Icon className={cn('h-3 w-3 mt-[1px] flex-shrink-0', color)} />
-                <span className="text-[11px] text-muted-foreground leading-tight line-clamp-1">{change.text}</span>
+                <span className="text-[11px] text-muted-foreground leading-tight line-clamp-1">
+                  {change.text}
+                </span>
               </div>
             );
           })}
@@ -443,11 +536,7 @@ function SidebarUpdateIndicator({ collapsed }: { collapsed: boolean }) {
             Updating...
           </div>
         )}
-        <Button
-          onClick={navigateToChangelog}
-          variant="muted"
-          size="toolbar"
-        >
+        <Button onClick={navigateToChangelog} variant="muted" size="toolbar">
           Details
         </Button>
       </div>
@@ -455,7 +544,11 @@ function SidebarUpdateIndicator({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-function UserProfileSection({ user }: { user: { name: string; email: string; avatar: string; isAdmin?: boolean } }) {
+function UserProfileSection({
+  user,
+}: {
+  user: { name: string; email: string; avatar: string; isAdmin?: boolean };
+}) {
   return <UserMenu user={user} />;
 }
 
@@ -473,20 +566,24 @@ function SidebarSections() {
   const { data: projectsData } = useAetherProjects();
   const sortedProjects = React.useMemo(() => {
     if (!projectsData || !Array.isArray(projectsData)) return [];
-    return [...projectsData].sort((a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    return [...projectsData].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
   }, [projectsData]);
 
-  const handleProjectClick = React.useCallback((project: AetherProject) => {
-    openTabAndNavigate({
-      id: `project:${project.id}`,
-      title: project.name,
-      type: 'project',
-      href: `/projects/${encodeURIComponent(project.id)}`,
-    });
-    if (isMobile) setOpenMobile(false);
-  }, [isMobile, setOpenMobile]);
+  const handleProjectClick = React.useCallback(
+    (project: AetherProject) => {
+      openTabAndNavigate({
+        id: `project:${project.id}`,
+        title: project.name,
+        type: 'project',
+        href: `/projects/${encodeURIComponent(project.id)}`,
+      });
+      if (isMobile) setOpenMobile(false);
+    },
+    [isMobile, setOpenMobile],
+  );
 
   // Legacy threads
   const migrateAll = useMigrateAllLegacyThreads();
@@ -494,7 +591,8 @@ function SidebarSections() {
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const { data: migrateStatus } = useMigrateAllStatus(migrateAllStarted);
 
-  const hasLegacy = !legacyLoading && legacyData && legacyData.threads.length > 0;
+  const hasLegacy =
+    !legacyLoading && legacyData && legacyData.threads.length > 0;
   const isMigrating = migrateStatus?.status === 'running';
   const migrateDone = migrateStatus?.status === 'done';
 
@@ -590,15 +688,20 @@ function SidebarSections() {
               <span className="text-[10px] tabular-nums text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
                 {legacyData!.total}
               </span>
-              <ChevronDown className={cn(
-                'h-3.5 w-3.5 text-muted-foreground transition-transform duration-200',
-                !legacyOpen && '-rotate-90',
-              )} />
+              <ChevronDown
+                className={cn(
+                  'h-3.5 w-3.5 text-muted-foreground transition-transform duration-200',
+                  !legacyOpen && '-rotate-90',
+                )}
+              />
             </button>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={(e) => { e.stopPropagation(); setConfirmOpen(true); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConfirmOpen(true);
+                  }}
                   disabled={isMigrating || migrateDone || migrateAll.isPending}
                   className={cn(
                     'flex items-center justify-center h-7 w-7 rounded-lg flex-shrink-0 transition-colors duration-150',
@@ -628,27 +731,41 @@ function SidebarSections() {
             </Tooltip>
           </div>
           {/* Progress bar — always visible when migrating */}
-          {(isMigrating || migrateAll.isPending) && migrateStatus && migrateStatus.total > 0 && (
-            <div className="px-6 pb-1.5">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] text-muted-foreground">
-                  Converting {migrateStatus.completed}/{migrateStatus.total}
-                  {migrateStatus.failed > 0 && <span className="text-destructive"> · {migrateStatus.failed} failed</span>}
-                </span>
+          {(isMigrating || migrateAll.isPending) &&
+            migrateStatus &&
+            migrateStatus.total > 0 && (
+              <div className="px-6 pb-1.5">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] text-muted-foreground">
+                    Converting {migrateStatus.completed}/{migrateStatus.total}
+                    {migrateStatus.failed > 0 && (
+                      <span className="text-destructive">
+                        {' '}
+                        · {migrateStatus.failed} failed
+                      </span>
+                    )}
+                  </span>
+                </div>
+                <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-primary transition-colors duration-300 ease-out"
+                    style={{
+                      width: `${Math.round(((migrateStatus.completed + migrateStatus.failed) / migrateStatus.total) * 100)}%`,
+                    }}
+                  />
+                </div>
               </div>
-              <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-primary transition-colors duration-300 ease-out"
-                  style={{ width: `${Math.round(((migrateStatus.completed + migrateStatus.failed) / migrateStatus.total) * 100)}%` }}
-                />
-              </div>
-            </div>
-          )}
+            )}
           {migrateDone && migrateStatus && (
             <div className="px-6 pb-1.5">
               <span className="text-[10px] text-emerald-600 dark:text-emerald-400">
                 Converted {migrateStatus.completed} chats
-                {migrateStatus.failed > 0 && <span className="text-destructive"> · {migrateStatus.failed} failed</span>}
+                {migrateStatus.failed > 0 && (
+                  <span className="text-destructive">
+                    {' '}
+                    · {migrateStatus.failed} failed
+                  </span>
+                )}
               </span>
             </div>
           )}
@@ -661,7 +778,9 @@ function SidebarSections() {
                     return (
                       <button
                         key={thread.thread_id}
-                        onClick={() => handleLegacyClick(thread.thread_id, thread.name)}
+                        onClick={() =>
+                          handleLegacyClick(thread.thread_id, thread.name)
+                        }
                         className={cn(
                           'flex items-center gap-2 w-full px-3 py-2 rounded-lg text-[13px] cursor-pointer',
                           'transition-colors duration-150',
@@ -670,7 +789,9 @@ function SidebarSections() {
                             : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground',
                         )}
                       >
-                        <span className="flex-1 truncate text-left">{thread.name || 'Untitled'}</span>
+                        <span className="flex-1 truncate text-left">
+                          {thread.name || 'Untitled'}
+                        </span>
                       </button>
                     );
                   })}
@@ -686,12 +807,16 @@ function SidebarSections() {
           <AlertDialogHeader>
             <AlertDialogTitle>Convert all previous chats?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will convert {legacyData?.total ?? 0} previous chats into sessions. The process runs in the background, but may take a few minutes depending on the number of chats.
+              This will convert {legacyData?.total ?? 0} previous chats into
+              sessions. The process runs in the background, but may take a few
+              minutes depending on the number of chats.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleMigrateAll}>Convert all</AlertDialogAction>
+            <AlertDialogAction onClick={handleMigrateAll}>
+              Convert all
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -719,13 +844,16 @@ function ScheduledDeletionCard() {
     staleTime: 30_000,
   });
 
-  const activeSandbox = activeInstanceId && sandboxList
-    ? sandboxList.find((s) => s.sandbox_id === activeInstanceId)
-    : sandbox;
+  const activeSandbox =
+    activeInstanceId && sandboxList
+      ? sandboxList.find((s) => s.sandbox_id === activeInstanceId)
+      : sandbox;
 
   if (!activeSandbox?.cancel_at_period_end) return null;
 
-  const cancelAt = activeSandbox.cancel_at ? new Date(activeSandbox.cancel_at) : null;
+  const cancelAt = activeSandbox.cancel_at
+    ? new Date(activeSandbox.cancel_at)
+    : null;
   const dateStr = cancelAt
     ? cancelAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     : 'billing period end';
@@ -751,7 +879,12 @@ function ScheduledDeletionCard() {
     }
   };
 
-  const daysLeft = cancelAt ? Math.max(0, Math.ceil((cancelAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : null;
+  const daysLeft = cancelAt
+    ? Math.max(
+        0,
+        Math.ceil((cancelAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+      )
+    : null;
 
   return (
     <div className="rounded-xl border border-red-500/30 bg-red-500/5 px-3.5 py-3">
@@ -759,7 +892,11 @@ function ScheduledDeletionCard() {
         Subscription cancelled
       </p>
       <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-        This instance will be deleted {daysLeft !== null ? `in ${daysLeft} day${daysLeft === 1 ? '' : 's'}` : `on ${dateStr}`}. All data will be permanently removed.
+        This instance will be deleted{' '}
+        {daysLeft !== null
+          ? `in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`
+          : `on ${dateStr}`}
+        . All data will be permanently removed.
       </p>
       <Button
         type="button"
@@ -769,13 +906,21 @@ function ScheduledDeletionCard() {
         size="toolbar"
         className="mt-2.5 w-full"
       >
-        {reactivating ? <><Loader2 className="h-3 w-3 animate-spin" /> Reactivating...</> : 'Reactivate'}
+        {reactivating ? (
+          <>
+            <Loader2 className="h-3 w-3 animate-spin" /> Reactivating...
+          </>
+        ) : (
+          'Reactivate'
+        )}
       </Button>
     </div>
   );
 }
 
-export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function SidebarLeft({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
   const { state, setOpen, setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
   // On mobile, the sidebar always shows expanded content inside the Sheet
@@ -783,7 +928,9 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
   const router = useRouter();
   const rawPathname = usePathname();
   const pathname = normalizeAppPathname(rawPathname);
-  const currentInstanceId = getCurrentInstanceIdFromPathname(rawPathname) || getActiveInstanceIdFromCookie();
+  const currentInstanceId =
+    getCurrentInstanceIdFromPathname(rawPathname) ||
+    getActiveInstanceIdFromCookie();
   const searchParams = useSearchParams();
 
   // Project filtering for session list removed — projects page merged into workspace
@@ -806,9 +953,15 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
       const { data } = await supabase.auth.getUser();
       if (data.user) {
         setUser({
-          name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'User',
+          name:
+            data.user.user_metadata?.name ||
+            data.user.email?.split('@')[0] ||
+            'User',
           email: data.user.email || '',
-          avatar: data.user.user_metadata?.avatar_url || data.user.user_metadata?.picture || '',
+          avatar:
+            data.user.user_metadata?.avatar_url ||
+            data.user.user_metadata?.picture ||
+            '',
           isAdmin,
         });
       }
@@ -835,7 +988,11 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
       });
       if (isMobile) setOpenMobile(false);
     } catch {
-      router.push(currentInstanceId ? buildInstancePath(currentInstanceId, '/dashboard') : '/dashboard');
+      router.push(
+        currentInstanceId
+          ? buildInstancePath(currentInstanceId, '/dashboard')
+          : '/dashboard',
+      );
       if (isMobile) setOpenMobile(false);
     }
   }, [createSession, router, isMobile, setOpenMobile, currentInstanceId]);
@@ -905,21 +1062,32 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
               className="group/collapsed absolute inset-0 flex items-center justify-center cursor-pointer"
               onClick={() => {
                 setOpen(true);
-                window.dispatchEvent(new CustomEvent('sidebar-left-toggled', { detail: { expanded: true } }));
+                window.dispatchEvent(
+                  new CustomEvent('sidebar-left-toggled', {
+                    detail: { expanded: true },
+                  }),
+                );
               }}
             >
               {/* Symbol — hides on hover */}
-              <Link href="/dashboard" onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                openTabAndNavigate({
-                  id: 'page:/dashboard',
-                  title: 'Dashboard',
-                  type: 'dashboard',
-                  href: '/dashboard',
-                }, router);
-                if (isMobile) setOpenMobile(false);
-              }} className="flex items-center justify-center group-hover/collapsed:hidden">
+              <Link
+                href="/dashboard"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  openTabAndNavigate(
+                    {
+                      id: 'page:/dashboard',
+                      title: 'Dashboard',
+                      type: 'dashboard',
+                      href: '/dashboard',
+                    },
+                    router,
+                  );
+                  if (isMobile) setOpenMobile(false);
+                }}
+                className="flex items-center justify-center group-hover/collapsed:hidden"
+              >
                 <AetherLogo
                   variant="symbol"
                   size={20}
@@ -929,20 +1097,29 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
               <ChevronRight className="h-3.5 w-3.5 text-sidebar-foreground hidden group-hover/collapsed:block" />
             </div>
           )}
-          <div className={cn(
-            'flex items-center transition-opacity duration-200',
-            effectiveState === 'collapsed' && 'opacity-0 pointer-events-none'
-          )}>
-            <Link href="/dashboard" onClick={(e) => {
-              e.preventDefault();
-              openTabAndNavigate({
-                id: 'page:/dashboard',
-                title: 'Dashboard',
-                type: 'dashboard',
-                href: '/dashboard',
-              }, router);
-              if (isMobile) setOpenMobile(false);
-            }} className="flex items-center">
+          <div
+            className={cn(
+              'flex items-center transition-opacity duration-200',
+              effectiveState === 'collapsed' && 'opacity-0 pointer-events-none',
+            )}
+          >
+            <Link
+              href="/dashboard"
+              onClick={(e) => {
+                e.preventDefault();
+                openTabAndNavigate(
+                  {
+                    id: 'page:/dashboard',
+                    title: 'Dashboard',
+                    type: 'dashboard',
+                    href: '/dashboard',
+                  },
+                  router,
+                );
+                if (isMobile) setOpenMobile(false);
+              }}
+              className="flex items-center"
+            >
               <AetherLogo
                 variant="logomark"
                 size={16}
@@ -954,10 +1131,12 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
           <button
             className={cn(
               'flex items-center justify-center h-7 w-7 rounded-lg transition-colors duration-150 cursor-pointer',
-        'text-sidebar-foreground hover:bg-sidebar-accent',
-              effectiveState === 'collapsed' ? 'opacity-0 pointer-events-none' : 'opacity-100'
+              'text-sidebar-foreground hover:bg-sidebar-accent',
+              effectiveState === 'collapsed'
+                ? 'opacity-0 pointer-events-none'
+                : 'opacity-100',
             )}
-            onClick={() => isMobile ? setOpenMobile(false) : setOpen(false)}
+            onClick={() => (isMobile ? setOpenMobile(false) : setOpen(false))}
             aria-label="Collapse sidebar"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
@@ -968,10 +1147,14 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
       {/* ====== CONTENT ====== */}
       <SidebarContent className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] relative overflow-visible">
         {/* --- Collapsed: icon buttons --- */}
-        <div className={cn(
-          'absolute inset-0 px-2 pt-2 space-y-0.5 flex flex-col items-center',
-          effectiveState === 'collapsed' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        )}>
+        <div
+          className={cn(
+            'absolute inset-0 px-2 pt-2 space-y-0.5 flex flex-col items-center',
+            effectiveState === 'collapsed'
+              ? 'opacity-100 pointer-events-auto'
+              : 'opacity-0 pointer-events-none',
+          )}
+        >
           <CollapsedIconButton
             icon={<SquarePen className="h-4 w-4" />}
             label="New session"
@@ -982,7 +1165,9 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
             icon={<Search className="h-4 w-4" />}
             label="Search"
             onClick={() => {
-              const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.userAgent);
+              const isMac =
+                typeof navigator !== 'undefined' &&
+                /Mac/.test(navigator.userAgent);
               document.dispatchEvent(
                 new KeyboardEvent('keydown', {
                   key: 'k',
@@ -1021,16 +1206,21 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
         </div>
 
         {/* --- Expanded layout --- */}
-        <div className={cn(
-          'flex flex-col h-full min-h-0',
-          effectiveState === 'collapsed' ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'
-        )}>
+        <div
+          className={cn(
+            'flex flex-col h-full min-h-0',
+            effectiveState === 'collapsed'
+              ? 'opacity-0 pointer-events-none'
+              : 'opacity-100 pointer-events-auto',
+          )}
+        >
           {/* Navigation */}
           <nav className="flex-shrink-0 px-3 pt-2 space-y-0.5">
             {/* New session */}
             <button
               onClick={handleNewSession}
               disabled={createSession.isPending}
+              data-testid="new-session-sidebar"
               className={cn(
                 'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-[13px] cursor-pointer',
                 'transition-colors duration-150',
@@ -1039,16 +1229,23 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
               )}
             >
               <SquarePen className="h-4 w-4 flex-shrink-0" />
-              <span className="flex-1 text-left">{createSession.isPending ? 'Creating...' : 'New session'}</span>
+              <span className="flex-1 text-left">
+                {createSession.isPending ? 'Creating...' : 'New session'}
+              </span>
               <kbd className="text-[10px] text-muted-foreground">
-                {typeof navigator !== 'undefined' && /Mac/.test(navigator.userAgent) ? '\u2318J' : 'Ctrl J'}
+                {typeof navigator !== 'undefined' &&
+                /Mac/.test(navigator.userAgent)
+                  ? '\u2318J'
+                  : 'Ctrl J'}
               </kbd>
             </button>
 
             {/* Search */}
             <button
               onClick={() => {
-                const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.userAgent);
+                const isMac =
+                  typeof navigator !== 'undefined' &&
+                  /Mac/.test(navigator.userAgent);
                 document.dispatchEvent(
                   new KeyboardEvent('keydown', {
                     key: 'k',
@@ -1065,7 +1262,10 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
               <Search className="h-4 w-4 flex-shrink-0" />
               <span className="flex-1 text-left">Search</span>
               <kbd className="text-[10px] text-muted-foreground">
-                {typeof navigator !== 'undefined' && /Mac/.test(navigator.userAgent) ? '\u2318K' : 'Ctrl K'}
+                {typeof navigator !== 'undefined' &&
+                /Mac/.test(navigator.userAgent)
+                  ? '\u2318K'
+                  : 'Ctrl K'}
               </kbd>
             </button>
 
@@ -1092,8 +1292,7 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
             </button>
 
             {/* Sessions — expandable, default open */}
-            </nav>
-
+          </nav>
 
           <SidebarSections />
         </div>

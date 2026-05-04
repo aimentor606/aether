@@ -81,7 +81,10 @@ export default function UsageDashboardPage() {
 
   if (unavailable) {
     return (
-      <div className="flex flex-col items-center justify-center flex-1 p-8 gap-4 text-center">
+      <div
+        className="flex flex-col items-center justify-center flex-1 p-8 gap-4 text-center"
+        data-testid="usage-no-data"
+      >
         <AlertCircle className="h-10 w-10 text-muted-foreground" />
         <div>
           <h2 className="text-lg font-semibold">
@@ -100,13 +103,15 @@ export default function UsageDashboardPage() {
     <div className="flex flex-col flex-1 overflow-auto p-6 gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Usage Dashboard</h1>
+          <h1 className="text-xl font-semibold" data-testid="usage-heading">
+            Usage Dashboard
+          </h1>
           <p className="text-sm text-muted-foreground">
             LLM token consumption over time
           </p>
         </div>
         <Tabs value={period} onValueChange={(v) => setPeriod(v as Period)}>
-          <TabsList>
+          <TabsList data-testid="period-selector">
             <TabsTrigger value="7d">7 days</TabsTrigger>
             <TabsTrigger value="30d">30 days</TabsTrigger>
             <TabsTrigger value="90d">90 days</TabsTrigger>
@@ -139,7 +144,7 @@ export default function UsageDashboardPage() {
         />
       </div>
 
-      <Card>
+      <Card data-testid="usage-chart">
         <CardHeader>
           <CardTitle>Daily Token Usage</CardTitle>
           <CardDescription>LLM tokens consumed per day</CardDescription>
@@ -202,7 +207,7 @@ function StatCard({
   loading: boolean;
 }) {
   return (
-    <Card>
+    <Card data-testid="stat-card">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}

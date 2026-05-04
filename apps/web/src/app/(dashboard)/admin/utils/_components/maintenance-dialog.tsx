@@ -25,6 +25,7 @@ interface MaintenanceDialogProps {
   setEndDate: (date: Date | undefined) => void;
   onSave: () => Promise<void>;
   isPending: boolean;
+  'data-testid'?: string;
 }
 
 export function MaintenanceDialog({
@@ -38,9 +39,10 @@ export function MaintenanceDialog({
   setEndDate,
   onSave,
   isPending,
+  'data-testid': dataTestId,
 }: MaintenanceDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} data-testid={dataTestId}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

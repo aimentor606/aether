@@ -2,12 +2,8 @@
 # Shared functions for aether scripts.
 # Usage: source "$(dirname "$0")/lib/common.sh"
 
-# Resolve the monorepo root (one level up from scripts/).
-resolve_root() {
-  cd "$(dirname "${BASH_SOURCE[1]:-$0}")/.." && pwd
-}
-
-ROOT_DIR="$(resolve_root)"
+# Resolve the monorepo root. common.sh lives at scripts/lib/common.sh, so go up 2 levels.
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SELFHOSTED_DIR="$ROOT_DIR/scripts/supabase"
 
 check_docker() {

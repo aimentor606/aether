@@ -1,14 +1,9 @@
 export { ChannelsPage } from './channels.page';
 export { ConnectorsPage } from './connectors.page';
-export { AuthPage } from './auth.page';
 export { ActivateTrialPage, CheckoutPage, NewInstanceModal, CreditPurchaseModal } from './billing.page';
-export { DashboardPage } from './dashboard.page';
 export { FilesPage } from './files.page';
 export { InstancesPage, InstanceDetailPage, InstanceBackupsPage } from './instances.page';
 export { SessionPage } from './session.page';
-export { SettingsApiKeysPage } from './settings-api-keys.page';
-export { SettingsCredentialsPage } from './settings-credentials.page';
-export { SettingsProvidersPage } from './settings-providers.page';
 export { ScheduledTasksPage } from './scheduled-tasks.page';
 export { SkillsPage } from './skills.page';
 export { TerminalPage } from './terminal.page';

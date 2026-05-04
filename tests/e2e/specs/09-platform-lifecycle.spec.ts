@@ -1,33 +1,29 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 import { getAccessToken, apiBase } from '../helpers/auth';
 
-let token: string;
 let createdKeyId: string | null = null;
 
-test.describe('09 — Platform Lifecycle Endpoints', () => {
-  test.beforeAll(async () => {
-    token = await getAccessToken();
-  });
-
-  test.afterAll(async () => {
-    // Cleanup: delete the test API key if it was created
-    if (!createdKeyId) return;
-    try {
-      await fetch(`${apiBase}/platform/api-keys/${createdKeyId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-    } catch {
-      // best-effort cleanup
-    }
-  });
-
-  // ── Sandbox info ──────────────────────────────────────────────────────
-
-  test('GET /v1/platform/sandbox/list — returns sandbox list', async () => {
-    const res = await fetch(`${apiBase}/platform/sandbox/list`, {
+// afterAll does not receive fixtures — use raw fetch for cleanup
+test.afterAll(async () => {
+  if (!createdKeyId) return;
+  try {
+    const token = await getAccessToken();
+    await fetch(`${apiBase}/platform/api-keys/${createdKeyId}`, {
+      method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
+  } catch {
+    // best-effort cleanup
+  }
+});
+
+test.describe('09 — Platform Lifecycle Endpoints', () => {
+  // ── Sandbox info ──────────────────────────────────────────────────────
+
+  test('GET /v1/platform/sandbox/list — returns sandbox list', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/platform/sandbox/list');
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toBeDefined();
@@ -35,10 +31,10 @@ test.describe('09 — Platform Lifecycle Endpoints', () => {
     expect(Array.isArray(body.sandboxes ?? body.data ?? body)).toBe(true);
   });
 
-  test('GET /v1/platform/sandbox — returns active sandbox or 404', async () => {
-    const res = await fetch(`${apiBase}/platform/sandbox`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/platform/sandbox — returns active sandbox or 404', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/platform/sandbox');
     expect([200, 404]).toContain(res.status);
     if (res.status === 200) {
       const body = await res.json();
@@ -46,10 +42,10 @@ test.describe('09 — Platform Lifecycle Endpoints', () => {
     }
   });
 
-  test('GET /v1/platform/providers — returns provider list', async () => {
-    const res = await fetch(`${apiBase}/platform/providers`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/platform/providers — returns provider list', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/platform/providers');
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toBeDefined();
@@ -57,19 +53,19 @@ test.describe('09 — Platform Lifecycle Endpoints', () => {
 
   // ── Version info (public) ─────────────────────────────────────────────
 
-  test('GET /v1/platform/sandbox/version — returns version', async () => {
-    const res = await fetch(`${apiBase}/platform/sandbox/version`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/platform/sandbox/version — returns version', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/platform/sandbox/version');
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toBeDefined();
   });
 
-  test('GET /v1/platform/sandbox/version/latest — returns latest version', async () => {
-    const res = await fetch(`${apiBase}/platform/sandbox/version/latest`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/platform/sandbox/version/latest — returns latest version', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/platform/sandbox/version/latest');
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toBeDefined();
@@ -77,22 +73,18 @@ test.describe('09 — Platform Lifecycle Endpoints', () => {
 
   // ── API Keys CRUD ─────────────────────────────────────────────────────
 
-  test('GET /v1/platform/api-keys — returns key list', async () => {
-    const res = await fetch(`${apiBase}/platform/api-keys`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  test('GET /v1/platform/api-keys — returns key list', async ({ apiFetch }) => {
+    const res = await apiFetch('/platform/api-keys');
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toBeDefined();
   });
 
-  test('POST /v1/platform/api-keys — creates a test key', async () => {
-    const res = await fetch(`${apiBase}/platform/api-keys`, {
+  test('POST /v1/platform/api-keys — creates a test key', async ({
+    apiFetch,
+  }) => {
+    const res = await apiFetch('/platform/api-keys', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({ title: 'E2E Test Key', expiresInDays: '1' }),
     });
     expect(res.status).toBe(200);
@@ -104,16 +96,14 @@ test.describe('09 — Platform Lifecycle Endpoints', () => {
     expect(createdKeyId).toBeTruthy();
   });
 
-  test('created API key appears in GET list', async () => {
+  test('created API key appears in GET list', async ({ apiFetch }) => {
     // Ensure the key was created before checking
     if (!createdKeyId) {
       test.skip();
       return;
     }
 
-    const res = await fetch(`${apiBase}/platform/api-keys`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await apiFetch('/platform/api-keys');
     expect(res.status).toBe(200);
     const body = await res.json();
 
@@ -128,28 +118,30 @@ test.describe('09 — Platform Lifecycle Endpoints', () => {
     expect(found).toBe(true);
   });
 
-  test('PATCH /v1/platform/api-keys/{keyId}/revoke — revokes the test key', async () => {
+  test('PATCH /v1/platform/api-keys/{keyId}/revoke — revokes the test key', async ({
+    apiFetch,
+  }) => {
     if (!createdKeyId) {
       test.skip();
       return;
     }
 
-    const res = await fetch(`${apiBase}/platform/api-keys/${createdKeyId}/revoke`, {
+    const res = await apiFetch(`/platform/api-keys/${createdKeyId}/revoke`, {
       method: 'PATCH',
-      headers: { Authorization: `Bearer ${token}` },
     });
     expect(res.status).toBe(200);
   });
 
-  test('DELETE /v1/platform/api-keys/{keyId} — deletes the test key', async () => {
+  test('DELETE /v1/platform/api-keys/{keyId} — deletes the test key', async ({
+    apiFetch,
+  }) => {
     if (!createdKeyId) {
       test.skip();
       return;
     }
 
-    const res = await fetch(`${apiBase}/platform/api-keys/${createdKeyId}`, {
+    const res = await apiFetch(`/platform/api-keys/${createdKeyId}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
     });
     expect(res.status).toBe(200);
 
@@ -159,11 +151,11 @@ test.describe('09 — Platform Lifecycle Endpoints', () => {
 
   // ── Backups (read-only, may 404) ──────────────────────────────────────
 
-  test('GET /v1/platform/sandbox/{sandboxId}/backups — may 404 if no sandbox', async () => {
+  test('GET /v1/platform/sandbox/{sandboxId}/backups — may 404 if no sandbox', async ({
+    apiFetch,
+  }) => {
     // First try to obtain a sandbox ID from the list endpoint
-    const listRes = await fetch(`${apiBase}/platform/sandbox/list`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const listRes = await apiFetch('/platform/sandbox/list');
     expect(listRes.status).toBe(200);
     const listBody = await listRes.json();
 
@@ -180,9 +172,7 @@ test.describe('09 — Platform Lifecycle Endpoints', () => {
       return;
     }
 
-    const res = await fetch(`${apiBase}/platform/sandbox/${sandboxId}/backups`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await apiFetch(`/platform/sandbox/${sandboxId}/backups`);
     // May 404 if sandbox has no backups
     expect([200, 404]).toContain(res.status);
   });

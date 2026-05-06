@@ -20,3 +20,5 @@ export { useAdminStressTest } from './hooks/use-admin-stress-test';
 export { useAdminSystemStatus, type SystemStatus, type MaintenanceNotice, type TechnicalIssue } from './hooks/use-admin-system-status';
 export { useFeatureFlags, type FeatureFlag, type FeatureFlagCreateParams } from './hooks/use-feature-flags';
 export { useLLMCredentials } from './hooks/use-llm-credentials';
+export { useModelPlayground, streamChatCompletion, type PlaygroundModel, type ChatMessage, type ChatCompletionChunk, type TokenUsage } from './hooks/use-model-playground';
+export { useDeveloperKeys, type DeveloperKey, type CreateDeveloperKeyParams, type CreateDeveloperKeyResult } from './hooks/use-developer-keys';

@@ -1,7 +1,7 @@
 'use client';
 
 import { Badge } from '@aether/ui/primitives';
-import type { TokenUsage } from '../types';
+import type { TokenUsage } from '@aether/sdk/client';
 
 interface TokenUsageBarProps {
   usage: TokenUsage | null | undefined;
@@ -19,7 +19,10 @@ export function TokenUsageBar({ usage }: TokenUsageBarProps) {
         {usage.completionTokens.toLocaleString()} out
       </Badge>
       {usage.estimatedCost != null && (
-        <Badge variant="outline" className="text-[10px] font-mono text-emerald-600 border-emerald-200">
+        <Badge
+          variant="outline"
+          className="text-[10px] font-mono text-emerald-600 border-emerald-200"
+        >
           ${usage.estimatedCost.toFixed(4)}
         </Badge>
       )}

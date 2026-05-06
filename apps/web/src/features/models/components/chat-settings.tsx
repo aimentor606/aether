@@ -21,7 +21,9 @@ export function ChatSettings({ settings, onChange }: ChatSettingsProps) {
         className="w-full flex items-center justify-between px-4 py-2 text-sm hover:bg-muted/50 transition-colors"
       >
         <span className="text-muted-foreground">Settings</span>
-        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {open && (
@@ -37,16 +39,31 @@ export function ChatSettings({ settings, onChange }: ChatSettingsProps) {
                 max={2}
                 step={0.1}
                 value={settings.temperature}
-                onChange={(e) => onChange({ ...settings, temperature: parseFloat(e.target.value) })}
+                onChange={(e) =>
+                  onChange({
+                    ...settings,
+                    temperature: parseFloat(e.target.value),
+                  })
+                }
                 className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-muted"
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Max Tokens</label>
+              <label className="text-xs text-muted-foreground mb-1 block">
+                Max Tokens
+              </label>
               <Input
                 type="number"
                 value={settings.maxTokens}
-                onChange={(e) => onChange({ ...settings, maxTokens: parseInt(e.target.value) || 4096 })}
+                onChange={(e) =>
+                  onChange({
+                    ...settings,
+                    maxTokens: Math.max(
+                      1,
+                      Math.min(128000, parseInt(e.target.value) || 4096),
+                    ),
+                  })
+                }
                 min={1}
                 max={128000}
                 className="h-8 text-sm"
@@ -54,10 +71,14 @@ export function ChatSettings({ settings, onChange }: ChatSettingsProps) {
             </div>
           </div>
           <div>
-            <label className="text-xs text-muted-foreground mb-1 block">System Prompt</label>
+            <label className="text-xs text-muted-foreground mb-1 block">
+              System Prompt
+            </label>
             <Textarea
               value={settings.systemPrompt}
-              onChange={(e) => onChange({ ...settings, systemPrompt: e.target.value })}
+              onChange={(e) =>
+                onChange({ ...settings, systemPrompt: e.target.value })
+              }
               placeholder="Optional system prompt..."
               rows={2}
               className="text-sm resize-none"

@@ -9,21 +9,37 @@ interface ModelSidebarProps {
   selectedModel: string;
   onSelect: (modelId: string) => void;
   isLoading?: boolean;
+  error?: boolean;
 }
 
-export function ModelSidebar({ models, selectedModel, onSelect, isLoading }: ModelSidebarProps) {
+export function ModelSidebar({
+  models,
+  selectedModel,
+  onSelect,
+  isLoading,
+  error,
+}: ModelSidebarProps) {
   const current = models.find((m) => m.id === selectedModel);
 
   return (
     <div className="w-64 border-r flex flex-col">
       <div className="p-4 border-b">
         <h2 className="text-sm font-semibold">Models</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">{models.length} available</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {models.length} available
+        </p>
       </div>
       <ScrollArea className="flex-1">
         <div className="p-2">
           {isLoading && (
-            <p className="text-sm text-muted-foreground p-2">Loading models...</p>
+            <p className="text-sm text-muted-foreground p-2">
+              Loading models...
+            </p>
+          )}
+          {error && (
+            <p className="text-sm text-destructive p-2">
+              Failed to load models. Please refresh.
+            </p>
           )}
           {models.map((model) => (
             <button
@@ -36,7 +52,9 @@ export function ModelSidebar({ models, selectedModel, onSelect, isLoading }: Mod
                   : 'hover:bg-muted text-foreground'
               }`}
             >
-              <div className="text-sm font-medium truncate">{model.display_name}</div>
+              <div className="text-sm font-medium truncate">
+                {model.display_name}
+              </div>
               <div className="text-xs text-muted-foreground mt-0.5">
                 {model.owned_by} · {model.tier}
               </div>
@@ -47,13 +65,20 @@ export function ModelSidebar({ models, selectedModel, onSelect, isLoading }: Mod
 
       {current && (
         <div className="p-3 border-t text-xs text-muted-foreground space-y-1.5">
-          <div>Context: {((current.context_window / 1024) | 0)}K tokens</div>
           <div>
-            Pricing: ${current.pricing.input.toFixed(2)} / ${current.pricing.output.toFixed(2)} per 1M tokens
+            Context: {Math.floor(current.context_window / 1024)}K tokens
+          </div>
+          <div>
+            Pricing: ${current.pricing.input.toFixed(2)} / $
+            {current.pricing.output.toFixed(2)} per 1M tokens
           </div>
           <div className="flex flex-wrap gap-1 mt-1">
             {current.capabilities.map((cap) => (
-              <Badge key={cap} variant="secondary" className="text-[10px] px-1.5 py-0">
+              <Badge
+                key={cap}
+                variant="secondary"
+                className="text-[10px] px-1.5 py-0"
+              >
                 {cap}
               </Badge>
             ))}

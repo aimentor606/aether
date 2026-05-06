@@ -1,7 +1,12 @@
 import { useState, useRef, useCallback } from 'react';
-import { useApiClient, streamChatCompletion, useModelPlayground } from '@aether/sdk/client';
+import {
+  useApiClient,
+  streamChatCompletion,
+  useModelPlayground,
+} from '@aether/sdk/client';
 import type { ChatMessage } from '@aether/sdk/client';
 import type { PlaygroundMessage, ModelSettings } from '../types';
+import { getAuthToken } from '@/lib/auth-token';
 
 export function usePlaygroundChat() {
   const client = useApiClient();
@@ -14,6 +19,7 @@ export function usePlaygroundChat() {
     systemPrompt: '',
   });
   const [isStreaming, setIsStreaming] = useState(false);
+  const [input, setInput] = useState('');
   const abortRef = useRef<AbortController | null>(null);
 
   const sendMessage = useCallback(
@@ -34,30 +40,39 @@ export function usePlaygroundChat() {
         status: 'streaming',
       };
 
-      const newMessages = [...messages, userMsg, assistantMsg];
-      setMessages(newMessages);
-      setIsStreaming(true);
+      setMessages((prev) => [...prev, userMsg, assistantMsg]);
 
       const chatHistory: ChatMessage[] = [
-        ...(settings.systemPrompt ? [{ role: 'system' as const, content: settings.systemPrompt }] : []),
-        ...messages.filter((m) => m.content && m.status === 'done').map((m) => ({ role: m.role, content: m.content })),
+        ...(settings.systemPrompt
+          ? [{ role: 'system' as const, content: settings.systemPrompt }]
+          : []),
+        ...messages
+          .filter((m) => m.content && m.status === 'done')
+          .map((m) => ({ role: m.role, content: m.content })),
         { role: 'user' as const, content: trimmed },
       ];
 
-      const controller = await streamChatCompletion(
+      const token = await getAuthToken();
+
+      // Start streaming — returns AbortController synchronously
+      const controller = streamChatCompletion(
         chatHistory,
         selectedModel,
         (chunk) => {
           setMessages((prev) =>
             prev.map((m) =>
-              m.id === assistantMsg.id ? { ...m, content: m.content + chunk } : m,
+              m.id === assistantMsg.id
+                ? { ...m, content: m.content + chunk }
+                : m,
             ),
           );
         },
         (usage) => {
           setMessages((prev) =>
             prev.map((m) =>
-              m.id === assistantMsg.id ? { ...m, status: 'done' as const, usage: usage ?? undefined } : m,
+              m.id === assistantMsg.id
+                ? { ...m, status: 'done' as const, usage: usage ?? undefined }
+                : m,
             ),
           );
           setIsStreaming(false);
@@ -66,15 +81,25 @@ export function usePlaygroundChat() {
           setMessages((prev) =>
             prev.map((m) =>
               m.id === assistantMsg.id
-                ? { ...m, content: m.content || `Error: ${error}`, status: 'error' as const }
+                ? {
+                    ...m,
+                    content: m.content || `Error: ${error}`,
+                    status: 'error' as const,
+                  }
                 : m,
             ),
           );
           setIsStreaming(false);
         },
+        undefined,
+        token ?? undefined,
+        { temperature: settings.temperature, maxTokens: settings.maxTokens },
       );
 
+      // Store controller BEFORE setting streaming state so Stop button works immediately
       abortRef.current = controller;
+      setIsStreaming(true);
+      setInput('');
     },
     [selectedModel, isStreaming, messages, settings],
   );
@@ -83,7 +108,9 @@ export function usePlaygroundChat() {
     abortRef.current?.abort();
     setIsStreaming(false);
     setMessages((prev) =>
-      prev.map((m) => (m.status === 'streaming' ? { ...m, status: 'done' as const } : m)),
+      prev.map((m) =>
+        m.status === 'streaming' ? { ...m, status: 'done' as const } : m,
+      ),
     );
   }, []);
 
@@ -99,6 +126,8 @@ export function usePlaygroundChat() {
     settings,
     setSettings,
     isStreaming,
+    input,
+    setInput,
     sendMessage,
     stopGeneration,
     clearChat,

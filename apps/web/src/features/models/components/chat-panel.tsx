@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { Trash2 } from 'lucide-react';
 import { Button } from '@aether/ui/primitives';
 import { ChatSettings } from './chat-settings';
@@ -13,6 +13,8 @@ interface ChatPanelProps {
   messages: PlaygroundMessage[];
   settings: ModelSettings;
   isStreaming: boolean;
+  input: string;
+  onInputChange: (value: string) => void;
   onSettingsChange: (settings: ModelSettings) => void;
   onSend: (text: string) => void;
   onStop: () => void;
@@ -25,16 +27,25 @@ export function ChatPanel({
   messages,
   settings,
   isStreaming,
+  input,
+  onInputChange,
   onSettingsChange,
   onSend,
   onStop,
   onClear,
 }: ChatPanelProps) {
-  const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isNearBottomRef = useRef(true);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    isNearBottomRef.current =
+      el.scrollTop + el.clientHeight >= el.scrollHeight - 50;
+  }, []);
 
   useEffect(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && isNearBottomRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
@@ -45,7 +56,6 @@ export function ChatPanel({
         e.preventDefault();
         if (input.trim() && !isStreaming) {
           onSend(input);
-          setInput('');
         }
       }
     },
@@ -63,8 +73,15 @@ export function ChatPanel({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs bg-muted px-2.5 py-1 rounded-full">{modelName}</span>
-          <Button variant="ghost" size="icon" onClick={onClear} title="Clear chat">
+          <span className="text-xs bg-muted px-2.5 py-1 rounded-full">
+            {modelName}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClear}
+            title="Clear chat"
+          >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -74,15 +91,19 @@ export function ChatPanel({
       <ChatSettings settings={settings} onChange={onSettingsChange} />
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-auto p-6 space-y-4">
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-auto p-6 space-y-4"
+      >
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <h3 className="text-lg font-medium text-muted-foreground">
               Select a model and start chatting
             </h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-md">
-              Try different models. Responses stream in real-time.
-              Token usage and cost are shown after each response.
+              Try different models. Responses stream in real-time. Token usage
+              and cost are shown after each response.
             </p>
           </div>
         )}
@@ -96,7 +117,7 @@ export function ChatPanel({
         <div className="flex gap-2">
           <textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => onInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={modelId ? `Send a message...` : 'Select a model first'}
             disabled={!modelId || isStreaming}
@@ -112,7 +133,6 @@ export function ChatPanel({
               onClick={() => {
                 if (input.trim()) {
                   onSend(input);
-                  setInput('');
                 }
               }}
               disabled={!input.trim() || !modelId}

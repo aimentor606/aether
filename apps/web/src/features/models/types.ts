@@ -1,12 +1,6 @@
-import type { ChatMessage } from '@aether/sdk/client';
+import type { ChatMessage, TokenUsage } from '@aether/sdk/client';
 
-export interface TokenUsage {
-  promptTokens: number;
-  completionTokens: number;
-  totalTokens: number;
-  estimatedCost?: number;
-}
-
+export type { TokenUsage };
 export type MessageStatus = 'streaming' | 'done' | 'error';
 
 export interface PlaygroundMessage extends ChatMessage {

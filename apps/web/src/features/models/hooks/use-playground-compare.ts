@@ -1,9 +1,16 @@
-import { useState, useRef, useCallback } from 'react';
-import { useApiClient, streamChatCompletion, useModelPlayground } from '@aether/sdk/client';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import {
+  useApiClient,
+  streamChatCompletion,
+  useModelPlayground,
+} from '@aether/sdk/client';
 import type { ChatMessage } from '@aether/sdk/client';
-import type { PlaygroundMessage, TokenUsage } from '../types';
+import type { PlaygroundMessage } from '../types';
+import type { TokenUsage } from '@aether/sdk/client';
+import { getAuthToken } from '@/lib/auth-token';
 
 export interface CompareInstance {
+  id: string;
   modelId: string;
   messages: PlaygroundMessage[];
   isStreaming: boolean;
@@ -16,11 +23,28 @@ export function usePlaygroundCompare() {
   const modelList = models.data ?? [];
 
   const [instances, setInstances] = useState<CompareInstance[]>([
-    { modelId: modelList[0]?.id ?? '', messages: [], isStreaming: false },
-    { modelId: modelList[1]?.id ?? '', messages: [], isStreaming: false },
+    { id: crypto.randomUUID(), modelId: '', messages: [], isStreaming: false },
+    { id: crypto.randomUUID(), modelId: '', messages: [], isStreaming: false },
   ]);
   const [input, setInput] = useState('');
   const abortRefs = useRef<AbortController[]>([]);
+  // Track latest instances for chat history without stale closure
+  const instancesRef = useRef(instances);
+  instancesRef.current = instances;
+
+  // Auto-populate model selectors when models load
+  useEffect(() => {
+    if (modelList.length === 0) return;
+    setInstances((prev) => {
+      const needsUpdate = prev.some((inst) => !inst.modelId);
+      if (!needsUpdate) return prev;
+      return prev.map((inst, i) => {
+        if (inst.modelId) return inst;
+        const model = modelList[i] ?? modelList[0];
+        return { ...inst, modelId: model?.id ?? '' };
+      });
+    });
+  }, [modelList]);
 
   const setInstanceModel = useCallback((index: number, modelId: string) => {
     setInstances((prev) =>
@@ -33,45 +57,67 @@ export function usePlaygroundCompare() {
       const trimmed = text.trim();
       if (!trimmed) return;
 
-      const anyStreaming = instances.some((inst) => inst.isStreaming);
-      if (anyStreaming) return;
+      // Guard against concurrent calls via functional updater
+      let blocked = false;
+      setInstances((prev) => {
+        if (prev.some((inst) => inst.isStreaming)) {
+          blocked = true;
+          return prev;
+        }
+        return prev;
+      });
+      if (blocked) return;
 
+      const token = await getAuthToken();
       abortRefs.current = [];
 
-      const updatedInstances = instances.map((inst) => {
-        if (!inst.modelId) return inst;
-        const userMsg: PlaygroundMessage = {
-          id: crypto.randomUUID(),
-          role: 'user',
-          content: trimmed,
-          status: 'done',
-        };
-        const assistantMsg: PlaygroundMessage = {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: '',
-          status: 'streaming',
-        };
-        return {
-          ...inst,
-          messages: [...inst.messages, userMsg, assistantMsg],
-          isStreaming: true,
-          usage: undefined,
-        };
-      });
+      // Pre-generate message IDs for callbacks
+      const current = instancesRef.current;
+      const ids = current.map(() => ({
+        user: crypto.randomUUID(),
+        assistant: crypto.randomUUID(),
+      }));
 
-      setInstances(updatedInstances);
+      setInstances((prev) =>
+        prev.map((inst, i) => {
+          if (!inst.modelId) return inst;
+          return {
+            ...inst,
+            messages: [
+              ...inst.messages,
+              {
+                id: ids[i].user,
+                role: 'user' as const,
+                content: trimmed,
+                status: 'done' as const,
+              },
+              {
+                id: ids[i].assistant,
+                role: 'assistant' as const,
+                content: '',
+                status: 'streaming' as const,
+              },
+            ],
+            isStreaming: true,
+            usage: undefined,
+          };
+        }),
+      );
 
-      for (let i = 0; i < updatedInstances.length; i++) {
-        const inst = updatedInstances[i];
-        if (!inst.modelId) continue;
+      current.forEach((inst, i) => {
+        if (!inst.modelId) return;
 
-        const assistantMsgId = inst.messages[inst.messages.length - 1].id;
-        const chatHistory: ChatMessage[] = inst.messages
-          .filter((m) => m.content && m.status === 'done')
-          .map((m) => ({ role: m.role, content: m.content }));
+        const assistantId = ids[i].assistant;
+        // Build history from ref (latest state), excluding in-flight messages
+        const chatHistory: ChatMessage[] = [
+          ...inst.messages
+            .filter((m) => m.content && m.status === 'done')
+            .map((m) => ({ role: m.role, content: m.content })),
+          { role: 'user' as const, content: trimmed },
+        ];
 
-        streamChatCompletion(
+        // streamChatCompletion returns AbortController synchronously
+        const controller = streamChatCompletion(
           chatHistory,
           inst.modelId,
           (chunk) => {
@@ -82,7 +128,9 @@ export function usePlaygroundCompare() {
                   : {
                       ...p,
                       messages: p.messages.map((m) =>
-                        m.id === assistantMsgId ? { ...m, content: m.content + chunk } : m,
+                        m.id === assistantId
+                          ? { ...m, content: m.content + chunk }
+                          : m,
                       ),
                     },
               ),
@@ -98,7 +146,13 @@ export function usePlaygroundCompare() {
                       isStreaming: false,
                       usage: usage ?? undefined,
                       messages: p.messages.map((m) =>
-                        m.id === assistantMsgId ? { ...m, status: 'done' as const, usage: usage ?? undefined } : m,
+                        m.id === assistantId
+                          ? {
+                              ...m,
+                              status: 'done' as const,
+                              usage: usage ?? undefined,
+                            }
+                          : m,
                       ),
                     },
               ),
@@ -113,22 +167,28 @@ export function usePlaygroundCompare() {
                       ...p,
                       isStreaming: false,
                       messages: p.messages.map((m) =>
-                        m.id === assistantMsgId
-                          ? { ...m, content: m.content || `Error: ${error}`, status: 'error' as const }
+                        m.id === assistantId
+                          ? {
+                              ...m,
+                              content: m.content || `Error: ${error}`,
+                              status: 'error' as const,
+                            }
                           : m,
                       ),
                     },
               ),
             );
           },
-        ).then((controller) => {
-          abortRefs.current[i] = controller;
-        });
-      }
+          undefined,
+          token ?? undefined,
+        );
+
+        abortRefs.current[i] = controller;
+      });
 
       setInput('');
     },
-    [instances],
+    [], // instancesRef removes the need for `instances` in deps
   );
 
   const stopAll = useCallback(() => {

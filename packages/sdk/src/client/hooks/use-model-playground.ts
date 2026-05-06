@@ -65,7 +65,12 @@ export function useModelPlayground(client: ApiClient) {
 
 // ─── Streaming helper (not a hook — called imperatively) ────────────────────
 
-export async function streamChatCompletion(
+export interface StreamChatOptions {
+  temperature?: number;
+  maxTokens?: number;
+}
+
+export function streamChatCompletion(
   messages: ChatMessage[],
   modelId: string,
   onChunk: (text: string) => void,
@@ -73,101 +78,128 @@ export async function streamChatCompletion(
   onError: (error: string) => void,
   onUsage?: (usage: TokenUsage) => void,
   authToken?: string,
-): Promise<AbortController> {
+  options?: StreamChatOptions,
+): AbortController {
   const controller = new AbortController();
 
-  try {
-    const response = await fetch('/v1/router/playground/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-      },
-      body: JSON.stringify({
-        model: modelId,
-        messages,
-        stream: true,
-        stream_options: { include_usage: true },
-      }),
-      signal: controller.signal,
-    });
+  // Start streaming in background; return controller immediately so caller can abort
+  (async () => {
+    try {
+      const response = await fetch('/v1/router/playground/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+        },
+        body: JSON.stringify({
+          model: modelId,
+          messages,
+          stream: true,
+          stream_options: { include_usage: true },
+          ...(options?.temperature != null ? { temperature: options.temperature } : {}),
+          ...(options?.maxTokens != null ? { max_tokens: options.maxTokens } : {}),
+        }),
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      onError(errorText);
-      return controller;
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) {
-      onError('No response body');
-      return controller;
-    }
-
-    const decoder = new TextDecoder();
-    let buffer = '';
-    let lastUsage: TokenUsage | undefined;
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() ?? '';
-
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed || !trimmed.startsWith('data: ')) continue;
-        const data = trimmed.slice(6);
-        if (data === '[DONE]') {
-          onDone(lastUsage);
-          return controller;
-        }
-
-        // Check for named event: aether_usage
-        if (trimmed.startsWith('event: aether_usage')) continue;
-
+      if (!response.ok) {
+        const text = await response.text();
+        let errorMsg = `Request failed (${response.status})`;
         try {
-          const chunk = JSON.parse(data) as ChatCompletionChunk;
-
-          // Extract usage if present (final chunk from stream_options)
-          if (chunk.usage?.total_tokens) {
-            lastUsage = {
-              promptTokens: chunk.usage.prompt_tokens,
-              completionTokens: chunk.usage.completion_tokens,
-              totalTokens: chunk.usage.total_tokens,
-            };
-          }
-
-          const content = chunk.choices?.[0]?.delta?.content;
-          if (content) {
-            onChunk(content);
-          }
-          if (chunk.choices?.[0]?.finish_reason === 'stop') {
-            onDone(lastUsage);
-            return controller;
-          }
+          const json = JSON.parse(text);
+          errorMsg = json.error || json.message || errorMsg;
         } catch {
-          // Skip malformed chunks — could be aether_usage event data
+          if (text.length > 0 && text.length < 200) errorMsg = text;
+        }
+        onError(errorMsg);
+        return;
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        onError('No response body');
+        return;
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let lastUsage: TokenUsage | undefined;
+      let currentEvent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+
+          // Track SSE event type
+          if (trimmed.startsWith('event: ')) {
+            currentEvent = trimmed.slice(7);
+            continue;
+          }
+
+          if (!trimmed.startsWith('data: ')) continue;
+          const data = trimmed.slice(6);
+
+          if (data === '[DONE]') {
+            onDone(lastUsage);
+            return;
+          }
+
+          // Handle aether_usage named event
+          if (currentEvent === 'aether_usage') {
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.promptTokens != null) {
+                lastUsage = parsed as TokenUsage;
+                onUsage?.(lastUsage);
+              }
+            } catch {
+              // Malformed usage data
+            }
+            currentEvent = '';
+            continue;
+          }
+
+          currentEvent = '';
+
           try {
-            const parsed = JSON.parse(data);
-            if (parsed.promptTokens != null) {
-              lastUsage = parsed as TokenUsage;
-              onUsage?.(lastUsage);
+            const chunk = JSON.parse(data) as ChatCompletionChunk;
+
+            if (chunk.usage?.total_tokens) {
+              lastUsage = {
+                promptTokens: chunk.usage.prompt_tokens,
+                completionTokens: chunk.usage.completion_tokens,
+                totalTokens: chunk.usage.total_tokens,
+              };
+            }
+
+            const content = chunk.choices?.[0]?.delta?.content;
+            if (content) {
+              onChunk(content);
+            }
+            if (chunk.choices?.[0]?.finish_reason === 'stop') {
+              onDone(lastUsage);
+              return;
             }
           } catch {
-            // Truly malformed, skip
+            // Malformed chunk
           }
         }
       }
-    }
 
-    onDone(lastUsage);
-  } catch (err) {
-    if (controller.signal.aborted) return controller;
-    onError(err instanceof Error ? err.message : 'Unknown error');
-  }
+      onDone(lastUsage);
+    } catch (err) {
+      if (controller.signal.aborted) return;
+      onError(err instanceof Error ? err.message : 'Unknown error');
+    }
+  })();
 
   return controller;
 }

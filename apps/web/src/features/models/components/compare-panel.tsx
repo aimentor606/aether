@@ -63,7 +63,7 @@ export function ComparePanel({
       {/* Model selectors row */}
       <div className="grid grid-cols-2 gap-px bg-border">
         {instances.map((inst, i) => (
-          <div key={i} className="bg-background p-3">
+          <div key={inst.id} className="bg-background p-3">
             <Select
               value={inst.modelId}
               onValueChange={(val) => onSetModel(i, val)}
@@ -85,12 +85,17 @@ export function ComparePanel({
 
       {/* Comparison columns */}
       <div className="flex-1 grid grid-cols-2 gap-px bg-border overflow-hidden">
-        {instances.map((inst, i) => (
-          <div key={i} className="bg-background overflow-auto p-4 space-y-4">
+        {instances.map((inst) => (
+          <div
+            key={inst.id}
+            className="bg-background overflow-auto p-4 space-y-4"
+          >
             {inst.messages.length === 0 && (
               <div className="flex items-center justify-center h-full text-center">
                 <p className="text-sm text-muted-foreground">
-                  {inst.modelId ? 'Send a message to compare responses' : 'Select a model above'}
+                  {inst.modelId
+                    ? 'Send a message to compare responses'
+                    : 'Select a model above'}
                 </p>
               </div>
             )}
@@ -109,7 +114,11 @@ export function ComparePanel({
             value={input}
             onChange={(e) => onInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={allModelsSelected ? 'Send the same prompt to both models...' : 'Select models first'}
+            placeholder={
+              allModelsSelected
+                ? 'Send the same prompt to both models...'
+                : 'Select models first'
+            }
             disabled={!allModelsSelected || anyStreaming}
             rows={1}
             className="flex-1 resize-none rounded-lg border bg-background px-4 py-2.5 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/20 disabled:opacity-50"

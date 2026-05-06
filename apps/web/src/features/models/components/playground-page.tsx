@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@aether/ui/primitives';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from '@aether/ui/primitives';
 import { usePlaygroundChat } from '../hooks/use-playground-chat';
 import { usePlaygroundCompare } from '../hooks/use-playground-compare';
 import { ModelSidebar } from './model-sidebar';
@@ -23,7 +28,10 @@ export function PlaygroundPage() {
   }, [modelList, chat.selectedModel]);
 
   return (
-    <div className="relative flex h-full w-full" data-testid="models-playground">
+    <div
+      className="relative flex h-full w-full"
+      data-testid="models-playground"
+    >
       <Tabs defaultValue="chat" className="flex flex-1 flex-col">
         {/* Tab bar */}
         <div className="absolute right-4 top-3 z-10">
@@ -40,6 +48,7 @@ export function PlaygroundPage() {
             selectedModel={chat.selectedModel}
             onSelect={chat.setSelectedModel}
             isLoading={chat.models.isLoading}
+            error={chat.models.isError}
           />
           <ChatPanel
             modelId={chat.selectedModel}
@@ -47,6 +56,8 @@ export function PlaygroundPage() {
             messages={chat.messages}
             settings={chat.settings}
             isStreaming={chat.isStreaming}
+            input={chat.input}
+            onInputChange={chat.setInput}
             onSettingsChange={chat.setSettings}
             onSend={chat.sendMessage}
             onStop={chat.stopGeneration}

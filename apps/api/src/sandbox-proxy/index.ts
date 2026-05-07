@@ -2,8 +2,10 @@ import { Hono } from 'hono';
 import { eq, and, ne } from 'drizzle-orm';
 import { sandboxes } from '@aether/db';
 import { config } from '../config';
+import { combinedAuth } from '../middleware/auth';
 import { getAuthToken } from './routes/auth';
 import { shareApp } from './routes/share';
+import { proxyToSandbox } from './routes/local-preview';
 import { db } from '../shared/db';
 
 const sandboxProxyApp = new Hono();
@@ -15,6 +17,42 @@ sandboxProxyApp.route('/auth', getAuthToken);
 // ── Public URL share endpoint ───────────────────────────────────────────────
 // POST /v1/p/share — returns a shareable URL for a sandbox port.
 sandboxProxyApp.route('/share', shareApp);
+
+// ── Catch-all proxy to sandbox ──────────────────────────────────────────────
+// /v1/p/{sandboxId}/{port}/* → forwards to sandbox's aether-master (port 8000)
+// or sandbox's port proxy for other ports.
+sandboxProxyApp.use('/:sandboxId/:port/*', combinedAuth);
+sandboxProxyApp.use('/:sandboxId/:port', combinedAuth);
+
+sandboxProxyApp.all('/:sandboxId/:port/*', async (c) => {
+  const sandboxId = c.req.param('sandboxId');
+  const port = parseInt(c.req.param('port'), 10);
+  if (isNaN(port) || port < 1 || port > 65535) {
+    return c.json({ error: `Invalid port: ${c.req.param('port')}` }, 400);
+  }
+
+  const fullPath = new URL(c.req.url).pathname;
+  const prefix = `/${sandboxId}/${port}`;
+  const idx = fullPath.indexOf(prefix);
+  const remainingPath = idx !== -1 ? fullPath.slice(idx + prefix.length) || '/' : '/';
+  const queryString = new URL(c.req.url).search;
+
+  const method = c.req.method;
+  let body: ArrayBuffer | undefined;
+  if (method !== 'GET' && method !== 'HEAD') {
+    body = await c.req.raw.arrayBuffer();
+  }
+
+  const origin = c.req.header('Origin') || '';
+
+  return proxyToSandbox(sandboxId, port, method, remainingPath, queryString, c.req.raw.headers, body, false, origin);
+});
+
+sandboxProxyApp.all('/:sandboxId/:port', async (c) => {
+  const sandboxId = c.req.param('sandboxId');
+  const port = c.req.param('port');
+  return c.redirect(`/${sandboxId}/${port}/`, 301);
+});
 
 // ── Provider cache ──────────────────────────────────────────────────────────
 // Cache sandbox provider lookups to avoid a DB query on every request.

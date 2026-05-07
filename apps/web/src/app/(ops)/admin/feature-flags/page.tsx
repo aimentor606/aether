@@ -28,9 +28,8 @@ import {
 } from '@aether/ui/primitives';
 import { useApiClient, useFeatureFlags } from '@aether/sdk/client';
 import type { FeatureFlag } from '@aether/sdk/client';
-import { useAdminRole } from '@/hooks/admin/use-admin-role';
 import { toast } from '@/lib/toast';
-import { Flag, Plus, Trash2, RefreshCw, Shield } from 'lucide-react';
+import { Flag, Plus, Trash2, RefreshCw } from 'lucide-react';
 
 const VERTICAL_OPTIONS = ['default', 'finance', 'healthcare', 'retail'];
 
@@ -46,7 +45,6 @@ function formatDate(dateStr: string) {
 
 export default function FeatureFlagsPage() {
   const client = useApiClient();
-  const { data: adminRole, isLoading: roleLoading } = useAdminRole();
   const { flags, upsert, remove } = useFeatureFlags(client);
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<FeatureFlag | null>(null);
@@ -55,24 +53,6 @@ export default function FeatureFlagsPage() {
   const [formVerticalId, setFormVerticalId] = useState('default');
   const [formFeatureName, setFormFeatureName] = useState('');
   const [formEnabled, setFormEnabled] = useState(false);
-
-  if (roleLoading) {
-    return (
-      <div className="p-6 space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-64 w-full" />
-      </div>
-    );
-  }
-
-  if (!adminRole?.isAdmin) {
-    return (
-      <div className="p-6 text-center text-muted-foreground">
-        <Shield className="mx-auto h-12 w-12 mb-4 opacity-50" />
-        <p>Admin access required.</p>
-      </div>
-    );
-  }
 
   const handleCreate = async () => {
     if (!formAccountId || !formFeatureName) {

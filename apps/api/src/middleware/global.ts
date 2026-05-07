@@ -48,7 +48,7 @@ export const observabilityMiddleware: MiddlewareHandler = async (c, next) => {
   const isProxyLongPoll = isSandboxProxyPath && path.includes('/global/event');
   const isProxyStartupProbe = isSandboxProxyPath && (
     path.includes('/global/health') ||
-    path.includes('/aether/health') ||
+    path.includes('/kortix/health') ||
     /\/sessions(?:\/|$)/.test(path)
   );
   const isExpectedProxyNoise = method === 'GET' && (

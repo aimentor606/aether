@@ -8,6 +8,8 @@ import { Toaster } from '@/components/ui/sonner';
 import '@/lib/polyfills';
 import { roobert } from './fonts/roobert';
 import { roobertMono } from './fonts/roobert-mono';
+import { satoshi } from './fonts/satoshi';
+import { jetbrainsMono } from './fonts/jetbrains-mono';
 import { Suspense, lazy } from 'react';
 import { I18nProvider } from '@/components/i18n-provider';
 import { getServerPublicEnv } from '@/lib/public-env-server';
@@ -150,7 +152,7 @@ export default async function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${roobert.variable} ${roobertMono.variable}`}
+      className={`${roobert.variable} ${roobertMono.variable} ${satoshi.variable} ${jetbrainsMono.variable}`}
     >
       <head>
         {/* Runtime config — evaluated at request time via connection() above.
@@ -161,7 +163,7 @@ export default async function RootLayout({
           }}
         />
 
-        {/* Font preloading is handled automatically by next/font/local in fonts/roobert.ts */}
+        {/* Font preloading is handled automatically by next/font in fonts/*.ts (Satoshi, JetBrains Mono, Roobert) */}
 
         {/* Prevent browser auto-translate (Google Translate, Chrome, etc.) from
             mutating the DOM. When translators modify text nodes, React's reconciler

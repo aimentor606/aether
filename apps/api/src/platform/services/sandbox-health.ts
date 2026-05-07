@@ -77,7 +77,7 @@ async function checkSandboxHealth(): Promise<void> {
     // 1. Check basic reachability (health endpoint bypasses auth)
     // 503 means Aether Master is running but the agent runtime isn't ready yet —
     // treat it as a soft failure (sandbox is reachable but not fully ready).
-    const healthRes = await fetch(`${baseUrl}/aether/health`, {
+    const healthRes = await fetch(`${baseUrl}/kortix/health`, {
       signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
     });
 
@@ -100,7 +100,7 @@ async function checkSandboxHealth(): Promise<void> {
     }
 
     // 2. Check auth works (protected endpoint)
-    const authRes = await fetch(`${baseUrl}/aether/ports`, {
+    const authRes = await fetch(`${baseUrl}/kortix/ports`, {
       headers: { Authorization: `Bearer ${config.INTERNAL_SERVICE_KEY}` },
       signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
     });
@@ -113,7 +113,7 @@ async function checkSandboxHealth(): Promise<void> {
         throw new Error('Auth failed and key sync unsuccessful');
       }
       // Key synced — verify again
-      const retryRes = await fetch(`${baseUrl}/aether/ports`, {
+      const retryRes = await fetch(`${baseUrl}/kortix/ports`, {
         headers: { Authorization: `Bearer ${config.INTERNAL_SERVICE_KEY}` },
         signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
       });

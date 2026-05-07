@@ -4,6 +4,10 @@ import { getModelPricing } from './model-pricing';
 // Model Registry
 // =============================================================================
 
+export type ModelCapability = 'streaming' | 'tools' | 'vision' | 'code' | 'reasoning';
+
+export type ModelCategory = 'chat' | 'code' | 'reasoning' | 'multimodal';
+
 export interface ModelConfig {
   /** The actual model ID to send to LiteLLM Proxy */
   litellmModel: string;
@@ -13,6 +17,18 @@ export interface ModelConfig {
   tier: 'free' | 'paid';
   cacheReadPer1M?: number;   // Cost per 1M cached-read tokens (USD)
   cacheWritePer1M?: number;  // Cost per 1M cache-write tokens (USD)
+  /** Human-readable model name */
+  displayName?: string;
+  /** Short description of the model's strengths */
+  description?: string;
+  /** Provider/company that owns the model */
+  ownedBy?: string;
+  /** Category for filtering in the playground */
+  category?: ModelCategory;
+  /** Capabilities this model supports */
+  capabilities?: ModelCapability[];
+  /** Maximum output tokens per request */
+  maxOutputTokens?: number;
 }
 
 export const MODELS: Record<string, ModelConfig> = {
@@ -23,6 +39,12 @@ export const MODELS: Record<string, ModelConfig> = {
     contextWindow: 204800,
     tier: 'free',
     cacheReadPer1M: 0.06,
+    displayName: 'MiniMax M2.7',
+    description: 'High-performance model with excellent long-context handling and cost efficiency.',
+    ownedBy: 'MiniMax',
+    category: 'chat',
+    capabilities: ['streaming', 'tools', 'code'],
+    maxOutputTokens: 16384,
   },
   'z-ai/glm-5-turbo': {
     litellmModel: 'z-ai/glm-5-turbo',
@@ -31,6 +53,12 @@ export const MODELS: Record<string, ModelConfig> = {
     contextWindow: 202752,
     tier: 'free',
     cacheReadPer1M: 0.24,
+    displayName: 'GLM-5 Turbo',
+    description: 'Powerful reasoning model with strong Chinese and English bilingual capabilities.',
+    ownedBy: 'Zhipu AI',
+    category: 'reasoning',
+    capabilities: ['streaming', 'tools', 'code', 'reasoning'],
+    maxOutputTokens: 16384,
   },
   'moonshotai/kimi-k2.5': {
     litellmModel: 'moonshotai/kimi-k2.5',
@@ -39,6 +67,12 @@ export const MODELS: Record<string, ModelConfig> = {
     contextWindow: 262144,
     tier: 'free',
     cacheReadPer1M: 0.225,
+    displayName: 'Kimi K2.5',
+    description: 'Ultra-long context model ideal for document analysis and multi-turn conversations.',
+    ownedBy: 'Moonshot AI',
+    category: 'chat',
+    capabilities: ['streaming', 'tools', 'code'],
+    maxOutputTokens: 16384,
   },
   'minimax/minimax-m2.5': {
     litellmModel: 'minimax/minimax-m2.5',
@@ -47,6 +81,12 @@ export const MODELS: Record<string, ModelConfig> = {
     contextWindow: 196608,
     tier: 'free',
     cacheReadPer1M: 0.10,
+    displayName: 'MiniMax M2.5',
+    description: 'Cost-effective model with strong general-purpose capabilities.',
+    ownedBy: 'MiniMax',
+    category: 'chat',
+    capabilities: ['streaming', 'tools', 'code'],
+    maxOutputTokens: 16384,
   },
 };
 
@@ -100,12 +140,19 @@ export function getAllModels() {
   return Object.entries(MODELS).map(([id, cfg]) => ({
     id,
     object: 'model' as const,
-    owned_by: 'aether',
+    owned_by: cfg.ownedBy ?? 'aether',
     context_window: cfg.contextWindow,
+    max_output_tokens: cfg.maxOutputTokens,
     pricing: {
       input: cfg.inputPer1M,
       output: cfg.outputPer1M,
+      cache_read: cfg.cacheReadPer1M,
+      cache_write: cfg.cacheWritePer1M,
     },
     tier: cfg.tier,
+    category: cfg.category ?? 'chat',
+    capabilities: cfg.capabilities ?? ['streaming'],
+    display_name: cfg.displayName ?? id,
+    description: cfg.description ?? '',
   }));
 }

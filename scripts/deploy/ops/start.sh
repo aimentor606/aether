@@ -57,6 +57,29 @@ FORWARDED_PROTO="http"
 [ "${USE_HTTPS:-false}" = "true" ] && FORWARDED_PROTO="https"
 export FORWARDED_PROTO
 
+# Validate API environment file
+API_ENV_FILE="../apps/api/.env"
+if [ -f "$API_ENV_FILE" ]; then
+  echo "Checking API environment..."
+  API_REQUIRED_VARS="DATABASE_URL SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY API_KEY_SECRET"
+  for var in $API_REQUIRED_VARS; do
+    if ! grep -q "^${var}=" "$API_ENV_FILE" || grep -q "^${var}=$" "$API_ENV_FILE"; then
+      echo "ERROR: $var is missing or empty in $API_ENV_FILE" >&2
+      echo "  See scripts/deploy/ops/.env.example for the required variables." >&2
+      exit 1
+    fi
+  done
+  # Warn about ENV_MODE — defaults to 'local' which disables billing in cloud deployments
+  if ! grep -q "^ENV_MODE=" "$API_ENV_FILE"; then
+    echo "WARNING: ENV_MODE not set in $API_ENV_FILE — defaults to 'local' (billing disabled)." >&2
+    echo "  Set ENV_MODE=cloud for managed SaaS deployments." >&2
+  fi
+  echo "  API env: valid"
+else
+  echo "WARNING: $API_ENV_FILE not found — API container will use defaults (local mode)." >&2
+  echo "  Create it with required vars: DATABASE_URL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, API_KEY_SECRET" >&2
+fi
+
 # Ensure Supabase stack (PG + Redis) is running
 echo "Checking Supabase stack (shared PG + Redis)..."
 if ! docker inspect --format='{{.State.Health.Status}}' supabase-db 2>/dev/null | grep -q "healthy"; then

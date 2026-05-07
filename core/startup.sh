@@ -196,6 +196,17 @@ if [ -x /ephemeral/aether-master/scripts/install-channel-clis.sh ]; then
   /ephemeral/aether-master/scripts/install-channel-clis.sh || echo "[startup] WARNING: channel CLI install failed"
 fi
 
+# ── Symlink master paths (legacy rename compat) ────────────────────────────
+# The master code lives at /ephemeral/kortix-master (build staging name).
+# Source code and s6 scripts reference /ephemeral/master; startup.sh references
+# /ephemeral/aether-master. Create symlinks so all paths resolve.
+if [ -d /ephemeral/kortix-master ] && [ ! -e /ephemeral/master ]; then
+  ln -s /ephemeral/kortix-master /ephemeral/master
+fi
+if [ -d /ephemeral/kortix-master ] && [ ! -e /ephemeral/aether-master ]; then
+  ln -s /ephemeral/kortix-master /ephemeral/aether-master
+fi
+
 echo "[startup] Starting s6-overlay via PID namespace..."
 
 if unshare --pid --fork true >/dev/null 2>&1; then

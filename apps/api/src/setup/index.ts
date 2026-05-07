@@ -113,7 +113,7 @@ async function fetchMasterJson<T>(path: string, init: RequestInit = {}, timeoutM
     const url = `${base}${path}`;
     try {
       const res = await fetchWithTimeout(url, init, timeoutMs);
-      // 503 from /aether/health means "starting" — still return the JSON body
+      // 503 from /kortix/health means "starting" — still return the JSON body
       // so callers can inspect the status/opencode fields.
       if (!res.ok && res.status !== 503) {
         lastErr = new Error(`Master ${url} returned ${res.status}`);
@@ -150,8 +150,8 @@ async function getLocalSandboxWarmStatus() {
   const provider = new LocalDockerProvider();
   const existing = await provider.find();
   const sandboxHealthUrl = config.SANDBOX_NETWORK
-    ? `http://${config.SANDBOX_CONTAINER_NAME}:8000/aether/health`
-    : `http://localhost:${config.SANDBOX_PORT_BASE || 14000}/aether/health`;
+    ? `http://${config.SANDBOX_CONTAINER_NAME}:8000/kortix/health`
+    : `http://localhost:${config.SANDBOX_PORT_BASE || 14000}/kortix/health`;
 
   if (existing && existing.status === 'running') {
     try {
@@ -613,7 +613,7 @@ setupApp.get('/health', async (c) => {
   // Installed/local Docker mode: check sandbox by HTTP (no docker CLI in image)
   if (!repoRoot) {
     try {
-      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/aether/health', {}, 5000);
+      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/kortix/health', {}, 5000);
       checks.sandbox = { ok: true };
       checks.docker = { ok: true };
       if (health.status === 'starting' || health.runtimeReady === false) {

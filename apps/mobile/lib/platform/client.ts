@@ -64,7 +64,7 @@ export function getSandboxPortUrl(sandboxExternalId: string, port: string): stri
 
 async function platformFetch<T>(
   path: string,
-  options: RequestInit = {},
+  options: RequestInit = {}
 ): Promise<PlatformResponse<T>> {
   const token = await getAuthToken();
   if (!token) {
@@ -208,7 +208,7 @@ export interface LocalSandboxProgress {
 
 export async function initLocalSandbox(
   name?: string,
-  onProgress?: (progress: LocalSandboxProgress) => void,
+  onProgress?: (progress: LocalSandboxProgress) => void
 ): Promise<SandboxInfo> {
   const token = await getAuthToken();
   if (!token) throw new Error('Not authenticated');
@@ -274,7 +274,7 @@ export async function checkInstanceHealth(url: string): Promise<string | null> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch(`${url}/aether/health`, { signal: controller.signal });
+    const res = await fetch(`${url}/kortix/health`, { signal: controller.signal });
     clearTimeout(timeout);
     if (!res.ok) return null;
     const data = await res.json();
@@ -436,13 +436,13 @@ export type ServiceAction = 'start' | 'stop' | 'restart' | 'delete';
 async function serviceRequest<T = any>(
   sandboxUrl: string,
   path: string,
-  init?: RequestInit,
+  init?: RequestInit
 ): Promise<T | null> {
   try {
     const token = await getAuthToken();
     const headers: Record<string, string> = {
       Accept: 'application/json',
-      ...(init?.headers as Record<string, string> || {}),
+      ...((init?.headers as Record<string, string>) || {}),
     };
     if (token) headers.Authorization = `Bearer ${token}`;
 
@@ -466,12 +466,12 @@ async function serviceRequest<T = any>(
 
 export async function getSandboxServices(
   sandboxUrl: string,
-  includeAll = false,
+  includeAll = false
 ): Promise<SandboxService[]> {
   const query = includeAll ? '?all=true' : '';
   const data = await serviceRequest<{ services?: SandboxService[] }>(
     sandboxUrl,
-    `/aether/services${query}`,
+    `/aether/services${query}`
   );
   return data?.services ?? [];
 }
@@ -479,7 +479,7 @@ export async function getSandboxServices(
 export async function sandboxServiceAction(
   sandboxUrl: string,
   serviceId: string,
-  action: ServiceAction,
+  action: ServiceAction
 ): Promise<boolean> {
   const isDelete = action === 'delete';
   const method = isDelete ? 'DELETE' : 'POST';
@@ -492,18 +492,18 @@ export async function sandboxServiceAction(
 
 export async function getSandboxServiceLogs(
   sandboxUrl: string,
-  serviceId: string,
+  serviceId: string
 ): Promise<string[]> {
   const data = await serviceRequest<{ logs?: string[] }>(
     sandboxUrl,
-    `/aether/services/${encodeURIComponent(serviceId)}/logs`,
+    `/aether/services/${encodeURIComponent(serviceId)}/logs`
   );
   return data?.logs ?? [];
 }
 
 export async function reconcileSandboxServices(
   sandboxUrl: string,
-  reload = false,
+  reload = false
 ): Promise<boolean> {
   const query = reload ? '?reload=true' : '';
   const data = await serviceRequest(sandboxUrl, `/aether/services/reconcile${query}`, {
@@ -514,7 +514,7 @@ export async function reconcileSandboxServices(
 
 export async function sandboxRuntimeReload(
   sandboxUrl: string,
-  mode: 'dispose-only' | 'full',
+  mode: 'dispose-only' | 'full'
 ): Promise<boolean> {
   const data = await serviceRequest(sandboxUrl, `/aether/services/system/reload`, {
     method: 'POST',

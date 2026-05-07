@@ -904,7 +904,7 @@ export default function WorkspacePage() {
                             ? 'new-command-button'
                             : 'new-project-button'
                     }
-                    className="group flex items-center gap-3 w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-left transition-colors hover:bg-accent hover:border-border disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                    className="group flex items-center gap-3 w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-left transition-colors hover:bg-accent hover:border-border disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
                   >
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border/50 bg-muted">
                       {createSession.isPending ? (
@@ -1008,7 +1008,7 @@ export default function WorkspacePage() {
                 >
                   {tab.label}
                   {kindCounts[tab.value] > 0 && (
-                    <span className="ml-1 opacity-50 tabular-nums">
+                    <span className="ml-1 opacity-70 tabular-nums">
                       {kindCounts[tab.value]}
                     </span>
                   )}
@@ -1043,7 +1043,7 @@ export default function WorkspacePage() {
                   data-state={scopeFilter === tab.value ? 'active' : 'inactive'}
                 >
                   {tab.label}{' '}
-                  <span className="ml-1 opacity-50 tabular-nums">
+                  <span className="ml-1 opacity-70 tabular-nums">
                     {scopeCounts[tab.value]}
                   </span>
                 </FilterBarItem>

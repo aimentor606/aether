@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { authenticatedFetch, getAuthToken } from "@/lib/auth-token";
+import { useEffect, useRef } from 'react';
+import { authenticatedFetch, getAuthToken } from '@/lib/auth-token';
 import {
-	incrementSandboxFail,
-	markInitialCheckDone,
-	resetForServerSwitch,
-	resetSandboxFail,
-	setOpenCodeHealth,
-	setSandboxStatus,
-	setSandboxVersion,
-	useSandboxConnectionStore,
-} from "@/stores/sandbox-connection-store";
-import { useServerStore } from "@/stores/server-store";
+  incrementSandboxFail,
+  markInitialCheckDone,
+  resetForServerSwitch,
+  resetSandboxFail,
+  setOpenCodeHealth,
+  setSandboxStatus,
+  setSandboxVersion,
+  useSandboxConnectionStore,
+} from '@/stores/sandbox-connection-store';
+import { useServerStore } from '@/stores/server-store';
 
 /**
  * Number of consecutive failures before marking as unreachable
@@ -45,174 +45,179 @@ const CHECK_TIMEOUT = 5_000;
  *   - If it's the first connection, requires 3 failures (same as before).
  */
 export function useSandboxConnection() {
-	const activeServerId = useServerStore((s) => s.activeServerId);
-	const serverVersion = useServerStore((s) => s.serverVersion);
+  const activeServerId = useServerStore((s) => s.activeServerId);
+  const serverVersion = useServerStore((s) => s.serverVersion);
 
-	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const abortRef = useRef<AbortController | null>(null);
-	const isMountRef = useRef(true);
-	const prevServerVersionRef = useRef(serverVersion);
-	const portsFetchedRef = useRef(false);
-	const versionFetchedRef = useRef(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const isMountRef = useRef(true);
+  const prevServerVersionRef = useRef(serverVersion);
+  const portsFetchedRef = useRef(false);
+  const versionFetchedRef = useRef(false);
 
-	useEffect(() => {
-		const isFirstMount = isMountRef.current;
-		isMountRef.current = false;
-		const isServerSwitch = serverVersion !== prevServerVersionRef.current;
-		prevServerVersionRef.current = serverVersion;
+  useEffect(() => {
+    const isFirstMount = isMountRef.current;
+    isMountRef.current = false;
+    const isServerSwitch = serverVersion !== prevServerVersionRef.current;
+    prevServerVersionRef.current = serverVersion;
 
-		if (isFirstMount || isServerSwitch) {
-			// Full reset — clears wasConnected, failCount, status, everything.
-			// Each instance starts with a clean slate.
-			resetForServerSwitch();
-			portsFetchedRef.current = false;
-			versionFetchedRef.current = false;
-		}
+    if (isFirstMount || isServerSwitch) {
+      // Full reset — clears wasConnected, failCount, status, everything.
+      // Each instance starts with a clean slate.
+      resetForServerSwitch();
+      portsFetchedRef.current = false;
+      versionFetchedRef.current = false;
+    }
 
-		let alive = true;
+    let alive = true;
 
-		async function check() {
-			if (!alive) return;
+    async function check() {
+      if (!alive) return;
 
-			const url = useServerStore.getState().getActiveServerUrl();
-			if (!url) {
-				scheduleNext();
-				return;
-			}
+      const url = useServerStore.getState().getActiveServerUrl();
+      if (!url) {
+        scheduleNext();
+        return;
+      }
 
-			// Don't fire health checks until auth is ready — avoids naked requests
-			// that return synthetic 401s and cause false "unreachable" status.
-			const token = await getAuthToken();
-			if (!token) {
-				scheduleNext();
-				return;
-			}
+      // Don't fire health checks until auth is ready — avoids naked requests
+      // that return synthetic 401s and cause false "unreachable" status.
+      const token = await getAuthToken();
+      if (!token) {
+        scheduleNext();
+        return;
+      }
 
-			abortRef.current?.abort();
-			const controller = new AbortController();
-			abortRef.current = controller;
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
 
-			try {
-				const timer = setTimeout(() => controller.abort(), CHECK_TIMEOUT);
+      try {
+        const timer = setTimeout(() => controller.abort(), CHECK_TIMEOUT);
 
-			const res = await authenticatedFetch(`${url}/global/health`, {
-				method: "GET",
-				signal: controller.signal,
-			});
-				clearTimeout(timer);
+        const res = await authenticatedFetch(`${url}/global/health`, {
+          method: 'GET',
+          signal: controller.signal,
+        });
+        clearTimeout(timer);
 
-				if (!alive) return;
+        if (!alive) return;
 
-				if (res.status === 401) {
-					// Treat 401 like any other failure — respect the threshold
-					// instead of immediately marking unreachable. During transitions
-					// (e.g. provisioning → dashboard), the proxy may briefly return 401
-					// before auth propagates.
-					throw new Error(`Auth error: ${res.status}`);
-				}
+        if (res.status === 401) {
+          // Treat 401 like any other failure — respect the threshold
+          // instead of immediately marking unreachable. During transitions
+          // (e.g. provisioning → dashboard), the proxy may briefly return 401
+          // before auth propagates.
+          throw new Error(`Auth error: ${res.status}`);
+        }
 
-				if (res.status === 403) {
-					throw new Error(`Auth error: ${res.status}`);
-				}
+        if (res.status === 403) {
+          throw new Error(`Auth error: ${res.status}`);
+        }
 
-				resetSandboxFail();
-				setSandboxStatus("connected");
+        resetSandboxFail();
+        setSandboxStatus('connected');
 
-				// Parse health response — extract healthy/version for consumers
-				// that previously relied on the duplicate useServerHealth hook.
-				try {
-					const healthData = await res.json();
-					setOpenCodeHealth(
-						healthData?.healthy === true,
-						healthData?.version,
-					);
-				} catch {
-					// Body already consumed or not JSON — treat as healthy since status was ok
-					setOpenCodeHealth(true);
-				}
+        // Parse health response — extract healthy/version for consumers
+        // that previously relied on the duplicate useServerHealth hook.
+        try {
+          const healthData = await res.json();
+          setOpenCodeHealth(healthData?.healthy === true, healthData?.version);
+        } catch {
+          // Body already consumed or not JSON — treat as healthy since status was ok
+          setOpenCodeHealth(true);
+        }
 
-				// Fetch port mappings once on first successful connection.
-				if (!portsFetchedRef.current) {
-					portsFetchedRef.current = true;
-					try {
-						const portsRes = await authenticatedFetch(`${url}/aether/ports`, {
-							signal: AbortSignal.timeout(3000),
-						}, { retryOnAuthError: false });
-						if (portsRes.ok) {
-							const data = await portsRes.json();
-							if (data.ports && Object.keys(data.ports).length > 0) {
-								const activeId = useServerStore.getState().activeServerId;
-								useServerStore.getState().updateServerSilent(activeId, {
-									mappedPorts: data.ports,
-									provider: "local_docker",
-								});
-							}
-						}
-					} catch {
-						/* non-critical — proxy fallback still works */
-					}
-				}
+        // Fetch port mappings once on first successful connection.
+        if (!portsFetchedRef.current) {
+          portsFetchedRef.current = true;
+          try {
+            const portsRes = await authenticatedFetch(
+              `${url}/kortix/ports`,
+              {
+                signal: AbortSignal.timeout(3000),
+              },
+              { retryOnAuthError: false },
+            );
+            if (portsRes.ok) {
+              const data = await portsRes.json();
+              if (data.ports && Object.keys(data.ports).length > 0) {
+                const activeId = useServerStore.getState().activeServerId;
+                useServerStore.getState().updateServerSilent(activeId, {
+                  mappedPorts: data.ports,
+                  provider: 'local_docker',
+                });
+              }
+            }
+          } catch {
+            /* non-critical — proxy fallback still works */
+          }
+        }
 
-				// Fetch sandbox version on every successful connect (detects upgrades/downgrades)
-				{
-					try {
-						const hRes = await authenticatedFetch(`${url}/aether/health`, {
-							signal: AbortSignal.timeout(3000),
-						}, { retryOnAuthError: false });
-						if (hRes.ok) {
-							const hData = await hRes.json();
-							if (hData.version) {
-								setSandboxVersion(hData.version);
-							}
-						}
-					} catch {
-						/* non-critical */
-					}
-				}
-			} catch {
-				if (!alive) return;
-				incrementSandboxFail();
+        // Fetch sandbox version on every successful connect (detects upgrades/downgrades)
+        {
+          try {
+            const hRes = await authenticatedFetch(
+              `${url}/kortix/health`,
+              {
+                signal: AbortSignal.timeout(3000),
+              },
+              { retryOnAuthError: false },
+            );
+            if (hRes.ok) {
+              const hData = await hRes.json();
+              if (hData.version) {
+                setSandboxVersion(hData.version);
+              }
+            }
+          } catch {
+            /* non-critical */
+          }
+        }
+      } catch {
+        if (!alive) return;
+        incrementSandboxFail();
 
-				const { failCount, wasConnected } =
-					useSandboxConnectionStore.getState();
-				const threshold = wasConnected
-					? FAIL_THRESHOLD_RECONNECT
-					: FAIL_THRESHOLD_FIRST;
+        const { failCount, wasConnected } =
+          useSandboxConnectionStore.getState();
+        const threshold = wasConnected
+          ? FAIL_THRESHOLD_RECONNECT
+          : FAIL_THRESHOLD_FIRST;
 
-				if (failCount >= threshold) {
-					setSandboxStatus("unreachable");
-				}
-			} finally {
-				if (alive) {
-					markInitialCheckDone();
-				}
-			}
+        if (failCount >= threshold) {
+          setSandboxStatus('unreachable');
+        }
+      } finally {
+        if (alive) {
+          markInitialCheckDone();
+        }
+      }
 
-			scheduleNext();
-		}
+      scheduleNext();
+    }
 
-		function scheduleNext() {
-			if (!alive) return;
-			if (timerRef.current) clearTimeout(timerRef.current);
+    function scheduleNext() {
+      if (!alive) return;
+      if (timerRef.current) clearTimeout(timerRef.current);
 
-			const { status, failCount } = useSandboxConnectionStore.getState();
-			let delay: number;
-			if (status === "connected") {
-				delay = POLL_CONNECTED;
-			} else if (status === "unreachable") {
-				delay = POLL_UNREACHABLE;
-			} else {
-				delay = failCount > 0 ? POLL_FAILING : POLL_UNREACHABLE;
-			}
-			timerRef.current = setTimeout(check, delay);
-		}
+      const { status, failCount } = useSandboxConnectionStore.getState();
+      let delay: number;
+      if (status === 'connected') {
+        delay = POLL_CONNECTED;
+      } else if (status === 'unreachable') {
+        delay = POLL_UNREACHABLE;
+      } else {
+        delay = failCount > 0 ? POLL_FAILING : POLL_UNREACHABLE;
+      }
+      timerRef.current = setTimeout(check, delay);
+    }
 
-		check();
+    check();
 
-		return () => {
-			alive = false;
-			abortRef.current?.abort();
-			if (timerRef.current) clearTimeout(timerRef.current);
-		};
-	}, [activeServerId, serverVersion]);
+    return () => {
+      alive = false;
+      abortRef.current?.abort();
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [activeServerId, serverVersion]);
 }

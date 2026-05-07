@@ -86,7 +86,7 @@ function EmptyState({
 }) {
   return (
     <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 text-center">
-      <p className="text-xs text-muted-foreground/60">{message}</p>
+      <p className="text-xs text-muted-foreground">{message}</p>
       {action && (
         <Button
           variant="outline"
@@ -240,7 +240,7 @@ function ConnectedTabContent({
                             connected
                           </span>
                         </div>
-                        <div className="text-[11px] text-muted-foreground/50 mt-0.5">
+                        <div className="text-[11px] text-muted-foreground/80 mt-0.5">
                           {modelCount} model{modelCount === 1 ? '' : 's'}
                           {source ? ` · ${source}` : ''}
                         </div>
@@ -251,9 +251,9 @@ function ConnectedTabContent({
                       >
                         {modelCount > 0 &&
                           (isExpanded ? (
-                            <ChevronDown className="h-3 w-3 text-muted-foreground/40" />
+                            <ChevronDown className="h-3 w-3 text-muted-foreground/70" />
                           ) : (
-                            <ChevronRight className="h-3 w-3 text-muted-foreground/40" />
+                            <ChevronRight className="h-3 w-3 text-muted-foreground/70" />
                           ))}
                         <Button
                           type="button"
@@ -264,7 +264,7 @@ function ConnectedTabContent({
                           disabled={isDisconnecting}
                           variant="ghost"
                           size="icon-sm"
-                          className="text-muted-foreground/40 hover:bg-destructive/10 hover:text-destructive"
+                          className="text-muted-foreground/70 hover:bg-destructive/10 hover:text-destructive"
                           title="Disconnect"
                         >
                           {isDisconnecting ? (
@@ -282,7 +282,7 @@ function ConnectedTabContent({
                           (model: any) => (
                             <div
                               key={model.id}
-                              className="px-3 py-1.5 text-xs text-muted-foreground/60 hover:bg-muted/20"
+                              className="px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted/20"
                             >
                               {model.name || model.id}
                             </div>
@@ -435,7 +435,7 @@ function ModelsTabContent({
                         providerModels[0]?.providerName ||
                         providerID}
                     </span>
-                    <span className="ml-auto text-[10px] text-muted-foreground/30 normal-case tracking-normal">
+                    <span className="ml-auto text-[10px] text-muted-foreground/70 normal-case tracking-normal">
                       {providerModels.length}
                     </span>
                   </div>
@@ -458,7 +458,7 @@ function ModelsTabContent({
                         <div className="truncate text-sm text-foreground">
                           {model.modelName}
                         </div>
-                        <div className="truncate text-[10px] text-muted-foreground/40 mt-0.5">
+                        <div className="truncate text-[10px] text-muted-foreground/70 mt-0.5">
                           {model.modelID}
                         </div>
                       </div>
@@ -546,7 +546,7 @@ export function ProviderModal({
           <DialogTitle className="text-sm font-semibold">
             LLM Providers
           </DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground/60">
+          <DialogDescription className="text-xs text-muted-foreground">
             Connect providers and manage which models appear in chat.
           </DialogDescription>
         </DialogHeader>
@@ -565,7 +565,7 @@ export function ProviderModal({
                 {tabItem.label}
                 {tabItem.id === 'connected' &&
                   connectedProviders.length > 0 && (
-                    <span className="ml-1 text-[10px] text-muted-foreground/40">
+                    <span className="ml-1 text-[10px] text-muted-foreground/70">
                       {connectedProviders.length}
                     </span>
                   )}

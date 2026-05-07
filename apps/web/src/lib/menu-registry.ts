@@ -28,7 +28,6 @@ import {
   MessageSquare,
   Calendar,
   ScrollText,
-  Brain,
   Cable,
   Globe,
   Compass,
@@ -37,6 +36,7 @@ import {
   Sparkles,
   Coins,
   LayoutTemplate,
+  Brain,
 
   // Actions
   Plus,
@@ -59,7 +59,6 @@ import {
   Keyboard,
 
   // Account
-  Zap,
   CreditCard,
   Receipt,
   Users,
@@ -71,22 +70,7 @@ import {
 
   // View / Misc
   PanelLeftClose,
-  PanelLeftIcon,
   LogOut,
-
-  // Admin
-  BarChart3,
-  AlertTriangle,
-  Database,
-  Server,
-  TestTube,
-  UserPlus,
-  BarChart2,
-  Flag,
-  MessageCircle,
-  Wrench,
-  Gauge,
-  ShieldCheck,
 } from 'lucide-react';
 
 const DEPLOYMENTS_ENABLED =
@@ -138,8 +122,7 @@ export type MenuGroup =
   | 'preferences'
   | 'account'
   | 'theme'
-  | 'view'
-  | 'admin';
+  | 'view';
 
 /**
  * Optional sub-group within a group for visual clustering.
@@ -199,8 +182,6 @@ export interface MenuItemDef {
   keywords?: string;
   /** If true, item is only shown when billing is enabled */
   requiresBilling?: boolean;
-  /** If true, item is only shown for admin users */
-  requiresAdmin?: boolean;
   /** If true, item is only shown when there's an active session */
   requiresSession?: boolean;
 }
@@ -384,6 +365,16 @@ export const menuRegistry: MenuItemDef[] = [
     kind: 'navigate',
     href: '/dashboard',
     tabType: 'dashboard',
+  },
+  {
+    id: 'models',
+    label: 'AI Models',
+    icon: Brain,
+    group: 'navigation',
+    showIn: ['commandPalette', 'rightSidebar'],
+    kind: 'navigate',
+    href: '/models',
+    keywords: 'playground chat llm gpt claude model api',
   },
   {
     id: 'marketplace',
@@ -615,16 +606,6 @@ export const menuRegistry: MenuItemDef[] = [
     href: '/finance',
     keywords: 'finance invoices expenses budgets ledger accounting',
   },
-  {
-    id: 'litellm-admin',
-    label: 'LiteLLM Management',
-    icon: Bot,
-    group: 'admin',
-    showIn: ['commandPalette'],
-    kind: 'navigate',
-    href: '/admin/litellm',
-    keywords: 'litellm llm models providers proxy management admin',
-  },
 
   // ──────────────────────────────────────────────────────────────────────────
   // SETTINGS PAGES (navigate to route)
@@ -821,120 +802,6 @@ export const menuRegistry: MenuItemDef[] = [
     kind: 'action',
     actionId: 'logout',
     keywords: 'log out sign out logout signout disconnect',
-  },
-
-  // ──────────────────────────────────────────────────────────────────────────
-  // ADMIN
-  // ──────────────────────────────────────────────────────────────────────────
-  {
-    id: 'admin-access-requests',
-    label: 'Admin: Access Requests',
-    icon: UserPlus,
-    group: 'admin',
-    showIn: ['userMenu', 'commandPalette'],
-    kind: 'navigate',
-    href: '/admin/access-requests',
-    requiresAdmin: true,
-    keywords: 'admin access requests users waitlist approve',
-  },
-  {
-    id: 'admin-sandboxes',
-    label: 'Admin: Sandboxes & Pool',
-    icon: Server,
-    group: 'admin',
-    showIn: ['userMenu', 'commandPalette'],
-    kind: 'navigate',
-    href: '/admin/sandboxes',
-    requiresAdmin: true,
-    keywords: 'admin sandboxes all containers instances pool warm',
-  },
-  {
-    id: 'admin-analytics',
-    label: 'Admin: Analytics',
-    icon: BarChart2,
-    group: 'admin',
-    showIn: ['commandPalette'],
-    kind: 'navigate',
-    href: '/admin/analytics',
-    requiresAdmin: true,
-    keywords: 'admin analytics dashboard metrics statistics',
-  },
-  {
-    id: 'admin-feedback',
-    label: 'Admin: Feedback',
-    icon: MessageCircle,
-    group: 'admin',
-    showIn: ['commandPalette'],
-    kind: 'navigate',
-    href: '/admin/feedback',
-    requiresAdmin: true,
-    keywords: 'admin feedback user reports',
-  },
-  {
-    id: 'admin-notifications',
-    label: 'Admin: Notifications',
-    icon: Bell,
-    group: 'admin',
-    showIn: ['commandPalette'],
-    kind: 'navigate',
-    href: '/admin/notifications',
-    requiresAdmin: true,
-    keywords: 'admin notifications push broadcast',
-  },
-  {
-    id: 'admin-utils',
-    label: 'Admin: Utils',
-    icon: Wrench,
-    group: 'admin',
-    showIn: ['commandPalette'],
-    kind: 'navigate',
-    href: '/admin/utils',
-    requiresAdmin: true,
-    keywords: 'admin utils utilities tools maintenance',
-  },
-  {
-    id: 'admin-sandbox-pool',
-    label: 'Admin: Sandbox Pool',
-    icon: Database,
-    group: 'admin',
-    showIn: ['commandPalette'],
-    kind: 'navigate',
-    href: '/admin/sandboxes',
-    requiresAdmin: true,
-    keywords: 'admin sandbox pool warm instances',
-  },
-  {
-    id: 'admin-stateless',
-    label: 'Admin: Stateless',
-    icon: Gauge,
-    group: 'admin',
-    showIn: ['commandPalette'],
-    kind: 'navigate',
-    href: '/admin/stateless',
-    requiresAdmin: true,
-    keywords: 'admin stateless mode configuration',
-  },
-  {
-    id: 'admin-feature-flags',
-    label: 'Admin: Feature Flags',
-    icon: Flag,
-    group: 'admin',
-    showIn: ['commandPalette'],
-    kind: 'navigate',
-    href: '/admin/feature-flags',
-    requiresAdmin: true,
-    keywords: 'admin feature flags toggles vertical config',
-  },
-  {
-    id: 'admin-stress-test',
-    label: 'Admin: Stress Test',
-    icon: TestTube,
-    group: 'admin',
-    showIn: ['commandPalette'],
-    kind: 'navigate',
-    href: '/admin/stress-test',
-    requiresAdmin: true,
-    keywords: 'admin stress test load performance',
   },
 ];
 

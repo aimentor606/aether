@@ -24,6 +24,7 @@ import { trackCtaSignup } from '@/lib/analytics/gtm';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useAuth } from '@/components/AuthProvider';
 import { Reveal } from '@/components/home/reveal';
+import { useRouter } from 'next/navigation';
 
 const INSTALL_CMD = 'curl -fsSL https://aether.dev/install | bash';
 
@@ -91,6 +92,7 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [showFloatingCta, setShowFloatingCta] = useState(false);
   const { user } = useAuth();
+  const router = useRouter();
 
   const { scrollY } = useScroll();
   const drawerRadius = useTransform(scrollY, [200, 600], [24, 0]);
@@ -105,7 +107,15 @@ export default function Home() {
   }, []);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(INSTALL_CMD);
+    navigator.clipboard.writeText(INSTALL_CMD).catch(() => {
+      const textarea = document.createElement('textarea');
+      textarea.value = INSTALL_CMD;
+      document.body.appendChild(textarea);
+      textarea.select();
+      // eslint-disable-next-line deprecation/deprecation
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    });
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, []);
@@ -113,11 +123,11 @@ export default function Home() {
   const handleLaunch = useCallback(() => {
     trackCtaSignup();
     if (!user) {
-      window.location.href = '/auth';
+      router.push('/auth');
       return;
     }
-    window.location.href = '/instances';
-  }, [user]);
+    router.push('/instances');
+  }, [user, router]);
 
   return (
     <BackgroundAALChecker>
@@ -130,10 +140,10 @@ export default function Home() {
             style={{ opacity: heroOpacity, scale: heroScale }}
           >
             <div className="flex-1 flex items-center justify-center pt-40 pointer-events-none">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-foreground text-center">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold tracking-[-0.04em] text-foreground text-center leading-[1.1]">
                 The Autonomous Company
                 <br />
-                <span className="text-muted-foreground/50">
+                <span className="text-muted-foreground/60">
                   Operating System
                 </span>
               </h1>
@@ -150,7 +160,7 @@ export default function Home() {
               <button
                 onClick={handleCopy}
                 aria-label="Copy install command"
-                className="group flex items-center gap-2.5 h-9 px-4 rounded-full bg-foreground/[0.03] border border-foreground/[0.06] hover:bg-foreground/[0.06] hover:border-foreground/[0.1] transition-colors cursor-pointer animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both"
+                className="group flex items-center gap-2.5 h-9 px-4 rounded-full bg-muted/30 border border-border hover:bg-muted/50 transition-colors cursor-pointer animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both"
               >
                 <span className="font-mono text-[11px] text-muted-foreground/35 select-none">
                   $
@@ -225,7 +235,7 @@ export default function Home() {
           {/* ═══════════════ WHAT IS AETHER ═══════════════ */}
           <section className="max-w-3xl mx-auto px-6 py-10 sm:py-14">
             <Reveal>
-              <p className="text-2xl sm:text-3xl md:text-4xl font-medium text-foreground leading-snug tracking-tight">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-medium text-foreground leading-snug tracking-[-0.02em]">
                 One machine. All your tools. Agents that run themselves.
               </p>
             </Reveal>
@@ -243,7 +253,7 @@ export default function Home() {
           {/* ═══════════════ THE SYSTEM ═══════════════ */}
           <section className="max-w-3xl mx-auto px-6 py-10 sm:py-14">
             <Reveal>
-              <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground mb-2">
+              <h2 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-foreground mb-2">
                 The system
               </h2>
             </Reveal>
@@ -321,7 +331,7 @@ export default function Home() {
           {/* ═══════════════ HOW IT WORKS ═══════════════ */}
           <section className="max-w-3xl mx-auto px-6 py-10 sm:py-14">
             <Reveal>
-              <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground mb-2">
+              <h2 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-foreground mb-2">
                 How it works
               </h2>
             </Reveal>

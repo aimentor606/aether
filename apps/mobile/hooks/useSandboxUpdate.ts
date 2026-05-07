@@ -56,7 +56,11 @@ export function useSandboxUpdate(currentVersion: string | null | undefined) {
   const [updateStatus, setUpdateStatus] = useState<SandboxUpdateStatus | null>(null);
 
   // Fetch latest version
-  const { data: versionInfo, isLoading, refetch } = useQuery({
+  const {
+    data: versionInfo,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['sandbox', 'latest-version'],
     queryFn: getLatestSandboxVersion,
     staleTime: 5 * 60 * 1000,
@@ -66,7 +70,11 @@ export function useSandboxUpdate(currentVersion: string | null | undefined) {
 
   const latestVersion = versionInfo?.version ?? null;
   const changelog = versionInfo?.changelog ?? null;
-  const updateAvailable = !!(currentVersion && latestVersion && isNewerVersion(currentVersion, latestVersion));
+  const updateAvailable = !!(
+    currentVersion &&
+    latestVersion &&
+    isNewerVersion(currentVersion, latestVersion)
+  );
 
   // Polling for update status
   const stopPolling = useCallback(() => {
@@ -97,12 +105,24 @@ export function useSandboxUpdate(currentVersion: string | null | undefined) {
   const updateMutation = useMutation({
     mutationFn: (version: string) => triggerSandboxUpdate(version),
     onMutate: () => {
-      setUpdateStatus({ phase: 'pulling', progress: 0, message: 'Starting update...', targetVersion: latestVersion, previousVersion: currentVersion ?? null, currentVersion: null, error: null, startedAt: new Date().toISOString(), updatedAt: null });
+      setUpdateStatus({
+        phase: 'pulling',
+        progress: 0,
+        message: 'Starting update...',
+        targetVersion: latestVersion,
+        previousVersion: currentVersion ?? null,
+        currentVersion: null,
+        error: null,
+        startedAt: new Date().toISOString(),
+        updatedAt: null,
+      });
       startPolling();
     },
     onError: (err: any) => {
       stopPolling();
-      setUpdateStatus((prev) => prev ? { ...prev, phase: 'failed', error: err?.message || 'Update failed' } : null);
+      setUpdateStatus((prev) =>
+        prev ? { ...prev, phase: 'failed', error: err?.message || 'Update failed' } : null
+      );
     },
   });
 
@@ -119,7 +139,8 @@ export function useSandboxUpdate(currentVersion: string | null | undefined) {
   }, []);
 
   const phase = updateStatus?.phase ?? 'idle';
-  const isUpdating = updateMutation.isPending || (!!updateStatus && !TERMINAL_PHASES.includes(phase));
+  const isUpdating =
+    updateMutation.isPending || (!!updateStatus && !TERMINAL_PHASES.includes(phase));
 
   return {
     updateAvailable,
@@ -132,7 +153,10 @@ export function useSandboxUpdate(currentVersion: string | null | undefined) {
     phaseLabel: PHASE_LABELS[phase] || phase,
     phaseProgress: updateStatus?.progress ?? PHASE_PROGRESS[phase] ?? 0,
     phaseMessage: updateStatus?.message ?? '',
-    updateResult: phase === 'complete' ? { success: true, currentVersion: updateStatus?.currentVersion ?? latestVersion ?? '' } : null,
+    updateResult:
+      phase === 'complete'
+        ? { success: true, currentVersion: updateStatus?.currentVersion ?? latestVersion ?? '' }
+        : null,
     updateError: phase === 'failed' ? new Error(updateStatus?.error || 'Update failed') : null,
     isLoading,
     refetch,
@@ -153,7 +177,7 @@ export function useGlobalSandboxUpdate() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`${sandboxUrl}/aether/health`);
+        const res = await fetch(`${sandboxUrl}/kortix/health`);
         if (!res.ok) return;
         const data = await res.json();
         if (!cancelled && data?.version) {
@@ -161,7 +185,9 @@ export function useGlobalSandboxUpdate() {
         }
       } catch {}
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [sandboxUrl]);
 
   return useSandboxUpdate(currentVersion);

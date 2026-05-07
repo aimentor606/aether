@@ -10,7 +10,7 @@ function parsePortMap(): Record<string, string> {
   try {
     return JSON.parse(raw)
   } catch {
-    console.warn('[Kortix Master] Failed to parse SANDBOX_PORT_MAP:', raw)
+    console.warn('[Aether] Failed to parse SANDBOX_PORT_MAP:', raw)
     return {}
   }
 }
@@ -75,7 +75,7 @@ export const config = {
       const generated = randomBytes(32).toString('hex')
       process.env.INTERNAL_SERVICE_KEY = generated
       console.warn(
-        '[Kortix Master] WARNING: No INTERNAL_SERVICE_KEY provided, auto-generated one.\n' +
+        '[Aether] WARNING: No INTERNAL_SERVICE_KEY provided, auto-generated one.\n' +
         '  This sandbox is auth-protected. External callers must use this key:\n' +
         `  ${generated}\n` +
         '  Set INTERNAL_SERVICE_KEY env var to avoid this warning.'

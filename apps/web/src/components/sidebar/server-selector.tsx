@@ -118,10 +118,10 @@ function useConnectionStatus(url: string, enabled: boolean) {
       }
       setStatus('connected');
 
-      // Try to get version from /aether/health
+      // Try to get version from /kortix/health
       try {
         const hres = await authenticatedFetch(
-          `${url}/aether/health`,
+          `${url}/kortix/health`,
           {
             signal: AbortSignal.timeout(3000),
           },
@@ -482,7 +482,7 @@ function DialogInstanceRow({
           <ProviderIcon
             className={cn(
               'h-4 w-4 flex-shrink-0',
-              isActive ? 'text-primary' : 'text-muted-foreground/60',
+              isActive ? 'text-primary' : 'text-muted-foreground',
             )}
           />
           <span
@@ -514,7 +514,7 @@ function DialogInstanceRow({
             </span>
           )}
           {server.isDefault && (
-            <span className="px-1.5 py-px text-[0.5625rem] font-medium text-muted-foreground/60 bg-muted/50 rounded-full uppercase tracking-wider leading-none flex-shrink-0">
+            <span className="px-1.5 py-px text-[0.5625rem] font-medium text-muted-foreground bg-muted/50 rounded-full uppercase tracking-wider leading-none flex-shrink-0">
               default
             </span>
           )}
@@ -523,7 +523,7 @@ function DialogInstanceRow({
 
         {/* URL — only when label differs from URL */}
         {hasCustomLabel && (
-          <p className="mt-1 ml-6 text-xs text-muted-foreground/50 font-mono break-all leading-relaxed">
+          <p className="mt-1 ml-6 text-xs text-muted-foreground/80 font-mono break-all leading-relaxed">
             {displayUrl}
           </p>
         )}
@@ -543,7 +543,7 @@ function DialogInstanceRow({
           )}
 
           {version && (
-            <span className="text-[10px] font-mono text-muted-foreground/60">
+            <span className="text-[10px] font-mono text-muted-foreground">
               v{version}
             </span>
           )}
@@ -577,7 +577,7 @@ function DialogInstanceRow({
           {sandboxUpdate?.updateAvailable &&
             !sandboxUpdate.isUpdating &&
             sandboxUpdate.changelog && (
-              <div className="basis-full mt-0.5 text-[10px] text-muted-foreground/70 space-y-0.5 max-w-[280px]">
+              <div className="basis-full mt-0.5 text-[10px] text-muted-foreground space-y-0.5 max-w-[280px]">
                 <p className="font-medium">{sandboxUpdate.changelog.title}</p>
                 <ul className="list-disc list-inside">
                   {sandboxUpdate.changelog.changes.slice(0, 3).map((c, i) => (
@@ -586,7 +586,7 @@ function DialogInstanceRow({
                     </li>
                   ))}
                   {sandboxUpdate.changelog.changes.length > 3 && (
-                    <li className="text-muted-foreground/50">
+                    <li className="text-muted-foreground/80">
                       +{sandboxUpdate.changelog.changes.length - 3} more
                     </li>
                   )}
@@ -703,7 +703,7 @@ export function InstanceManagerDialog({
   const [sandboxError, setSandboxError] = React.useState<string | null>(null);
   const [sandboxProgress, setSandboxProgress] =
     React.useState<SandboxCreateProgress | null>(null);
-  // Track the cloud sandbox's current version (from /aether/health, fetched by DialogInstanceRow)
+  // Track the cloud sandbox's current version (from /kortix/health, fetched by DialogInstanceRow)
   const [sandboxVersion, setSandboxVersion] = React.useState<string | null>(
     null,
   );
@@ -952,7 +952,7 @@ export function InstanceManagerDialog({
             });
 
       // Managed VPS providers can report as active before services are actually ready.
-      // Do not route to dashboard until /aether/health returns a real version.
+      // Do not route to dashboard until /kortix/health returns a real version.
       if (isManagedVpsProvider) {
         if (managedVpsProgressTimer) {
           clearInterval(managedVpsProgressTimer);
@@ -975,7 +975,7 @@ export function InstanceManagerDialog({
 
           try {
             const res = await authenticatedFetch(
-              `${sandboxUrl}/aether/health`,
+              `${sandboxUrl}/kortix/health`,
               { signal: AbortSignal.timeout(5000) },
               { retryOnAuthError: false },
             );
@@ -1185,14 +1185,14 @@ export function InstanceManagerDialog({
               {servers.length >= 3 && (
                 <div className="px-4 pb-3">
                   <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 pointer-events-none" />
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/80 pointer-events-none" />
                     <input
                       type="text"
                       placeholder="Search instances..."
                       autoComplete="off"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      className="w-full h-8 text-xs pl-8 pr-3 rounded-lg bg-muted/40 border border-border/40 outline-none placeholder:text-muted-foreground/40 focus:border-primary/30 focus:bg-muted/60 transition-colors"
+                      className="w-full h-8 text-xs pl-8 pr-3 rounded-lg bg-muted/40 border border-border/40 outline-none placeholder:text-muted-foreground/70 focus:border-primary/30 focus:bg-muted/60 transition-colors"
                     />
                   </div>
                 </div>
@@ -1201,7 +1201,7 @@ export function InstanceManagerDialog({
               {/* Instance list */}
               <div className="flex flex-col gap-1.5 px-3 pb-3 max-h-[400px] overflow-y-auto">
                 {filtered.length === 0 ? (
-                  <div className="py-8 text-center text-sm text-muted-foreground/60">
+                  <div className="py-8 text-center text-sm text-muted-foreground">
                     {search
                       ? `No instances match "${search}"`
                       : 'No instances yet'}
@@ -1288,7 +1288,7 @@ export function InstanceManagerDialog({
                       {renderShellHighlighted(sshMeta.ssh_command)}
                     </pre>
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-[10px] text-muted-foreground/50">
+                      <p className="text-[10px] text-muted-foreground/80">
                         Last generated{' '}
                         {new Date(sshMeta.updatedAt).toLocaleString()}
                       </p>
@@ -1383,7 +1383,7 @@ export function InstanceManagerDialog({
                       <p className="text-sm font-medium text-foreground">
                         Cloud
                       </p>
-                      <p className="text-xs text-muted-foreground/70 mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         Managed sandbox on Daytona cloud
                       </p>
                     </div>
@@ -1408,7 +1408,7 @@ export function InstanceManagerDialog({
                       <p className="text-sm font-medium text-foreground">
                         JustaVPS
                       </p>
-                      <p className="text-xs text-muted-foreground/70 mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         Create a managed VPS via JustaVPS
                       </p>
                     </div>
@@ -1434,7 +1434,7 @@ export function InstanceManagerDialog({
                       <p className="text-sm font-medium text-foreground">
                         Local Docker
                       </p>
-                      <p className="text-xs text-muted-foreground/70 mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {isCreatingSandbox &&
                         creatingProvider === 'local_docker' &&
                         sandboxProgress
@@ -1460,7 +1460,7 @@ export function InstanceManagerDialog({
                       <p className="text-sm font-medium text-foreground">
                         Add Cloud Instance
                       </p>
-                      <p className="text-xs text-muted-foreground/70 mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         Select server type and location for an additional
                         JustaVPS instance
                       </p>
@@ -1469,7 +1469,7 @@ export function InstanceManagerDialog({
                 )}
 
                 {isBillingEnabled() && !canAddInstances && (
-                  <div className="rounded-xl border border-border/50 bg-muted/20 px-3.5 py-3 text-xs text-muted-foreground/70">
+                  <div className="rounded-xl border border-border/50 bg-muted/20 px-3.5 py-3 text-xs text-muted-foreground">
                     Free plan: connect a custom instance, or upgrade to Pro to
                     add managed cloud instances.
                   </div>
@@ -1493,7 +1493,7 @@ export function InstanceManagerDialog({
                     <p className="text-sm font-medium text-foreground">
                       Custom URL
                     </p>
-                    <p className="text-xs text-muted-foreground/70 mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       Connect to any Aether instance by address
                     </p>
                   </div>
@@ -1536,10 +1536,10 @@ export function InstanceManagerDialog({
                     placeholder="http://localhost:8008/v1/p/aether-sandbox/8000"
                     value={formUrl}
                     onChange={(e) => setFormUrl(e.target.value)}
-                    className="w-full h-9 px-3 text-sm font-mono rounded-lg bg-muted/30 border border-border/60 outline-none placeholder:text-muted-foreground/30 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-colors"
+                    className="w-full h-9 px-3 text-sm font-mono rounded-lg bg-muted/30 border border-border/60 outline-none placeholder:text-muted-foreground/70 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-colors"
                     required
                   />
-                  <p className="text-[10px] text-muted-foreground/50">
+                  <p className="text-[10px] text-muted-foreground/80">
                     The full URL of the Aether server, e.g.
                     http://192.168.1.50:8008/v1/p/aether-sandbox/8000
                   </p>
@@ -1549,14 +1549,14 @@ export function InstanceManagerDialog({
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-medium text-muted-foreground">
                     Display Name{' '}
-                    <span className="text-muted-foreground/40">(optional)</span>
+                    <span className="text-muted-foreground/70">(optional)</span>
                   </label>
                   <input
                     type="text"
                     placeholder="My dev instance"
                     value={formLabel}
                     onChange={(e) => setFormLabel(e.target.value)}
-                    className="w-full h-9 px-3 text-sm rounded-lg bg-muted/30 border border-border/60 outline-none placeholder:text-muted-foreground/30 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-colors"
+                    className="w-full h-9 px-3 text-sm rounded-lg bg-muted/30 border border-border/60 outline-none placeholder:text-muted-foreground/70 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-colors"
                   />
                 </div>
               </div>
@@ -1609,13 +1609,13 @@ export function InstanceManagerDialog({
                         )}
                       </button>
                     </div>
-                    <p className="text-[10px] text-muted-foreground/50">
+                    <p className="text-[10px] text-muted-foreground/80">
                       Need new keys? Regenerate below.
                     </p>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     <div className="rounded-lg border border-border/40 bg-muted/20 px-2.5 py-2">
-                      <p className="text-[0.5625rem] uppercase tracking-wider text-muted-foreground/40 mb-0.5">
+                      <p className="text-[0.5625rem] uppercase tracking-wider text-muted-foreground/70 mb-0.5">
                         Host
                       </p>
                       <p className="text-xs font-mono text-foreground/80">
@@ -1623,7 +1623,7 @@ export function InstanceManagerDialog({
                       </p>
                     </div>
                     <div className="rounded-lg border border-border/40 bg-muted/20 px-2.5 py-2">
-                      <p className="text-[0.5625rem] uppercase tracking-wider text-muted-foreground/40 mb-0.5">
+                      <p className="text-[0.5625rem] uppercase tracking-wider text-muted-foreground/70 mb-0.5">
                         Port
                       </p>
                       <p className="text-xs font-mono text-foreground/80">
@@ -1631,7 +1631,7 @@ export function InstanceManagerDialog({
                       </p>
                     </div>
                     <div className="rounded-lg border border-border/40 bg-muted/20 px-2.5 py-2">
-                      <p className="text-[0.5625rem] uppercase tracking-wider text-muted-foreground/40 mb-0.5">
+                      <p className="text-[0.5625rem] uppercase tracking-wider text-muted-foreground/70 mb-0.5">
                         User
                       </p>
                       <p className="text-xs font-mono text-foreground/80">

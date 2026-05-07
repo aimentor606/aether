@@ -52,7 +52,7 @@ services:
       - TZ=Etc/UTC
       - SUBFOLDER=/
       - TITLE=aether Sandbox ${SANDBOX_NAME:-default}
-      - OPENCODE_CONFIG_DIR=/ephemeral/aether-master/opencode
+      - OPENCODE_CONFIG_DIR=/ephemeral/master/opencode
       - OPENCODE_PERMISSION={"*":"allow"}
       - DISPLAY=:1
       - LSS_DIR=/workspace/.lss
@@ -77,7 +77,8 @@ services:
       - aether_LOCAL_SOURCE=${aether_LOCAL_SOURCE:-1}
       - START_DOCKER=true
     env_file:
-      - .env
+      - path: .env
+        required: false
     volumes:
       # ── THE persistence volume ─────────────────────────────────────────
       # Single volume, mounted at /workspace. This is the ONLY persistent
@@ -95,6 +96,7 @@ services:
       - "127.0.0.1:14007:22"    # SSH
       - "127.0.0.1:14008:3211"  # Static Web Server (standalone HTML/assets)
     shm_size: "2gb"
+    entrypoint: ["/bin/sh", "-c", "ln -sf /ephemeral/kortix-master /ephemeral/master 2>/dev/null; ln -sf /ephemeral/kortix-master /ephemeral/aether-master 2>/dev/null; exec /ephemeral/startup.sh"]
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/aether/health"]

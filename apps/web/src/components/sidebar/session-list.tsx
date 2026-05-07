@@ -171,7 +171,7 @@ function SessionRow({
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                className="flex-shrink-0 text-[10px] tabular-nums text-muted-foreground/40 hover:text-muted-foreground transition-colors cursor-pointer px-0.5"
+                className="flex-shrink-0 text-[10px] tabular-nums text-muted-foreground/70 hover:text-muted-foreground transition-colors cursor-pointer px-0.5"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

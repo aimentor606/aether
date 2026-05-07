@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import {
@@ -47,6 +48,7 @@ import { trackSendAuthLink } from '@/lib/analytics/gtm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WallpaperBackground } from '@/components/ui/wallpaper-background';
 import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 // Lazy load heavy components
 const GoogleSignIn = lazy(() => import('@/components/GoogleSignIn'));
@@ -213,7 +215,7 @@ function AccessRequestForm({
       </div>
 
       <div className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-xl px-4 py-3 mb-5">
-        <p className="text-[11px] text-foreground/35 mb-0.5">Requesting for</p>
+        <p className="text-xs text-foreground/40 mb-0.5">Requesting for</p>
         <p className="text-[15px] text-foreground/80 font-medium">{email}</p>
       </div>
 
@@ -256,6 +258,7 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isLoading } = useAuth();
+  const reducedMotion = useReducedMotion();
   const mode = searchParams.get('mode');
   const rawReturnUrl =
     searchParams.get('returnUrl') || searchParams.get('redirect');
@@ -910,24 +913,28 @@ function LoginContent() {
               }}
             >
               <div className="flex flex-col items-center gap-1.5">
-                <p className="text-foreground/50 text-sm font-medium tracking-wide">
+                <p className="text-foreground/60 text-sm font-medium tracking-wide">
                   Aether
                 </p>
-                <p className="text-foreground/25 text-xs tracking-widest uppercase">
+                <p className="text-foreground/45 text-xs tracking-widest uppercase">
                   Click or press Enter to sign in
                 </p>
               </div>
               {/* Scroll indicator */}
-              <motion.div
-                animate={{ y: [0, 5, 0] }}
-                transition={{
-                  duration: 1.8,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              >
-                <ChevronRight className="size-3.5 text-foreground/20 rotate-90" />
-              </motion.div>
+              {reducedMotion ? (
+                <ChevronRight className="size-3.5 text-foreground/30 rotate-90" />
+              ) : (
+                <motion.div
+                  animate={{ y: [0, 5, 0] }}
+                  transition={{
+                    duration: 1.8,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <ChevronRight className="size-3.5 text-foreground/30 rotate-90" />
+                </motion.div>
+              )}
             </motion.div>
           </motion.div>
         )}
@@ -966,7 +973,7 @@ function LoginContent() {
                 {/* Shared header */}
                 <p
                   data-testid="auth-heading"
-                  className="text-[11px] text-center text-foreground/30 tracking-[0.2em] uppercase mb-6"
+                  className="text-xs text-center text-foreground/40 tracking-[0.2em] uppercase mb-6"
                 >
                   Sign in to Aether
                 </p>
@@ -983,10 +990,9 @@ function LoginContent() {
                       autoComplete="email"
                       className="h-11 text-sm rounded-xl bg-foreground/[0.03] border-foreground/[0.08] shadow-none focus-visible:border-foreground/20 transition-colors"
                     />
-                    <Input
+                    <PasswordInput
                       id="password"
                       name="password"
-                      type="password"
                       placeholder="Password"
                       required
                       autoComplete="current-password"
@@ -1022,7 +1028,7 @@ function LoginContent() {
                         <div className="w-full border-t border-foreground/[0.06]" />
                       </div>
                       <div className="relative flex justify-center">
-                        <span className="px-3 bg-background/80 dark:bg-background/75 text-[10px] text-foreground/20 tracking-[0.15em] uppercase">
+                        <span className="px-3 bg-background/80 dark:bg-background/75 text-xs text-foreground/30 tracking-[0.15em] uppercase">
                           or
                         </span>
                       </div>
@@ -1042,7 +1048,7 @@ function LoginContent() {
 
                       {referralCodeParam && (
                         <div className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-xl px-3 py-2">
-                          <p className="text-[10px] text-foreground/35 mb-0.5">
+                          <p className="text-xs text-foreground/40 mb-0.5">
                             Referral
                           </p>
                           <p className="text-[13px] font-semibold">
@@ -1071,14 +1077,14 @@ function LoginContent() {
                         />
                         <label
                           htmlFor="gdprConsent"
-                          className="text-[11px] leading-[1.6] text-foreground/30 cursor-pointer select-none"
+                          className="text-xs leading-[1.6] text-foreground/40 cursor-pointer select-none"
                         >
                           I agree to the{' '}
                           <a
                             href="https://www.aether.dev/legal?tab=privacy"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-foreground/45 hover:text-foreground/65 transition-colors"
+                            className="text-foreground/55 hover:text-foreground/75 transition-colors"
                           >
                             Privacy Policy
                           </a>
@@ -1087,7 +1093,7 @@ function LoginContent() {
                             href="https://www.aether.dev/legal?tab=terms"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-foreground/45 hover:text-foreground/65 transition-colors"
+                            className="text-foreground/55 hover:text-foreground/75 transition-colors"
                           >
                             Terms
                           </a>
@@ -1157,6 +1163,7 @@ function SelfHostedLoginContent() {
   const searchParams = useSearchParams();
   const { user, isLoading } = useAuth();
   const { installed, loading: statusLoading } = useInstallStatus();
+  const reducedMotion = useReducedMotion();
   const rawReturnUrl =
     searchParams.get('returnUrl') || searchParams.get('redirect');
   const returnUrl = rawReturnUrl?.match(/^\/instances\/[^/]+/)
@@ -1240,23 +1247,27 @@ function SelfHostedLoginContent() {
               }}
             >
               <div className="flex flex-col items-center gap-1.5">
-                <p className="text-foreground/50 text-sm font-medium tracking-wide">
+                <p className="text-foreground/60 text-sm font-medium tracking-wide">
                   Aether
                 </p>
-                <p className="text-foreground/25 text-xs tracking-widest uppercase">
+                <p className="text-foreground/45 text-xs tracking-widest uppercase">
                   Click or press Enter to sign in
                 </p>
               </div>
-              <motion.div
-                animate={{ y: [0, 5, 0] }}
-                transition={{
-                  duration: 1.8,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              >
-                <ChevronRight className="size-3.5 text-foreground/20 rotate-90" />
-              </motion.div>
+              {reducedMotion ? (
+                <ChevronRight className="size-3.5 text-foreground/30 rotate-90" />
+              ) : (
+                <motion.div
+                  animate={{ y: [0, 5, 0] }}
+                  transition={{
+                    duration: 1.8,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <ChevronRight className="size-3.5 text-foreground/30 rotate-90" />
+                </motion.div>
+              )}
             </motion.div>
           </motion.div>
         )}

@@ -182,12 +182,12 @@ function ServiceCard({
                   </span>
                 )}
                 {service.port > 0 && (
-                  <span className="text-xs text-muted-foreground/50 font-mono">
+                  <span className="text-xs text-muted-foreground/80 font-mono">
                     :{service.port}
                   </span>
                 )}
                 {service.framework && service.framework !== 'unknown' && (
-                  <span className="text-xs text-muted-foreground/50">
+                  <span className="text-xs text-muted-foreground/80">
                     {service.framework}
                   </span>
                 )}
@@ -210,7 +210,7 @@ function ServiceCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {service.startedAt && (
-                <span className="text-[11px] text-muted-foreground/50">
+                <span className="text-[11px] text-muted-foreground/80">
                   {formatTimeAgo(service.startedAt)}
                 </span>
               )}

@@ -94,6 +94,36 @@ const PROTECTED_ROUTES = [
   '/onboarding',
 ];
 
+// Routes that require admin role (server-side check)
+const ADMIN_ROUTES = [
+  '/admin/analytics',
+  '/admin/sandboxes',
+  '/admin/sandbox-pool',
+  '/admin/access-requests',
+  '/admin/feature-flags',
+  '/admin/litellm',
+  '/admin/stateless',
+  '/admin/stress-test',
+  '/admin/notifications',
+  '/admin/feedback',
+  '/admin/utils',
+];
+
+const ADMIN_ROLE_COOKIE = 'aether-admin-role';
+const ADMIN_ROLE_COOKIE_MAX_AGE = 5 * 60; // 5 minutes
+
+function isAdminRoute(pathname: string): boolean {
+  return ADMIN_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + '/')
+  );
+}
+
+function isSelfHostedMode(): boolean {
+  const envMode =
+    process.env.AETHER_PUBLIC_ENV_MODE || process.env.NEXT_PUBLIC_ENV_MODE;
+  return envMode !== 'cloud';
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const instanceRoute = extractInstanceRoute(pathname);
@@ -256,7 +286,7 @@ export async function middleware(request: NextRequest) {
   // to /dashboard. This avoids the old client-side redirect chain that caused
   // a white flash (render null → useAuth resolves → router.replace → skeleton).
   if (pathname === '/' && user) {
-    const target = activeInstanceId ? buildInstancePath(activeInstanceId, '/dashboard') : '/instances';
+    const target = activeInstanceId ? buildInstancePath(activeInstanceId, '/dashboard') : '/instances?reason=no-instance';
     return NextResponse.redirect(new URL(target, request.url));
   }
 
@@ -323,6 +353,71 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
+    // ── Admin routes: server-side role check ─────────────────────────
+    if (isAdminRoute(effectivePathname)) {
+      if (isSelfHostedMode()) {
+        // Self-hosted: all authenticated users are admins
+        // Continue with the response, no gate needed
+      } else {
+        // Cloud mode: check admin role via cached cookie or backend API
+        let isAdmin = false;
+        const adminCookie = request.cookies.get(ADMIN_ROLE_COOKIE)?.value;
+
+        if (adminCookie) {
+          try {
+            const parsed = JSON.parse(adminCookie);
+            if (parsed.exp > Date.now()) {
+              isAdmin = parsed.isAdmin === true;
+            }
+          } catch {
+            // Invalid cookie, recheck
+          }
+        }
+
+        if (!isAdmin) {
+          // Check via backend API
+          try {
+            const backendUrl =
+              process.env.BACKEND_URL ||
+              process.env.AETHER_PUBLIC_BACKEND_URL ||
+              'http://localhost:8008/v1';
+            const { data: sessionData } =
+              await supabase.auth.getSession();
+            const accessToken = sessionData?.session?.access_token;
+
+            if (accessToken) {
+              const res = await fetch(`${backendUrl}/user-roles`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+                signal: AbortSignal.timeout(3000),
+              });
+              if (res.ok) {
+                const data = await res.json();
+                isAdmin = data.isAdmin === true;
+              }
+            }
+          } catch {
+            // Backend unreachable — deny access
+          }
+        }
+
+        if (!isAdmin) {
+          const url = request.nextUrl.clone();
+          url.pathname = '/dashboard';
+          url.searchParams.set('error', 'admin_required');
+          return NextResponse.redirect(url);
+        }
+
+        // Cache the result
+        if (!adminCookie) {
+          supabaseResponse.cookies.set(
+            ADMIN_ROLE_COOKIE,
+            JSON.stringify({ isAdmin: true, exp: Date.now() + ADMIN_ROLE_COOKIE_MAX_AGE * 1000 }),
+            { path: '/', maxAge: ADMIN_ROLE_COOKIE_MAX_AGE, sameSite: 'lax' }
+          );
+        }
+      }
+    }
+
     // ── Instance-scoped routes (/instances/:id/dashboard, etc.) ──────────
     // Rewrite to the bare app route and set the active-instance cookie.
     // Works for both cloud and local mode.
@@ -348,7 +443,7 @@ export async function middleware(request: NextRequest) {
     // otherwise send to /instances to pick one.
     if (isInstanceScopedAppPath(pathname)) {
       const url = request.nextUrl.clone();
-      url.pathname = activeInstanceId ? buildInstancePath(activeInstanceId, pathname) : '/instances';
+      url.pathname = activeInstanceId ? buildInstancePath(activeInstanceId, pathname) : '/instances?reason=no-instance';
       return NextResponse.redirect(url);
     }
 

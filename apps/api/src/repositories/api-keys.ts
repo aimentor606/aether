@@ -11,7 +11,7 @@ import {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type ApiKeyType = 'user' | 'sandbox';
+export type ApiKeyType = 'user' | 'sandbox' | 'developer';
 
 export interface ApiKeyValidationResult {
   isValid: boolean;
@@ -19,27 +19,35 @@ export interface ApiKeyValidationResult {
   sandboxId?: string;
   keyId?: string;
   type?: ApiKeyType;
+  scopes?: string[];
+  allowedModels?: string[];
   error?: string;
 }
 
 export interface CreateApiKeyParams {
-  sandboxId: string;
+  sandboxId?: string;
   accountId: string;
   title: string;
   description?: string;
   expiresAt?: Date;
   type?: ApiKeyType;
+  scopes?: string[];
+  allowedModels?: string[];
+  rateLimitPerMinute?: number;
 }
 
 export interface CreateApiKeyResult {
   keyId: string;
   publicKey: string;
-  secretKey: string; // returned ONCE at creation, never stored
+  secretKey: string;
   title: string;
   description: string | null;
   status: string;
   type: ApiKeyType;
-  sandboxId: string;
+  sandboxId: string | null;
+  scopes: string[] | null;
+  allowedModels: string[] | null;
+  rateLimitPerMinute: number | null;
   expiresAt: Date | null;
   createdAt: Date;
 }
@@ -72,13 +80,16 @@ export async function createApiKey(params: CreateApiKeyParams): Promise<CreateAp
   const [row] = await db
     .insert(aetherApiKeys)
     .values({
-      sandboxId: params.sandboxId,
+      sandboxId: params.sandboxId ?? null,
       accountId: params.accountId,
       publicKey,
       secretKeyHash,
       title: params.title,
       description: params.description ?? null,
       type: keyType,
+      scopes: params.scopes ?? null,
+      allowedModels: params.allowedModels ?? null,
+      rateLimitPerMinute: params.rateLimitPerMinute ?? null,
       expiresAt: params.expiresAt ?? null,
     })
     .returning();
@@ -90,12 +101,15 @@ export async function createApiKey(params: CreateApiKeyParams): Promise<CreateAp
   return {
     keyId: row.keyId,
     publicKey: row.publicKey,
-    secretKey, // plaintext — shown once
+    secretKey,
     title: row.title,
     description: row.description,
     status: row.status,
     type: row.type as ApiKeyType,
     sandboxId: row.sandboxId,
+    scopes: row.scopes,
+    allowedModels: row.allowedModels,
+    rateLimitPerMinute: row.rateLimitPerMinute,
     expiresAt: row.expiresAt,
     createdAt: row.createdAt,
   };
@@ -184,6 +198,8 @@ export async function validateSecretKey(secretKey: string): Promise<ApiKeyValida
         type: aetherApiKeys.type,
         status: aetherApiKeys.status,
         expiresAt: aetherApiKeys.expiresAt,
+        scopes: aetherApiKeys.scopes,
+        allowedModels: aetherApiKeys.allowedModels,
       })
       .from(aetherApiKeys)
       .where(
@@ -210,9 +226,11 @@ export async function validateSecretKey(secretKey: string): Promise<ApiKeyValida
     return {
       isValid: true,
       accountId: row.accountId,
-      sandboxId: row.sandboxId,
+      sandboxId: row.sandboxId ?? undefined,
       keyId: row.keyId,
       type: row.type as ApiKeyType,
+      scopes: row.scopes ?? undefined,
+      allowedModels: row.allowedModels ?? undefined,
     };
   } catch (err) {
     console.error('API key validation error:', err);

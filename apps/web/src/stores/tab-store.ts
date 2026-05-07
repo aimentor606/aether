@@ -33,6 +33,9 @@ const MAX_RECENTLY_CLOSED = 20;
 
 /** Maximum depth for tab focus history (VS Code-like back-navigation) */
 const MAX_FOCUS_HISTORY = 50;
+
+/** Maximum number of open tabs to prevent memory pressure */
+const MAX_TABS = 15;
 export const DASHBOARD_TAB: Omit<Tab, 'openedAt'> & { openedAt: number } = {
   id: DASHBOARD_TAB_ID,
   title: '',
@@ -209,10 +212,24 @@ export const useTabStore = create<TabState>()(
           openedAt: Date.now(),
         };
 
-        const updated = ensureDashboardTab({ ...tabs, [newTab.id]: newTab }, [
-          ...tabOrder,
-          newTab.id,
-        ]);
+        // Enforce tab limit — close the oldest non-pinned tab if at capacity
+        let prunedTabs = { ...tabs };
+        let prunedOrder = [...tabOrder];
+        if (tabOrder.length >= MAX_TABS) {
+          const unpinnedIds = tabOrder.filter(
+            (id) => !tabs[id]?.pinned && id !== DASHBOARD_TAB_ID,
+          );
+          if (unpinnedIds.length > 0) {
+            const evictId = unpinnedIds[0];
+            delete prunedTabs[evictId];
+            prunedOrder = prunedOrder.filter((id) => id !== evictId);
+          }
+        }
+
+        const updated = ensureDashboardTab(
+          { ...prunedTabs, [newTab.id]: newTab },
+          [...prunedOrder, newTab.id],
+        );
 
         set({
           ...updated,

@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Button } from '@/components/ui/button';
 import { AetherLoader } from '@/components/ui/aether-loader';
 import { selfHostedSignIn, installOwner } from '@/app/auth/actions';
@@ -78,10 +79,9 @@ function InstallerForm({ onSuccess, onError }: InstallerFormProps) {
         onChange={(e) => setEmail(e.target.value)}
         className="h-11 text-[15px] bg-foreground/[0.04] border-foreground/[0.08] rounded-xl shadow-none"
       />
-      <Input
+      <PasswordInput
         id="install-password"
         name="password"
-        type="password"
         placeholder="Password"
         required
         autoComplete="new-password"
@@ -89,10 +89,9 @@ function InstallerForm({ onSuccess, onError }: InstallerFormProps) {
         onChange={(e) => setPassword(e.target.value)}
         className="h-11 text-[15px] bg-foreground/[0.04] border-foreground/[0.08] rounded-xl shadow-none"
       />
-      <Input
+      <PasswordInput
         id="install-confirm-password"
         name="confirmPassword"
-        type="password"
         placeholder="Confirm password"
         required
         autoComplete="new-password"
@@ -119,8 +118,11 @@ export type SandboxProviderName = 'local_docker' | 'daytona' | 'justavps';
 export function useInstallStatus() {
   const [installed, setInstalled] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sandboxProviders, setSandboxProviders] = useState<SandboxProviderName[]>([]);
-  const [defaultProvider, setDefaultProvider] = useState<SandboxProviderName>('local_docker');
+  const [sandboxProviders, setSandboxProviders] = useState<
+    SandboxProviderName[]
+  >([]);
+  const [defaultProvider, setDefaultProvider] =
+    useState<SandboxProviderName>('local_docker');
 
   useEffect(() => {
     const backendUrl = getEnv().BACKEND_URL || 'http://localhost:8008/v1';
@@ -158,7 +160,10 @@ export function useInstallStatus() {
 
         const statusData = await statusRes.json();
 
-        if (statusData.installed === null || statusData.installed === undefined) {
+        if (
+          statusData.installed === null ||
+          statusData.installed === undefined
+        ) {
           if (retries < MAX_RETRIES) {
             retries++;
             setTimeout(fetchStatus, 1500 * retries);
@@ -223,8 +228,11 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
     setPending(true);
 
     const form = e.currentTarget;
-    const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim().toLowerCase();
-    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value
+      .trim()
+      .toLowerCase();
+    const password = (form.elements.namedItem('password') as HTMLInputElement)
+      .value;
 
     if (!email || !email.includes('@')) {
       setErrorMessage('Please enter a valid email address');
@@ -244,10 +252,11 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
         try {
           const supabase = createBrowserSupabaseClient();
           await supabase.auth.signOut({ scope: 'local' });
-          const { data: clientSignInData, error: clientSignInError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
+          const { data: clientSignInData, error: clientSignInError } =
+            await supabase.auth.signInWithPassword({
+              email,
+              password,
+            });
 
           if (!clientSignInError && clientSignInData.session) {
             invalidateTokenCache();
@@ -292,7 +301,8 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
           }
 
           if (!signedInJwt) {
-            window.location.href = result.redirectTo || returnUrl || '/instances';
+            window.location.href =
+              result.redirectTo || returnUrl || '/instances';
             return;
           }
         }
@@ -303,7 +313,9 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
         window.location.href = returnUrl || '/instances';
         return;
       } else {
-        setErrorMessage('This instance still needs its initial owner account. Run the Aether installer/CLI bootstrap first.');
+        setErrorMessage(
+          'This instance still needs its initial owner account. Run the Aether installer/CLI bootstrap first.',
+        );
         setPending(false);
       }
     } catch (err: any) {
@@ -373,10 +385,9 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
           autoComplete="email"
           className="h-11 text-[15px] bg-foreground/[0.04] border-foreground/[0.08] shadow-none"
         />
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           placeholder="Password"
           required
           autoComplete="current-password"

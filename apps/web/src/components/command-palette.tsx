@@ -62,7 +62,6 @@ import { createClient } from '@/lib/supabase/client';
 import { isBillingEnabled } from '@/lib/config';
 import { useTheme } from 'next-themes';
 import { clearUserLocalStorage } from '@/lib/utils/clear-local-storage';
-import { useAdminRole } from '@/hooks/admin';
 import { flattenModels } from '@/lib/models';
 import { useModelStore } from '@/hooks/opencode/use-model-store';
 import {
@@ -71,7 +70,7 @@ import {
   MODEL_SELECTOR_PROVIDER_IDS,
 } from '@/components/providers/provider-branding';
 import { useWorkspaceSearch, useFilesStore } from '@/features/files';
-import { useAetherProjects, type AetherProject } from '@/hooks/aether/use-aether-projects';
+import { useAetherProjects } from '@/hooks/aether/use-aether-projects';
 import { useOpenCodeMessages } from '@/hooks/opencode/use-opencode-sessions';
 import { useMessageJumpStore } from '@/stores/message-jump-store';
 import { groupMessagesIntoTurns, isTextPart, type TextPart } from '@/ui';
@@ -373,8 +372,6 @@ export function CommandPalette() {
   const createPty = useCreatePty();
   const { theme, setTheme } = useTheme();
   const billingEnabled = isBillingEnabled();
-  const { data: adminRoleData } = useAdminRole();
-  const isAdmin = adminRoleData?.isAdmin ?? false;
 
   // ── Data hooks ──
   const { data: sessions } = useOpenCodeSessions();
@@ -521,10 +518,9 @@ export function CommandPalette() {
     return getItemsForSurface('commandPalette').filter((item) => {
       if (item.requiresBilling && !billingEnabled) return false;
       if (item.requiresSession && !currentSessionId) return false;
-      if (item.requiresAdmin && !isAdmin) return false;
       return true;
     });
-  }, [billingEnabled, currentSessionId, isAdmin]);
+  }, [billingEnabled, currentSessionId]);
 
   // Filter navigation items client-side
   const filteredNavItems = useMemo(() => {
@@ -656,22 +652,6 @@ export function CommandPalette() {
       setIsCreating(false);
     }
   }, [isCreating, createSession, close]);
-
-  const handleNavigate = useCallback(
-    (path: string, label?: string) => {
-      const type = path.startsWith('/settings')
-        ? 'settings' as const
-        : 'page' as const;
-      openTabAndNavigate({
-        id: `page:${path}`,
-        title: label || path.split('/').pop() || '',
-        type,
-        href: path,
-      }, router);
-      close();
-    },
-    [router, close],
-  );
 
   const handleSelectSession = useCallback(
     (sessionId: string, title?: string) => {

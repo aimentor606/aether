@@ -79,31 +79,31 @@ const DeploymentsPage = lazy(() =>
   })),
 );
 
-// Admin pages
+// Admin pages (ops portal)
 const AdminAnalyticsPage = lazy(
-  () => import('@/app/(dashboard)/admin/analytics/page'),
+  () => import('@/app/(ops)/admin/analytics/page'),
 );
 const AdminFeedbackPage = lazy(
-  () => import('@/app/(dashboard)/admin/feedback/page'),
+  () => import('@/app/(ops)/admin/feedback/page'),
 );
 const AdminNotificationsPage = lazy(
-  () => import('@/app/(dashboard)/admin/notifications/page'),
+  () => import('@/app/(ops)/admin/notifications/page'),
 );
-const AdminUtilsPage = lazy(() => import('@/app/(dashboard)/admin/utils/page'));
+const AdminUtilsPage = lazy(() => import('@/app/(ops)/admin/utils/page'));
 const AdminSandboxPoolPage = lazy(
-  () => import('@/app/(dashboard)/admin/sandbox-pool/page'),
+  () => import('@/app/(ops)/admin/sandbox-pool/page'),
 );
 const AdminStatelessPage = lazy(
-  () => import('@/app/(dashboard)/admin/stateless/page'),
+  () => import('@/app/(ops)/admin/stateless/page'),
 );
 const AdminStressTestPage = lazy(
-  () => import('@/app/(dashboard)/admin/stress-test/page'),
+  () => import('@/app/(ops)/admin/stress-test/page'),
 );
 const AdminAccessRequestsPage = lazy(
-  () => import('@/app/(dashboard)/admin/access-requests/page'),
+  () => import('@/app/(ops)/admin/access-requests/page'),
 );
 const AdminSandboxesPage = lazy(
-  () => import('@/app/(dashboard)/admin/sandboxes/page'),
+  () => import('@/app/(ops)/admin/sandboxes/page'),
 );
 
 const LegacyThreadPage = lazy(
@@ -115,6 +115,8 @@ const ProjectDetailPage = lazy(
 );
 
 const UsageDashboardPage = lazy(() => import('@/app/(dashboard)/usage/page'));
+
+const ModelsPlaygroundPage = lazy(() => import('@/app/(dashboard)/models/page'));
 
 // ---------------------------------------------------------------------------
 // Route → Component mapping
@@ -128,6 +130,7 @@ const PAGE_COMPONENTS: Record<string, ComponentType> = {
   '/settings/providers': ProvidersPage,
   '/credits-explained': CreditsPage,
   '/usage': UsageDashboardPage,
+  '/models': ModelsPlaygroundPage,
   '/changelog': ChangelogPage,
   '/workspace': WorkspacePage,
   '/projects': WorkspacePage,

@@ -483,7 +483,6 @@ export default function SandboxPoolAdminPage() {
                     <Server className="w-5 h-5 text-secondary" />
                     Pooled Sandboxes
                   </CardTitle>
-                  </CardTitle>
                   <CardDescription>
                     {sandboxesData?.count ?? sandboxesData?.total ?? 0}{' '}
                     sandboxes currently available in the pool

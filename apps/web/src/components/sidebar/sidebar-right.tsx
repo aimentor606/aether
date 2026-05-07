@@ -195,7 +195,7 @@ export function SidebarRight() {
                       <div key={subGroup ?? clusterIdx} className={clusterIdx === 0 ? 'mt-0' : 'mt-2'}>
                         {label && (
                           <div className="px-3 pb-1.5 pt-1">
-                            <span className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wider select-none">
+                            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider select-none">
                               {label}
                             </span>
                           </div>
@@ -235,7 +235,7 @@ export function SidebarRight() {
                       <div key={subGroup ?? clusterIdx} className="mt-3">
                         {label && (
                           <div className="px-3 pb-1.5 pt-1">
-                            <span className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wider select-none">
+                            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider select-none">
                               {label}
                             </span>
                           </div>
@@ -437,7 +437,7 @@ export function SidebarRight() {
                     <div key={subGroup ?? clusterIdx} className={clusterIdx === 0 ? 'mt-0' : 'mt-2'}>
                       {label && (
                         <div className="px-3 pb-1.5 pt-1">
-                          <span className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wider select-none">
+                          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider select-none">
                             {label}
                           </span>
                         </div>
@@ -477,7 +477,7 @@ export function SidebarRight() {
                     <div key={subGroup ?? clusterIdx} className="mt-3">
                       {label && (
                         <div className="px-3 pb-1.5 pt-1">
-                          <span className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wider select-none">
+                          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider select-none">
                             {label}
                           </span>
                         </div>

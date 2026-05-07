@@ -147,7 +147,7 @@ export function TerminalTabContent({
   if (!pty) {
     return (
       <div className="h-full w-full flex flex-col items-center justify-center bg-background gap-3">
-        <Terminal className="h-8 w-8 text-muted-foreground/30" />
+        <Terminal className="h-8 w-8 text-muted-foreground/70" />
         <span className="text-xs text-muted-foreground">
           Terminal session ended
         </span>

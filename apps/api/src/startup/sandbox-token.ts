@@ -180,7 +180,7 @@ export async function injectSandboxToken(sandboxId: string, accountId: string): 
       );
       // Also write to bootstrap file so token survives container restart
       rawExecSync(
-        `docker exec ${config.SANDBOX_CONTAINER_NAME} bash -c 'mkdir -p /workspace/.secrets && cat /workspace/.secrets/.bootstrap-env.json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin) if sys.stdin.readable() else {}; d.update(${JSON.stringify(JSON.stringify({ AETHER_TOKEN: token, AETHER_API_URL: aetherApiUrl }))}); print(json.dumps(d))" > /workspace/.secrets/.bootstrap-env.json.tmp && mv /workspace/.secrets/.bootstrap-env.json.tmp /workspace/.secrets/.bootstrap-env.json'`,
+        `docker exec ${config.SANDBOX_CONTAINER_NAME} bash -c 'mkdir -p /workspace/.secrets && cat /workspace/.secrets/.bootstrap-env.json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin) if sys.stdin.readable() else {}; d.update(${JSON.stringify({ AETHER_TOKEN: token, AETHER_API_URL: aetherApiUrl }).replace(/"/g, '\\"')}); print(json.dumps(d))" > /workspace/.secrets/.bootstrap-env.json.tmp && mv /workspace/.secrets/.bootstrap-env.json.tmp /workspace/.secrets/.bootstrap-env.json'`,
         { stdio: 'pipe', timeout: 15_000, env: dockerEnv },
       ).toString();
       console.log('[startup] AETHER_TOKEN synced via docker exec fallback + bootstrap file');

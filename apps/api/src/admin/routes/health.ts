@@ -15,7 +15,7 @@ healthRoutes.get('/api/health', async (c) => {
 
   if (!repoRoot) {
     try {
-      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/aether/health', {}, 5000);
+      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/kortix/health', {}, 5000);
       checks.sandbox = { ok: true };
       checks.docker = { ok: true };
       // If runtime isn't ready, sandbox is reachable but not fully operational

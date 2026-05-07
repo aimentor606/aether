@@ -661,12 +661,12 @@ export function SessionTurn({
                 </span>
               )}
               {sessionReport.prompt && (
-                <span className="text-muted-foreground/40 truncate">
+                <span className="text-muted-foreground/60 truncate">
                   {sessionReport.prompt.slice(0, 60)}
                 </span>
               )}
             </div>
-            <ExternalLink className="size-3 flex-shrink-0 text-muted-foreground/30 group-hover/report:text-muted-foreground/60 transition-colors" />
+            <ExternalLink className="size-3 flex-shrink-0 text-muted-foreground/60 group-hover/report:text-muted-foreground/60 transition-colors" />
           </div>
           <SubSessionModal
             open={sessionReportModalOpen}

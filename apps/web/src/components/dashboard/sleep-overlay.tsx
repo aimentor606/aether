@@ -82,7 +82,7 @@ function SleepClock({ phase }: { phase: 'in' | 'visible' | 'out' }) {
       }}
     >
       <p
-        className="text-foreground/35 text-[13px] font-light tracking-widest"
+        className="text-foreground/60 text-[13px] font-light tracking-widest"
         suppressHydrationWarning
       >
         {day} {month} {date}
@@ -232,7 +232,7 @@ export function SleepOverlay() {
               referrerPolicy="no-referrer"
             />
           ) : (
-            <span className="text-foreground/40 text-xl font-medium">
+            <span className="text-foreground/60 text-xl font-medium">
               {user?.name?.charAt(0)?.toUpperCase() || ''}
             </span>
           )}
@@ -240,7 +240,7 @@ export function SleepOverlay() {
         <p className="text-foreground/80 text-[15px] sm:text-base font-medium tracking-wide mb-1">
           {user?.name || ''}
         </p>
-        <p className="text-foreground/30 text-xs tracking-wide">
+        <p className="text-foreground/60 text-xs tracking-wide">
           Click anywhere or press Enter to continue
         </p>
       </div>

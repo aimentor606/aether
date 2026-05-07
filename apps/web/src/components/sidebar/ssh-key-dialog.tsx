@@ -160,8 +160,8 @@ function SecretCodeBlock({ text, label }: { text: string; label?: string }) {
           {finalMasked}
         </p>
         <div className="flex items-center gap-1.5 px-3 py-1.5 border-t border-border/30 bg-muted/20">
-          <KeyRound className="h-2.5 w-2.5 text-muted-foreground/50 shrink-0" />
-          <span className="text-[10px] text-muted-foreground/50">
+          <KeyRound className="h-2.5 w-2.5 text-muted-foreground/80 shrink-0" />
+          <span className="text-[10px] text-muted-foreground/80">
             Private key hidden — click to copy full command
           </span>
         </div>
@@ -227,7 +227,7 @@ export function SSHResultView({
       {/* ── Divider ── */}
       <div className="flex items-center gap-3">
         <div className="h-px flex-1 bg-border/40" />
-        <span className="text-[10px] text-muted-foreground/40 uppercase tracking-wider">
+        <span className="text-[10px] text-muted-foreground/70 uppercase tracking-wider">
           or manually
         </span>
         <div className="h-px flex-1 bg-border/40" />
@@ -271,7 +271,7 @@ export function SSHResultView({
           {/* Cursor / VS Code */}
           <div className="p-3 space-y-2 min-w-0">
             <div className="flex items-center gap-2">
-              <Monitor className="h-3.5 w-3.5 text-muted-foreground/70" />
+              <Monitor className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="text-xs font-medium">Cursor / VS Code</span>
               <span className="text-[0.5625rem] font-medium bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded-full leading-none">
                 Recommended
@@ -304,7 +304,7 @@ export function SSHResultView({
           {/* Plain SSH */}
           <div className="p-3 space-y-2 min-w-0">
             <div className="flex items-center gap-2">
-              <Terminal className="h-3.5 w-3.5 text-muted-foreground/70" />
+              <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="text-xs font-medium">Terminal / Plain SSH</span>
             </div>
             <VisibleCodeBlock text={reconnectCmd} label="SSH command" />
@@ -468,7 +468,7 @@ export function SSHKeyDialog({ open, onOpenChange }: SSHKeyDialogProps) {
                 </>
               )}
             </Button>
-            <p className="text-[10px] text-muted-foreground/60 text-center">
+            <p className="text-[10px] text-muted-foreground text-center">
               Generates an ed25519 keypair unique to this machine and configures
               SSH access.
             </p>
@@ -487,7 +487,7 @@ export function SSHKeyDialog({ open, onOpenChange }: SSHKeyDialogProps) {
                     label="Reconnect"
                   />
                 </div>
-                <p className="text-[0.5625rem] text-muted-foreground/40">
+                <p className="text-[0.5625rem] text-muted-foreground/70">
                   From {new Date(sshMeta.updatedAt).toLocaleString()}
                 </p>
               </div>

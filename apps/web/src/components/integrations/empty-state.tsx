@@ -4,7 +4,7 @@ import { Ripple } from '@/components/ui/ripple';
 
 export const EmptyState = () => (
   <div
-    className="relative bg-muted/20 rounded-3xl border border-dashed border-border/50 flex flex-col items-center justify-center py-20 px-4 overflow-hidden"
+    className="relative bg-muted/20 rounded-lg border border-dashed border-border/50 flex flex-col items-center justify-center py-20 px-4 overflow-hidden"
     data-testid="connectors-empty"
   >
     <Ripple mainCircleSize={160} mainCircleOpacity={0.12} numCircles={6} />

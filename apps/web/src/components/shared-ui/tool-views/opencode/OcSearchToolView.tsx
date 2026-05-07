@@ -291,7 +291,7 @@ function FilePathList({
                 {name}
               </span>
               {dir && (
-                <span className="text-muted-foreground/40 truncate text-[11px]">
+                <span className="text-muted-foreground/60 truncate text-[11px]">
                   {dir}
                 </span>
               )}
@@ -354,7 +354,7 @@ function GrepResultList({
                   {name}
                 </span>
                 {dir && (
-                  <span className="text-muted-foreground/40 truncate text-[11px]">
+                  <span className="text-muted-foreground/60 truncate text-[11px]">
                     {dir}
                   </span>
                 )}

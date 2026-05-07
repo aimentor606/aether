@@ -6,7 +6,7 @@
  *   - If running a stable build, compares against latest stable
  *
  * Docker image-based update flow:
- *   - `currentVersion` is provided by the caller (from /aether/health)
+ *   - `currentVersion` is provided by the caller (from /kortix/health)
  *   - `latestVersion` is fetched from the platform API (channel-aware)
  *   - Frontend compares them → `updateAvailable`
  *   - `update()` POSTs to aether-api which pulls new image + recreates container

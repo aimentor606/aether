@@ -63,7 +63,7 @@ export function PromptExamples({
                 <p className="text-sm text-foreground/80 group-hover:text-foreground transition-colors leading-relaxed flex-1">
                   {prompt.text}
                 </p>
-                <ArrowUpRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-foreground/60 shrink-0 transition-colors duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <ArrowUpRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-foreground/60 shrink-0 transition-colors duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </div>
             </motion.div>
           ))}

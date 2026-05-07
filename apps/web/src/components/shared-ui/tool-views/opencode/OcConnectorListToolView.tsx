@@ -103,7 +103,7 @@ export function OcConnectorListToolView({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full py-12 px-6">
-            <Plug className="h-8 w-8 text-muted-foreground/30 mb-3" />
+            <Plug className="h-8 w-8 text-muted-foreground/60 mb-3" />
             <p className="text-sm text-muted-foreground">No connectors found</p>
             <p className="text-xs text-muted-foreground/50 mt-1">Use connector_setup to add services</p>
           </div>

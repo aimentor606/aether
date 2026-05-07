@@ -22,7 +22,7 @@ export function CtaSection({ onLaunch, launching = false }: { onLaunch: () => vo
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight text-foreground mb-6">
           Ready to launch your computer?
         </h2>
-        <p className="text-lg text-muted-foreground/70 leading-relaxed mb-10 max-w-2xl mx-auto">
+        <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto">
           Join thousands of engineers running autonomous agents on their own infrastructure. Open source, self-hosted, and free forever.
         </p>
         <div className="flex flex-col items-center gap-8">
@@ -50,7 +50,7 @@ export function CtaSection({ onLaunch, launching = false }: { onLaunch: () => vo
           </div>
           <div className="flex items-center gap-4 w-full max-w-xs mx-auto">
             <div className="h-px bg-border/30 flex-1" />
-            <span className="text-xs text-muted-foreground/40 uppercase tracking-widest">-- or install on your machine</span>
+            <span className="text-xs text-muted-foreground/70 uppercase tracking-widest">-- or install on your machine</span>
             <div className="h-px bg-border/30 flex-1" />
           </div>
           <div className="w-full max-w-lg mx-auto">
@@ -58,11 +58,11 @@ export function CtaSection({ onLaunch, launching = false }: { onLaunch: () => vo
               onClick={handleCopy}
               className="group w-full flex items-center gap-3 rounded-2xl border border-border/50 bg-card/30 px-5 py-3.5 text-left transition-colors hover:bg-muted/20 cursor-pointer"
             >
-              <span className="text-muted-foreground/40 text-sm select-none font-mono">$</span>
+              <span className="text-muted-foreground/70 text-sm select-none font-mono">$</span>
               <code className="flex-1 text-sm font-mono text-foreground/80 truncate">
                 {INSTALL_CMD}
               </code>
-              <span className="shrink-0 text-muted-foreground/40 group-hover:text-muted-foreground/70 transition-colors">
+              <span className="shrink-0 text-muted-foreground/70 group-hover:text-muted-foreground transition-colors">
                 {copied ? (
                   <Check className="size-4 text-emerald-500" />
                 ) : (

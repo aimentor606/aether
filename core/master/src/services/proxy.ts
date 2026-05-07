@@ -75,7 +75,7 @@ export async function proxyToOpenCode(c: Context): Promise<Response> {
         // Try to extract a meaningful error message from JSON response
         const parsed = JSON.parse(text)
         const errMsg = parsed?.data?.message || parsed?.message || parsed?.error || text.slice(0, 200)
-        console.error(`[Kortix Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: ${errMsg}`)
+        console.error(`[Aether] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: ${errMsg}`)
       } catch {
         const text = new TextDecoder().decode(body).slice(0, 200)
         // Check for Bun's HTML error fallback (module resolution errors, etc.)
@@ -83,12 +83,12 @@ export async function proxyToOpenCode(c: Context): Promise<Response> {
           // Extract the base64 error from Bun's fallback page
           const b64Match = new TextDecoder().decode(body).match(/type="binary\/peechy">\s*([\w+/=]+)\s*</)
           if (b64Match) {
-            console.error(`[Kortix Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: Bun startup crash (module resolution or compile error — check OpenCode logs)`)
+            console.error(`[Aether] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: Bun startup crash (module resolution or compile error — check OpenCode logs)`)
           } else {
-            console.error(`[Kortix Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: Bun error page returned (check OpenCode logs)`)
+            console.error(`[Aether] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: Bun error page returned (check OpenCode logs)`)
           }
         } else {
-          console.error(`[Kortix Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: ${text || '(empty response)'}`)
+          console.error(`[Aether] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: ${text || '(empty response)'}`)
         }
       }
     }
@@ -103,7 +103,7 @@ export async function proxyToOpenCode(c: Context): Promise<Response> {
     // AbortError for manual controller.abort())
     if (error instanceof DOMException && (error.name === 'AbortError' || error.name === 'TimeoutError')) {
       if (!acceptsSSE) {
-        console.error(`[Kortix Master] OpenCode timeout on ${c.req.method} ${url.pathname} after ${FETCH_TIMEOUT_MS / 1000}s`)
+        console.error(`[Aether] OpenCode timeout on ${c.req.method} ${url.pathname} after ${FETCH_TIMEOUT_MS / 1000}s`)
         return c.json({ error: 'OpenCode not responding', details: `${url.pathname} timed out after ${FETCH_TIMEOUT_MS / 1000}s — OpenCode may still be starting` }, 504)
       }
       // SSE client disconnected — just return empty response (connection is already gone)
@@ -112,9 +112,9 @@ export async function proxyToOpenCode(c: Context): Promise<Response> {
     const errMsg = error instanceof Error ? error.message : String(error)
     const isConnRefused = errMsg.includes('ECONNREFUSED') || errMsg.includes('Unable to connect')
     if (isConnRefused) {
-      console.error(`[Kortix Master] OpenCode unreachable on ${c.req.method} ${url.pathname}: ${errMsg} — is OpenCode running on ${config.OPENCODE_HOST}:${config.OPENCODE_PORT}?`)
+      console.error(`[Aether] OpenCode unreachable on ${c.req.method} ${url.pathname}: ${errMsg} — is OpenCode running on ${config.OPENCODE_HOST}:${config.OPENCODE_PORT}?`)
     } else {
-      console.error(`[Kortix Master] Proxy error on ${c.req.method} ${url.pathname}: ${errMsg}`)
+      console.error(`[Aether] Proxy error on ${c.req.method} ${url.pathname}: ${errMsg}`)
     }
     return c.json({ error: 'Failed to proxy to OpenCode', details: errMsg }, 502)
   }

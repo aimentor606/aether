@@ -257,7 +257,7 @@ function SideBySideDiffView({
             return (
               <tr key={i}>
                 {/* Left side (old) */}
-                <td className="w-8 min-w-8 text-right pr-2 select-none text-muted-foreground/30 align-top border-r border-border/20">
+                <td className="w-8 min-w-8 text-right pr-2 select-none text-muted-foreground/60 align-top border-r border-border/20">
                   {row.left.num ?? ''}
                 </td>
                 <td
@@ -293,7 +293,7 @@ function SideBySideDiffView({
                   )}
                 </td>
                 {/* Right side (new) */}
-                <td className="w-8 min-w-8 text-right pr-2 select-none text-muted-foreground/30 align-top border-r border-border/20">
+                <td className="w-8 min-w-8 text-right pr-2 select-none text-muted-foreground/60 align-top border-r border-border/20">
                   {row.right.num ?? ''}
                 </td>
                 <td
@@ -439,7 +439,7 @@ export function OcEditToolView({
                     'p-1 rounded transition-colors cursor-pointer',
                     viewMode === 'unified'
                       ? 'text-foreground bg-muted/60'
-                      : 'text-muted-foreground/40 hover:text-muted-foreground',
+                      : 'text-muted-foreground/60 hover:text-muted-foreground',
                   )}
                   title="Unified view"
                 >
@@ -451,7 +451,7 @@ export function OcEditToolView({
                     'p-1 rounded transition-colors cursor-pointer',
                     viewMode === 'split'
                       ? 'text-foreground bg-muted/60'
-                      : 'text-muted-foreground/40 hover:text-muted-foreground',
+                      : 'text-muted-foreground/60 hover:text-muted-foreground',
                   )}
                   title="Side-by-side view"
                 >

@@ -96,7 +96,7 @@ export function OcPatchPartView({ part }: OcPatchPartViewProps) {
           <div className="p-2 space-y-0.5">
             {fileEntries.map((entry, i) => (
               <div key={i} className="flex items-center gap-1.5 px-1.5 py-0.5 text-[11px] text-muted-foreground">
-                <FileEdit className="size-3 flex-shrink-0 text-muted-foreground/40" />
+                <FileEdit className="size-3 flex-shrink-0 text-muted-foreground/60" />
                 <span className="truncate font-mono" title={entry.path}>
                   {entry.path}
                 </span>

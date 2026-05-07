@@ -1,5 +1,12 @@
 # Production compose — used by deploy-api.yml CI workflow on the VPS.
 # Build from repo root: docker compose --profile backend up -d
+#
+# Required env vars (set in shell or ops/.env before building):
+#   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_BACKEND_URL
+#   NEXT_PUBLIC_ENV_MODE (local|cloud), NEXT_PUBLIC_BILLING_ENABLED (true|false)
+#
+# The API container reads its config from apps/api/.env (mounted below).
+# See ops/.env.example for the full list of required API env vars.
 
 services:
   frontend:
@@ -12,6 +19,7 @@ services:
         NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
         NEXT_PUBLIC_BILLING_ENABLED: ${NEXT_PUBLIC_BILLING_ENABLED:-false}
         NEXT_PUBLIC_ENV_MODE: ${NEXT_PUBLIC_ENV_MODE:-local}
+        NEXT_PUBLIC_AETHER_DEPLOYMENTS_ENABLED: ${NEXT_PUBLIC_AETHER_DEPLOYMENTS_ENABLED:-false}
     ports:
       - "3000:3000"
     profiles: [frontend, all]

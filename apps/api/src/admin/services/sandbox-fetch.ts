@@ -35,7 +35,7 @@ export async function fetchMasterJson<T>(path: string, init: RequestInit = {}, t
     const url = `${base}${path}`;
     try {
       const res = await fetchWithTimeout(url, init, timeoutMs);
-      // 503 from /aether/health means "starting" — still return the JSON body
+      // 503 from /kortix/health means "starting" — still return the JSON body
       // so callers can inspect the status/opencode fields.
       if (!res.ok && res.status !== 503) { lastErr = new Error(`Master ${url} returned ${res.status}`); continue; }
       return (await res.json()) as T;

@@ -76,7 +76,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useIsMobile } from '@/hooks/utils';
 import { cn } from '@/lib/utils';
-import { useAdminRole } from '@/hooks/admin';
 import { useDocumentModalStore } from '@/stores/use-document-modal-store';
 import { isBillingEnabled } from '@/lib/config';
 
@@ -369,7 +368,7 @@ function ProjectsFlyout() {
           >
             <span className="flex-1 truncate text-left">{project.name}</span>
             {(project.sessionCount ?? 0) > 0 && (
-              <span className="text-[10px] text-muted-foreground/40 tabular-nums">
+              <span className="text-[10px] text-muted-foreground/70 tabular-nums">
                 {project.sessionCount}
               </span>
             )}
@@ -468,7 +467,7 @@ function SidebarUpdateIndicator({ collapsed }: { collapsed: boolean }) {
   const remaining = changes.length - 3;
 
   return (
-    <div className="rounded-xl border border-primary/15 bg-primary/[0.03] overflow-hidden">
+    <div className="rounded-xl border border-primary/20 bg-primary/5 overflow-hidden">
       {/* Header row */}
       <div className="flex items-center gap-2 px-3 pt-2.5 pb-1.5">
         <span className="relative flex h-2 w-2 flex-shrink-0">
@@ -487,7 +486,7 @@ function SidebarUpdateIndicator({ collapsed }: { collapsed: boolean }) {
           className="p-0.5 rounded hover:bg-muted/80 transition-colors cursor-pointer flex-shrink-0"
           aria-label="Dismiss"
         >
-          <X className="h-3 w-3 text-muted-foreground/60" />
+          <X className="h-3 w-3 text-muted-foreground" />
         </button>
       </div>
 
@@ -647,7 +646,7 @@ function SidebarSections() {
                     >
                       <span className="flex-1 truncate">{project.name}</span>
                       {(project.sessionCount ?? 0) > 0 && (
-                        <span className="text-[10px] text-muted-foreground/40 tabular-nums">
+                        <span className="text-[10px] text-muted-foreground/70 tabular-nums">
                           {project.sessionCount}
                         </span>
                       )}
@@ -937,15 +936,11 @@ export function SidebarLeft({
 
   const { isOpen: isDocumentModalOpen } = useDocumentModalStore();
 
-  const { data: adminRoleData } = useAdminRole();
-  const isAdmin = adminRoleData?.isAdmin ?? false;
-
   const [user, setUser] = useState<{
     name: string;
     email: string;
     avatar: string;
-    isAdmin?: boolean;
-  }>({ name: 'Loading...', email: '', avatar: '', isAdmin: false });
+  }>({ name: 'Loading...', email: '', avatar: '' });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -962,12 +957,11 @@ export function SidebarLeft({
             data.user.user_metadata?.avatar_url ||
             data.user.user_metadata?.picture ||
             '',
-          isAdmin,
         });
       }
     };
     fetchUserData();
-  }, [isAdmin]);
+  }, []);
 
   const createSession = useCreateOpenCodeSession();
 

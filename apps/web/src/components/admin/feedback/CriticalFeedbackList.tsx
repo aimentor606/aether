@@ -44,7 +44,7 @@ export function CriticalFeedbackList() {
             );
           } else {
             return (
-              <Star key={i} className="h-3 w-3 text-muted-foreground/30" />
+              <Star key={i} className="h-3 w-3 text-muted-foreground/60" />
             );
           }
         })}

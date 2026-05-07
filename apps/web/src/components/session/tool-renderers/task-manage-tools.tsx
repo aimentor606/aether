@@ -40,7 +40,7 @@ function TaskCreateTool({ part }: ToolProps) {
   const priority = (input.priority as string) || 'medium';
   return (
     <div className="flex items-center gap-2 px-2.5 py-1.5 text-xs rounded-lg bg-muted/20 border border-border/40">
-      <Circle className="size-3 text-muted-foreground/40 flex-shrink-0" />
+      <Circle className="size-3 text-muted-foreground/60 flex-shrink-0" />
       <span className="text-foreground/80 truncate flex-1">{title}</span>
       {priority === 'high' && (
         <span className="text-[0.5625rem] font-medium text-foreground/50 bg-muted/60 px-1.5 py-px rounded">
@@ -99,7 +99,7 @@ ToolRegistry.register('task-done', TaskDoneTool);
 
 function TaskDeleteTool({ part }: ToolProps) {
   return (
-    <div className="flex items-center gap-2 px-2.5 py-1 text-xs text-muted-foreground/40">
+    <div className="flex items-center gap-2 px-2.5 py-1 text-xs text-muted-foreground/60">
       <Trash2 className="size-3 flex-shrink-0" />
       <span>Task removed</span>
     </div>
@@ -232,9 +232,9 @@ function SkillTool({ part, forceOpen }: ToolProps) {
         </div>
 
         {running ? (
-          <Loader2 className="size-3 animate-spin text-muted-foreground/40 flex-shrink-0" />
+          <Loader2 className="size-3 animate-spin text-muted-foreground/60 flex-shrink-0" />
         ) : (
-          <ExternalLink className="size-3 flex-shrink-0 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />
+          <ExternalLink className="size-3 flex-shrink-0 text-muted-foreground/60 group-hover:text-muted-foreground/60 transition-colors" />
         )}
       </div>
 

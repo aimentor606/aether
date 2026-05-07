@@ -67,7 +67,7 @@ function PowerButton({
         viewBox="0 0 24 24"
         className={cn(
           'size-[22px] transition-colors duration-200',
-          hovered ? 'text-foreground' : 'text-foreground/35',
+          hovered ? 'text-foreground' : 'text-foreground/60',
         )}
         fill="none"
         stroke="currentColor"

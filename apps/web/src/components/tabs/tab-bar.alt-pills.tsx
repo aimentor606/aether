@@ -195,7 +195,7 @@ function TabContextMenu({ tab, position, onAction, onClose }: ContextMenuProps) 
       className={cn(
         'flex items-center gap-2 w-full px-2.5 py-1.5 text-[13px] rounded-lg transition-colors duration-150 text-left cursor-pointer',
         muted
-          ? 'text-muted-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50'
+          ? 'text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/50'
           : 'text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/50'
       )}
       onClick={() => { onAction(action, tab.id); onClose(); }}
@@ -203,7 +203,7 @@ function TabContextMenu({ tab, position, onAction, onClose }: ContextMenuProps) 
       {icon}
       <span className="flex-1">{label}</span>
       {shortcut && (
-        <span className="text-[10px] text-muted-foreground/40 ml-4">{shortcut}</span>
+        <span className="text-[10px] text-muted-foreground/70 ml-4">{shortcut}</span>
       )}
     </button>
   );
@@ -215,15 +215,15 @@ function TabContextMenu({ tab, position, onAction, onClose }: ContextMenuProps) 
       style={{ left: position.x, top: position.y }}
     >
       {tab.pinned
-        ? item('Unpin tab', 'unpin', <PinOff className="h-3.5 w-3.5 text-muted-foreground/50" />)
-        : item('Pin tab', 'pin', <Pin className="h-3.5 w-3.5 text-muted-foreground/50" />)
+        ? item('Unpin tab', 'unpin', <PinOff className="h-3.5 w-3.5 text-muted-foreground/80" />)
+        : item('Pin tab', 'pin', <Pin className="h-3.5 w-3.5 text-muted-foreground/80" />)
       }
       <div className="mx-2 my-1 border-t border-border/30" />
-      {!tab.pinned && item('Close', 'close', <X className="h-3.5 w-3.5 text-muted-foreground/50" />, 'Ctrl+W')}
-      {item('Close others', 'closeOthers', <XCircle className="h-3.5 w-3.5 text-muted-foreground/50" />)}
-      {item('Close to the right', 'closeRight', <ArrowRightToLine className="h-3.5 w-3.5 text-muted-foreground/50" />)}
+      {!tab.pinned && item('Close', 'close', <X className="h-3.5 w-3.5 text-muted-foreground/80" />, 'Ctrl+W')}
+      {item('Close others', 'closeOthers', <XCircle className="h-3.5 w-3.5 text-muted-foreground/80" />)}
+      {item('Close to the right', 'closeRight', <ArrowRightToLine className="h-3.5 w-3.5 text-muted-foreground/80" />)}
       <div className="mx-2 my-1 border-t border-border/30" />
-      {item('Close all', 'closeAll', <XCircle className="h-3.5 w-3.5 text-muted-foreground/50" />, undefined, true)}
+      {item('Close all', 'closeAll', <XCircle className="h-3.5 w-3.5 text-muted-foreground/80" />, undefined, true)}
     </div>
   );
 }
@@ -274,10 +274,10 @@ function TabListDropdown({ tabs, activeTabId, onActivate, open, onOpenChange, ge
             {pendingCount > 0 && !isBusy && <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />}
           </div>
         ) : (
-          <Icon className={cn('h-3.5 w-3.5 flex-shrink-0', isActive ? 'text-sidebar-accent-foreground/70' : 'text-muted-foreground/50')} />
+          <Icon className={cn('h-3.5 w-3.5 flex-shrink-0', isActive ? 'text-sidebar-accent-foreground/70' : 'text-muted-foreground/80')} />
         )}
         <span className="flex-1 truncate">{tab.title || 'Untitled'}</span>
-        {tab.pinned && <Pin className="h-2 w-2 flex-shrink-0 text-muted-foreground/40 -rotate-[20deg]" />}
+        {tab.pinned && <Pin className="h-2 w-2 flex-shrink-0 text-muted-foreground/70 -rotate-[20deg]" />}
         {tab.dirty && <span className="flex-shrink-0 h-1.5 w-1.5 rounded-full bg-amber-500" />}
         {pendingCount > 0 && (
           <span className="flex-shrink-0 h-4 min-w-4 px-1 rounded-full bg-amber-500/15 text-amber-500 text-[10px] font-medium flex items-center justify-center">
@@ -294,7 +294,7 @@ function TabListDropdown({ tabs, activeTabId, onActivate, open, onOpenChange, ge
         <button
           className={cn(
             'flex items-center justify-center w-7 h-7 rounded-lg cursor-pointer',
-            'text-muted-foreground/50 hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors duration-150',
+            'text-muted-foreground/80 hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors duration-150',
             open && 'text-muted-foreground bg-sidebar-accent/50',
           )}
         >
@@ -311,7 +311,7 @@ function TabListDropdown({ tabs, activeTabId, onActivate, open, onOpenChange, ge
               onKeyDown={(e) => e.stopPropagation()}
               placeholder="Filter tabs..."
               autoFocus
-              className="w-full px-2.5 py-1.5 text-[13px] rounded-lg bg-muted/50 border border-border/50 placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/30"
+              className="w-full px-2.5 py-1.5 text-[13px] rounded-lg bg-muted/50 border border-border/50 placeholder:text-muted-foreground/80 focus:outline-none focus:ring-1 focus:ring-primary/30"
             />
           </div>
         )}
@@ -320,7 +320,7 @@ function TabListDropdown({ tabs, activeTabId, onActivate, open, onOpenChange, ge
           {sessionTabs.length > 0 && (
             <DropdownMenuGroup>
               {otherTabs.length > 0 && (
-                <DropdownMenuLabel className="text-[10px] font-medium text-muted-foreground/50 uppercase tracking-wider py-1 px-2.5">
+                <DropdownMenuLabel className="text-[10px] font-medium text-muted-foreground/80 uppercase tracking-wider py-1 px-2.5">
                   Sessions
                 </DropdownMenuLabel>
               )}
@@ -331,7 +331,7 @@ function TabListDropdown({ tabs, activeTabId, onActivate, open, onOpenChange, ge
           {otherTabs.length > 0 && (
             <DropdownMenuGroup>
               {sessionTabs.length > 0 && (
-                <DropdownMenuLabel className="text-[10px] font-medium text-muted-foreground/50 uppercase tracking-wider py-1 px-2.5">
+                <DropdownMenuLabel className="text-[10px] font-medium text-muted-foreground/80 uppercase tracking-wider py-1 px-2.5">
                   Pages
                 </DropdownMenuLabel>
               )}
@@ -345,7 +345,7 @@ function TabListDropdown({ tabs, activeTabId, onActivate, open, onOpenChange, ge
           )}
         </div>
 
-        <div className="px-3 py-1.5 border-t border-border/40 text-[10px] text-muted-foreground/50">
+        <div className="px-3 py-1.5 border-t border-border/40 text-[10px] text-muted-foreground/80">
           {tabs.length} tab{tabs.length !== 1 ? 's' : ''} open
         </div>
       </DropdownMenuContent>
@@ -506,7 +506,7 @@ function TabItem({
         <Tooltip>
           <TooltipTrigger asChild>
             <span className="flex items-center justify-center w-4 h-4">
-              <Icon className={cn('h-4 w-4 transition-colors', isActive ? 'text-sidebar-accent-foreground' : 'text-muted-foreground/60')} />
+              <Icon className={cn('h-4 w-4 transition-colors', isActive ? 'text-sidebar-accent-foreground' : 'text-muted-foreground')} />
             </span>
           </TooltipTrigger>
           <TooltipContent side="bottom" className="text-xs">Home</TooltipContent>
@@ -517,7 +517,7 @@ function TabItem({
         </span>
       ) : (
         <span className="flex-shrink-0 flex items-center justify-center w-4 h-4">
-          <Icon className={cn('h-3.5 w-3.5 transition-colors', isActive ? 'text-sidebar-accent-foreground' : 'text-muted-foreground/60')} />
+          <Icon className={cn('h-3.5 w-3.5 transition-colors', isActive ? 'text-sidebar-accent-foreground' : 'text-muted-foreground')} />
         </span>
       )}
 
@@ -535,7 +535,7 @@ function TabItem({
 
       {/* Pin indicator — hidden for dashboard (it's always pinned but we don't show the icon) */}
       {tab.pinned && !isDashboard && (
-        <Pin className="flex-shrink-0 h-2 w-2 text-muted-foreground/40 -rotate-[20deg] hidden md:block" />
+        <Pin className="flex-shrink-0 h-2 w-2 text-muted-foreground/70 -rotate-[20deg] hidden md:block" />
       )}
 
       {/* Close button — never shown for dashboard */}
@@ -1099,14 +1099,14 @@ export function TabBar() {
         <div className="flex-shrink-0 flex items-center gap-0 pl-2 pr-1 md:hidden">
           <button
             onClick={() => { sidebar.setOpenMobile(true); }}
-            className="flex items-center justify-center w-7 h-7 rounded-lg text-muted-foreground/60 hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors"
+            className="flex items-center justify-center w-7 h-7 rounded-lg text-muted-foreground hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors"
             aria-label="Open menu"
           >
             <Menu className="h-4 w-4" />
           </button>
           <button
             onClick={() => { rightSidebar?.setOpenMobile(true); }}
-            className="flex items-center justify-center w-7 h-7 rounded-lg text-muted-foreground/60 hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors"
+            className="flex items-center justify-center w-7 h-7 rounded-lg text-muted-foreground hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors"
             aria-label="Quick actions"
           >
             <PanelRight className="h-4 w-4" />
@@ -1118,7 +1118,7 @@ export function TabBar() {
             <TooltipTrigger asChild>
               <button
                 onClick={() => window.history.back()}
-                className="flex items-center justify-center w-6 h-6 rounded-lg text-muted-foreground/50 hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors duration-150 cursor-pointer"
+                className="flex items-center justify-center w-6 h-6 rounded-lg text-muted-foreground/80 hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors duration-150 cursor-pointer"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </button>
@@ -1129,7 +1129,7 @@ export function TabBar() {
             <TooltipTrigger asChild>
               <button
                 onClick={() => window.history.forward()}
-                className="flex items-center justify-center w-6 h-6 rounded-lg text-muted-foreground/50 hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors duration-150 cursor-pointer"
+                className="flex items-center justify-center w-6 h-6 rounded-lg text-muted-foreground/80 hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors duration-150 cursor-pointer"
               >
                 <ChevronRight className="h-3.5 w-3.5" />
               </button>
@@ -1180,7 +1180,7 @@ export function TabBar() {
                 onClick={handleNewTab}
                 className={cn(
                   'flex items-center justify-center w-7 h-7 rounded-lg cursor-pointer',
-                  'text-muted-foreground/50 hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors duration-150',
+                  'text-muted-foreground/80 hover:text-muted-foreground hover:bg-sidebar-accent/50 transition-colors duration-150',
                 )}
               >
                 <Plus className="h-3.5 w-3.5" />

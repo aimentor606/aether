@@ -204,7 +204,7 @@ export function OcApplyPatchToolView({
                           {name}
                         </span>
                         {dir && (
-                          <span className="text-muted-foreground/40 truncate text-[10px]">
+                          <span className="text-muted-foreground/60 truncate text-[10px]">
                             {dir}
                           </span>
                         )}

@@ -220,7 +220,7 @@ function SideBySideDiff({ patch, filename }: { patch: string; filename: string }
             return (
               <tr key={i}>
                 {/* Left side (old) */}
-                <td className="w-8 min-w-8 text-right pr-2 select-none text-muted-foreground/30 align-top border-r border-border/20">
+                <td className="w-8 min-w-8 text-right pr-2 select-none text-muted-foreground/60 align-top border-r border-border/20">
                   {row.left.num ?? ''}
                 </td>
                 <td
@@ -242,7 +242,7 @@ function SideBySideDiff({ patch, filename }: { patch: string; filename: string }
                   )}
                 </td>
                 {/* Right side (new) */}
-                <td className="w-8 min-w-8 text-right pr-2 select-none text-muted-foreground/30 align-top border-r border-border/20">
+                <td className="w-8 min-w-8 text-right pr-2 select-none text-muted-foreground/60 align-top border-r border-border/20">
                   {row.right.num ?? ''}
                 </td>
                 <td
@@ -635,7 +635,7 @@ export function SessionDiffViewer({ sessionId, isFullscreen, onToggleFullscreen 
     return (
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-2 px-5 py-4 pr-12 border-b border-border/40">
-          <GitCompareArrows className="size-4 text-muted-foreground/40" />
+          <GitCompareArrows className="size-4 text-muted-foreground/60" />
           <span className="text-xs font-medium text-muted-foreground">Changes</span>
         </div>
         <div className="flex-1 flex items-center justify-center">
@@ -656,7 +656,7 @@ export function SessionDiffViewer({ sessionId, isFullscreen, onToggleFullscreen 
     return (
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-2 px-5 py-4 pr-12 border-b border-border/40">
-          <GitCompareArrows className="size-4 text-muted-foreground/40" />
+          <GitCompareArrows className="size-4 text-muted-foreground/60" />
           <span className="text-xs font-medium text-muted-foreground">Changes</span>
         </div>
         <div className="flex-1 flex items-center justify-center text-center px-6">
@@ -670,11 +670,11 @@ export function SessionDiffViewer({ sessionId, isFullscreen, onToggleFullscreen 
     return (
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-2 px-5 py-4 pr-12 border-b border-border/40">
-          <GitCompareArrows className="size-4 text-muted-foreground/40" />
+          <GitCompareArrows className="size-4 text-muted-foreground/60" />
           <span className="text-xs font-medium text-muted-foreground">Changes</span>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-12 min-h-[200px]">
-          <FileCode2 className="size-10 text-muted-foreground/20 mb-4" />
+          <FileCode2 className="size-10 text-muted-foreground/60 mb-4" />
           <p className="text-base text-muted-foreground">No changes yet</p>
           <p className="text-sm text-muted-foreground/50 mt-1.5">
             File changes will appear here as the session progresses

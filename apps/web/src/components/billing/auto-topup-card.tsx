@@ -195,7 +195,7 @@ export function AutoTopupCard({
       )}
 
       {!enabled && (
-        <p className="text-[11px] text-muted-foreground/40">
+        <p className="text-[11px] text-muted-foreground/60">
           Your agent will pause when credits run out. You can enable this anytime.
         </p>
       )}

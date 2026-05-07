@@ -262,7 +262,7 @@ export default function BackupsPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !create.isPending && handleCreate()}
-                className="flex-1 h-10 text-sm px-3 rounded-xl bg-muted/40 border border-border/50 outline-none placeholder:text-muted-foreground/40 focus:border-primary/30 focus:bg-muted/60 transition-colors"
+                className="flex-1 h-10 text-sm px-3 rounded-xl bg-muted/40 border border-border/50 outline-none placeholder:text-muted-foreground/60 focus:border-primary/30 focus:bg-muted/60 transition-colors"
               />
               <Button
                 onClick={handleCreate}
@@ -290,7 +290,7 @@ export default function BackupsPage() {
           {!isLoading && backups.length === 0 && (
             <div className="rounded-xl border border-dashed border-border/60 bg-muted/10 p-8 flex flex-col items-center gap-4">
               <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-muted/50">
-                <HardDrive className="h-7 w-7 text-muted-foreground/40" />
+                <HardDrive className="h-7 w-7 text-muted-foreground/60" />
               </div>
               <div className="text-center">
                 <p className="text-sm font-medium text-foreground/80">No backups yet</p>
@@ -321,7 +321,7 @@ export default function BackupsPage() {
 
           {/* Footer hint */}
           {!isLoading && backupsEnabled && backups.length > 0 && (
-            <p className="text-[11px] text-muted-foreground/40 mt-4 text-center">
+            <p className="text-[11px] text-muted-foreground/60 mt-4 text-center">
               Automatic daily backups are enabled. The provider retains the latest backups.
             </p>
           )}

@@ -186,14 +186,14 @@ function CommandInput({
     >
       <SearchIcon
         className={cn(
-          'shrink-0 text-muted-foreground/50',
+          'shrink-0 text-muted-foreground/80',
           compact ? 'size-4' : 'size-[18px]',
         )}
       />
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
-          'placeholder:text-muted-foreground/40 flex w-full bg-transparent outline-hidden disabled:cursor-not-allowed disabled:opacity-50',
+          'placeholder:text-muted-foreground/70 flex w-full bg-transparent outline-hidden disabled:cursor-not-allowed disabled:opacity-50',
           compact ? 'h-11 text-[13px]' : 'h-14 text-[15px]',
           className,
         )}
@@ -226,7 +226,7 @@ function CommandEmpty({
   return (
     <CommandPrimitive.Empty
       data-slot="command-empty"
-      className="py-10 text-center text-sm text-muted-foreground/60"
+      className="py-10 text-center text-sm text-muted-foreground"
       {...props}
     />
   );
@@ -241,7 +241,7 @@ function CommandGroup({
       data-slot="command-group"
       className={cn(
         'text-foreground overflow-hidden py-1',
-        '[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-muted-foreground/50',
+        '[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-muted-foreground/80',
         className,
       )}
       {...props}
@@ -272,7 +272,7 @@ function CommandItem({
       className={cn(
         'relative flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm outline-hidden select-none transition-colors duration-75',
         'data-[selected=true]:bg-foreground/[0.07] data-[selected=true]:text-foreground',
-        "[&_svg:not([class*='text-'])]:text-muted-foreground/60",
+        "[&_svg:not([class*='text-'])]:text-muted-foreground",
         'data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-40',
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
@@ -290,7 +290,7 @@ function CommandShortcut({
     <span
       data-slot="command-shortcut"
       className={cn(
-        'ml-auto inline-flex items-center gap-0.5 text-[11px] font-medium text-muted-foreground/40 tracking-wide',
+        'ml-auto inline-flex items-center gap-0.5 text-[11px] font-medium text-muted-foreground/70 tracking-wide',
         className,
       )}
       {...props}
@@ -311,7 +311,7 @@ function CommandFooter({
     <div
       data-slot="command-footer"
       className={cn(
-        'flex items-center gap-4 border-t border-border/30 px-4 py-2 text-[11px] text-muted-foreground/40',
+        'flex items-center gap-4 border-t border-border/30 px-4 py-2 text-[11px] text-muted-foreground/70',
         className,
       )}
       {...props}
@@ -324,7 +324,7 @@ function CommandFooter({
 /** Inline keyboard hint badge — consistent across all command surfaces. */
 function CommandKbd({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="inline-flex items-center justify-center h-[18px] min-w-[18px] px-1 rounded bg-foreground/[0.05] border border-border/30 text-[10px] font-medium text-muted-foreground/50 leading-none">
+    <kbd className="inline-flex items-center justify-center h-[18px] min-w-[18px] px-1 rounded bg-foreground/[0.05] border border-border/30 text-[10px] font-medium text-muted-foreground/80 leading-none">
       {children}
     </kbd>
   );

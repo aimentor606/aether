@@ -54,7 +54,7 @@ const filterTabs: Array<{ label: string; value: DeploymentStatus | undefined }> 
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
 const EmptyState = ({ onCreateClick }: { onCreateClick: () => void }) => (
-  <div className="bg-muted/20 rounded-3xl border flex flex-col items-center justify-center py-16 px-4">
+  <div className="bg-muted/20 rounded-lg border flex flex-col items-center justify-center py-16 px-4">
     <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4">
       <Rocket className="h-6 w-6 text-muted-foreground" />
     </div>
@@ -262,7 +262,7 @@ export function DeploymentsPage() {
             deployments.length === 0 && !statusFilter ? (
               <EmptyState onCreateClick={handleNewDeployment} />
             ) : (
-              <div className="bg-muted/20 rounded-3xl border flex flex-col items-center justify-center py-12 px-4">
+              <div className="bg-muted/20 rounded-lg border flex flex-col items-center justify-center py-12 px-4">
                 <p className="text-sm text-muted-foreground">
                   {searchQuery
                     ? `No deployments match "${searchQuery}"`

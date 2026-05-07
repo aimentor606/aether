@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import {
@@ -47,6 +48,7 @@ import { trackSendAuthLink } from '@/lib/analytics/gtm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WallpaperBackground } from '@/components/ui/wallpaper-background';
 import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 
 // Lazy load heavy components
 const GoogleSignIn = lazy(() => import('@/components/GoogleSignIn'));
@@ -69,7 +71,7 @@ function LiveClock() {
   return (
     <div className="flex flex-col items-center select-none pointer-events-none">
       <p
-        className="text-foreground/35 text-[13px] font-light tracking-widest"
+        className="text-foreground/60 text-[13px] font-light tracking-widest"
         suppressHydrationWarning
       >
         {day} {month} {date}
@@ -197,7 +199,7 @@ function AccessRequestForm({
   };
 
   return (
-    <div className="bg-background/75 dark:bg-background/70 backdrop-blur-2xl border border-foreground/[0.08] rounded-2xl p-9 max-w-md w-full">
+    <div className="bg-background/75 dark:bg-background/70 backdrop-blur-2xl border border-foreground/[0.08] rounded-lg p-9 max-w-md w-full">
       <div className="flex flex-col items-center mb-7">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-foreground/[0.06] border border-foreground/[0.08] mb-4">
           <Mail className="h-5 w-5 text-foreground/50" />
@@ -205,7 +207,7 @@ function AccessRequestForm({
         <h1 className="text-[22px] font-semibold text-foreground/95 tracking-tight">
           Get Early Access
         </h1>
-        <p className="text-sm text-foreground/45 mt-1.5 text-center leading-relaxed">
+        <p className="text-sm text-foreground/60 mt-1.5 text-center leading-relaxed">
           We&apos;re onboarding new users in batches.
           <br />
           Reserve your spot and we&apos;ll notify you.
@@ -213,7 +215,7 @@ function AccessRequestForm({
       </div>
 
       <div className="bg-foreground/[0.04] border border-foreground/[0.08] rounded-xl px-4 py-3 mb-5">
-        <p className="text-[11px] text-foreground/35 mb-0.5">Requesting for</p>
+        <p className="text-xs text-foreground/60 mb-0.5">Requesting for</p>
         <p className="text-[15px] text-foreground/80 font-medium">{email}</p>
       </div>
 
@@ -228,7 +230,7 @@ function AccessRequestForm({
           name="useCase"
           placeholder="What will you build with Aether?"
           rows={3}
-          className="w-full rounded-xl bg-foreground/[0.04] border border-foreground/[0.08] text-[15px] text-foreground/80 placeholder:text-foreground/30 px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/15 transition-colors"
+          className="w-full rounded-xl bg-foreground/[0.04] border border-foreground/[0.08] text-[15px] text-foreground/80 placeholder:text-foreground/60 px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/15 transition-colors"
         />
         <SubmitButton
           formAction={handleRequestAccess}
@@ -243,7 +245,7 @@ function AccessRequestForm({
         <button
           type="button"
           onClick={onBack}
-          className="text-xs text-foreground/25 hover:text-foreground/45 transition-colors"
+          className="text-xs text-foreground/60 hover:text-foreground/60 transition-colors"
         >
           &larr; Back to sign in
         </button>
@@ -256,6 +258,7 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isLoading } = useAuth();
+  const reducedMotion = useReducedMotion();
   const mode = searchParams.get('mode');
   const rawReturnUrl =
     searchParams.get('returnUrl') || searchParams.get('redirect');
@@ -269,7 +272,9 @@ function LoginContent() {
   const isPasswordMode = searchParams.get('auth') === 'password';
   const t = useTranslations('auth');
 
-  const [phase, setPhase] = useState<AuthPhase>('lock');
+  const [phase, setPhase] = useState<AuthPhase>(
+    searchParams.get('phase') === 'form' ? 'form' : 'lock',
+  );
   const [referralCode, setReferralCode] = useState(referralCodeParam);
   const [showReferralDialog, setShowReferralDialog] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -570,7 +575,7 @@ function LoginContent() {
                 setOtpCode('');
                 setShowOtpModal(true);
               }}
-              className="text-xs text-foreground/30 hover:text-foreground/50 transition-colors text-center"
+              className="text-xs text-foreground/60 hover:text-foreground/50 transition-colors text-center"
             >
               Or{' '}
               <span className="underline underline-offset-2">
@@ -579,7 +584,7 @@ function LoginContent() {
             </button>
             <button
               onClick={() => setRegistrationSuccess(false)}
-              className="text-xs text-foreground/30 hover:text-foreground/50 transition-colors text-center"
+              className="text-xs text-foreground/60 hover:text-foreground/50 transition-colors text-center"
             >
               {t('didntReceiveEmail')}{' '}
               <span className="underline underline-offset-2">
@@ -592,7 +597,7 @@ function LoginContent() {
         {/* OTP verification modal */}
         <Dialog open={showOtpModal} onOpenChange={setShowOtpModal}>
           <DialogContent
-            className="!max-w-[300px] sm:!max-w-[300px] p-5 gap-0 rounded-2xl"
+            className="!max-w-[300px] sm:!max-w-[300px] p-5 gap-0 rounded-lg"
             hideCloseButton
             aria-describedby="otp-modal-desc"
           >
@@ -652,7 +657,7 @@ function LoginContent() {
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
           >
             {accessRequestSubmitted ? (
-              <div className="bg-background/75 dark:bg-background/70 backdrop-blur-2xl border border-foreground/[0.08] rounded-2xl p-7">
+              <div className="bg-background/75 dark:bg-background/70 backdrop-blur-2xl border border-foreground/[0.08] rounded-lg p-7">
                 <div className="flex flex-col items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
                     <MailCheck className="h-5 w-5 text-emerald-500" />
@@ -661,7 +666,7 @@ function LoginContent() {
                     <h1 className="text-[17px] font-medium text-foreground/90 tracking-tight">
                       You&apos;re on the list
                     </h1>
-                    <p className="text-[13px] text-foreground/40 mt-1.5 max-w-[260px] mx-auto">
+                    <p className="text-[13px] text-foreground/60 mt-1.5 max-w-[260px] mx-auto">
                       We&apos;ll email{' '}
                       <span className="text-foreground/60 font-medium">
                         {signupClosedEmail}
@@ -674,7 +679,7 @@ function LoginContent() {
                       setSignupClosed(false);
                       setAccessRequestSubmitted(false);
                     }}
-                    className="text-[11px] text-foreground/25 hover:text-foreground/45 transition-colors mt-1"
+                    className="text-[11px] text-foreground/60 hover:text-foreground/60 transition-colors mt-1"
                   >
                     &larr; Back to sign in
                   </button>
@@ -744,7 +749,7 @@ function LoginContent() {
                       )}
                     >
                       {otpDigits[i] || (
-                        <span className="text-foreground/20">·</span>
+                        <span className="text-foreground/60">·</span>
                       )}
                     </div>
                   ))}
@@ -811,7 +816,7 @@ function LoginContent() {
                     setAutoSendingCode(false);
                   }
                 }}
-                className="text-xs text-foreground/40 hover:text-foreground/60 transition-colors"
+                className="text-xs text-foreground/60 hover:text-foreground/60 transition-colors"
               >
                 Didn&apos;t receive it?{' '}
                 <span className="underline underline-offset-2">Send again</span>
@@ -910,24 +915,28 @@ function LoginContent() {
               }}
             >
               <div className="flex flex-col items-center gap-1.5">
-                <p className="text-foreground/50 text-sm font-medium tracking-wide">
+                <p className="text-foreground/60 text-sm font-medium tracking-wide">
                   Aether
                 </p>
-                <p className="text-foreground/25 text-xs tracking-widest uppercase">
+                <p className="text-foreground/60 text-xs tracking-widest uppercase">
                   Click or press Enter to sign in
                 </p>
               </div>
               {/* Scroll indicator */}
-              <motion.div
-                animate={{ y: [0, 5, 0] }}
-                transition={{
-                  duration: 1.8,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              >
-                <ChevronRight className="size-3.5 text-foreground/20 rotate-90" />
-              </motion.div>
+              {reducedMotion ? (
+                <ChevronRight className="size-3.5 text-foreground/60 rotate-90" />
+              ) : (
+                <motion.div
+                  animate={{ y: [0, 5, 0] }}
+                  transition={{
+                    duration: 1.8,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <ChevronRight className="size-3.5 text-foreground/60 rotate-90" />
+                </motion.div>
+              )}
             </motion.div>
           </motion.div>
         )}
@@ -966,7 +975,7 @@ function LoginContent() {
                 {/* Shared header */}
                 <p
                   data-testid="auth-heading"
-                  className="text-[11px] text-center text-foreground/30 tracking-[0.2em] uppercase mb-6"
+                  className="text-xs text-center text-foreground/60 tracking-[0.2em] uppercase mb-6"
                 >
                   Sign in to Aether
                 </p>
@@ -983,10 +992,9 @@ function LoginContent() {
                       autoComplete="email"
                       className="h-11 text-sm rounded-xl bg-foreground/[0.03] border-foreground/[0.08] shadow-none focus-visible:border-foreground/20 transition-colors"
                     />
-                    <Input
+                    <PasswordInput
                       id="password"
                       name="password"
-                      type="password"
                       placeholder="Password"
                       required
                       autoComplete="current-password"
@@ -1022,7 +1030,7 @@ function LoginContent() {
                         <div className="w-full border-t border-foreground/[0.06]" />
                       </div>
                       <div className="relative flex justify-center">
-                        <span className="px-3 bg-background/80 dark:bg-background/75 text-[10px] text-foreground/20 tracking-[0.15em] uppercase">
+                        <span className="px-3 bg-background/80 dark:bg-background/75 text-xs text-foreground/60 tracking-[0.15em] uppercase">
                           or
                         </span>
                       </div>
@@ -1042,7 +1050,7 @@ function LoginContent() {
 
                       {referralCodeParam && (
                         <div className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-xl px-3 py-2">
-                          <p className="text-[10px] text-foreground/35 mb-0.5">
+                          <p className="text-xs text-foreground/60 mb-0.5">
                             Referral
                           </p>
                           <p className="text-[13px] font-semibold">
@@ -1071,14 +1079,14 @@ function LoginContent() {
                         />
                         <label
                           htmlFor="gdprConsent"
-                          className="text-[11px] leading-[1.6] text-foreground/30 cursor-pointer select-none"
+                          className="text-xs leading-[1.6] text-foreground/60 cursor-pointer select-none"
                         >
                           I agree to the{' '}
                           <a
                             href="https://www.aether.dev/legal?tab=privacy"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-foreground/45 hover:text-foreground/65 transition-colors"
+                            className="text-foreground/55 hover:text-foreground/75 transition-colors"
                           >
                             Privacy Policy
                           </a>
@@ -1087,7 +1095,7 @@ function LoginContent() {
                             href="https://www.aether.dev/legal?tab=terms"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-foreground/45 hover:text-foreground/65 transition-colors"
+                            className="text-foreground/55 hover:text-foreground/75 transition-colors"
                           >
                             Terms
                           </a>
@@ -1117,7 +1125,7 @@ function LoginContent() {
                         <button
                           type="button"
                           onClick={() => setShowReferralDialog(true)}
-                          className="text-[11px] text-foreground/20 hover:text-foreground/40 transition-colors cursor-pointer"
+                          className="text-[11px] text-foreground/60 hover:text-foreground/60 transition-colors cursor-pointer"
                         >
                           Have a referral code?
                         </button>
@@ -1157,12 +1165,15 @@ function SelfHostedLoginContent() {
   const searchParams = useSearchParams();
   const { user, isLoading } = useAuth();
   const { installed, loading: statusLoading } = useInstallStatus();
+  const reducedMotion = useReducedMotion();
   const rawReturnUrl =
     searchParams.get('returnUrl') || searchParams.get('redirect');
   const returnUrl = rawReturnUrl?.match(/^\/instances\/[^/]+/)
     ? '/instances'
     : rawReturnUrl;
-  const [phase, setPhase] = useState<'lock' | 'form'>('lock');
+  const [phase, setPhase] = useState<'lock' | 'form'>(
+    searchParams.get('phase') === 'form' ? 'form' : 'lock',
+  );
 
   // After auth, redirect to /instances. The /instances page handles
   // sandbox creation, and /instances/[id] handles setup (provider, keys).
@@ -1240,23 +1251,27 @@ function SelfHostedLoginContent() {
               }}
             >
               <div className="flex flex-col items-center gap-1.5">
-                <p className="text-foreground/50 text-sm font-medium tracking-wide">
+                <p className="text-foreground/60 text-sm font-medium tracking-wide">
                   Aether
                 </p>
-                <p className="text-foreground/25 text-xs tracking-widest uppercase">
+                <p className="text-foreground/60 text-xs tracking-widest uppercase">
                   Click or press Enter to sign in
                 </p>
               </div>
-              <motion.div
-                animate={{ y: [0, 5, 0] }}
-                transition={{
-                  duration: 1.8,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              >
-                <ChevronRight className="size-3.5 text-foreground/20 rotate-90" />
-              </motion.div>
+              {reducedMotion ? (
+                <ChevronRight className="size-3.5 text-foreground/60 rotate-90" />
+              ) : (
+                <motion.div
+                  animate={{ y: [0, 5, 0] }}
+                  transition={{
+                    duration: 1.8,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <ChevronRight className="size-3.5 text-foreground/60 rotate-90" />
+                </motion.div>
+              )}
             </motion.div>
           </motion.div>
         )}
@@ -1288,7 +1303,7 @@ function SelfHostedLoginContent() {
               exit={{ opacity: 0, y: 20, scale: 0.97 }}
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="bg-background/75 dark:bg-background/70 backdrop-blur-2xl border border-foreground/[0.08] rounded-2xl p-7 max-h-[calc(100vh-4rem)] overflow-y-auto">
+              <div className="bg-background/75 dark:bg-background/70 backdrop-blur-2xl border border-foreground/[0.08] rounded-lg p-7 max-h-[calc(100vh-4rem)] overflow-y-auto">
                 <SelfHostedForm returnUrl={returnUrl} installed={installed} />
               </div>
             </motion.div>

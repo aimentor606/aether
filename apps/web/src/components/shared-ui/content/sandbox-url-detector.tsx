@@ -485,7 +485,7 @@ function SandboxUrlChip({
           <TooltipTrigger asChild>
             <button
               onClick={handleCopyUrl}
-              className="p-1 rounded hover:bg-muted/60 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+              className="p-1 rounded hover:bg-muted/60 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
             >
               {copied ? (
                 <Check className="h-3 w-3 text-emerald-500" />
@@ -501,7 +501,7 @@ function SandboxUrlChip({
           <TooltipTrigger asChild>
             <button
               onClick={handleOpenExternal}
-              className="p-1 rounded hover:bg-muted/60 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+              className="p-1 rounded hover:bg-muted/60 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
             >
               <ExternalLink className="h-3 w-3" />
             </button>
@@ -513,7 +513,7 @@ function SandboxUrlChip({
           <TooltipTrigger asChild>
             <button
               onClick={navigateToPreviewTab}
-              className="p-1 rounded hover:bg-muted/60 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+              className="p-1 rounded hover:bg-muted/60 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
             >
               <MonitorPlay className="h-3 w-3" />
             </button>

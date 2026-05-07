@@ -21,15 +21,8 @@ import {
 } from '@aether/ui/primitives';
 import { useApiClient, useAdminAccessRequests } from '@aether/sdk/client';
 import type { AccessRequest } from '@aether/sdk/client';
-import { useAdminRole } from '@/hooks/admin/use-admin-role';
 import { toast } from '@/lib/toast';
-import {
-  CheckCircle,
-  XCircle,
-  Clock,
-  ShieldCheck,
-  UserPlus,
-} from 'lucide-react';
+import { CheckCircle, XCircle, Clock, UserPlus } from 'lucide-react';
 
 function StatusBadge({ status }: { status: AccessRequest['status'] }) {
   switch (status) {
@@ -66,7 +59,6 @@ function formatDate(dateStr: string) {
 
 export default function AccessRequestsPage() {
   const client = useApiClient();
-  const { data: adminRole, isLoading: roleLoading } = useAdminRole();
   const [activeTab, setActiveTab] = useState<string>('pending');
   const [confirmDialog, setConfirmDialog] = useState<{
     request: AccessRequest;
@@ -76,34 +68,6 @@ export default function AccessRequestsPage() {
   const admin = useAdminAccessRequests(client, {
     status: activeTab === 'all' ? undefined : activeTab,
   });
-
-  if (roleLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-6xl mx-auto p-6">
-          <Skeleton className="h-8 w-48 mb-2" />
-          <Skeleton className="h-4 w-72 mb-8" />
-          <Skeleton className="h-96 w-full" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!adminRole?.isAdmin) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <ShieldCheck className="h-12 w-12 text-muted-foreground/40 mx-auto" />
-          <h2 className="text-lg font-medium text-foreground/80">
-            Admin access required
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            You don&apos;t have permission to view this page.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   const summary = admin.list.data?.summary || {
     pending: 0,

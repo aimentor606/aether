@@ -87,7 +87,7 @@ export function DashboardPromoBanner() {
                 </span>
               </div>
 
-              <span className="text-muted-foreground/50 hidden sm:inline">
+              <span className="text-muted-foreground/80 hidden sm:inline">
                 &middot;
               </span>
 
@@ -109,7 +109,7 @@ export function DashboardPromoBanner() {
               {/* Close */}
               <button
                 onClick={handleDismiss}
-                className="ml-1 p-1 rounded-full hover:bg-muted/50 transition-colors text-muted-foreground/60 hover:text-muted-foreground"
+                className="ml-1 p-1 rounded-full hover:bg-muted/50 transition-colors text-muted-foreground hover:text-muted-foreground"
                 aria-label="Dismiss"
               >
                 <X className="h-3.5 w-3.5" />

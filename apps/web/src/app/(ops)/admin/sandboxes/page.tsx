@@ -33,11 +33,9 @@ import {
   useAdminSandboxPool,
 } from '@aether/sdk/client';
 import type { AdminSandbox } from '@aether/sdk/client';
-import { useAdminRole } from '@/hooks/admin/use-admin-role';
 import { toast } from '@/lib/toast';
 import {
   Server,
-  ShieldCheck,
   Trash2,
   RefreshCw,
   Search,
@@ -786,7 +784,7 @@ function PoolTab() {
                         </span>
                         <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground/60">
                           <span>{formatMemory(t.memory)} RAM</span>
-                          <span className="text-muted-foreground/20">
+                          <span className="text-muted-foreground/60">
                             {'\u00B7'}
                           </span>
                           <span>{formatDisk(t.disk)} SSD</span>
@@ -802,7 +800,7 @@ function PoolTab() {
                           className={cn(
                             'w-8 h-8 rounded-full border flex items-center justify-center transition-colors',
                             qty === 0
-                              ? 'border-border/30 text-muted-foreground/30 cursor-not-allowed'
+                              ? 'border-border/30 text-muted-foreground/60 cursor-not-allowed'
                               : 'border-border hover:bg-muted cursor-pointer',
                           )}
                         >
@@ -818,7 +816,7 @@ function PoolTab() {
                           className={cn(
                             'w-8 h-8 rounded-full border flex items-center justify-center transition-colors',
                             qty >= 20
-                              ? 'border-border/30 text-muted-foreground/30 cursor-not-allowed'
+                              ? 'border-border/30 text-muted-foreground/60 cursor-not-allowed'
                               : 'border-border hover:bg-muted cursor-pointer',
                           )}
                         >
@@ -862,7 +860,6 @@ function PoolTab() {
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function AdminSandboxesPage() {
-  const { data: adminRole, isLoading: roleLoading } = useAdminRole();
   const [activeTab, setActiveTab] = useState<string>('sandboxes');
 
   const client = useApiClient();
@@ -870,34 +867,6 @@ export default function AdminSandboxesPage() {
 
   const { data: health } = pool.health;
   const { data: poolList } = pool.list;
-
-  if (roleLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-6xl mx-auto p-6">
-          <Skeleton className="h-8 w-48 mb-2" />
-          <Skeleton className="h-4 w-72 mb-8" />
-          <Skeleton className="h-96 w-full" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!adminRole?.isAdmin) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <ShieldCheck className="h-12 w-12 text-muted-foreground/40 mx-auto" />
-          <h2 className="text-lg font-medium text-foreground/80">
-            Admin access required
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            You don&apos;t have permission to view this page.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   const poolListData = poolList as any;
   const healthData = health as any;

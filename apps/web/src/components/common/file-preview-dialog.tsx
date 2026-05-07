@@ -147,14 +147,14 @@ export function FilePreviewDialog() {
                 <div className="flex flex-col items-center justify-center h-full gap-3 p-8 text-center">
                   {isNotFound ? (
                     <>
-                      <FileX className="h-8 w-8 text-muted-foreground/30" />
+                      <FileX className="h-8 w-8 text-muted-foreground/60" />
                       <p className="text-sm text-muted-foreground">
                         File does not exist
                       </p>
                       <p className="text-xs font-mono text-muted-foreground/60 max-w-sm break-all">
                         {path}
                       </p>
-                      <p className="text-xs text-muted-foreground/40 mt-1">
+                      <p className="text-xs text-muted-foreground/60 mt-1">
                         This path may be relative or from a different session.
                         Files must use absolute paths to be accessible.
                       </p>

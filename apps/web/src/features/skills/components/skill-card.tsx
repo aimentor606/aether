@@ -112,7 +112,7 @@ export function SkillCard({ skill, onEdit, onDelete, onNavigate }: SkillCardProp
               </button>
             </div>
           )}
-          <ChevronRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors" />
+          <ChevronRight className="h-4 w-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
         </div>
       </div>
     </div>

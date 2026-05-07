@@ -434,7 +434,7 @@ export function FileHistoryPanel() {
         {/* Error */}
         {error && !isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-3 p-8 text-center">
-            <AlertCircle className="h-8 w-8 text-muted-foreground/30" />
+            <AlertCircle className="h-8 w-8 text-muted-foreground/60" />
             <p className="text-sm text-muted-foreground">
               Failed to load history
             </p>
@@ -452,7 +452,7 @@ export function FileHistoryPanel() {
         {/* Empty state */}
         {!isLoading && !error && totalCommits === 0 && (
           <div className="flex flex-col items-center justify-center h-full gap-3 p-8 text-center">
-            <GitCommitHorizontal className="h-8 w-8 text-muted-foreground/20" />
+            <GitCommitHorizontal className="h-8 w-8 text-muted-foreground/60" />
             <p className="text-sm text-muted-foreground">No commit history</p>
             <p className="text-xs text-muted-foreground/50 mt-1">
               This file has no git commits yet.
@@ -472,7 +472,7 @@ export function FileHistoryPanel() {
                       {group.label}
                     </span>
                     <div className="flex-1 h-px bg-border/40" />
-                    <span className="text-xs text-muted-foreground/40 tabular-nums">
+                    <span className="text-xs text-muted-foreground/60 tabular-nums">
                       {group.commits.length}
                     </span>
                   </div>

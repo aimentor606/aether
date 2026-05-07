@@ -215,7 +215,7 @@ function SingleFileRow({
             {filename}
           </span>
           {dir && (
-            <span className="text-muted-foreground/40 truncate text-[11px]">
+            <span className="text-muted-foreground/60 truncate text-[11px]">
               {dir}
             </span>
           )}
@@ -268,7 +268,7 @@ function MultiFileList({
                 {fname}
               </span>
               {dir && (
-                <span className="text-muted-foreground/40 truncate text-[11px]">
+                <span className="text-muted-foreground/60 truncate text-[11px]">
                   {dir}
                 </span>
               )}

@@ -160,7 +160,7 @@ export default function SandboxPoolAdminPage() {
         <div className="max-w-7xl mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
                 <Server className="w-6 h-6 text-primary" />
               </div>
               <div>
@@ -482,7 +482,6 @@ export default function SandboxPoolAdminPage() {
                   <CardTitle className="flex items-center gap-2">
                     <Server className="w-5 h-5 text-secondary" />
                     Pooled Sandboxes
-                  </CardTitle>
                   </CardTitle>
                   <CardDescription>
                     {sandboxesData?.count ?? sandboxesData?.total ?? 0}{' '}

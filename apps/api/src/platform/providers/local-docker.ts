@@ -970,11 +970,11 @@ export class LocalDockerProvider implements SandboxProvider {
 
   /**
    * Wait for the sandbox to pass health checks.
-   * Polls GET /aether/health until it returns 200 with status "ok".
+   * Polls GET /kortix/health until it returns 200 with status "ok".
    */
   private async waitForHealth(timeoutMs: number): Promise<void> {
     const start = Date.now();
-    const healthUrl = `http://localhost:${PORT_MAP['8000']}/aether/health`;
+    const healthUrl = `http://localhost:${PORT_MAP['8000']}/kortix/health`;
 
     while (Date.now() - start < timeoutMs) {
       try {

@@ -6,6 +6,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { SpotlightCard } from '@/components/ui/spotlight-card';
@@ -35,14 +36,19 @@ export function WorkspaceItemCard({
   /** Optional slot for buttons rendered in the bottom-right */
   actions?: React.ReactNode;
 } & { 'data-testid'?: string }) {
+  const prefersReducedMotion = useReducedMotion();
   return (
     <motion.div
       layout
       {...rest}
-      initial={{ opacity: 0, y: 12 }}
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.96 }}
-      transition={{ duration: 0.18, delay: Math.min(index * 0.02, 0.35) }}
+      exit={prefersReducedMotion ? undefined : { opacity: 0, scale: 0.96 }}
+      transition={
+        prefersReducedMotion
+          ? { duration: 0 }
+          : { duration: 0.18, delay: Math.min(index * 0.02, 0.35) }
+      }
     >
       <SpotlightCard className="bg-card border border-border/50 h-full">
         <div

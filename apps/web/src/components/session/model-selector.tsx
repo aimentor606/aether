@@ -240,7 +240,7 @@ export function ModelSelector({ models, selectedModel, onSelect }: ModelSelector
                     <div className="flex items-center gap-2">
                       <ProviderLogo providerID={group.providerID} name={group.providerName} size="small" />
                       <span>{PROVIDER_LABELS[group.providerID] || group.providerName}</span>
-                      <span className="ml-auto text-[10px] text-muted-foreground/30 normal-case tracking-normal">
+                      <span className="ml-auto text-[10px] text-muted-foreground/60 normal-case tracking-normal">
                         {group.models.length}
                       </span>
                     </div>

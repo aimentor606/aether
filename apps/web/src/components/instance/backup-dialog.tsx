@@ -147,7 +147,7 @@ export function BackupDialog({ open, onOpenChange, sandboxId }: BackupDialogProp
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !create.isPending && handleCreate()}
-                className="flex-1 h-9 text-xs px-3 rounded-lg bg-muted/40 border border-border/40 outline-none placeholder:text-muted-foreground/40 focus:border-primary/30 focus:bg-muted/60 transition-colors"
+                className="flex-1 h-9 text-xs px-3 rounded-lg bg-muted/40 border border-border/40 outline-none placeholder:text-muted-foreground/60 focus:border-primary/30 focus:bg-muted/60 transition-colors"
               />
               <Button
                 size="sm"
@@ -176,7 +176,7 @@ export function BackupDialog({ open, onOpenChange, sandboxId }: BackupDialogProp
             {!isLoading && backups.length === 0 && (
               <div className="flex flex-col items-center gap-3 py-12">
                 <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-muted/50">
-                  <HardDrive className="h-6 w-6 text-muted-foreground/40" />
+                  <HardDrive className="h-6 w-6 text-muted-foreground/60" />
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-medium text-foreground/80">No backups yet</p>

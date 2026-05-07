@@ -20,7 +20,7 @@ interface SandboxConnectionStore {
   reconnectAttempts: number;
   /** Timestamp when status changed to unreachable/connecting (for "down since") */
   disconnectedAt: number | null;
-  /** Current sandbox version from /aether/health (e.g. "0.5.1") */
+  /** Current sandbox version from /kortix/health (e.g. "0.5.1") */
   sandboxVersion: string | null;
   /** OpenCode server version from /global/health (e.g. "1.2.10") */
   openCodeVersion: string | null;

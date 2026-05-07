@@ -58,6 +58,7 @@ export const apiKeyStatusEnum = aetherSchema.enum('api_key_status', [
 export const apiKeyTypeEnum = aetherSchema.enum('api_key_type', [
   'user',
   'sandbox',
+  'developer',
 ]);
 
 export const integrationStatusEnum = aetherSchema.enum('integration_status', [
@@ -219,7 +220,6 @@ export const aetherApiKeys = aetherSchema.table(
   {
     keyId: uuid('key_id').defaultRandom().primaryKey(),
     sandboxId: uuid('sandbox_id')
-      .notNull()
       .references(() => sandboxes.sandboxId, { onDelete: 'cascade' }),
     accountId: uuid('account_id').notNull(),
     publicKey: varchar('public_key', { length: 64 }).notNull(),
@@ -228,6 +228,9 @@ export const aetherApiKeys = aetherSchema.table(
     description: text('description'),
     type: apiKeyTypeEnum('type').default('user').notNull(),
     status: apiKeyStatusEnum('status').default('active').notNull(),
+    scopes: jsonb('scopes').default([]).$type<string[]>(),
+    allowedModels: jsonb('allowed_models').default([]).$type<string[]>(),
+    rateLimitPerMinute: integer('rate_limit_per_minute'),
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

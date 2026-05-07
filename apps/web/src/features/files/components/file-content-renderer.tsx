@@ -229,7 +229,7 @@ function isBlobCategory(cat: FileCategory): cat is BlobCategory {
 function RendererFallback() {
   return (
     <div className="flex items-center justify-center h-full">
-      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" />
+      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/60" />
     </div>
   );
 }
@@ -252,7 +252,7 @@ function FileNotFoundState({ filePath }: { filePath: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-3 p-8 text-center">
       <div className="h-12 w-12 rounded-xl bg-muted/50 flex items-center justify-center">
-        <FileX className="h-6 w-6 text-muted-foreground/40" />
+        <FileX className="h-6 w-6 text-muted-foreground/60" />
       </div>
       <p className="text-sm font-medium text-muted-foreground">
         File not found
@@ -260,7 +260,7 @@ function FileNotFoundState({ filePath }: { filePath: string }) {
       <p className="text-xs font-mono text-muted-foreground/50 max-w-sm break-all">
         {filePath}
       </p>
-      <p className="text-xs text-muted-foreground/40 max-w-xs">
+      <p className="text-xs text-muted-foreground/60 max-w-xs">
         This file does not exist or may have been deleted.
       </p>
     </div>
@@ -783,7 +783,7 @@ export function FileContentRenderer({
         {/* Loading */}
         {showLoadingState && (
           <div className="flex items-center justify-center h-full">
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" />
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/60" />
           </div>
         )}
 
@@ -895,9 +895,9 @@ export function FileContentRenderer({
         {/* Audio preview */}
         {isContentReady && fileCategory === 'audio' && blobUrl && (
           <div className="flex flex-col items-center justify-center h-full gap-5 p-8">
-            <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-lg bg-muted/50 flex items-center justify-center">
               <svg
-                className="h-6 w-6 text-muted-foreground/40"
+                className="h-6 w-6 text-muted-foreground/60"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -976,7 +976,7 @@ export function FileContentRenderer({
           ) && (
             <div className="flex flex-col items-center justify-center h-full gap-3 p-8 text-center">
               <div className="h-12 w-12 rounded-xl bg-muted/50 flex items-center justify-center">
-                <FileWarning className="h-6 w-6 text-muted-foreground/30" />
+                <FileWarning className="h-6 w-6 text-muted-foreground/60" />
               </div>
               <p className="text-sm text-muted-foreground/50">Binary file</p>
               <Button
@@ -1149,18 +1149,18 @@ function JsonNode({
           className="cursor-pointer hover:bg-muted/30 rounded-sm transition-colors inline-flex items-center gap-1"
           onClick={() => setIsCollapsed((v) => !v)}
         >
-          <span className="text-muted-foreground/40 text-xs w-3.5 text-center select-none">
+          <span className="text-muted-foreground/60 text-xs w-3.5 text-center select-none">
             {isCollapsed ? '\u25B6' : '\u25BC'}
           </span>
           {keyName !== null && (
             <span className="text-primary/70">{`"${keyName}"`}: </span>
           )}
           {isCollapsed ? (
-            <span className="text-muted-foreground/40">
+            <span className="text-muted-foreground/60">
               [{count} item{count !== 1 ? 's' : ''}]
             </span>
           ) : (
-            <span className="text-muted-foreground/30">[</span>
+            <span className="text-muted-foreground/60">[</span>
           )}
         </div>
         {!isCollapsed && (
@@ -1175,7 +1175,7 @@ function JsonNode({
             ))}
             <div
               style={{ paddingLeft: depth * 20 }}
-              className="text-muted-foreground/30"
+              className="text-muted-foreground/60"
             >
               ]
             </div>
@@ -1195,18 +1195,18 @@ function JsonNode({
           className="cursor-pointer hover:bg-muted/30 rounded-sm transition-colors inline-flex items-center gap-1"
           onClick={() => setIsCollapsed((v) => !v)}
         >
-          <span className="text-muted-foreground/40 text-xs w-3.5 text-center select-none">
+          <span className="text-muted-foreground/60 text-xs w-3.5 text-center select-none">
             {isCollapsed ? '\u25B6' : '\u25BC'}
           </span>
           {keyName !== null && (
             <span className="text-primary/70">{`"${keyName}"`}: </span>
           )}
           {isCollapsed ? (
-            <span className="text-muted-foreground/40">
+            <span className="text-muted-foreground/60">
               {'{' + count + ' key' + (count !== 1 ? 's' : '') + '}'}
             </span>
           ) : (
-            <span className="text-muted-foreground/30">{'{'}</span>
+            <span className="text-muted-foreground/60">{'{'}</span>
           )}
         </div>
         {!isCollapsed && (
@@ -1216,7 +1216,7 @@ function JsonNode({
             ))}
             <div
               style={{ paddingLeft: depth * 20 }}
-              className="text-muted-foreground/30"
+              className="text-muted-foreground/60"
             >
               {'}'}
             </div>

@@ -22,8 +22,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { trackCtaSignup } from '@/lib/analytics/gtm';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useAuth } from '@/components/AuthProvider';
 import { Reveal } from '@/components/home/reveal';
+import { useRouter } from 'next/navigation';
 
 const INSTALL_CMD = 'curl -fsSL https://aether.dev/install | bash';
 
@@ -91,11 +93,25 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [showFloatingCta, setShowFloatingCta] = useState(false);
   const { user } = useAuth();
+  const router = useRouter();
 
+  const prefersReducedMotion = useReducedMotion();
   const { scrollY } = useScroll();
-  const drawerRadius = useTransform(scrollY, [200, 600], [24, 0]);
-  const heroOpacity = useTransform(scrollY, [0, 400], [1, 0]);
-  const heroScale = useTransform(scrollY, [0, 400], [1, 0.95]);
+  const drawerRadius = useTransform(
+    scrollY,
+    [200, 600],
+    prefersReducedMotion ? [0, 0] : [24, 0],
+  );
+  const heroOpacity = useTransform(
+    scrollY,
+    [0, 400],
+    prefersReducedMotion ? [1, 1] : [1, 0],
+  );
+  const heroScale = useTransform(
+    scrollY,
+    [0, 400],
+    prefersReducedMotion ? [1, 1] : [1, 0.95],
+  );
 
   useEffect(() => {
     const onScroll = () =>
@@ -105,7 +121,15 @@ export default function Home() {
   }, []);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(INSTALL_CMD);
+    navigator.clipboard.writeText(INSTALL_CMD).catch(() => {
+      const textarea = document.createElement('textarea');
+      textarea.value = INSTALL_CMD;
+      document.body.appendChild(textarea);
+      textarea.select();
+      // eslint-disable-next-line deprecation/deprecation
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    });
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, []);
@@ -113,11 +137,11 @@ export default function Home() {
   const handleLaunch = useCallback(() => {
     trackCtaSignup();
     if (!user) {
-      window.location.href = '/auth';
+      router.push('/auth');
       return;
     }
-    window.location.href = '/instances';
-  }, [user]);
+    router.push('/instances');
+  }, [user, router]);
 
   return (
     <BackgroundAALChecker>
@@ -130,10 +154,10 @@ export default function Home() {
             style={{ opacity: heroOpacity, scale: heroScale }}
           >
             <div className="flex-1 flex items-center justify-center pt-40 pointer-events-none">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-foreground text-center">
+              <h1 className="text-5xl sm:text-6xl md:text-6xl font-semibold tracking-[-0.04em] text-foreground text-center leading-[1.1]">
                 The Autonomous Company
                 <br />
-                <span className="text-muted-foreground/50">
+                <span className="text-muted-foreground/60">
                   Operating System
                 </span>
               </h1>
@@ -150,9 +174,9 @@ export default function Home() {
               <button
                 onClick={handleCopy}
                 aria-label="Copy install command"
-                className="group flex items-center gap-2.5 h-9 px-4 rounded-full bg-foreground/[0.03] border border-foreground/[0.06] hover:bg-foreground/[0.06] hover:border-foreground/[0.1] transition-colors cursor-pointer animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both"
+                className="group flex items-center gap-2.5 h-9 px-4 rounded-full bg-muted/30 border border-border hover:bg-muted/50 transition-colors cursor-pointer animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both"
               >
-                <span className="font-mono text-[11px] text-muted-foreground/35 select-none">
+                <span className="font-mono text-[11px] text-muted-foreground/60 select-none">
                   $
                 </span>
                 <code className="text-[11px] font-mono text-foreground/60 tracking-tight">
@@ -162,28 +186,36 @@ export default function Home() {
                   {copied ? (
                     <Check className="size-3 text-emerald-500" />
                   ) : (
-                    <Copy className="size-3 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />
+                    <Copy className="size-3 text-muted-foreground/60 group-hover:text-muted-foreground/50 transition-colors" />
                   )}
                 </div>
               </button>
               <motion.div
                 className="mt-3"
-                animate={{ y: [0, 6, 0] }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
+                animate={prefersReducedMotion ? {} : { y: [0, 6, 0] }}
+                transition={
+                  prefersReducedMotion
+                    ? {}
+                    : {
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                      }
+                }
               >
                 <div className="w-5 h-8 rounded-full border-2 border-muted-foreground/20 flex items-start justify-center p-1">
                   <motion.div
                     className="w-1 h-1.5 rounded-full bg-muted-foreground/40"
-                    animate={{ y: [0, 8, 0] }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
+                    animate={prefersReducedMotion ? {} : { y: [0, 8, 0] }}
+                    transition={
+                      prefersReducedMotion
+                        ? {}
+                        : {
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: 'easeInOut',
+                          }
+                    }
                   />
                 </div>
               </motion.div>
@@ -225,7 +257,7 @@ export default function Home() {
           {/* ═══════════════ WHAT IS AETHER ═══════════════ */}
           <section className="max-w-3xl mx-auto px-6 py-10 sm:py-14">
             <Reveal>
-              <p className="text-2xl sm:text-3xl md:text-4xl font-medium text-foreground leading-snug tracking-tight">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-medium text-foreground leading-snug tracking-[-0.02em]">
                 One machine. All your tools. Agents that run themselves.
               </p>
             </Reveal>
@@ -243,7 +275,7 @@ export default function Home() {
           {/* ═══════════════ THE SYSTEM ═══════════════ */}
           <section className="max-w-3xl mx-auto px-6 py-10 sm:py-14">
             <Reveal>
-              <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground mb-2">
+              <h2 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-foreground mb-2">
                 The system
               </h2>
             </Reveal>
@@ -301,7 +333,7 @@ export default function Home() {
                   },
                 ].map(({ icon, title, desc }) => (
                   <div key={title} className="flex items-start gap-3">
-                    <div className="mt-0.5 flex items-center justify-center size-7 rounded-lg bg-foreground/[0.04] border border-foreground/[0.06] text-foreground/40 shrink-0">
+                    <div className="mt-0.5 flex items-center justify-center size-7 rounded-lg bg-foreground/[0.04] border border-foreground/[0.06] text-foreground/60 shrink-0">
                       {icon}
                     </div>
                     <div>
@@ -321,7 +353,7 @@ export default function Home() {
           {/* ═══════════════ HOW IT WORKS ═══════════════ */}
           <section className="max-w-3xl mx-auto px-6 py-10 sm:py-14">
             <Reveal>
-              <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground mb-2">
+              <h2 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-foreground mb-2">
                 How it works
               </h2>
             </Reveal>
@@ -337,7 +369,7 @@ export default function Home() {
               <Reveal>
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-[13px] font-mono text-muted-foreground/40">
+                    <span className="text-[13px] font-mono text-muted-foreground/60">
                       /01
                     </span>
                     <span className="text-sm text-foreground/70">
@@ -359,7 +391,7 @@ export default function Home() {
                     <IntegrationPill domain="hubspot.com" name="HubSpot" />
                     <IntegrationPill domain="drive.google.com" name="Drive" />
                   </div>
-                  <p className="mt-3 text-[11px] text-muted-foreground/30">
+                  <p className="mt-3 text-[11px] text-muted-foreground/60">
                     3,000+ via OAuth · MCP · REST · CLI · env vars
                   </p>
                 </div>
@@ -369,7 +401,7 @@ export default function Home() {
               <Reveal>
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-[13px] font-mono text-muted-foreground/40">
+                    <span className="text-[13px] font-mono text-muted-foreground/60">
                       /02
                     </span>
                     <span className="text-sm text-foreground/70">
@@ -411,7 +443,7 @@ export default function Home() {
               <Reveal>
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-[13px] font-mono text-muted-foreground/40">
+                    <span className="text-[13px] font-mono text-muted-foreground/60">
                       /03
                     </span>
                     <span className="text-sm text-foreground/70">
@@ -466,7 +498,7 @@ export default function Home() {
             aria-label="Copy install command"
             className="group hidden sm:flex items-center gap-2 h-8 px-3 rounded-full hover:bg-foreground/[0.04] transition-colors cursor-pointer"
           >
-            <span className="font-mono text-[11px] text-muted-foreground/40 select-none">
+            <span className="font-mono text-[11px] text-muted-foreground/60 select-none">
               $
             </span>
             <code className="text-[11px] font-mono text-foreground/60 tracking-tight">
@@ -475,7 +507,7 @@ export default function Home() {
             {copied ? (
               <Check className="size-3 text-emerald-500" />
             ) : (
-              <Copy className="size-3 text-muted-foreground/30 group-hover:text-muted-foreground/50 transition-colors" />
+              <Copy className="size-3 text-muted-foreground/60 group-hover:text-muted-foreground/50 transition-colors" />
             )}
           </button>
           <span className="hidden sm:block w-px h-5 bg-border/40" />

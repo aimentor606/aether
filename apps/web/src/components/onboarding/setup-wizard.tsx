@@ -90,7 +90,7 @@ function StepIndicator({
           />
         ))}
       </div>
-      <p className="text-[11px] font-medium text-muted-foreground/40 uppercase tracking-wider">
+      <p className="text-[11px] font-medium text-muted-foreground/60 uppercase tracking-wider">
         {steps[current]?.label}
       </p>
     </div>
@@ -137,7 +137,7 @@ function ConfigureModal({
             onClick={onClose}
             variant="ghost"
             size="icon-sm"
-            className="text-foreground/40 hover:text-foreground/70"
+            className="text-foreground/60 hover:text-foreground/70"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -248,7 +248,7 @@ function HowItWorksPane({
             <p className="text-[13px] font-medium text-foreground/80">
               Coding subscriptions
             </p>
-            <p className="text-[11px] text-foreground/40 leading-relaxed">
+            <p className="text-[11px] text-foreground/60 leading-relaxed">
               ChatGPT Max, Claude Pro / Code, or similar. Best value at scale —
               we strongly recommend this.
             </p>
@@ -257,13 +257,13 @@ function HowItWorksPane({
 
         <div className="flex items-start gap-3 px-3 py-3 rounded-xl border border-foreground/[0.06] bg-foreground/[0.02]">
           <div className="h-7 w-7 rounded-lg bg-foreground/[0.05] flex items-center justify-center shrink-0 mt-0.5">
-            <Key className="h-3.5 w-3.5 text-foreground/40" />
+            <Key className="h-3.5 w-3.5 text-foreground/60" />
           </div>
           <div className="text-left">
             <p className="text-[13px] font-medium text-foreground/80">
               Your own API keys
             </p>
-            <p className="text-[11px] text-foreground/40 leading-relaxed">
+            <p className="text-[11px] text-foreground/60 leading-relaxed">
               OpenAI, Anthropic, Google, OpenRouter — bring any key you already
               have.
             </p>
@@ -273,13 +273,13 @@ function HowItWorksPane({
         {isBillingEnabled() && (
           <div className="flex items-start gap-3 px-3 py-3 rounded-xl border border-foreground/[0.06] bg-foreground/[0.02]">
             <div className="h-7 w-7 rounded-lg bg-foreground/[0.05] flex items-center justify-center shrink-0 mt-0.5">
-              <CreditCard className="h-3.5 w-3.5 text-foreground/40" />
+              <CreditCard className="h-3.5 w-3.5 text-foreground/60" />
             </div>
             <div className="text-left">
               <p className="text-[13px] font-medium text-foreground/80">
                 Aether credits
               </p>
-              <p className="text-[11px] text-foreground/40 leading-relaxed">
+              <p className="text-[11px] text-foreground/60 leading-relaxed">
                 Don&apos;t have a key yet? We include a few free credits to get
                 you started.
               </p>
@@ -423,7 +423,7 @@ function ProvidersPane({
     return (
       <div className="flex flex-col items-center py-16 space-y-4">
         <AetherLoader size="small" />
-        <p className="text-xs text-muted-foreground/40">Checking providers…</p>
+        <p className="text-xs text-muted-foreground/60">Checking providers…</p>
       </div>
     );
   }
@@ -599,7 +599,7 @@ function DefaultModelPane({
     return (
       <div className="flex flex-col items-center py-16 space-y-4">
         <AetherLoader size="small" />
-        <p className="text-xs text-muted-foreground/40">Loading models…</p>
+        <p className="text-xs text-muted-foreground/60">Loading models…</p>
       </div>
     );
   }
@@ -637,7 +637,7 @@ function DefaultModelPane({
                   name={models[0]?.providerName}
                   size="small"
                 />
-                <span className="text-[11px] font-medium text-foreground/40 uppercase tracking-wider">
+                <span className="text-[11px] font-medium text-foreground/60 uppercase tracking-wider">
                   {PROVIDER_LABELS[providerID] || providerID}
                 </span>
               </div>
@@ -660,7 +660,7 @@ function DefaultModelPane({
                       <div className="text-[13px] font-medium text-foreground/80 truncate">
                         {model.modelName}
                       </div>
-                      <div className="text-[11px] text-foreground/30 truncate">
+                      <div className="text-[11px] text-foreground/60 truncate">
                         {model.modelID}
                       </div>
                     </div>
@@ -893,21 +893,21 @@ function ToolKeysPane({
                   className="flex items-start gap-3 p-2.5 rounded-xl border border-foreground/[0.06] bg-foreground/[0.02]"
                 >
                   <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-foreground/[0.05]">
-                    <Icon className="h-3.5 w-3.5 text-foreground/40" />
+                    <Icon className="h-3.5 w-3.5 text-foreground/60" />
                   </div>
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="text-[13px] font-medium text-foreground/80">
                         {s.label}
                       </span>
-                      <span className="text-[11px] text-foreground/30">
+                      <span className="text-[11px] text-foreground/60">
                         {s.description}
                       </span>
                       <a
                         href={s.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="ml-auto text-foreground/20 hover:text-foreground/50 transition-colors"
+                        className="ml-auto text-foreground/60 hover:text-foreground/50 transition-colors"
                       >
                         <ExternalLink className="h-3 w-3" />
                       </a>
@@ -1325,7 +1325,7 @@ export function SetupWizard({ onComplete }: { onComplete: () => void }) {
 
       {/* Footer — hidden on welcome step */}
       {step > 0 && (
-        <p className="absolute bottom-6 text-[11px] text-foreground/20">
+        <p className="absolute bottom-6 text-[11px] text-foreground/60">
           You can change all of this later in Settings.
         </p>
       )}

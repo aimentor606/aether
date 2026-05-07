@@ -648,7 +648,7 @@ function TreeNodeChildren({
   if (!sorted.length && !showInlineCreate) {
     return (
       <div
-        className="py-1 text-xs text-muted-foreground/40 italic select-none"
+        className="py-1 text-xs text-muted-foreground/60 italic select-none"
         style={{ paddingLeft: 8 + depth * 16 + 16 }}
       >
         empty

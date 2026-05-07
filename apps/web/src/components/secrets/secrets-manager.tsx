@@ -219,7 +219,7 @@ export function SecretsManager() {
                     'text-xs font-mono w-[220px] flex-shrink-0 truncate',
                     row.hasValue
                       ? 'text-foreground'
-                      : 'text-muted-foreground/60',
+                      : 'text-muted-foreground',
                   )}
                 >
                   {row.key}
@@ -254,7 +254,7 @@ export function SecretsManager() {
                           'text-xs font-mono truncate',
                           row.hasValue
                             ? 'text-muted-foreground'
-                            : 'text-muted-foreground/30',
+                            : 'text-muted-foreground/70',
                         )}
                       >
                         {row.hasValue
@@ -266,7 +266,7 @@ export function SecretsManager() {
                       {row.hasValue && (
                         <button
                           onClick={() => toggleReveal(row.key)}
-                          className="text-muted-foreground/50 hover:text-foreground flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="text-muted-foreground/80 hover:text-foreground flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           {isRevealed ? (
                             <EyeOff className="h-3 w-3" />

@@ -73,16 +73,20 @@ ARG OCX_VERSION=2.0.0
 COPY LICENSE /LICENSE
 
 # ── OS packages ──────────────────────────────────────────────────────────────
+# retry_apk: retry apk add up to 3 times to handle transient mirror timeouts
 RUN apk update \
-    && apk add --no-cache \
-        nodejs npm rsync \
-        python3-dev py3-pip py3-virtualenv \
-        curl unzip ca-certificates \
-        gcc g++ musl-dev linux-headers \
-        libffi-dev libxml2-dev libxslt-dev \
-        gcompat \
-        openssh-server openssh-sftp-server \
-        bash-completion \
+    && for i in 1 2 3; do \
+        apk add --no-cache \
+            nodejs npm rsync \
+            python3-dev py3-pip py3-virtualenv \
+            curl unzip ca-certificates \
+            gcc g++ musl-dev linux-headers \
+            libffi-dev libxml2-dev libxslt-dev \
+            gcompat \
+            openssh-server openssh-sftp-server \
+            bash-completion \
+        && break || (echo "apk attempt $i failed, retrying..." && apk update && sleep 5); \
+    done \
     && rm -rf /var/cache/apk/*
 
 # ── Skill system dependencies ────────────────────────────────────────────────
@@ -98,16 +102,23 @@ RUN apk update \
 # texlive: pdflatex + bibtex (paper-creator skill)
 # *-dev: build deps for Pillow, pdf2image (pptx, pdf, logo-creator)
 RUN apk update \
-    && apk add --no-cache \
-        poppler-utils poppler-dev \
-        qpdf \
-        pandoc \
-        libreoffice \
-        tesseract-ocr tesseract-ocr-data-eng \
-        ffmpeg \
-        texlive texmf-dist-latexrecommended texmf-dist-bibtexextra \
-        jpeg-dev zlib-dev freetype-dev openjpeg-dev tiff-dev \
+    && for i in 1 2 3; do \
+        apk add --no-cache \
+            poppler-utils poppler-dev \
+            qpdf \
+            pandoc \
+            libreoffice \
+            tesseract-ocr tesseract-ocr-data-eng \
+            ffmpeg \
+            jpeg-dev zlib-dev freetype-dev openjpeg-dev tiff-dev \
+        && break || (echo "apk attempt $i failed, retrying..." && apk update && sleep 5); \
+    done \
     && rm -rf /var/cache/apk/*
+# texlive: post-install trigger (fmtutil-sys) may fail — packages install correctly
+RUN apk add --no-cache \
+        texlive texmf-dist-latexrecommended texmf-dist-bibtexextra \
+    || true; \
+    rm -rf /var/cache/apk/*
 
 # ── Bun runtime ───────────────────────────────────────────────────────────────
 ENV BUN_INSTALL=/opt/bun
@@ -218,7 +229,7 @@ RUN mkdir -p /workspace/.browser-profile \
     && git config --system --add safe.directory '*' \
     && echo "abc ALL=(root) NOPASSWD: /usr/bin/s6-svc, /bin/s6-svc, /usr/sbin/s6-svc, /usr/bin/s6-rc, /bin/s6-rc" >> /etc/sudoers
 WORKDIR /workspace
-ENVWORKSPACE=/workspace
+ENV WORKSPACE=/workspace
 
 # NOTE: Persistent package ENVs (PYTHONUSERBASE, PIP_USER, NPM_CONFIG_PREFIX)
 # are set AFTER the build step — see "Runtime persistence" section below.
@@ -227,7 +238,7 @@ ENVWORKSPACE=/workspace
 
 # ── Services (s6-rc.d longrun) ──────────────────────────────────────────────
 COPY core/s6-services/ /etc/s6-overlay/s6-rc.d/
-RUN for svc in svc-master svc-opencode-serve \
+RUN for svc in svc-kortix-master svc-opencode-serve \
         svc-chromium-persistent svc-agent-browser-session svc-agent-browser-viewer \
         svc-static-web svc-lss-sync svc-sshd svc-docker; do \
         touch "/etc/s6-overlay/s6-rc.d/user/contents.d/${svc}"; \
@@ -265,28 +276,30 @@ RUN chmod +x /ephemeral/tests/*.sh 2>/dev/null || true
 #   master/opencode/   — OpenCode config dir (agents, skills, plugins, tools)
 #   master/channels/   — Channel CLIs (ktelegram, kslack, kchannel)
 #   master/triggers/   — Cron + webhook triggers
-COPY core/kortix-master  /opt/build/kortix-master
+COPY core/master  /opt/build/kortix-master
 COPY core/s6-services/svc-agent-browser-viewer/index.html /opt/build/browser-viewer/index.html
 
 # ── Build sandbox runtime ────────────────────────────────────────────────────
 RUN set -eo pipefail && echo "[docker] Building sandbox runtime v${SANDBOX_VERSION}..." && \
     \
     # ── 1.master (single bun install — includes triggers, channels, opencode deps) ── \
-    mkdir -p /ephemeral/kortix-master && \
+    mkdir -p /ephemeral/master && \
     rsync -a --exclude=node_modules --exclude=bun.lock --exclude=.git \
-      /opt/build/kortix-master/ /ephemeral/kortix-master/ && \
-    cd /ephemeral/kortix-master && bun install 2>&1 && \
-    test -d /ephemeral/kortix-master/node_modules && \
-    chmod +x /ephemeral/kortix-master/scripts/*.sh 2>/dev/null || true && \
+      /opt/build/kortix-master/ /ephemeral/master/ && \
+    cd /ephemeral/master && \
+    sed -i '/"agent-tunnel": "workspace:@aether\/agent-tunnel@\*"/d' package.json && \
+    bun install 2>&1 && \
+    test -d /ephemeral/master/node_modules && \
+    chmod +x /ephemeral/master/scripts/*.sh 2>/dev/null || true && \
     echo "[docker]master: bun install OK (includes triggers, channel CLIs, opencode)" && \
     \
     # ── 2. skills shipped in-tree under skills/KORTIX-system/ (recursive discovery) ── \
-    echo "[docker] skills: agent-tunnel, agent-browser, presentations in /ephemeral/kortix-master/opencode/skills/KORTIX-system/" && \
+    echo "[docker] skills: agent-tunnel, agent-browser, presentations in /ephemeral/master/opencode/skills/KORTIX-system/" && \
     \
     # ── 4. bun-pty musl patches ── \
     ARCH=$(uname -m) && \
     for PTY_DIR in \
-        /ephemeral/kortix-master/node_modules/bun-pty/rust-pty/target/release \
+        /ephemeral/master/node_modules/bun-pty/rust-pty/target/release \
         /opt/bun/install/cache/bun-pty@*/rust-pty/target/release; do \
       [ -d "$PTY_DIR" ] || continue; \
       if [ "$ARCH" = "x86_64" ]; then \
@@ -319,7 +332,7 @@ RUN set -eo pipefail && echo "[docker] Building sandbox runtime v${SANDBOX_VERSI
     echo "[docker] Global binaries: opencode=$(opencode --version 2>/dev/null || echo '?'), agent-browser, ocx" && \
     \
     # ── 9. Binary patches (MUST run after npm install -g opencode-ai) ── \
-    bash /ephemeral/kortix-master/opencode/patches/apply.sh && \
+    bash /ephemeral/master/opencode/patches/apply.sh && \
     \
     # ── 10. Fix agent-browser native binary on Alpine musl ── \
     # The Rust native binary requires glibc's __res_init which doesn't exist in musl. \
@@ -372,7 +385,7 @@ ENV AGENT_BROWSER_ARGS="--no-sandbox,--disable-gpu,--disable-dev-shm-usage,--dis
 ENV AGENT_BROWSER_USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 ENV AGENT_BROWSER_IDLE_TIMEOUT_MS=0
 ENV AGENT_BROWSER_STREAM_PORT=9223
-ENV OPENCODE_CONFIG_DIR=/ephemeral/kortix-master/opencode
+ENV OPENCODE_CONFIG_DIR=/ephemeral/master/opencode
 ENV SANDBOX_VERSION=${SANDBOX_VERSION}
 
 # ── Playwright — use system Chromium (no separate download needed) ───────────

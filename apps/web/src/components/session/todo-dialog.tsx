@@ -29,7 +29,7 @@ const statusConfig: Record<string, { icon: typeof Circle; color: string; label: 
   pending: { icon: Circle, color: 'text-muted-foreground/50', label: 'Pending' },
   in_progress: { icon: Loader2, color: 'text-muted-foreground', label: 'In Progress' },
   completed: { icon: CheckCircle2, color: 'text-muted-foreground', label: 'Completed' },
-  cancelled: { icon: Ban, color: 'text-muted-foreground/30', label: 'Cancelled' },
+  cancelled: { icon: Ban, color: 'text-muted-foreground/60', label: 'Cancelled' },
 };
 
 const priorityConfig: Record<string, { color: string; label: string }> = {
@@ -81,14 +81,14 @@ export function TodoDialog({ sessionId, open, onOpenChange }: TodoDialogProps) {
 
             {error && (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <AlertTriangle className="h-6 w-6 text-muted-foreground/30 mb-2" />
+                <AlertTriangle className="h-6 w-6 text-muted-foreground/60 mb-2" />
                 <p className="text-sm text-muted-foreground">Failed to load tasks</p>
               </div>
             )}
 
             {!isLoading && !error && (!todos || todos.length === 0) && (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <ListTodo className="h-8 w-8 text-muted-foreground/20 mb-3" />
+                <ListTodo className="h-8 w-8 text-muted-foreground/60 mb-3" />
                 <p className="text-sm text-muted-foreground">No tasks yet</p>
                 <p className="text-xs text-muted-foreground/50 mt-1">
                   Tasks will appear here as the agent works

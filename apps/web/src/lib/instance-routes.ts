@@ -24,7 +24,7 @@ export const INSTANCE_SCOPED_ROUTES = [
   '/configuration',
   '/deployments',
   '/changelog',
-  '/admin',
+  // '/admin' — removed: ops pages are platform-level, not instance-scoped
   '/legacy',
   '/credits-explained',
 ] as const;

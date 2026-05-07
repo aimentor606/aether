@@ -581,7 +581,7 @@ export function DriveGridView({
           className="flex flex-col items-center justify-center py-20 text-center"
           data-testid="files-empty"
         >
-          <FolderOpen className="h-16 w-16 text-muted-foreground/20 mb-4" />
+          <FolderOpen className="h-16 w-16 text-muted-foreground/60 mb-4" />
           <p className="text-sm text-muted-foreground">This folder is empty</p>
           <p className="text-xs text-muted-foreground/60 mt-1">
             Drop files here or use the New button to get started

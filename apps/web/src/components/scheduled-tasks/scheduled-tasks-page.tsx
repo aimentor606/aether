@@ -227,7 +227,7 @@ const TaskListItem = ({
 
 const EmptyState = ({ onCreateClick }: { onCreateClick: () => void }) => (
   <div
-    className="bg-muted/20 rounded-3xl border flex flex-col items-center justify-center py-16 px-4"
+    className="bg-muted/20 rounded-lg border flex flex-col items-center justify-center py-16 px-4"
     data-testid="triggers-empty"
   >
     <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4">

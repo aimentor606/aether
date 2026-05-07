@@ -3,7 +3,6 @@
 import { cn } from '@/lib/utils';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import {
   ChevronsUpDown,
   CreditCard,
@@ -11,13 +10,11 @@ import {
 } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -41,7 +38,6 @@ import { useReferralDialog } from '@/stores/referral-dialog';
 import { ReferralDialog } from '@/components/referrals/referral-dialog';
 import { ServerSelector } from '@/components/sidebar/server-selector';
 import {
-  getItemsByGroup,
   themeOptions,
   type MenuItemDef,
   type SettingsTabId,
@@ -100,12 +96,7 @@ export function UserMenu({ user }: UserMenuProps) {
   const getInitials = (name: string) =>
     name.split(' ').map((p) => p.charAt(0)).join('').toUpperCase().substring(0, 2);
 
-  // ── Registry-driven menu items (admin only) ──
-  const adminItems = getItemsByGroup('userMenu', 'admin').filter((item) => {
-    if (item.requiresAdmin && !user.isAdmin) return false;
-    return true;
-  });
-
+  // ── Navigation ──
   const handleMenuNav = (href: string, label: string) => {
     const type = href.startsWith('/settings') ? 'settings' as const : 'page' as const;
     openTabAndNavigate({
@@ -148,7 +139,7 @@ export function UserMenu({ user }: UserMenuProps) {
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
                 size="lg"
-                className='bg-muted/40 hover:bg-muted/20 rounded-2xl border'
+                className='bg-muted/40 hover:bg-muted/20 rounded-lg border'
               >
                 <Avatar className="h-8 w-8 rounded-full flex-shrink-0">
                   <AvatarImage src={user.avatar} alt={user.name} />
@@ -183,16 +174,6 @@ export function UserMenu({ user }: UserMenuProps) {
                   <span>Settings</span>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
-
-              {/* Admin */}
-              {adminItems.length > 0 && (
-                <>
-                  <DropdownMenuSeparator className="my-1" />
-                  <DropdownMenuGroup>
-                    {adminItems.map(renderRegistryItem)}
-                  </DropdownMenuGroup>
-                </>
-              )}
 
               <DropdownMenuSeparator className="my-1" />
 

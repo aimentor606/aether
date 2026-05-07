@@ -1,11 +1,13 @@
 import { Hono } from 'hono';
 import { config } from '../config';
-import { apiKeyAuth } from '../middleware/auth';
+import { apiKeyAuth, supabaseAuth } from '../middleware/auth';
 import { tenantConfigLoader } from '../middleware/tenant-config-loader';
 import { webSearch } from './routes/search-web';
 import { imageSearch } from './routes/search-image';
 import { litellmAdmin } from './routes/litellm-admin';
 import { invoicesRoutes, expensesRoutes, budgetsRoutes, ledgersRoutes } from './routes/finance';
+import { playground } from './routes/model-playground';
+import { developerKeys } from './routes/developer-keys';
 
 const router = new Hono();
 
@@ -18,6 +20,14 @@ router.get('/health', (c) => {
     env: config.ENV_MODE,
   });
 });
+
+// Model playground (supabaseAuth for frontend users)
+router.use('/playground/*', supabaseAuth);
+router.route('/playground', playground);
+
+// Developer API keys (supabaseAuth — users manage their own keys)
+router.use('/developer-keys/*', supabaseAuth);
+router.route('/developer-keys', developerKeys);
 
 // Search routes (apiKeyAuth + tenant)
 router.use('/web-search/*', apiKeyAuth);

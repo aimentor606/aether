@@ -182,12 +182,12 @@ function ServiceCard({
                   </span>
                 )}
                 {service.port > 0 && (
-                  <span className="text-xs text-muted-foreground/50 font-mono">
+                  <span className="text-xs text-muted-foreground/80 font-mono">
                     :{service.port}
                   </span>
                 )}
                 {service.framework && service.framework !== 'unknown' && (
-                  <span className="text-xs text-muted-foreground/50">
+                  <span className="text-xs text-muted-foreground/80">
                     {service.framework}
                   </span>
                 )}
@@ -210,7 +210,7 @@ function ServiceCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {service.startedAt && (
-                <span className="text-[11px] text-muted-foreground/50">
+                <span className="text-[11px] text-muted-foreground/80">
                   {formatTimeAgo(service.startedAt)}
                 </span>
               )}
@@ -309,7 +309,7 @@ function LoadingSkeleton() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div key={i} className="rounded-2xl border dark:bg-card p-4 sm:p-5">
+        <div key={i} className="rounded-lg border dark:bg-card p-4 sm:p-5">
           <div className="flex items-center gap-3 mb-3">
             <Skeleton className="h-9 w-9 rounded-[10px]" />
             <div className="flex-1 space-y-2">
@@ -332,10 +332,10 @@ function LoadingSkeleton() {
 
 function EmptyState() {
   return (
-    <div className="relative bg-muted/20 rounded-3xl border border-dashed border-border/50 flex flex-col items-center justify-center py-20 px-4 overflow-hidden">
+    <div className="relative bg-muted/20 rounded-lg border border-dashed border-border/50 flex flex-col items-center justify-center py-20 px-4 overflow-hidden">
       <Ripple mainCircleSize={160} mainCircleOpacity={0.12} numCircles={6} />
       <div className="relative z-10 flex flex-col items-center">
-        <div className="w-16 h-16 bg-muted border rounded-2xl flex items-center justify-center mb-4">
+        <div className="w-16 h-16 bg-muted border rounded-lg flex items-center justify-center mb-4">
           <Server className="h-7 w-7 text-muted-foreground" />
         </div>
         <h3 className="text-lg font-semibold text-foreground mb-2">
@@ -690,7 +690,7 @@ export function RunningServicesPanel() {
             </DialogDescription>
           </DialogHeader>
           <div className="px-6 py-5">
-            <ScrollArea className="h-[28rem] rounded-2xl border border-border/60 bg-muted/20">
+            <ScrollArea className="h-[28rem] rounded-lg border border-border/60 bg-muted/20">
               <div className="p-4">
                 {logsLoading ? (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">

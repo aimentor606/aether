@@ -1,5 +1,4 @@
 import { timingSafeEqual, createHash } from 'crypto'
-import { existsSync, mkdirSync } from 'fs'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
@@ -8,8 +7,8 @@ import { describeRoute, resolver, generateSpecs } from 'hono-openapi'
 import { Scalar } from '@scalar/hono-api-reference'
 import { buildMergedSpec } from './services/spec-merger'
 import { proxyToOpenCode } from './services/proxy'
-import { SecretStore } from './services/secret-store'
-import { syncAuthToSecrets, startWatcher as startAuthWatcher } from './services/auth-sync'
+import { boot } from './boot'
+import { createWsServer, getActiveConnections } from './ws-proxy'
 // REMOVED: opencode-hotreload watcher — it auto-disposed the OpenCode instance on
 // ANY .opencode/ file change, killing all active agent sessions mid-operation.
 // Dispose is now handled explicitly by:
@@ -36,88 +35,11 @@ import preferencesRouter from './routes/preferences'
 import projectsRouter from './routes/projects'
 import { tasksRouter } from './routes/tasks'
 import { agentsRouter } from './routes/agents'
-import { serviceManager } from './services/service-manager'
 import { config } from './config'
-import { loadBootstrapEnv, saveBootstrapEnv } from './services/bootstrap-env'
 import { HealthResponse, PortsResponse } from './schemas/common'
 
-// ─── Crash protection ────────────────────────────────────────────────────────
-// Prevent unhandled errors from silently killing the process or leaving it
-// in a broken state. Log and continue.
-process.on('uncaughtException', (err) => {
-  console.error('[Kortix Master] UNCAUGHT EXCEPTION:', err)
-})
-process.on('unhandledRejection', (reason) => {
-  console.error('[Kortix Master] UNHANDLED REJECTION:', reason)
-})
-
+await boot()
 const app = new Hono()
-
-// ─── Bootstrap: restore core env vars if missing from process.env ───────────
-// Must run BEFORE SecretStore because AETHER_TOKEN is the encryption key.
-loadBootstrapEnv()
-
-// Initialize secret store and load ENV variables
-const secretStore = new SecretStore()
-await secretStore.loadIntoProcessEnv()
-
-// Initialize share store (load persisted shares, start prune timer)
-import { initShareStore } from './services/share-store'
-initShareStore()
-
-// ─── Guarantee AETHER_TOKEN + AETHER_API_URL in s6 env dir ──────────────────
-// These are injected as Docker env vars at container creation but never written
-// to the s6 env directory. Tools use getEnv() which falls back to reading
-// /run/s6/container_environment/{KEY} — so we must write them there on boot
-// to ensure they're always available regardless of how the process was started.
-{
-  const S6_ENV_DIR = process.env.S6_ENV_DIR || '/run/s6/container_environment'
-  const CORE_VARS = ['AETHER_TOKEN', 'AETHER_API_URL', 'INTERNAL_SERVICE_KEY'] as const
-  let synced = 0
-  for (const key of CORE_VARS) {
-    // Use injected env var, but fall back to a sane default for AETHER_API_URL
-    // so OpenCode's {env:AETHER_API_URL} substitution always produces a valid URL.
-    let val: string | undefined = process.env[key]
-    if (!val && key === 'AETHER_API_URL') {
-      val = 'http://localhost:8008'
-    }
-    if (val) {
-      try {
-        if (!existsSync(S6_ENV_DIR)) mkdirSync(S6_ENV_DIR, { recursive: true })
-        await Bun.write(`${S6_ENV_DIR}/${key}`, val)
-        synced++
-      } catch (err) {
-        console.warn(`[Kortix Master] Failed to write ${key} to s6 env dir:`, err)
-      }
-    }
-  }
-  if (synced > 0) {
-    console.log(`[Kortix Master] Synced ${synced} core env var(s) to s6 env dir`)
-  }
-  // Persist core vars so they survive across restarts even if Docker env is lost
-  saveBootstrapEnv()
-}
-
-const authSyncDisabled = process.env.AETHER_DISABLE_AUTH_SYNC === 'true'
-
-// Two-way sync: OpenCode auth.json ↔ SecretStore (provider API keys)
-if (!authSyncDisabled) {
-  await syncAuthToSecrets(secretStore).catch(err =>
-    console.error('[Kortix Master] auth-sync boot error:', err)
-  )
-  // File watcher: auto-sync when auth.json changes at runtime
-  startAuthWatcher(secretStore)
-}
-
-// REMOVED: startHotReload() — see comment at top of file for rationale.
-
-// Updates are Docker image-based — no crash recovery needed
-
-if (process.env.AETHER_DISABLE_CORE_SUPERVISOR !== 'true') {
-  await serviceManager.start().catch(err =>
-    console.error('[Kortix Master] service manager start error:', err)
-  )
-}
 
 // Cron scheduling + webhook routing handled by unified triggers plugin.
 // TriggerManager starts cron jobs from .kortix/triggers.yaml + DB on boot.
@@ -221,7 +143,7 @@ async function checkOpenCodeReady(): Promise<boolean> {
     })
     if (res.ok) {
       openCodeReady = true
-      console.log('[Kortix Master] OpenCode is ready')
+      console.log('[Aether] OpenCode is ready')
       // Consume body to free connection
       await res.arrayBuffer()
       return true
@@ -240,7 +162,7 @@ app.get('/docs/openapi.json',
   describeRoute({ hide: true, responses: { 200: { description: 'OpenAPI spec' } } }),
   async (c) => {
     // Generate master's own spec
-    constSpec = await generateSpecs(app)
+    const kortixSpec = await generateSpecs(app)
     // Merge with OpenCode's spec (fetched from localhost, cached 30s)
     const merged = await buildMergedSpec(kortixSpec as any)
 
@@ -300,7 +222,7 @@ app.get('/kortix/health',
     await checkOpenCodeReady()
     const status = openCodeReady ? 'ok' : 'starting'
     const httpStatus = openCodeReady ? 200 : 503
-    return c.json({ status, version, imageVersion: version, activeWs: activeConnections, runtimeReady: openCodeReady }, httpStatus)
+    return c.json({ status, version, imageVersion: version, activeWs: getActiveConnections(), runtimeReady: openCodeReady }, httpStatus)
   },
 )
 
@@ -408,7 +330,7 @@ app.all('/hooks/*', async (c) => {
     const data = await res.json()
     return c.json(data, res.status as any)
   } catch (err) {
-    console.error(`[Kortix Master] Webhook proxy error for ${pathname}:`, err)
+    console.error(`[Aether] Webhook proxy error for ${pathname}:`, err)
     return c.json({ ok: false, error: 'Failed to forward webhook to trigger server' }, 502)
   }
 })
@@ -434,7 +356,7 @@ app.post('/events/pipedream/:listenerId', async (c) => {
     const data = await res.json()
     return c.json(data, res.status as any)
   } catch (err) {
-    console.error(`[Kortix Master] Pipedream event forward error for ${listenerId}:`, err)
+    console.error(`[Aether] Pipedream event forward error for ${listenerId}:`, err)
     return c.json({ ok: false, error: 'Failed to forward event to triggers webhook server' }, 502)
   }
 })
@@ -470,244 +392,15 @@ app.all('*',
   },
 )
 
-console.log(`[Kortix Master] Starting on port ${config.PORT}`)
+console.log(`[Aether] Starting on port ${config.PORT}`)
 
 // Push Pipedream creds to API after boot (async, non-blocking)
 setTimeout(() => pushPipedreamCredsToApi(), 5_000)
-console.log(`[Kortix Master] Proxying to OpenCode at ${config.OPENCODE_HOST}:${config.OPENCODE_PORT}`)
-console.log(`[Kortix Master] API docs available at http://localhost:${config.PORT}/docs`)
+console.log(`[Aether] Proxying to OpenCode at ${config.OPENCODE_HOST}:${config.OPENCODE_PORT}`)
+console.log(`[Aether] API docs available at http://localhost:${config.PORT}/docs`)
 
-// ─── Blocked ports (same list as the HTTP proxy router) ──────────────────────
-const WS_BLOCKED_PORTS = new Set([config.PORT])
-
-// ─── Connection tracking ─────────────────────────────────────────────────────
-let activeConnections = 0
-
-// ─── WebSocket constants ─────────────────────────────────────────────────────
-const WS_CONNECT_TIMEOUT_MS = 10_000      // 10s to establish upstream connection
-const WS_BUFFER_MAX_BYTES = 1024 * 1024   // 1MB max buffer per connection
-const WS_IDLE_TIMEOUT_MS = 5 * 60_000     // 5min idle timeout (no messages)
-
-// ─── WebSocket data attached to each proxied connection ──────────────────────
-interface WsProxyData {
-  targetPort: number
-  targetPath: string
-  upstream: WebSocket | null
-  buffered: (string | Buffer | ArrayBuffer)[]
-  bufferBytes: number
-  connectTimer: ReturnType<typeof setTimeout> | null
-  idleTimer: ReturnType<typeof setTimeout> | null
-  closed: boolean
-}
-
-function clearWsTimers(data: WsProxyData) {
-  if (data.connectTimer) { clearTimeout(data.connectTimer); data.connectTimer = null }
-  if (data.idleTimer) { clearTimeout(data.idleTimer); data.idleTimer = null }
-}
-
-function resetIdleTimer(ws: { data: WsProxyData; close: (code?: number, reason?: string) => void }) {
-  if (ws.data.idleTimer) clearTimeout(ws.data.idleTimer)
-  ws.data.idleTimer = setTimeout(() => {
-    console.warn(`[Kortix Master] WS idle timeout for port ${ws.data.targetPort}`)
-    try { ws.close(1000, 'idle timeout') } catch {}
-  }, WS_IDLE_TIMEOUT_MS)
-}
-
-/**
- * Parse /proxy/:port/* from a URL pathname.
- * Returns { port, path } or null if the path doesn't match.
- */
-function parseProxyPath(pathname: string): { port: number; path: string } | null {
-  const match = pathname.match(/^\/proxy\/(\d{1,5})(\/.*)?$/)
-  if (!match) return null
-  const port = parseInt(match[1], 10)
-  if (isNaN(port) || port < 1 || port > 65535) return null
-  return { port, path: match[2] || '/' }
-}
-
-/**
- * Bun server export — handles both HTTP (via Hono) and WebSocket upgrades.
- */
-export default {
-  port: config.PORT,
-
-  // Raise Bun's idle timeout from the default 10s. SSE connections
-  // (e.g. /global/event) can be long-lived with no data flowing —
-  // the default kills them, causing the frontend to reconnect in a loop.
-  // Per-request override (server.timeout(req, 0)) is also applied for SSE
-  // in the proxy, but this global value covers any other long-lived connections.
-  idleTimeout: 255, // seconds; per-request SSE override disables it entirely
-
-  fetch(req: Request, server: any): Response | Promise<Response> | undefined {
-    // ── Per-request timeout for SSE ─────────────────────────────────────
-    // Disable idle timeout entirely for SSE requests so Bun doesn't kill
-    // long-lived event streams after the global idleTimeout.
-    if ((req.headers.get('accept') || '').includes('text/event-stream')) {
-      server.timeout(req, 0)
-    }
-    // ── WebSocket upgrade for /proxy/:port/* ────────────────────────────
-    if (req.headers.get('upgrade')?.toLowerCase() === 'websocket') {
-      const url = new URL(req.url)
-
-      // Skip auth for localhost (same-container) WS connections
-      const wsRemoteAddr = server.requestIP(req)?.address
-      const wsIsLocal = !!wsRemoteAddr && LOOPBACK_ADDRS.has(wsRemoteAddr)
-
-      if (!wsIsLocal) {
-        // Validate INTERNAL_SERVICE_KEY for external WS upgrades (header or ?token= query param)
-        const authHeader = req.headers.get('Authorization')
-        let wsToken: string | null = null
-        if (authHeader?.startsWith('Bearer ')) wsToken = authHeader.slice(7)
-        if (!wsToken) wsToken = url.searchParams.get('token')
-        if (!wsToken || !verifyServiceKey(wsToken)) {
-          return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-            status: 401,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        }
-      }
-
-      const parsed = parseProxyPath(url.pathname)
-
-      if (parsed && !WS_BLOCKED_PORTS.has(parsed.port)) {
-        const success = server.upgrade(req, {
-          data: {
-            targetPort: parsed.port,
-            targetPath: parsed.path + url.search,
-            upstream: null,
-            buffered: [],
-            bufferBytes: 0,
-            connectTimer: null,
-            idleTimer: null,
-            closed: false,
-          } satisfies WsProxyData,
-        })
-        if (success) return undefined // Bun took over — no HTTP response needed
-      }
-
-      // Also handle catch-all WebSocket proxy to OpenCode
-      if (!parsed) {
-        const success = server.upgrade(req, {
-          data: {
-            targetPort: config.OPENCODE_PORT,
-            targetPath: url.pathname + url.search,
-            upstream: null,
-            buffered: [],
-            bufferBytes: 0,
-            connectTimer: null,
-            idleTimer: null,
-            closed: false,
-          } satisfies WsProxyData,
-        })
-        if (success) return undefined
-      }
-    }
-
-    // ── HTTP / SSE — delegate to Hono ──────────────────────────────────
-    // Pass the client IP via env so the auth middleware can detect localhost
-    const remoteAddr = server.requestIP(req)?.address
-    return app.fetch(req, { remoteAddr })
-  },
-
-  websocket: {
-    /**
-     * Client connected — open an upstream WebSocket to the target service.
-     */
-    open(ws: { data: WsProxyData; send: (data: any) => void; close: (code?: number, reason?: string) => void }) {
-      activeConnections++
-      const { targetPort, targetPath } = ws.data
-      const upstreamUrl = `ws://localhost:${targetPort}${targetPath}`
-
-      // Start idle timer
-      resetIdleTimer(ws)
-
-      // Connection timeout — if upstream doesn't connect in time, kill it
-      ws.data.connectTimer = setTimeout(() => {
-        if (ws.data.upstream?.readyState === WebSocket.CONNECTING) {
-          console.warn(`[Kortix Master] WS upstream connect timeout for port ${targetPort}`)
-          try { ws.data.upstream.close() } catch {}
-          try { ws.close(1011, 'upstream connect timeout') } catch {}
-        }
-      }, WS_CONNECT_TIMEOUT_MS)
-
-      try {
-        const upstream = new WebSocket(upstreamUrl)
-        ws.data.upstream = upstream
-
-        upstream.addEventListener('open', () => {
-          // Clear connect timeout
-          if (ws.data.connectTimer) { clearTimeout(ws.data.connectTimer); ws.data.connectTimer = null }
-
-          // Flush any messages buffered while upstream was connecting
-          for (const msg of ws.data.buffered) {
-            upstream.send(msg)
-          }
-          ws.data.buffered = []
-          ws.data.bufferBytes = 0
-        })
-
-        upstream.addEventListener('message', (e: MessageEvent) => {
-          resetIdleTimer(ws)
-          try { ws.send(e.data) } catch {
-            // Client disconnected — close upstream
-            try { upstream.close() } catch {}
-          }
-        })
-
-        upstream.addEventListener('close', (e: CloseEvent) => {
-          if (!ws.data.closed) {
-            // Propagate close code/reason from upstream to downstream client
-            try { ws.close(e.code || 1000, e.reason || '') } catch { /* already closed */ }
-          }
-        })
-
-        upstream.addEventListener('error', (e: Event) => {
-          // Log the actual error for debugging — WS error events don't carry
-          // details, but the close that follows will have the code/reason.
-          console.warn(`[Kortix Master] WS upstream error for port ${targetPort} (path: ${targetPath})`)
-          if (!ws.data.closed) {
-            try { ws.close(1011, 'upstream error') } catch { /* already closed */ }
-          }
-        })
-      } catch (err) {
-        console.error(`[Kortix Master] WS proxy failed to connect to port ${targetPort}:`, err)
-        try { ws.close(1011, 'upstream connection failed') } catch {}
-      }
-    },
-
-    /**
-     * Client sent a message — forward to upstream.
-     */
-    message(ws: { data: WsProxyData; close: (code?: number, reason?: string) => void }, message: string | Buffer) {
-      resetIdleTimer(ws)
-      const upstream = ws.data.upstream
-      if (upstream && upstream.readyState === WebSocket.OPEN) {
-        upstream.send(message)
-      } else if (upstream && upstream.readyState === WebSocket.CONNECTING) {
-        // Buffer until upstream is ready, with size limit
-        const size = typeof message === 'string' ? message.length : (message as Buffer).byteLength
-        if (ws.data.bufferBytes + size > WS_BUFFER_MAX_BYTES) {
-          console.warn(`[Kortix Master] WS buffer overflow for port ${ws.data.targetPort}, closing`)
-          try { ws.close(1011, 'buffer overflow') } catch {}
-          return
-        }
-        ws.data.buffered.push(message)
-        ws.data.bufferBytes += size
-      }
-      // If upstream is closed/closing, silently drop
-    },
-
-    /**
-     * Client disconnected — tear down upstream and all timers.
-     */
-    close(ws: { data: WsProxyData }) {
-      activeConnections--
-      ws.data.closed = true
-      clearWsTimers(ws.data)
-      try { ws.data.upstream?.close() } catch {}
-      ws.data.upstream = null
-      ws.data.buffered = []
-      ws.data.bufferBytes = 0
-    },
-  },
-}
+export default createWsServer({
+  verifyServiceKey,
+  loopbackAddrs: LOOPBACK_ADDRS,
+  app,
+})

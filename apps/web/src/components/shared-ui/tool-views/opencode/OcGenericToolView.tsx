@@ -360,7 +360,7 @@ function StructuredOutputDisplay({
                     )}
                   />
                   <span className="text-xs font-medium">Stack trace</span>
-                  <span className="text-[10px] text-muted-foreground/40 font-mono ml-1">
+                  <span className="text-[10px] text-muted-foreground/60 font-mono ml-1">
                     {section.lines.length} lines
                   </span>
                 </button>

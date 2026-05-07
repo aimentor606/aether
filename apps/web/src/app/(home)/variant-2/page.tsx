@@ -123,7 +123,7 @@ export default function Variant2Home() {
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
               className="text-center max-w-4xl mx-auto relative z-30 mt-12"
             >
-              <h1 className="text-5xl sm:text-7xl md:text-8xl font-medium tracking-tighter leading-[0.9] pb-4 bg-gradient-to-b from-foreground to-foreground/30 text-transparent bg-clip-text">
+              <h1 className="text-5xl sm:text-6xl md:text-6xl font-medium tracking-tighter leading-[0.9] pb-4 bg-gradient-to-b from-foreground to-foreground/30 text-transparent bg-clip-text">
                 The AI Computer.
               </h1>
             </motion.div>
@@ -157,7 +157,7 @@ export default function Variant2Home() {
                   className="group flex items-center justify-between w-full max-w-sm h-10 px-4 rounded-lg bg-foreground/[0.03] border border-foreground/[0.08] hover:bg-foreground/[0.06] hover:border-foreground/[0.12] transition-colors cursor-pointer backdrop-blur-md"
                 >
                   <div className="flex items-center gap-3 overflow-hidden">
-                    <span className="font-mono text-xs text-muted-foreground/40 select-none">
+                    <span className="font-mono text-xs text-muted-foreground/60 select-none">
                       $
                     </span>
                     <code className="text-xs font-mono text-foreground/70 tracking-tight group-hover:text-foreground transition-colors truncate">
@@ -168,7 +168,7 @@ export default function Variant2Home() {
                     {copied ? (
                       <Check className="size-3.5 text-emerald-500" />
                     ) : (
-                      <Copy className="size-3.5 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />
+                      <Copy className="size-3.5 text-muted-foreground/60 group-hover:text-muted-foreground/60 transition-colors" />
                     )}
                   </div>
                 </button>
@@ -181,7 +181,7 @@ export default function Variant2Home() {
               animate={{ opacity: 1 }}
               transition={{ delay: 1, duration: 1 }}
             >
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground/30">
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60">
                 Scroll to explore
               </span>
               <div className="w-px h-8 bg-gradient-to-b from-muted-foreground/30 to-transparent" />
@@ -269,7 +269,7 @@ export default function Variant2Home() {
                         <div className="size-1.5 rounded-full bg-muted-foreground/15" />
                         <div className="size-1.5 rounded-full bg-muted-foreground/15" />
                       </div>
-                      <span className="text-[0.5625rem] font-mono text-muted-foreground/30 ml-1">
+                      <span className="text-[0.5625rem] font-mono text-muted-foreground/60 ml-1">
                         output
                       </span>
                     </div>
@@ -290,7 +290,7 @@ export default function Variant2Home() {
                     <div className="text-sm font-medium text-foreground/70 tracking-tight">
                       {label}
                     </div>
-                    <div className="mt-1 text-[10px] text-muted-foreground/40 font-mono">
+                    <div className="mt-1 text-[10px] text-muted-foreground/60 font-mono">
                       {prompt}
                     </div>
                   </div>
@@ -367,20 +367,20 @@ export default function Variant2Home() {
               </div>
 
               <Reveal delay={0.15}>
-                <div className="rounded-2xl overflow-hidden border border-border/40 bg-card/20 font-mono text-[11px]">
+                <div className="rounded-lg overflow-hidden border border-border/40 bg-card/20 font-mono text-[11px]">
                   <div className="bg-muted/10 border-b border-border/30 px-4 py-3 flex items-center gap-2.5">
                     <div className="flex gap-1.5">
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground/40 ml-1">
+                    <span className="text-[10px] font-mono text-muted-foreground/60 ml-1">
                       aether — session
                     </span>
                   </div>
                   <div className="p-5 space-y-5">
                     <div className="space-y-1">
-                      <div className="text-muted-foreground/35 text-[0.5625rem] uppercase tracking-widest">
+                      <div className="text-muted-foreground/60 text-[0.5625rem] uppercase tracking-widest">
                         You
                       </div>
                       <div className="text-foreground/65 leading-relaxed">
@@ -389,7 +389,7 @@ export default function Variant2Home() {
                       </div>
                     </div>
                     <div className="space-y-2 pl-3 border-l border-border/25">
-                      <div className="text-muted-foreground/35 text-[0.5625rem] uppercase tracking-widest mb-3">
+                      <div className="text-muted-foreground/60 text-[0.5625rem] uppercase tracking-widest mb-3">
                         Aether
                       </div>
                       {[
@@ -423,7 +423,7 @@ export default function Variant2Home() {
                           <span
                             className={
                               done
-                                ? 'text-muted-foreground/40 line-through decoration-muted-foreground/25'
+                                ? 'text-muted-foreground/60 line-through decoration-muted-foreground/25'
                                 : 'text-foreground/70'
                             }
                           >
@@ -437,7 +437,7 @@ export default function Variant2Home() {
                       reference.
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-foreground/30">$</span>
+                      <span className="text-foreground/60">$</span>
                       <span className="w-1.5 h-3.5 bg-muted-foreground/25 animate-pulse inline-block" />
                     </div>
                   </div>
@@ -450,20 +450,20 @@ export default function Variant2Home() {
           <div className="border-t border-border/30">
             <div className="max-w-7xl mx-auto px-6 py-10 sm:py-14 grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
               <Reveal>
-                <div className="rounded-2xl overflow-hidden border border-border/40 bg-card/20 font-mono">
+                <div className="rounded-lg overflow-hidden border border-border/40 bg-card/20 font-mono">
                   <div className="bg-muted/10 border-b border-border/30 px-4 py-3 flex items-center justify-between">
                     <div className="flex gap-1.5">
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-widest">
+                    <span className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-widest">
                       root@aether ~ aether status
                     </span>
                     <div className="size-2.5 opacity-0" />
                   </div>
                   <div className="p-5 space-y-1 text-[11px]">
-                    <div className="grid grid-cols-12 gap-2 text-[0.5625rem] text-muted-foreground/30 uppercase tracking-widest pb-2 border-b border-border/20 mb-3">
+                    <div className="grid grid-cols-12 gap-2 text-[0.5625rem] text-muted-foreground/60 uppercase tracking-widest pb-2 border-b border-border/20 mb-3">
                       <div className="col-span-5">Agent</div>
                       <div className="col-span-3">Uptime</div>
                       <div className="col-span-4">Last action</div>
@@ -517,22 +517,22 @@ export default function Variant2Home() {
                             className={
                               running
                                 ? 'text-foreground/65'
-                                : 'text-muted-foreground/35'
+                                : 'text-muted-foreground/60'
                             }
                           >
                             {name}
                           </span>
                         </div>
-                        <div className="col-span-3 text-muted-foreground/35">
+                        <div className="col-span-3 text-muted-foreground/60">
                           {uptime}
                         </div>
-                        <div className="col-span-4 text-muted-foreground/40 truncate">
+                        <div className="col-span-4 text-muted-foreground/60 truncate">
                           {last}
                         </div>
                       </div>
                     ))}
                     <div className="flex items-center gap-1.5 pt-3 border-t border-border/20 mt-2">
-                      <span className="text-foreground/30">$</span>
+                      <span className="text-foreground/60">$</span>
                       <span className="w-1.5 h-3.5 bg-muted-foreground/25 animate-pulse inline-block" />
                     </div>
                   </div>
@@ -609,9 +609,9 @@ export default function Variant2Home() {
 
               <div className="grid sm:grid-cols-2 gap-8">
                 <Reveal delay={0.15}>
-                  <div className="rounded-2xl border border-border/40 bg-card/20 overflow-hidden">
+                  <div className="rounded-lg border border-border/40 bg-card/20 overflow-hidden">
                     <div className="px-5 py-4 border-b border-border/25">
-                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground/35 font-medium">
+                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
                         Connected
                       </div>
                     </div>
@@ -631,12 +631,12 @@ export default function Variant2Home() {
                           <span className="text-sm text-foreground/70 font-medium">
                             {name}
                           </span>
-                          <span className="text-[0.5625rem] font-mono uppercase tracking-widest text-muted-foreground/35 bg-muted/20 px-2 py-0.5 rounded-md">
+                          <span className="text-[0.5625rem] font-mono uppercase tracking-widest text-muted-foreground/60 bg-muted/20 px-2 py-0.5 rounded-md">
                             {tag}
                           </span>
                         </div>
                       ))}
-                      <div className="pt-2 text-[10px] text-muted-foreground/30 text-center border-t border-border/20">
+                      <div className="pt-2 text-[10px] text-muted-foreground/60 text-center border-t border-border/20">
                         3,000+ via OAuth · MCP · REST · CLI · env vars
                       </div>
                     </div>
@@ -644,9 +644,9 @@ export default function Variant2Home() {
                 </Reveal>
 
                 <Reveal delay={0.25}>
-                  <div className="rounded-2xl border border-border/40 bg-card/20 overflow-hidden font-mono text-[11px]">
+                  <div className="rounded-lg border border-border/40 bg-card/20 overflow-hidden font-mono text-[11px]">
                     <div className="px-5 py-4 border-b border-border/25">
-                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground/35 font-medium">
+                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
                         ~/workspace
                       </div>
                     </div>
@@ -665,13 +665,13 @@ export default function Variant2Home() {
                           className="flex items-center gap-2 py-1 px-1 rounded hover:bg-muted/15 transition-colors"
                           style={{ paddingLeft: `${d * 1.25 + 0.25}rem` }}
                         >
-                          <span className="text-muted-foreground/25 text-[10px]">
+                          <span className="text-muted-foreground/60 text-[10px]">
                             {f ? '·' : '▸'}
                           </span>
                           <span className="text-foreground/55">{n}</span>
                         </div>
                       ))}
-                      <div className="mt-2 pt-2 border-t border-border/20 text-muted-foreground/25 pl-1">
+                      <div className="mt-2 pt-2 border-t border-border/20 text-muted-foreground/60 pl-1">
                         SSH · git-trackable · grep-searchable
                       </div>
                     </div>
@@ -699,7 +699,7 @@ export default function Variant2Home() {
                 onClick={handleCopy}
                 className="group inline-flex items-center gap-2.5 h-9 px-4 rounded-lg bg-foreground/[0.03] border border-foreground/[0.08] hover:bg-foreground/[0.06] hover:border-foreground/[0.12] transition-colors cursor-pointer"
               >
-                <span className="font-mono text-[11px] text-muted-foreground/35 select-none">
+                <span className="font-mono text-[11px] text-muted-foreground/60 select-none">
                   $
                 </span>
                 <code className="text-[11px] font-mono text-foreground/70 tracking-tight">
@@ -709,7 +709,7 @@ export default function Variant2Home() {
                   {copied ? (
                     <Check className="size-3 text-emerald-500" />
                   ) : (
-                    <Copy className="size-3 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />
+                    <Copy className="size-3 text-muted-foreground/60 group-hover:text-muted-foreground/60 transition-colors" />
                   )}
                 </div>
               </button>

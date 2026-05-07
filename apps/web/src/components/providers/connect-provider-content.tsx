@@ -451,7 +451,7 @@ export function ConnectProviderContent({
 
       {/* Description for list view */}
       {view.type === 'list' && (
-        <p className="pb-4 text-sm text-muted-foreground/70">
+        <p className="pb-4 text-sm text-muted-foreground">
           Choose a provider to power model access in chat.
         </p>
       )}
@@ -478,7 +478,7 @@ export function ConnectProviderContent({
         <>
           {/* Search */}
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input type="text"
               placeholder="Search providers..." autoComplete="off"
               value={search}
@@ -505,7 +505,7 @@ export function ConnectProviderContent({
                     Add any OpenAI-compatible endpoint
                   </span>
                 </span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors ml-auto" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground/70 group-hover:text-muted-foreground transition-colors ml-auto" />
               </Button>
             )}
 
@@ -543,11 +543,11 @@ export function ConnectProviderContent({
                         )}
                       </span>
                       {!isConnected && PROVIDER_HINTS[p.id] && (
-                        <span className="text-[10px] text-muted-foreground/50 font-medium whitespace-nowrap">
+                        <span className="text-[10px] text-muted-foreground/80 font-medium whitespace-nowrap">
                           {PROVIDER_HINTS[p.id]}
                         </span>
                       )}
-                      <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors ml-auto" />
+                      <ChevronRight className="h-4 w-4 text-muted-foreground/70 group-hover:text-muted-foreground transition-colors ml-auto" />
                     </Button>
                   );
                 })}
@@ -567,7 +567,7 @@ export function ConnectProviderContent({
                    <AccordionTrigger className="rounded-xl border border-border/50 bg-muted/20 px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-foreground/70 hover:bg-muted/35 hover:no-underline [&>svg]:hidden">
                     <span className="flex items-center justify-between w-full gap-3">
                       <span>Other ({otherGroup.length})</span>
-                      <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground/50 transition-transform duration-200', otherOpen && 'rotate-180')} />
+                      <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground/80 transition-transform duration-200', otherOpen && 'rotate-180')} />
                     </span>
                   </AccordionTrigger>
                   <AccordionContent className="pt-1 pb-0">
@@ -594,7 +594,7 @@ export function ConnectProviderContent({
                               </span>
                               <span className="text-xs text-muted-foreground block mt-0.5">{p.id}</span>
                             </span>
-                            <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors ml-auto" />
+                            <ChevronRight className="h-4 w-4 text-muted-foreground/70 group-hover:text-muted-foreground transition-colors ml-auto" />
                           </Button>
                         );
                     })}
@@ -604,7 +604,7 @@ export function ConnectProviderContent({
             )}
 
             {filteredProviders.length === 0 && !search.toLowerCase().startsWith('custom') && (
-              <div className="text-sm text-center py-8 text-muted-foreground/60">No providers found</div>
+              <div className="text-sm text-center py-8 text-muted-foreground">No providers found</div>
             )}
           </div>
         </>
@@ -613,7 +613,7 @@ export function ConnectProviderContent({
       {/* ============ CUSTOM PROVIDER FORM ============ */}
       {view.type === 'custom' && (
         <form onSubmit={handleCustomSubmit} className="space-y-4">
-          <p className="text-sm text-muted-foreground/70">
+          <p className="text-sm text-muted-foreground">
             Add an OpenAI-compatible provider.{' '}
             <a href="https://opencode.ai/docs/providers/#custom-provider" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-0.5">
               Learn more <ExternalLink className="h-3 w-3" />
@@ -633,9 +633,9 @@ export function ConnectProviderContent({
                <Input type="text" placeholder="https://api.example.com/v1" value={customForm.baseURL} onChange={(e) => setCustomForm((f) => ({ ...f, baseURL: e.target.value }))} className="h-9 rounded-xl border-border/50 bg-background text-sm" />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">API Key <span className="font-normal text-muted-foreground/50">(optional)</span></label>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">API Key <span className="font-normal text-muted-foreground/80">(optional)</span></label>
                <Input placeholder="sk-..." type="password" value={customForm.apiKey} onChange={(e) => setCustomForm((f) => ({ ...f, apiKey: e.target.value }))} className="h-9 rounded-xl border-border/50 bg-background text-sm" />
-              <p className="text-[11px] text-muted-foreground/50 mt-1.5">Use {'{env:VAR_NAME}'} to read from environment</p>
+              <p className="text-[11px] text-muted-foreground/80 mt-1.5">Use {'{env:VAR_NAME}'} to read from environment</p>
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Model</label>
@@ -683,10 +683,10 @@ export function ConnectProviderContent({
                       <span className="flex-1 min-w-0">
                         <span className="text-sm font-medium block">{methodLabel(method)}</span>
                         {desc && (
-                          <span className="text-xs text-muted-foreground/70 block mt-0.5">{desc}</span>
+                          <span className="text-xs text-muted-foreground block mt-0.5">{desc}</span>
                         )}
                       </span>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0 ml-auto" />
+                      <ChevronRight className="h-4 w-4 text-muted-foreground/70 group-hover:text-muted-foreground transition-colors shrink-0 ml-auto" />
                     </Button>
                   );
                 })}

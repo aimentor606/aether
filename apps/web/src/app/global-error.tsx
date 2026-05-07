@@ -21,10 +21,13 @@ export default function GlobalError({
         area: 'global-error-boundary',
       },
       extra: {
-        pathname: typeof window !== 'undefined' ? window.location.pathname : undefined,
-        search: typeof window !== 'undefined' ? window.location.search : undefined,
+        pathname:
+          typeof window !== 'undefined' ? window.location.pathname : undefined,
+        search:
+          typeof window !== 'undefined' ? window.location.search : undefined,
         href: typeof window !== 'undefined' ? window.location.href : undefined,
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+        userAgent:
+          typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
       },
     });
   }, [error]);
@@ -117,7 +120,9 @@ export default function GlobalError({
           </svg>
 
           {/* Title */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+          >
             <h1
               style={{
                 margin: 0,
@@ -139,8 +144,8 @@ export default function GlobalError({
                 color: 'rgba(255,255,255,0.4)',
               }}
             >
-              A critical error occurred that prevented the application from loading.
-              Our team has been notified automatically.
+              A critical error occurred that prevented the application from
+              loading. Our team has been notified automatically.
             </p>
           </div>
 
@@ -213,9 +218,16 @@ export default function GlobalError({
           </div>
 
           {/* Action buttons — stacked */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              width: '100%',
+            }}
+          >
             <a
-              href="/"
+              href="/instances"
               style={{
                 padding: '14px 24px',
                 borderRadius: '999px',
@@ -283,8 +295,6 @@ export default function GlobalError({
             {timestamp || '---- -- --T--:--:--.---Z'}
           </div>
         </div>
-
-
       </body>
     </html>
   );

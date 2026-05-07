@@ -130,10 +130,10 @@ function TaskTool({ part, forceOpen }: ToolProps) {
 
         {/* Right side */}
         {running && (
-          <Loader2 className="size-3 animate-spin text-muted-foreground/40 flex-shrink-0" />
+          <Loader2 className="size-3 animate-spin text-muted-foreground/60 flex-shrink-0" />
         )}
         {childSessionId && !running && (
-          <ExternalLink className="size-3 flex-shrink-0 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />
+          <ExternalLink className="size-3 flex-shrink-0 text-muted-foreground/60 group-hover:text-muted-foreground/60 transition-colors" />
         )}
       </div>
 

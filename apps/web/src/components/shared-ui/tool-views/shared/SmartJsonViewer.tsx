@@ -60,7 +60,7 @@ const ValueRenderer = ({ value }: { value: any }) => {
 const KeyRenderer = ({ name }: { name: string }) => (
   <span className="text-muted-foreground/80 mr-1">
     <span className="font-medium">{name}</span>
-    <span className="text-muted-foreground/40">:</span>
+    <span className="text-muted-foreground/60">:</span>
   </span>
 );
 
@@ -138,7 +138,7 @@ export const SmartJsonViewer: React.FC<SmartJsonViewerProps> = ({
             </span>
           )}
 
-          {isEmpty && <span className="text-muted-foreground/40"></span>}
+          {isEmpty && <span className="text-muted-foreground/60"></span>}
 
           {(!isExpanded || isEmpty) && (
             <span className="text-muted-foreground/50">{brackets[1]}</span>

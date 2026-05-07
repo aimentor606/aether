@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useServerStore } from '@/stores/server-store';
+import { toast } from 'sonner';
 import {
   getCurrentInstanceIdFromWindow,
   toInstanceAwarePath,
@@ -33,6 +34,9 @@ const MAX_RECENTLY_CLOSED = 20;
 
 /** Maximum depth for tab focus history (VS Code-like back-navigation) */
 const MAX_FOCUS_HISTORY = 50;
+
+/** Maximum number of open tabs to prevent memory pressure */
+const MAX_TABS = 15;
 export const DASHBOARD_TAB: Omit<Tab, 'openedAt'> & { openedAt: number } = {
   id: DASHBOARD_TAB_ID,
   title: '',
@@ -209,10 +213,24 @@ export const useTabStore = create<TabState>()(
           openedAt: Date.now(),
         };
 
-        const updated = ensureDashboardTab({ ...tabs, [newTab.id]: newTab }, [
-          ...tabOrder,
-          newTab.id,
-        ]);
+        // Enforce tab limit — close the oldest non-pinned tab if at capacity
+        let prunedTabs = { ...tabs };
+        let prunedOrder = [...tabOrder];
+        if (tabOrder.length >= MAX_TABS) {
+          const unpinnedIds = tabOrder.filter(
+            (id) => !tabs[id]?.pinned && id !== DASHBOARD_TAB_ID,
+          );
+          if (unpinnedIds.length > 0) {
+            const evictId = unpinnedIds[0];
+            delete prunedTabs[evictId];
+            prunedOrder = prunedOrder.filter((id) => id !== evictId);
+          }
+        }
+
+        const updated = ensureDashboardTab(
+          { ...prunedTabs, [newTab.id]: newTab },
+          [...prunedOrder, newTab.id],
+        );
 
         set({
           ...updated,
@@ -459,7 +477,11 @@ export const useTabStore = create<TabState>()(
               'aether-tabs-per-server',
               JSON.stringify(cache),
             );
-          } catch {}
+          } catch {
+            toast.error(
+              'Failed to save tab state. Your tabs may not be restored after switching.',
+            );
+          }
         }
 
         // Restore the full tab state for the new server
@@ -477,7 +499,9 @@ export const useTabStore = create<TabState>()(
             });
             return;
           }
-        } catch {}
+        } catch {
+          // Restore failed — start fresh (no toast, this is expected for new servers)
+        }
 
         // No saved state for new server — start with just the dashboard tab
         const ensured = ensureDashboardTab({}, []);
@@ -591,6 +615,12 @@ useTabStore.subscribe((state) => {
         tabFocusHistory: state.tabFocusHistory,
       };
       localStorage.setItem('aether-tabs-per-server', JSON.stringify(cache));
-    } catch {}
+    } catch (e) {
+      // Background sync failure — warn once per session rather than toast spam
+      if (!(globalThis as Record<string, unknown>).__tabSyncWarned) {
+        console.warn('[tab-store] Failed to sync tab state:', e);
+        (globalThis as Record<string, unknown>).__tabSyncWarned = true;
+      }
+    }
   }, 500);
 });

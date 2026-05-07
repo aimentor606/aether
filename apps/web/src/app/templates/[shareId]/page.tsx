@@ -409,7 +409,7 @@ export default function TemplateSharePage() {
         <div className="w-full max-w-7xl">
           <div
             className={cn(
-              'mx-auto rounded-2xl transition-colors duration-300',
+              'mx-auto rounded-lg transition-colors duration-300',
               hasScrolled
                 ? 'px-2 md:px-4 border border-border backdrop-blur-lg bg-background/75'
                 : 'shadow-none px-3 md:px-6',
@@ -469,11 +469,11 @@ export default function TemplateSharePage() {
               <div className="relative">
                 {colorPalette.length > 0 && (
                   <div
-                    className="absolute -inset-10 rounded-2xl opacity-0 dark:opacity-100 transition-colors duration-1000 pointer-events-none"
+                    className="absolute -inset-10 rounded-lg opacity-0 dark:opacity-100 transition-colors duration-1000 pointer-events-none"
                     style={gradientStyle}
                   />
                 )}
-                <div className="relative aspect-square w-full max-w-sm mx-auto lg:mx-0 rounded-2xl overflow-hidden bg-background">
+                <div className="relative aspect-square w-full max-w-sm mx-auto lg:mx-0 rounded-lg overflow-hidden bg-background">
                   <div className="w-full h-full flex items-center justify-center">
                     <AgentAvatar
                       iconName={template.icon_name}

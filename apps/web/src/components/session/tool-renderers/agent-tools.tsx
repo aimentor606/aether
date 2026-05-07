@@ -168,7 +168,7 @@ function AgentSpawnTool({ part, forceOpen }: ToolProps) {
             )}
 
             {hasSession && (
-              <ChevronRight className="size-3.5 text-muted-foreground/20 group-hover:text-muted-foreground/50 transition-colors flex-shrink-0" />
+              <ChevronRight className="size-3.5 text-muted-foreground/60 group-hover:text-muted-foreground/50 transition-colors flex-shrink-0" />
             )}
           </div>
 
@@ -255,7 +255,7 @@ function AgentSpawnTool({ part, forceOpen }: ToolProps) {
                 >
                   <ChevronRight
                     className={cn(
-                      'size-3 text-muted-foreground/40 transition-transform flex-shrink-0',
+                      'size-3 text-muted-foreground/60 transition-transform flex-shrink-0',
                       outputExpanded && 'rotate-90',
                     )}
                   />
@@ -263,7 +263,7 @@ function AgentSpawnTool({ part, forceOpen }: ToolProps) {
                     Result
                   </span>
                   {!outputExpanded && workerPreview && (
-                    <span className="text-[11px] text-muted-foreground/40 truncate">
+                    <span className="text-[11px] text-muted-foreground/60 truncate">
                       {workerPreview}
                     </span>
                   )}
@@ -403,7 +403,7 @@ function AgentMessageTool({ part }: ToolProps) {
             )}
 
             {hasSession && (
-              <ChevronRight className="size-3.5 text-muted-foreground/20 group-hover:text-muted-foreground/50 transition-colors flex-shrink-0" />
+              <ChevronRight className="size-3.5 text-muted-foreground/60 group-hover:text-muted-foreground/50 transition-colors flex-shrink-0" />
             )}
           </div>
 
@@ -490,7 +490,7 @@ function AgentMessageTool({ part }: ToolProps) {
                 >
                   <ChevronRight
                     className={cn(
-                      'size-3 text-muted-foreground/40 transition-transform flex-shrink-0',
+                      'size-3 text-muted-foreground/60 transition-transform flex-shrink-0',
                       outputExpanded && 'rotate-90',
                     )}
                   />
@@ -498,7 +498,7 @@ function AgentMessageTool({ part }: ToolProps) {
                     Result
                   </span>
                   {!outputExpanded && workerPreview && (
-                    <span className="text-[11px] text-muted-foreground/40 truncate">
+                    <span className="text-[11px] text-muted-foreground/60 truncate">
                       {workerPreview}
                     </span>
                   )}
@@ -620,7 +620,7 @@ function AgentStatusTool({ part }: ToolProps) {
               >
                 <ChevronRight
                   className={cn(
-                    'size-3 text-muted-foreground/40 transition-transform flex-shrink-0',
+                    'size-3 text-muted-foreground/60 transition-transform flex-shrink-0',
                     expanded && 'rotate-90',
                   )}
                 />

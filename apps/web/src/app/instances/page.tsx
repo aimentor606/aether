@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { useQuery } from '@tanstack/react-query';
 import { AetherLogo } from '@/components/sidebar/aether-logo';
@@ -224,12 +224,12 @@ function InstanceCard({
                 }
               }}
               title="Backups"
-              className="flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground/30 hover:text-muted-foreground/80 hover:bg-muted/50 transition-colors opacity-0 group-hover:opacity-100"
+              className="flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground/60 hover:text-muted-foreground/80 hover:bg-muted/50 transition-colors opacity-0 group-hover:opacity-100"
             >
               <Archive className="h-3.5 w-3.5" />
             </span>
           )}
-          <ExternalLink className="h-4 w-4 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />
+          <ExternalLink className="h-4 w-4 text-muted-foreground/60 group-hover:text-muted-foreground/60 transition-colors" />
         </div>
       </div>
     </button>
@@ -303,7 +303,7 @@ function FallbackInstanceCard({
             )}
           </div>
         </div>
-        <ExternalLink className="h-4 w-4 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0 mt-1" />
+        <ExternalLink className="h-4 w-4 text-muted-foreground/60 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0 mt-1" />
       </div>
     </button>
   );
@@ -313,11 +313,16 @@ function FallbackInstanceCard({
 
 export default function InstancesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectReason = searchParams.get('reason');
+  const authEvent = searchParams.get('auth_event');
   const { user, isLoading: authLoading } = useAuth();
   const { servers, activeServerId } = useServerStore();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [autoCreating, setAutoCreating] = useState(false);
+  const [autoCreateFailed, setAutoCreateFailed] = useState(false);
+  const [autoCreateError, setAutoCreateError] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
   const isCloud = isBillingEnabled();
   const {
@@ -364,20 +369,32 @@ export default function InstancesPage() {
   }, [user, refetch]);
 
   // Local mode: auto-create the single sandbox if none exists, then redirect.
-  // Only 1 instance allowed in local mode.
+  // Only 1 instance allowed in local mode. Stop retrying after first failure.
   useEffect(() => {
-    if (!user || isLoading || autoCreating || isCloud) return;
+    if (!user || isLoading || autoCreating || autoCreateFailed || isCloud)
+      return;
     if (sandboxes && sandboxes.length === 0) {
       setAutoCreating(true);
       ensureSandbox()
         .then(() => refetch())
         .catch((err) => {
           console.error('[instances] Auto-create sandbox failed:', err);
-          toast.error('Failed to create sandbox. Please try again.');
+          const msg = err instanceof Error ? err.message : String(err);
+          setAutoCreateError(msg);
+          toast.error('Failed to create sandbox.');
+          setAutoCreateFailed(true);
         })
         .finally(() => setAutoCreating(false));
     }
-  }, [user, isLoading, sandboxes, autoCreating, isCloud, refetch]);
+  }, [
+    user,
+    isLoading,
+    sandboxes,
+    autoCreating,
+    autoCreateFailed,
+    isCloud,
+    refetch,
+  ]);
 
   // Auto-redirect: if there's exactly 1 instance (local mode typical), go straight to it.
   useEffect(() => {
@@ -411,6 +428,7 @@ export default function InstancesPage() {
       setCheckoutOpen(true);
     } else {
       // Local mode: create directly, no checkout
+      setAutoCreateFailed(false);
       setAutoCreating(true);
       ensureSandbox()
         .then(() => refetch())
@@ -456,6 +474,30 @@ export default function InstancesPage() {
     );
   }
 
+  // Unified post-login setup screen: show when fresh signup detected and
+  // sandbox is being fetched or auto-created (local mode). Prevents the
+  // jarring flash of the instances list before the auto-redirect fires.
+  // Only for signups — returning users should see the instances list.
+  if (
+    authEvent === 'signup' &&
+    (autoCreating || (isLoading && !autoCreateFailed))
+  ) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-6">
+        <AetherLogo size={22} />
+        <div className="flex flex-col items-center gap-2">
+          <h1 className="text-base font-medium text-foreground/80">
+            Setting up your Aether
+          </h1>
+          <p className="text-sm text-muted-foreground/50">
+            {autoCreating ? 'Creating your workspace…' : 'Preparing…'}
+          </p>
+        </div>
+        <Loader2 className="h-5 w-5 animate-spin text-primary/60" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Top bar */}
@@ -496,6 +538,13 @@ export default function InstancesPage() {
           </Button>
         </div>
       </div>
+
+      {redirectReason === 'no-instance' && (
+        <div className="mx-6 mb-2 flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm text-primary">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span>Select or create a workspace to continue.</span>
+        </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 flex items-start justify-center px-4 pt-12 pb-20">
@@ -555,7 +604,7 @@ export default function InstancesPage() {
 
           {/* Claim computer card for legacy paid users */}
           {canClaimComputer && !pageLoading && (
-            <div className="rounded-2xl border border-border/50 bg-gradient-to-b from-background to-muted/20 px-8 py-14 pb-6 flex flex-col items-center text-center gap-6">
+            <div className="rounded-lg border border-border/50 bg-gradient-to-b from-background to-muted/20 px-8 py-14 pb-6 flex flex-col items-center text-center gap-6">
               <img
                 src="/aether-computer.png"
                 alt="Aether Computer"
@@ -621,19 +670,46 @@ export default function InstancesPage() {
                 data-testid="instances-empty"
               >
                 <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-muted/50">
-                  <Server className="h-7 w-7 text-muted-foreground/40" />
+                  {autoCreateFailed ? (
+                    <AlertCircle className="h-7 w-7 text-red-400/60" />
+                  ) : (
+                    <Server className="h-7 w-7 text-muted-foreground/60" />
+                  )}
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-medium text-foreground/80">
-                    No instances yet
+                    {autoCreateFailed
+                      ? 'Sandbox creation failed'
+                      : 'No instances yet'}
                   </p>
                   <p className="text-xs text-muted-foreground/60 mt-1">
-                    Create your first Aether instance to get started.
+                    {autoCreateFailed
+                      ? 'Your workspace could not be created automatically.'
+                      : 'Create your first Aether instance to get started.'}
                   </p>
                 </div>
-                <Button onClick={handleCreateInstance} className="gap-1.5">
+                {autoCreateFailed && autoCreateError && (
+                  <div className="w-full rounded-lg border border-red-500/15 bg-red-500/[0.04] px-4 py-3">
+                    <p className="text-[13px] text-red-400/90 text-center break-words leading-relaxed">
+                      {autoCreateError}
+                    </p>
+                  </div>
+                )}
+                {autoCreateFailed && !isCloud && (
+                  <p className="text-xs text-muted-foreground/50 text-center">
+                    Make sure Docker is running and try again.
+                  </p>
+                )}
+                <Button
+                  onClick={() => {
+                    setAutoCreateFailed(false);
+                    setAutoCreateError(null);
+                    handleCreateInstance();
+                  }}
+                  className="gap-1.5"
+                >
                   <Plus className="h-3.5 w-3.5" />
-                  New Aether
+                  {autoCreateFailed ? 'Retry' : 'New Aether'}
                 </Button>
               </div>
             )}

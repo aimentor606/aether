@@ -5,9 +5,9 @@ import { GithubButton } from '@/components/home/github-button';
 
 export const OSSCard = () => {
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-border/50 bg-card/30 p-8 sm:p-12 shadow-sm">
+    <div className="relative w-full overflow-hidden rounded-lg border border-border/50 bg-card/30 p-8 sm:p-12 shadow-sm">
       <div className="relative z-10 flex flex-col items-center text-center">
-        <div className="mb-6 flex items-center justify-center size-12 rounded-2xl bg-muted/20 border border-border/50">
+        <div className="mb-6 flex items-center justify-center size-12 rounded-lg bg-muted/20 border border-border/50">
           <Heart className="size-5 text-muted-foreground/60" />
         </div>
         <h3 className="text-xl sm:text-2xl font-medium text-foreground mb-3">

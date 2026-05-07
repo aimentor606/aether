@@ -8,6 +8,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { AnimatedBg } from '@/components/ui/animated-bg';
 import { AetherLogo } from '@/components/sidebar/aether-logo';
 
+function getHomeHref(): string {
+  if (typeof document === 'undefined') return '/';
+  return document.cookie.includes('aether-auth-token') ? '/instances' : '/';
+}
+
 export default function NotFound() {
   return (
     <div className="w-full relative overflow-hidden min-h-[100dvh]">
@@ -67,7 +72,8 @@ export default function NotFound() {
 
           {/* Description - responsive */}
           <p className="text-sm sm:text-base text-foreground/60 text-center leading-relaxed px-2">
-            The page you&apos;re looking for doesn&apos;t exist or has been moved.
+            The page you&apos;re looking for doesn&apos;t exist or has been
+            moved.
           </p>
 
           {/* Status Card - 456px width, 96px height */}
@@ -90,12 +96,11 @@ export default function NotFound() {
           </Card>
 
           {/* Action Button */}
-          <Button
-            asChild
-            size="lg"
-            className="w-full h-12"
-          >
-            <Link href="/" className="flex items-center justify-center gap-2">
+          <Button asChild size="lg" className="w-full h-12">
+            <Link
+              href={getHomeHref()}
+              className="flex items-center justify-center gap-2"
+            >
               <ArrowLeft className="h-4 w-4" />
               <span>Return Home</span>
             </Link>

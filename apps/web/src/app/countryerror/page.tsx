@@ -67,7 +67,7 @@ export default function CountryError() {
           </div>
 
           {/* Footer text */}
-          <p className="text-[13px] text-foreground/40 text-center">
+          <p className="text-[13px] text-foreground/60 text-center">
             If you believe this is an error, please reach out to our support
             team.
           </p>

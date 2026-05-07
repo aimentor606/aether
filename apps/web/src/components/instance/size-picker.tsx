@@ -90,7 +90,7 @@ export function SizePicker({
               </div>
               <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground/60">
                 <span>{formatMemory(t.memory)} RAM</span>
-                <span className="text-muted-foreground/20">{'\u00B7'}</span>
+                <span className="text-muted-foreground/60">{'\u00B7'}</span>
                 <span>{formatDisk(t.disk)} SSD</span>
               </div>
             </div>
@@ -100,7 +100,7 @@ export function SizePicker({
                 {isDefault && defaultOnly ? 'Included' : formatPrice(t.priceMonthlyMarkup)}
               </span>
               {!(isDefault && defaultOnly) && (
-                <span className="text-[11px] text-muted-foreground/40">/mo</span>
+                <span className="text-[11px] text-muted-foreground/60">/mo</span>
               )}
             </div>
           </button>

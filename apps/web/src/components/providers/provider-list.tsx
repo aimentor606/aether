@@ -100,7 +100,7 @@ export function ProviderList({
   if (connectedProviders.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
-        <p className="text-xs text-muted-foreground/60">No providers connected</p>
+        <p className="text-xs text-muted-foreground">No providers connected</p>
         {showConnectButton && onConnect && (
           <Button
             variant="outline"
@@ -142,7 +142,7 @@ export function ProviderList({
                       connected
                     </span>
                   </div>
-                  <span className="text-[11px] text-muted-foreground/50">
+                  <span className="text-[11px] text-muted-foreground/80">
                     {modelCount} model{modelCount !== 1 ? 's' : ''}
                     {source && <> · <span className="capitalize">{source}</span></>}
                   </span>
@@ -152,7 +152,7 @@ export function ProviderList({
                   disabled={isDisc}
                   variant="ghost"
                   size="icon-sm"
-                  className="text-muted-foreground/30 hover:text-red-500 hover:bg-red-500/10"
+                  className="text-muted-foreground/70 hover:text-red-500 hover:bg-red-500/10"
                   title="Disconnect"
                 >
                   {isDisc ? (

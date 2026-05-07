@@ -2275,13 +2275,13 @@ export function SessionChat({
                               queueClearSession(sessionId);
                             }
                           }}
-                          className="inline-flex items-center justify-center size-5 rounded-md text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                          className="inline-flex items-center justify-center size-5 rounded-md text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 transition-colors"
                         >
                           <X className="size-3" />
                         </span>
                         <ChevronUp
                           className={cn(
-                            'size-3 text-muted-foreground/40 transition-transform',
+                            'size-3 text-muted-foreground/60 transition-transform',
                             !queueExpanded && 'rotate-180',
                           )}
                         />
@@ -2296,7 +2296,7 @@ export function SessionChat({
                               key={qm.id}
                               className="group/q flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-muted/60 transition-colors"
                             >
-                              <span className="text-[10px] tabular-nums text-muted-foreground/40 shrink-0 w-3 text-center">
+                              <span className="text-[10px] tabular-nums text-muted-foreground/60 shrink-0 w-3 text-center">
                                 {idx + 1}
                               </span>
                               <p className="flex-1 text-xs text-muted-foreground truncate min-w-0">

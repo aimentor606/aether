@@ -3,7 +3,7 @@
  * Tests read, write, sync, write-through, self-trigger suppression.
  */
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
-import { mkdtempSync, rmSync, readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
+import { mkdtempSync, rmSync, readFileSync, writeFileSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
 import { TriggerStore } from '../../triggers/src/trigger-store'
@@ -45,7 +45,7 @@ triggers:
     action:
       type: prompt
       prompt: "Generate the daily report"
-      agent:master
+      agent: aether
 
   - name: "Deploy Hook"
     source:

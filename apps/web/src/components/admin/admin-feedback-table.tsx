@@ -85,7 +85,7 @@ export function AdminFeedbackTable() {
             );
           } else {
             return (
-              <Star key={i} className="h-4 w-4 text-muted-foreground/30" />
+              <Star key={i} className="h-4 w-4 text-muted-foreground/60" />
             );
           }
         })}

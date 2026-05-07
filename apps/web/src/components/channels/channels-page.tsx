@@ -403,7 +403,7 @@ export function ChannelsPage() {
             {[1, 2].map((i) => (
               <div
                 key={i}
-                className="rounded-2xl border bg-card p-4 flex items-center gap-3"
+                className="rounded-lg border bg-card p-4 flex items-center gap-3"
               >
                 <Skeleton className="h-10 w-10 rounded-xl" />
                 <div className="flex-1 space-y-2">
@@ -417,7 +417,7 @@ export function ChannelsPage() {
           /* ── Empty state ── */
           <div className="space-y-4">
             <div className="text-center py-8">
-              <div className="w-12 h-12 rounded-2xl bg-muted border flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 rounded-lg bg-muted border flex items-center justify-center mx-auto mb-3">
                 <MessageSquare className="h-6 w-6 text-muted-foreground" />
               </div>
               <h3 className="text-base font-semibold mb-1">No channels yet</h3>
@@ -437,7 +437,7 @@ export function ChannelsPage() {
               <button
                 onClick={() => openSetupDialog('telegram')}
                 data-testid="telegram-setup"
-                className="flex items-center gap-3 p-4 rounded-2xl border border-border/50 bg-card hover:bg-muted/50 transition-colors cursor-pointer text-left group"
+                className="flex items-center gap-3 p-4 rounded-lg border border-border/50 bg-card hover:bg-muted/50 transition-colors cursor-pointer text-left group"
               >
                 <div className="w-10 h-10 rounded-xl bg-muted border border-border/50 flex items-center justify-center shrink-0 group-hover:border-primary/30 transition-colors">
                   <TelegramIcon className="h-5 w-5 text-foreground" />
@@ -452,7 +452,7 @@ export function ChannelsPage() {
               <button
                 onClick={() => openSetupDialog('slack')}
                 data-testid="slack-setup"
-                className="flex items-center gap-3 p-4 rounded-2xl border border-border/50 bg-card hover:bg-muted/50 transition-colors cursor-pointer text-left group"
+                className="flex items-center gap-3 p-4 rounded-lg border border-border/50 bg-card hover:bg-muted/50 transition-colors cursor-pointer text-left group"
               >
                 <div className="w-10 h-10 rounded-xl bg-muted border border-border/50 flex items-center justify-center shrink-0 group-hover:border-primary/30 transition-colors">
                   <SlackIcon className="h-5 w-5 text-foreground" />

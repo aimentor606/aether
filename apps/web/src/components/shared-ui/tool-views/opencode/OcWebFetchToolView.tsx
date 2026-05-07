@@ -214,7 +214,7 @@ export function OcWebFetchToolView({
                           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                         />
                       ) : (
-                        <Globe className="size-3.5 text-muted-foreground/50" />
+                        <Globe className="size-3.5 text-muted-foreground/80" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -222,12 +222,12 @@ export function OcWebFetchToolView({
                         {result.title || rDomain || result.url}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-muted-foreground/50 font-mono truncate">
+                        <span className="text-xs text-muted-foreground/80 font-mono truncate">
                           {rDomain}
                         </span>
                       </div>
                       {result.success && snippet && (
-                        <p className="text-xs text-muted-foreground/60 leading-relaxed line-clamp-2 mt-1.5">
+                        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mt-1.5">
                           {snippet}
                         </p>
                       )}
@@ -243,7 +243,7 @@ export function OcWebFetchToolView({
                       ) : (
                         <AlertTriangle className="size-3.5 text-amber-500/70" />
                       )}
-                      <ExternalLink className="size-3.5 text-muted-foreground/20 group-hover:text-muted-foreground/50 transition-colors" />
+                      <ExternalLink className="size-3.5 text-muted-foreground/60 group-hover:text-muted-foreground/80 transition-colors" />
                     </div>
                   </a>
                 );

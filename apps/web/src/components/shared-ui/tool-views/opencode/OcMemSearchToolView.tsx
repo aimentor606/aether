@@ -139,7 +139,7 @@ export function OcMemSearchToolView({
           </ScrollArea>
         ) : parsed.matched && !isError ? (
           <div className="flex flex-col items-center justify-center h-full py-12 px-6">
-            <Brain className="h-8 w-8 text-muted-foreground/30 mb-3" />
+            <Brain className="h-8 w-8 text-muted-foreground/60 mb-3" />
             <p className="text-sm text-muted-foreground">No memories found</p>
           </div>
         ) : output && !isError ? (
@@ -155,7 +155,7 @@ export function OcMemSearchToolView({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full py-12 px-6">
-            <Brain className="h-8 w-8 text-muted-foreground/30 mb-3" />
+            <Brain className="h-8 w-8 text-muted-foreground/60 mb-3" />
             <p className="text-sm text-muted-foreground">No memories found</p>
           </div>
         )}

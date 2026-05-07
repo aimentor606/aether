@@ -98,7 +98,7 @@ export default function AppDownloadPage() {
             transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center mb-16"
           >
-            <div className="relative bg-white dark:bg-[#2a2a2a] rounded-3xl overflow-hidden border border-border/60 dark:border-[#232324] w-full max-w-md">
+            <div className="relative bg-white dark:bg-[#2a2a2a] rounded-lg overflow-hidden border border-border/60 dark:border-[#232324] w-full max-w-md">
               {/* QR Code area */}
               <div className="relative bg-muted dark:bg-[#e8e4df] flex items-center justify-center p-12">
                 <AppDownloadQR size={200} logoSize={32} />

@@ -136,7 +136,7 @@ function StudyCard({
         {thesis}
       </p>
 
-      <div className="overflow-hidden rounded-2xl border border-border/50 bg-muted/18">
+      <div className="overflow-hidden rounded-lg border border-border/50 bg-muted/18">
         {rows.map(([title, detail], index) => (
           <div
             key={title}
@@ -231,7 +231,7 @@ export default function ExplorationPage() {
               <div className="grid gap-6 lg:grid-cols-2">
                 <Reveal delay={0.1}>
                   <NotebookBlock title="Filesystem">
-                    <div className="rounded-2xl border border-border/45 bg-muted/18 p-5 font-mono text-xs leading-loose text-muted-foreground/70">
+                    <div className="rounded-lg border border-border/45 bg-muted/18 p-5 font-mono text-xs leading-loose text-muted-foreground/70">
                       {filesystemProof.map((item) => (
                         <div key={item}>{item}</div>
                       ))}
@@ -241,7 +241,7 @@ export default function ExplorationPage() {
 
                 <Reveal delay={0.14}>
                   <NotebookBlock title="Memory Model">
-                    <div className="rounded-2xl border border-border/45 bg-muted/18 p-5">
+                    <div className="rounded-lg border border-border/45 bg-muted/18 p-5">
                       <div className="flex flex-wrap gap-2 text-[11px] font-mono text-muted-foreground/68">
                         {['tool call', 'observation', 'consolidation', 'long-term memory', 'future context'].map(
                           (item, index) => (
@@ -249,7 +249,7 @@ export default function ExplorationPage() {
                               <span className="rounded-full border border-border/50 px-3 py-1">
                                 {item}
                               </span>
-                              {index < 4 ? <span className="text-muted-foreground/35">{'->'}</span> : null}
+                              {index < 4 ? <span className="text-muted-foreground/60">{'->'}</span> : null}
                             </div>
                           )
                         )}
@@ -275,7 +275,7 @@ export default function ExplorationPage() {
                       {copyLines.map((line) => (
                         <div
                           key={line}
-                          className="rounded-2xl border border-border/45 bg-muted/14 px-4 py-3 text-sm leading-relaxed text-foreground/84"
+                          className="rounded-lg border border-border/45 bg-muted/14 px-4 py-3 text-sm leading-relaxed text-foreground/84"
                         >
                           {line}
                         </div>
@@ -286,7 +286,7 @@ export default function ExplorationPage() {
 
                 <Reveal delay={0.14}>
                   <NotebookBlock title="Integration Surface">
-                    <div className="rounded-2xl border border-border/45 bg-muted/18 p-5 font-mono text-xs leading-loose text-muted-foreground/70">
+                    <div className="rounded-lg border border-border/45 bg-muted/18 p-5 font-mono text-xs leading-loose text-muted-foreground/70">
                       {integrations.map(([name, method]) => (
                         <div key={name} className="flex items-start justify-between gap-4 border-t border-border/35 py-2 first:border-t-0 first:pt-0 last:pb-0">
                           <span className="text-foreground/84">{name}</span>

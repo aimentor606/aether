@@ -112,7 +112,7 @@ export function ReasoningPartCard({
 
           {/* Right side: spinner when streaming, chevron */}
           {reasoningStreaming && (
-            <Loader2 className="size-3 animate-spin text-muted-foreground/40 flex-shrink-0" />
+            <Loader2 className="size-3 animate-spin text-muted-foreground/60 flex-shrink-0" />
           )}
           <ChevronRight
             className={cn(

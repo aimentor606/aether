@@ -128,7 +128,7 @@ function SnapshotTimeline({ sessionId, isFullscreen, onToggleFullscreen }: Snaps
     return (
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-2 px-5 py-4 pr-12 border-b border-border/40">
-          <History className="size-4 text-muted-foreground/40" />
+          <History className="size-4 text-muted-foreground/60" />
           <span className="text-xs font-medium text-muted-foreground">Snapshots</span>
         </div>
         <div className="flex-1 flex items-center justify-center">
@@ -151,7 +151,7 @@ function SnapshotTimeline({ sessionId, isFullscreen, onToggleFullscreen }: Snaps
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between px-5 py-4 pr-12 border-b border-border/40">
           <div className="flex items-center gap-2">
-            <History className="size-4 text-muted-foreground/40" />
+            <History className="size-4 text-muted-foreground/60" />
             <span className="text-xs font-medium text-muted-foreground">Snapshots</span>
           </div>
           {onToggleFullscreen && (
@@ -170,7 +170,7 @@ function SnapshotTimeline({ sessionId, isFullscreen, onToggleFullscreen }: Snaps
           )}
         </div>
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-12 min-h-[200px]">
-          <GitCommitHorizontal className="size-10 text-muted-foreground/20 mb-4" />
+          <GitCommitHorizontal className="size-10 text-muted-foreground/60 mb-4" />
           {snapshotEnabled ? (
             <>
               <p className="text-base text-muted-foreground">No snapshots yet</p>

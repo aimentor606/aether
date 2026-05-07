@@ -362,7 +362,7 @@ export function FileHistoryPopoverContent({
 
         {error && !isLoading && (
           <div className="flex flex-col items-center justify-center gap-2 p-6 text-center">
-            <AlertCircle className="h-6 w-6 text-muted-foreground/30" />
+            <AlertCircle className="h-6 w-6 text-muted-foreground/60" />
             <p className="text-xs text-muted-foreground">
               {error instanceof Error &&
               error.message.includes('not a git repository')
@@ -374,7 +374,7 @@ export function FileHistoryPopoverContent({
 
         {!isLoading && !error && totalCommits === 0 && (
           <div className="flex flex-col items-center justify-center gap-2 p-6 text-center">
-            <GitCommitHorizontal className="h-6 w-6 text-muted-foreground/20" />
+            <GitCommitHorizontal className="h-6 w-6 text-muted-foreground/60" />
             <p className="text-xs text-muted-foreground">No commit history</p>
           </div>
         )}

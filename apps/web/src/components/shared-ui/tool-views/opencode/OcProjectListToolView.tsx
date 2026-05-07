@@ -107,7 +107,7 @@ export function OcProjectListToolView({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full py-12 px-6">
-            <Folder className="h-8 w-8 text-muted-foreground/30 mb-3" />
+            <Folder className="h-8 w-8 text-muted-foreground/60 mb-3" />
             <p className="text-sm text-muted-foreground">No projects found</p>
             <p className="text-xs text-muted-foreground/50 mt-1">Use project_create to create one</p>
           </div>

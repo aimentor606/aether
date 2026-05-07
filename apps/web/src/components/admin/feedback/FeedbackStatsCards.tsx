@@ -49,7 +49,7 @@ export function FeedbackStatsCards({ ...rest }: { 'data-testid'?: string }) {
               );
             } else {
               return (
-                <Star key={i} className="h-5 w-5 text-muted-foreground/30" />
+                <Star key={i} className="h-5 w-5 text-muted-foreground/60" />
               );
             }
           })}

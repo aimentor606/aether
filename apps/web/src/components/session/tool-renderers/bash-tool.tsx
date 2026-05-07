@@ -438,7 +438,7 @@ function BashTool({ part, defaultOpen, forceOpen, locked }: ToolProps) {
             {/* Output label */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 border-b border-border/30">
               <div className="size-1.5 rounded-full bg-muted-foreground/25" />
-              <span className="text-[0.5625rem] font-medium uppercase tracking-wider text-muted-foreground/40">
+              <span className="text-[0.5625rem] font-medium uppercase tracking-wider text-muted-foreground/60">
                 Output
               </span>
             </div>

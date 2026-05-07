@@ -422,7 +422,7 @@ function DetailSheet({
 
               {/* Empty fallback */}
               {rows.length === 0 && !content && (
-                <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/30">
+                <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/60">
                   <p className="text-xs">No additional details</p>
                 </div>
               )}
@@ -454,7 +454,7 @@ function LoadingSkeleton() {
       {skeletonKeys.map((key) => (
         <div
           key={`workspace-skeleton-${key}`}
-          className="rounded-2xl border bg-card p-4 sm:p-5"
+          className="rounded-lg border bg-card p-4 sm:p-5"
         >
           <div className="mb-3 space-y-2">
             <Skeleton className="h-4 w-32" />
@@ -530,7 +530,7 @@ function EmptyState({
       className="flex flex-col items-center justify-center py-20 rounded-xl border border-dashed border-border/50"
       data-testid="workspace-empty"
     >
-      <Blocks className="h-7 w-7 text-muted-foreground/30 mb-3" />
+      <Blocks className="h-7 w-7 text-muted-foreground/60 mb-3" />
       <p className="text-sm font-medium text-foreground mb-1">
         Nothing here yet
       </p>
@@ -924,7 +924,7 @@ export default function WorkspacePage() {
                           {action.meta}
                         </span>
                       )}
-                      <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/30 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </div>
                   </button>
                 );
@@ -974,7 +974,7 @@ export default function WorkspacePage() {
                           {action.meta}
                         </span>
                       )}
-                      <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/30 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </div>
                   </button>
                 );

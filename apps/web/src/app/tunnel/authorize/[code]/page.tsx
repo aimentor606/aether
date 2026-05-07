@@ -162,7 +162,7 @@ function DeviceAuthorize() {
             {/* Header */}
             <div className="flex flex-col items-center gap-1 mb-6">
               <AetherLogo size={24} />
-              <p className="text-[11px] text-foreground/30 tracking-[0.2em] uppercase mt-3">
+              <p className="text-[11px] text-foreground/60 tracking-[0.2em] uppercase mt-3">
                 Authorize Device
               </p>
             </div>
@@ -175,14 +175,14 @@ function DeviceAuthorize() {
                   {info.deviceCode}
                 </span>
               </div>
-              <span className="text-xs text-foreground/30 tabular-nums font-mono">
+              <span className="text-xs text-foreground/60 tabular-nums font-mono">
                 {minutes}:{seconds.toString().padStart(2, '0')}
               </span>
             </div>
 
             {/* Machine info */}
             {info.machineHostname && (
-              <div className="flex items-center gap-2 text-[13px] text-foreground/40 mb-5">
+              <div className="flex items-center gap-2 text-[13px] text-foreground/60 mb-5">
                 <Monitor className="h-3.5 w-3.5" />
                 <span>{info.machineHostname}</span>
               </div>
@@ -194,7 +194,7 @@ function DeviceAuthorize() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={info.machineHostname || 'Connection name'}
-                className="w-full h-11 text-sm bg-foreground/[0.03] border border-foreground/[0.08] rounded-xl px-3.5 shadow-none focus-visible:outline-none focus-visible:border-foreground/20 transition-colors placeholder:text-foreground/25"
+                className="w-full h-11 text-sm bg-foreground/[0.03] border border-foreground/[0.08] rounded-xl px-3.5 shadow-none focus-visible:outline-none focus-visible:border-foreground/20 transition-colors placeholder:text-foreground/60"
               />
             </div>
 
@@ -204,7 +204,7 @@ function DeviceAuthorize() {
                 <div className="w-full border-t border-foreground/[0.06]" />
               </div>
               <div className="relative flex justify-center">
-                <span className="px-3 bg-background/80 dark:bg-background/75 text-[10px] text-foreground/20 tracking-[0.15em] uppercase">
+                <span className="px-3 bg-background/80 dark:bg-background/75 text-[10px] text-foreground/60 tracking-[0.15em] uppercase">
                   Permissions
                 </span>
               </div>
@@ -235,9 +235,9 @@ function DeviceAuthorize() {
                     )}>
                       {selected && <Check className="h-3 w-3 text-background" />}
                     </div>
-                    <Icon className={cn('h-4 w-4 shrink-0', selected ? 'text-foreground/70' : 'text-foreground/25')} />
+                    <Icon className={cn('h-4 w-4 shrink-0', selected ? 'text-foreground/70' : 'text-foreground/60')} />
                     <div className="flex-1 min-w-0">
-                      <span className={cn('text-[13px]', selected ? 'text-foreground/80' : 'text-foreground/40')}>
+                      <span className={cn('text-[13px]', selected ? 'text-foreground/80' : 'text-foreground/60')}>
                         {cap.label}
                       </span>
                     </div>
@@ -258,7 +258,7 @@ function DeviceAuthorize() {
               <button
                 onClick={handleDeny}
                 disabled={deny.isPending || approve.isPending}
-                className="w-full text-xs text-foreground/30 hover:text-foreground/50 transition-colors py-2"
+                className="w-full text-xs text-foreground/60 hover:text-foreground/50 transition-colors py-2"
               >
                 Deny request
               </button>
@@ -266,7 +266,7 @@ function DeviceAuthorize() {
           </div>
 
           {/* Footer hint */}
-          <p className="text-[11px] text-center text-foreground/20 mt-4">
+          <p className="text-[11px] text-center text-foreground/60 mt-4">
             Confirm the code above matches your terminal.
           </p>
         </div>

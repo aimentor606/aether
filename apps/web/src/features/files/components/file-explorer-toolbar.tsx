@@ -64,7 +64,7 @@ export function FileExplorerToolbar() {
             </span>
           </>
         ) : (
-          <span className="text-muted-foreground/40 text-xs select-none">
+          <span className="text-muted-foreground/60 text-xs select-none">
             {projectName}
           </span>
         )}

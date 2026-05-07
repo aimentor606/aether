@@ -38,15 +38,15 @@ function ago(t?: string | number) {
 }
 
 const statusIcon: Record<string, { icon: typeof Circle; color: string }> = {
-  pending: { icon: Circle, color: 'text-muted-foreground/40' },
+  pending: { icon: Circle, color: 'text-muted-foreground/60' },
   in_progress: { icon: Loader2, color: 'text-blue-400' },
   done: { icon: CheckCircle2, color: 'text-emerald-500' },
   blocked: { icon: AlertTriangle, color: 'text-amber-500' },
-  cancelled: { icon: Ban, color: 'text-muted-foreground/30' },
+  cancelled: { icon: Ban, color: 'text-muted-foreground/60' },
   running: { icon: Loader2, color: 'text-blue-400' },
   completed: { icon: CheckCircle2, color: 'text-emerald-500' },
   failed: { icon: AlertTriangle, color: 'text-red-500' },
-  stopped: { icon: Ban, color: 'text-muted-foreground/40' },
+  stopped: { icon: Ban, color: 'text-muted-foreground/60' },
 };
 
 const priorityBadge: Record<string, string> = {
@@ -166,11 +166,11 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
   if (!project) return (
     <div className="flex-1 flex items-center justify-center flex-col gap-3">
       <FolderGit2 className="h-12 w-12 text-muted-foreground/10" />
-      <p className="text-sm font-medium text-muted-foreground/40">Project not found</p>
+      <p className="text-sm font-medium text-muted-foreground/60">Project not found</p>
       <Button
         variant="ghost"
         size="sm"
-        className="text-xs text-muted-foreground/30"
+        className="text-xs text-muted-foreground/60"
         onClick={() => openTabAndNavigate({ id: 'page:/workspace', title: 'Workspace', type: 'page', href: '/workspace' })}
       >
         Back to Workspace
@@ -199,7 +199,7 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
               >
                 {parentDir}
               </button>
-              <span className="text-muted-foreground/40 text-sm">/</span>
+              <span className="text-muted-foreground/60 text-sm">/</span>
               {editingField === 'name' ? (
                 <input type="text"
                   ref={editInputRef}
@@ -359,7 +359,7 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
                             {t.priority}
                           </span>
                         )}
-                        <span className="text-xs text-muted-foreground/30 tabular-nums shrink-0">{ago(t.updated_at)}</span>
+                        <span className="text-xs text-muted-foreground/60 tabular-nums shrink-0">{ago(t.updated_at)}</span>
                       </div>
                     );
                   })}
@@ -371,7 +371,7 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
               ? <EmptyState icon={Cpu} text="No agents spawned" sub="Agents appear here when Aether delegates work to sub-agents" />
               : <div className="rounded-lg border border-border bg-card overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-2.5 bg-muted/30 border-b border-border text-sm">
-                    <Cpu className="h-4 w-4 text-muted-foreground/40" />
+                    <Cpu className="h-4 w-4 text-muted-foreground/60" />
                     <span className="font-semibold text-foreground">{agentList.length} agent{agentList.length > 1 ? 's' : ''}</span>
                   </div>
                   {agentList.map((a: AetherAgent) => {
@@ -384,7 +384,7 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
                         <SI className={cn('h-4 w-4 shrink-0', si.color, a.status === 'running' && 'animate-spin')} />
                         <Badge variant="outline" className="text-[0.5625rem] h-4 px-1.5 font-mono shrink-0">{a.agent_type}</Badge>
                         <span className="text-sm text-foreground/70 truncate flex-1">{a.description}</span>
-                        <span className="text-xs text-muted-foreground/30 tabular-nums shrink-0">{ago(a.created_at)}</span>
+                        <span className="text-xs text-muted-foreground/60 tabular-nums shrink-0">{ago(a.created_at)}</span>
                       </button>
                     );
                   })}
@@ -396,15 +396,15 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
               ? <EmptyState icon={MessageSquare} text="No sessions linked" sub="Sessions are linked when you use project_select" />
               : <div className="rounded-lg border border-border bg-card overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-2.5 bg-muted/30 border-b border-border text-sm">
-                    <MessageSquare className="h-4 w-4 text-muted-foreground/40" />
+                    <MessageSquare className="h-4 w-4 text-muted-foreground/60" />
                     <span className="font-semibold text-foreground">{sessionList.length} session{sessionList.length > 1 ? 's' : ''}</span>
                   </div>
                   {sessionList.map((s: any) => (
                     <button key={s.id} onClick={() => openTabAndNavigate({ id: s.id, title: s.title || 'Session', type: 'session', href: `/sessions/${s.id}` })}
                       className="flex items-center h-11 px-4 gap-3 w-full hover:bg-muted/30 transition-colors cursor-pointer text-left border-b border-border last:border-0">
-                      <MessageSquare className="h-4 w-4 text-muted-foreground/20 shrink-0" />
+                      <MessageSquare className="h-4 w-4 text-muted-foreground/60 shrink-0" />
                       <span className="text-sm text-foreground/70 truncate flex-1">{s.title || 'Untitled'}</span>
-                      <span className="text-xs text-muted-foreground/30 tabular-nums shrink-0">{ago(s.time?.updated)}</span>
+                      <span className="text-xs text-muted-foreground/60 tabular-nums shrink-0">{ago(s.time?.updated)}</span>
                     </button>
                   ))}
                 </div>
@@ -440,7 +440,7 @@ function EmptyState({ icon: Icon, text, sub }: { icon: typeof ListTodo; text: st
   return (
     <div className="rounded-lg border border-border bg-card p-12 text-center">
       <Icon className="h-8 w-8 text-muted-foreground/10 mx-auto mb-3" />
-      <p className="text-sm text-muted-foreground/30">{text}</p>
+      <p className="text-sm text-muted-foreground/60">{text}</p>
       {sub && <p className="text-xs text-muted-foreground/15 mt-1">{sub}</p>}
     </div>
   );
@@ -457,7 +457,7 @@ function ProjectSidebar({ project, editingField, editValue, editTextareaRef, set
             {!editingField && (
               <button
                 onClick={() => startEditing('description', project.description || '')}
-                className="ml-auto text-muted-foreground/30 hover:text-muted-foreground transition-colors cursor-pointer"
+                className="ml-auto text-muted-foreground/60 hover:text-muted-foreground transition-colors cursor-pointer"
                 title="Edit description"
               >
                 <Pencil className="h-3.5 w-3.5" />
@@ -473,7 +473,7 @@ function ProjectSidebar({ project, editingField, editValue, editTextareaRef, set
                 onKeyDown={handleEditKeyDown}
                 onBlur={saveEdit}
                 rows={3}
-                className="w-full text-sm bg-muted/40 border border-border rounded-md px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-primary resize-none text-foreground placeholder:text-muted-foreground/30"
+                className="w-full text-sm bg-muted/40 border border-border rounded-md px-2.5 py-1.5 outline-none focus:ring-1 focus:ring-primary resize-none text-foreground placeholder:text-muted-foreground/60"
                 placeholder="Add a description..."
               />
               <div className="flex items-center gap-1 mt-1.5">
@@ -507,7 +507,7 @@ function ProjectSidebar({ project, editingField, editValue, editTextareaRef, set
             </p>
           ) : (
             <p
-              className="text-sm text-muted-foreground/40 italic mb-4 cursor-pointer hover:text-muted-foreground transition-colors rounded px-1 -mx-1 py-0.5"
+              className="text-sm text-muted-foreground/60 italic mb-4 cursor-pointer hover:text-muted-foreground transition-colors rounded px-1 -mx-1 py-0.5"
               onClick={() => startEditing('description', '')}
               title="Click to add description"
             >
@@ -519,25 +519,25 @@ function ProjectSidebar({ project, editingField, editValue, editTextareaRef, set
           <div className="space-y-2.5">
             {project.path && project.path !== '/' && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <FolderOpen className="h-4 w-4 text-muted-foreground/40 shrink-0" />
+                <FolderOpen className="h-4 w-4 text-muted-foreground/60 shrink-0" />
                 <span className="truncate font-mono text-xs">{project.path}</span>
               </div>
             )}
             {project.created_at && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4 text-muted-foreground/40 shrink-0" />
+                <Clock className="h-4 w-4 text-muted-foreground/60 shrink-0" />
                 <span>Created {ago(project.created_at)}</span>
               </div>
             )}
             {sessionList.length > 0 && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MessageSquare className="h-4 w-4 text-muted-foreground/40 shrink-0" />
+                <MessageSquare className="h-4 w-4 text-muted-foreground/60 shrink-0" />
                 <span>{sessionList.length} session{sessionList.length > 1 ? 's' : ''}</span>
               </div>
             )}
             {agentList.length > 0 && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Cpu className="h-4 w-4 text-muted-foreground/40 shrink-0" />
+                <Cpu className="h-4 w-4 text-muted-foreground/60 shrink-0" />
                 <span>{agentList.length} agent{agentList.length > 1 ? 's' : ''}</span>
               </div>
             )}
@@ -580,7 +580,7 @@ function ProjectSidebar({ project, editingField, editValue, editTextareaRef, set
                   {taskStats.pending > 0 && (
                     <div className="text-center p-2 rounded-md bg-muted/30 border border-border">
                       <div className="text-lg font-bold text-muted-foreground tabular-nums">{taskStats.pending}</div>
-                      <div className="text-[10px] text-muted-foreground/40 uppercase tracking-wider">Open</div>
+                      <div className="text-[10px] text-muted-foreground/60 uppercase tracking-wider">Open</div>
                     </div>
                   )}
                 </div>
@@ -623,9 +623,9 @@ function ProjectSidebar({ project, editingField, editValue, editTextareaRef, set
                   onClick={() => openTabAndNavigate({ id: s.id, title: s.title || 'Session', type: 'session', href: `/sessions/${s.id}` })}
                   className="flex items-center gap-2 w-full text-left rounded-md px-2 py-1.5 hover:bg-muted/40 transition-colors cursor-pointer"
                 >
-                  <MessageSquare className="h-3 w-3 text-muted-foreground/30 shrink-0" />
+                  <MessageSquare className="h-3 w-3 text-muted-foreground/60 shrink-0" />
                   <span className="text-xs text-foreground/70 truncate flex-1">{s.title || 'Untitled'}</span>
-                  <span className="text-[10px] text-muted-foreground/30 tabular-nums shrink-0">{ago(s.time?.updated)}</span>
+                  <span className="text-[10px] text-muted-foreground/60 tabular-nums shrink-0">{ago(s.time?.updated)}</span>
                 </button>
               ))}
               {sessionList.length > 5 && (

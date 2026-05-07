@@ -112,7 +112,7 @@ function LocalProvisioningView({
         </div>
         <p className="text-xs text-muted-foreground/50 text-center">{msg}</p>
       </div>
-      <p className="text-[11px] text-muted-foreground/30 text-center">
+      <p className="text-[11px] text-muted-foreground/60 text-center">
         First boot can take a few minutes while the image is pulled.
       </p>
     </div>
@@ -137,7 +137,7 @@ function WakingInstanceView({ label }: { label: string }) {
         </p>
       </div>
 
-      <div className="inline-flex items-center gap-2 rounded-full border border-foreground/[0.08] bg-foreground/[0.03] px-3 py-1.5 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/45">
+      <div className="inline-flex items-center gap-2 rounded-full border border-foreground/[0.08] bg-foreground/[0.03] px-3 py-1.5 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/60">
         <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
         Checking health
       </div>
@@ -358,7 +358,7 @@ export default function InstanceDetailPage() {
           {/* Logo + title */}
           <div className="mb-12 flex flex-col items-center gap-3 animate-instance-fade-in">
             <AetherLogo size={22} />
-            <h1 className="text-[15px] font-normal text-foreground/30 tracking-[0.15em] uppercase">
+            <h1 className="text-[15px] font-normal text-foreground/60 tracking-[0.15em] uppercase">
               {titleText}
             </h1>
           </div>
@@ -371,7 +371,7 @@ export default function InstanceDetailPage() {
           {/* Not found */}
           {!isLoading && !sandbox && (
             <div className="flex flex-col items-center gap-4">
-              <AlertCircle className="h-10 w-10 text-muted-foreground/30" />
+              <AlertCircle className="h-10 w-10 text-muted-foreground/60" />
               <p className="text-sm text-muted-foreground">
                 Instance not found
               </p>
@@ -405,7 +405,7 @@ export default function InstanceDetailPage() {
               variant="ghost"
               size="sm"
               onClick={() => router.push('/instances')}
-              className="mt-4 text-muted-foreground/40 hover:text-foreground"
+              className="mt-4 text-muted-foreground/60 hover:text-foreground"
             >
               Cancel
             </Button>
@@ -440,7 +440,7 @@ export default function InstanceDetailPage() {
                       Provisioning Failed
                     </h2>
                     {(serverType || location) && (
-                      <p className="text-xs text-muted-foreground/40 mt-1 font-mono">
+                      <p className="text-xs text-muted-foreground/60 mt-1 font-mono">
                         {[serverType, location].filter(Boolean).join(' · ')}
                       </p>
                     )}

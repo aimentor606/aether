@@ -535,7 +535,7 @@ export function FileExplorerPage() {
   if (!isHealthLoading && !health?.healthy) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 p-8 text-center bg-background">
-        <ServerOff className="h-12 w-12 text-muted-foreground/30" />
+        <ServerOff className="h-12 w-12 text-muted-foreground/60" />
         <div>
           <h3 className="text-base font-medium text-foreground">Server not reachable</h3>
           <p className="text-sm text-muted-foreground mt-1.5">
@@ -730,7 +730,7 @@ export function FileExplorerPage() {
       {isDragOverPage && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm border-2 border-dashed border-primary/50 rounded-xl pointer-events-none">
           <div className="flex flex-col items-center gap-3 text-center">
-            <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <div className="h-16 w-16 rounded-lg bg-primary/10 flex items-center justify-center">
               <Upload className="h-8 w-8 text-primary" />
             </div>
             <div>

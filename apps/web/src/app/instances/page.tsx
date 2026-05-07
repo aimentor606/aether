@@ -224,12 +224,12 @@ function InstanceCard({
                 }
               }}
               title="Backups"
-              className="flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground/30 hover:text-muted-foreground/80 hover:bg-muted/50 transition-colors opacity-0 group-hover:opacity-100"
+              className="flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground/60 hover:text-muted-foreground/80 hover:bg-muted/50 transition-colors opacity-0 group-hover:opacity-100"
             >
               <Archive className="h-3.5 w-3.5" />
             </span>
           )}
-          <ExternalLink className="h-4 w-4 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />
+          <ExternalLink className="h-4 w-4 text-muted-foreground/60 group-hover:text-muted-foreground/60 transition-colors" />
         </div>
       </div>
     </button>
@@ -303,7 +303,7 @@ function FallbackInstanceCard({
             )}
           </div>
         </div>
-        <ExternalLink className="h-4 w-4 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0 mt-1" />
+        <ExternalLink className="h-4 w-4 text-muted-foreground/60 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0 mt-1" />
       </div>
     </button>
   );
@@ -604,7 +604,7 @@ export default function InstancesPage() {
 
           {/* Claim computer card for legacy paid users */}
           {canClaimComputer && !pageLoading && (
-            <div className="rounded-2xl border border-border/50 bg-gradient-to-b from-background to-muted/20 px-8 py-14 pb-6 flex flex-col items-center text-center gap-6">
+            <div className="rounded-lg border border-border/50 bg-gradient-to-b from-background to-muted/20 px-8 py-14 pb-6 flex flex-col items-center text-center gap-6">
               <img
                 src="/aether-computer.png"
                 alt="Aether Computer"
@@ -673,7 +673,7 @@ export default function InstancesPage() {
                   {autoCreateFailed ? (
                     <AlertCircle className="h-7 w-7 text-red-400/60" />
                   ) : (
-                    <Server className="h-7 w-7 text-muted-foreground/40" />
+                    <Server className="h-7 w-7 text-muted-foreground/60" />
                   )}
                 </div>
                 <div className="text-center">

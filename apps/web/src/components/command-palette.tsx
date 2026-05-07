@@ -145,11 +145,11 @@ function FileSearchPage({
     return (
       <div className="flex flex-col items-center gap-3 py-12">
         <div className="flex items-center justify-center h-10 w-10 rounded-full bg-muted/30">
-          <Search className="h-4 w-4 text-muted-foreground/40" />
+          <Search className="h-4 w-4 text-muted-foreground/60" />
         </div>
         <div className="text-center space-y-1">
           <p className="text-sm text-muted-foreground/60">Type to search files in /workspace</p>
-          <p className="text-[11px] text-muted-foreground/30">
+          <p className="text-[11px] text-muted-foreground/60">
             Prefix with <kbd className="px-1 py-0.5 rounded bg-muted text-[10px] font-mono">&gt;</kbd> to search file contents
           </p>
         </div>
@@ -174,14 +174,14 @@ function FileSearchPage({
     return (
       <div className="flex flex-col items-center gap-2 py-12">
         <div className="flex items-center justify-center h-10 w-10 rounded-full bg-muted/30">
-          <Search className="h-4 w-4 text-muted-foreground/30" />
+          <Search className="h-4 w-4 text-muted-foreground/60" />
         </div>
         <div className="text-center">
           <span className="text-sm text-muted-foreground/60">
             No {search.isContentSearch ? 'content matches' : 'files found'} for &ldquo;{search.searchedQuery}&rdquo;
           </span>
           {!search.isContentSearch && (
-            <p className="text-[11px] text-muted-foreground/30 mt-1">
+            <p className="text-[11px] text-muted-foreground/60 mt-1">
               Try a shorter query or prefix with &gt; for content search
             </p>
           )}
@@ -220,7 +220,7 @@ function FileSearchPage({
                   value={sanitizeCmdkValue(`content ${filePath} ${match.lines} ${match.line_number}`)}
                   onSelect={() => onSelect(filePath)}
                 >
-                  <Hash className="h-3.5 w-3.5 text-muted-foreground/40 flex-shrink-0" />
+                  <Hash className="h-3.5 w-3.5 text-muted-foreground/60 flex-shrink-0" />
                   <span className="text-[11px] text-muted-foreground/50 tabular-nums w-8 text-right flex-shrink-0">
                     {match.line_number}
                   </span>
@@ -252,7 +252,7 @@ function FileSearchPage({
           )}
           <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
             <span className="truncate text-sm font-medium">{item.name}</span>
-            <span className="text-[10px] text-muted-foreground/35 font-mono truncate flex-shrink min-w-0">
+            <span className="text-[10px] text-muted-foreground/60 font-mono truncate flex-shrink min-w-0">
               {item.path}
             </span>
           </div>
@@ -315,7 +315,7 @@ function MessagesPage({
     return (
       <div className="flex flex-col items-center gap-2 py-12">
         <div className="flex items-center justify-center h-10 w-10 rounded-full bg-muted/30">
-          <MessageCircle className="h-4 w-4 text-muted-foreground/30" />
+          <MessageCircle className="h-4 w-4 text-muted-foreground/60" />
         </div>
         <span className="text-sm text-muted-foreground/60">
           {query ? `No messages matching "${query}"` : 'No messages in this session'}
@@ -332,7 +332,7 @@ function MessagesPage({
           value={sanitizeCmdkValue(`message ${index} ${item.text.slice(0, 80)}`)}
           onSelect={() => onSelect(item.id)}
         >
-          <MessageCircle className="h-3.5 w-3.5 text-muted-foreground/40 flex-shrink-0" />
+          <MessageCircle className="h-3.5 w-3.5 text-muted-foreground/60 flex-shrink-0" />
           <span className="text-[11px] text-muted-foreground/50 tabular-nums w-6 text-right flex-shrink-0">
             #{index + 1}
           </span>
@@ -991,7 +991,7 @@ export function CommandPalette() {
               <ArrowLeft className="h-3 w-3" />
               <span>Back</span>
             </button>
-            <span className="text-xs text-muted-foreground/30">/</span>
+            <span className="text-xs text-muted-foreground/60">/</span>
             <span className="text-xs font-medium text-foreground/80">{pageTitle}</span>
           </div>
         )}
@@ -1064,9 +1064,9 @@ export function CommandPalette() {
                           <Bot className="h-4 w-4" />
                           <span className="flex-1">Change Agent</span>
                           {currentAgent && (
-                            <span className="text-[10px] text-muted-foreground/40">{currentAgent.name}</span>
+                            <span className="text-[10px] text-muted-foreground/60">{currentAgent.name}</span>
                           )}
-                          <ChevronRight className="h-3 w-3 text-muted-foreground/30" />
+                          <ChevronRight className="h-3 w-3 text-muted-foreground/60" />
                         </CommandItem>
                         <CommandItem
                           value="suggestion change model llm switch"
@@ -1075,13 +1075,13 @@ export function CommandPalette() {
                           <Cpu className="h-4 w-4" />
                           <span className="flex-1">Change Model</span>
                           {currentModelKey && (
-                            <span className="text-[10px] text-muted-foreground/40 truncate max-w-[160px]">
+                            <span className="text-[10px] text-muted-foreground/60 truncate max-w-[160px]">
                               {allModels.find(
                                 (m) => m.providerID === currentModelKey.providerID && m.modelID === currentModelKey.modelID,
                               )?.modelName || currentModelKey.modelID}
                             </span>
                           )}
-                          <ChevronRight className="h-3 w-3 text-muted-foreground/30" />
+                          <ChevronRight className="h-3 w-3 text-muted-foreground/60" />
                         </CommandItem>
                         <CommandItem
                           value="suggestion jump to message go scroll navigate"
@@ -1089,7 +1089,7 @@ export function CommandPalette() {
                         >
                           <MessageCircle className="h-4 w-4" />
                           <span className="flex-1">Jump to Message</span>
-                          <ChevronRight className="h-3 w-3 text-muted-foreground/30" />
+                          <ChevronRight className="h-3 w-3 text-muted-foreground/60" />
                         </CommandItem>
                       </>
                     )}
@@ -1101,8 +1101,8 @@ export function CommandPalette() {
                     >
                       <Search className="h-4 w-4" />
                       <span className="flex-1">Search Files</span>
-                      <span className="text-[10px] text-muted-foreground/40">/workspace</span>
-                      <ChevronRight className="h-3 w-3 text-muted-foreground/30" />
+                      <span className="text-[10px] text-muted-foreground/60">/workspace</span>
+                      <ChevronRight className="h-3 w-3 text-muted-foreground/60" />
                     </CommandItem>
                   </CommandGroup>
 
@@ -1121,13 +1121,13 @@ export function CommandPalette() {
                             <div className="flex flex-col overflow-hidden flex-1 min-w-0">
                               <span className="truncate text-sm font-medium">{name}</span>
                               {project.worktree && project.worktree !== '/' && (
-                                <span className="text-[11px] text-muted-foreground/40 truncate font-mono">
+                                <span className="text-[11px] text-muted-foreground/60 truncate font-mono">
                                   {project.worktree}
                                 </span>
                               )}
                             </div>
                             {project.time?.updated && (
-                              <span className="text-[10px] text-muted-foreground/30 tabular-nums flex-shrink-0">
+                              <span className="text-[10px] text-muted-foreground/60 tabular-nums flex-shrink-0">
                                 {formatRelativeTime(project.time.updated)}
                               </span>
                             )}
@@ -1155,7 +1155,7 @@ export function CommandPalette() {
                           <span className="truncate flex-1">
                             {session.title || session.slug || 'Untitled'}
                           </span>
-                          <span className="text-[10px] text-muted-foreground/30 tabular-nums flex-shrink-0">
+                          <span className="text-[10px] text-muted-foreground/60 tabular-nums flex-shrink-0">
                             {formatRelativeTime(session.time.updated)}
                           </span>
                         </CommandItem>
@@ -1179,7 +1179,7 @@ export function CommandPalette() {
                         >
                           {item.id === 'change-agent' ? <Bot className="h-4 w-4" /> : item.id === 'jump-to-message' ? <MessageCircle className="h-4 w-4" /> : <Cpu className="h-4 w-4" />}
                           <span className="flex-1">{item.label}</span>
-                          <ChevronRight className="h-3 w-3 text-muted-foreground/30" />
+                          <ChevronRight className="h-3 w-3 text-muted-foreground/60" />
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -1242,14 +1242,14 @@ export function CommandPalette() {
                               <div className="flex items-center gap-2">
                                 <span className="truncate text-sm font-medium">{name}</span>
                                 {project.worktree && project.worktree !== '/' && (
-                                  <span className="text-[10px] text-muted-foreground/40 font-mono flex-shrink-0 truncate max-w-[200px]">
+                                  <span className="text-[10px] text-muted-foreground/60 font-mono flex-shrink-0 truncate max-w-[200px]">
                                     {project.worktree}
                                   </span>
                                 )}
                               </div>
                             </div>
                             {project.time?.updated && (
-                              <span className="text-[10px] text-muted-foreground/30 tabular-nums flex-shrink-0">
+                              <span className="text-[10px] text-muted-foreground/60 tabular-nums flex-shrink-0">
                                 {formatRelativeTime(project.time.updated)}
                               </span>
                             )}
@@ -1283,7 +1283,7 @@ export function CommandPalette() {
                                     <span className="truncate text-sm font-medium">
                                       {session.title || session.slug}
                                     </span>
-                                    <span className="text-[10px] text-muted-foreground/40 font-mono flex-shrink-0">
+                                    <span className="text-[10px] text-muted-foreground/60 font-mono flex-shrink-0">
                                       {session.id}
                                     </span>
                                   </>
@@ -1303,7 +1303,7 @@ export function CommandPalette() {
                                 )}
                               </span>
                             </div>
-                            <ArrowRightLeft className="h-3 w-3 text-muted-foreground/30 flex-shrink-0" />
+                            <ArrowRightLeft className="h-3 w-3 text-muted-foreground/60 flex-shrink-0" />
                           </CommandItem>
                         );
                       })}
@@ -1323,7 +1323,7 @@ export function CommandPalette() {
                             ? `Open localhost:${detectedUrl.port}${detectedUrl.path !== '/' ? detectedUrl.path : ''}`
                             : `Open ${new URL(detectedUrl.url).hostname}`}
                         </span>
-                        <span className="text-[10px] text-muted-foreground/40">browser</span>
+                        <span className="text-[10px] text-muted-foreground/60">browser</span>
                       </CommandItem>
                     </CommandGroup>
                   )}
@@ -1339,8 +1339,8 @@ export function CommandPalette() {
                         <span className="flex-1">
                           Search files for &ldquo;{query.trim()}&rdquo;
                         </span>
-                        <span className="text-[10px] text-muted-foreground/40">/workspace</span>
-                        <ChevronRight className="h-3 w-3 text-muted-foreground/30" />
+                        <span className="text-[10px] text-muted-foreground/60">/workspace</span>
+                        <ChevronRight className="h-3 w-3 text-muted-foreground/60" />
                       </CommandItem>
                     </CommandGroup>
                   )}
@@ -1349,13 +1349,13 @@ export function CommandPalette() {
                   {showNoResults && (
                     <div className="flex flex-col items-center gap-2 py-12" cmdk-empty="">
                       <div className="flex items-center justify-center h-10 w-10 rounded-full bg-muted/30">
-                        <Search className="h-4 w-4 text-muted-foreground/30" />
+                        <Search className="h-4 w-4 text-muted-foreground/60" />
                       </div>
                       <div className="text-center">
                         <span className="text-sm text-muted-foreground/60">
                           No results for &ldquo;{query.trim()}&rdquo;
                         </span>
-                        <p className="text-[11px] text-muted-foreground/30 mt-1">
+                        <p className="text-[11px] text-muted-foreground/60 mt-1">
                           Try &ldquo;Search files&rdquo; or a different term
                         </p>
                       </div>
@@ -1429,7 +1429,7 @@ export function CommandPalette() {
 
               {filteredAgents.length === 0 && (
                 <div className="flex flex-col items-center gap-2 py-12" cmdk-empty="">
-                  <Bot className="h-5 w-5 text-muted-foreground/30" />
+                  <Bot className="h-5 w-5 text-muted-foreground/60" />
                   <span className="text-sm text-muted-foreground/60">
                     {query ? `No agents matching "${query}"` : 'No agents available'}
                   </span>
@@ -1466,7 +1466,7 @@ export function CommandPalette() {
                       >
                         <div className="flex flex-col overflow-hidden flex-1 min-w-0">
                           <span className="truncate text-sm">{model.modelName}</span>
-                          <span className="text-[10px] text-muted-foreground/40 font-mono truncate">
+                          <span className="text-[10px] text-muted-foreground/60 font-mono truncate">
                             {model.modelID}
                           </span>
                         </div>
@@ -1493,7 +1493,7 @@ export function CommandPalette() {
 
               {visibleModels.length === 0 && (
                 <div className="flex flex-col items-center gap-2 py-12" cmdk-empty="">
-                  <Cpu className="h-5 w-5 text-muted-foreground/30" />
+                  <Cpu className="h-5 w-5 text-muted-foreground/60" />
                   <span className="text-sm text-muted-foreground/60">
                     {query ? `No models matching "${query}"` : 'No models available'}
                   </span>

@@ -530,7 +530,7 @@ export function isTriggerTitle(val: unknown): val is TriggerTitle {
 
 export function ToolEmptyState({ message }: { message: string }) {
   return (
-    <div className="flex items-center justify-center gap-1.5 px-3 py-3 text-muted-foreground/40">
+    <div className="flex items-center justify-center gap-1.5 px-3 py-3 text-muted-foreground/60">
       <Search className="size-3" />
       <span className="text-[11px]">{message}</span>
     </div>
@@ -898,7 +898,7 @@ export function BasicTool({
 
           {/* Right side: spinner when running (+ chevron if expandable), chevron when done */}
           {running && (
-            <Loader2 className="size-3 animate-spin text-muted-foreground/40 flex-shrink-0" />
+            <Loader2 className="size-3 animate-spin text-muted-foreground/60 flex-shrink-0" />
           )}
           {children && !locked && (
             <ChevronRight
@@ -1245,7 +1245,7 @@ export function StructuredOutput({ sections }: { sections: OutputSection[] }) {
                     )}
                   />
                   <span className="text-[10px] font-medium">Stack trace</span>
-                  <span className="text-[10px] text-muted-foreground/40 font-mono ml-1">
+                  <span className="text-[10px] text-muted-foreground/60 font-mono ml-1">
                     {section.lines.length} lines
                   </span>
                 </button>

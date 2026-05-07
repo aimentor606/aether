@@ -42,7 +42,7 @@ export default function CareersPageClient() {
         {/* Position */}
         <Reveal>
           <div className="mt-14">
-            <h2 className="text-xs uppercase tracking-widest text-muted-foreground/40 mb-5">
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-5">
               Open Position
             </h2>
             <div>
@@ -52,7 +52,7 @@ export default function CareersPageClient() {
               <p className="text-base text-muted-foreground/60 leading-relaxed mt-1.5">
                 You are what you are. You drive what you must. Independent, founder-type person who falls under the above definition or not.
               </p>
-              <p className="text-xs text-muted-foreground/35 mt-2">San Francisco — or anywhere, but we{"'"}ll get you here.</p>
+              <p className="text-xs text-muted-foreground/60 mt-2">San Francisco — or anywhere, but we{"'"}ll get you here.</p>
             </div>
           </div>
         </Reveal>

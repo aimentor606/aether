@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { TabErrorBoundary } from './tab-error-boundary';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { toast } from 'sonner';
 import { useAuth } from '@/components/AuthProvider';
 import { useConnectionToasts } from '@/components/dashboard/connecting-screen';
@@ -256,7 +257,7 @@ function DashboardSkeleton() {
       <div className="flex w-full max-w-[360px] flex-col items-center gap-6 text-center">
         <div className="mb-2 flex flex-col items-center gap-3">
           <AetherLogo size={22} />
-          <p className="text-[15px] font-normal uppercase tracking-[0.15em] text-foreground/30">
+          <p className="text-[15px] font-normal uppercase tracking-[0.15em] text-foreground/60">
             Connecting to Workspace
           </p>
         </div>
@@ -538,6 +539,7 @@ export default function DashboardLayoutContent({
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const prefersReducedMotion = useReducedMotion();
   const explicitRouteInstanceId = getCurrentInstanceIdFromPathname(pathname);
   const routeInstanceId =
     explicitRouteInstanceId || getActiveInstanceIdFromCookie();
@@ -990,7 +992,11 @@ export default function DashboardLayoutContent({
           </Suspense>
         )}
 
-        <div className="relative flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div
+          id="main-content"
+          tabIndex={-1}
+          className="relative flex-1 min-h-0 flex flex-col overflow-hidden"
+        >
           {!hideChrome && (
             <Suspense fallback={null}>
               <AnnouncementDialog />
@@ -1007,10 +1013,18 @@ export default function DashboardLayoutContent({
             {!hideChrome && (
               <motion.div
                 key="tab-bar"
-                initial={{ height: 0, opacity: 0 }}
+                initial={
+                  prefersReducedMotion ? false : { height: 0, opacity: 0 }
+                }
                 animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                exit={
+                  prefersReducedMotion ? undefined : { height: 0, opacity: 0 }
+                }
+                transition={
+                  prefersReducedMotion
+                    ? { duration: 0 }
+                    : { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
+                }
                 className="overflow-hidden"
               >
                 <TabBar />

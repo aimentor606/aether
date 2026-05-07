@@ -56,7 +56,7 @@ export default function PartnershipsPageClient() {
         {/* Price */}
         <Reveal delay={0.2}>
           <div className="mt-14 p-6 rounded-lg border border-border/50 bg-muted/5">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground/40 mb-2">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-2">
               Monthly Retainer
             </p>
             <p className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground">
@@ -71,26 +71,26 @@ export default function PartnershipsPageClient() {
         {/* How it works */}
         <Reveal>
           <div className="mt-14">
-            <h2 className="text-xs uppercase tracking-widest text-muted-foreground/40 mb-5">
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-5">
               How It Works
             </h2>
             <div className="space-y-6">
               <div>
-                <p className="text-xs text-muted-foreground/35 mb-1">Phase 1</p>
+                <p className="text-xs text-muted-foreground/60 mb-1">Phase 1</p>
                 <p className="text-base font-medium text-foreground/70">Understand</p>
                 <p className="text-base text-muted-foreground/60 leading-relaxed mt-1.5">
                   We go deep. We talk to you, your team, your operators. We map every process — inputs, outputs, the black boxes where humans are doing repetitive work day-to-day. What{"'"}s actually happening, not what the org chart says.
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground/35 mb-1">Phase 2</p>
+                <p className="text-xs text-muted-foreground/60 mb-1">Phase 2</p>
                 <p className="text-base font-medium text-foreground/70">Build & Deploy</p>
                 <p className="text-base text-muted-foreground/60 leading-relaxed mt-1.5">
                   We build autonomous operations on Aether — agents, automations, autonomous teams — wired into your tools and data. Fully deployed, in production. This requires low politics, low bureaucracy, and real access. Credentials, systems, green lights. We need ownership to move. This is a partnership, not a consulting engagement.
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground/35 mb-1">Ongoing</p>
+                <p className="text-xs text-muted-foreground/60 mb-1">Ongoing</p>
                 <p className="text-base font-medium text-foreground/70">Operate & Expand</p>
                 <p className="text-base text-muted-foreground/60 leading-relaxed mt-1.5">
                   We stay. Optimizing what{"'"}s running, expanding into new workflows, increasing autonomy — progressively replacing manual process with systems that run themselves.

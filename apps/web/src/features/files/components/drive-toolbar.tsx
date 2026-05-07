@@ -197,7 +197,7 @@ export function DriveToolbar({
                   key={index}
                   className="flex items-center gap-0.5 min-w-0 shrink-0"
                 >
-                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
                   <Button
                     onClick={() => handleSegmentClick(index)}
                     variant="ghost"

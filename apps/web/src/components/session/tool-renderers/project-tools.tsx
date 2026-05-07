@@ -166,11 +166,11 @@ function ProjectSelectTool({ part }: ToolProps) {
         {name}
       </span>
       {path && (
-        <span className="text-[10px] text-muted-foreground/40 font-mono truncate hidden group-hover:inline">
+        <span className="text-[10px] text-muted-foreground/60 font-mono truncate hidden group-hover:inline">
           {path}
         </span>
       )}
-      <ChevronRight className="size-3 text-muted-foreground/20 group-hover:text-muted-foreground/40 flex-shrink-0" />
+      <ChevronRight className="size-3 text-muted-foreground/60 group-hover:text-muted-foreground/60 flex-shrink-0" />
     </div>
   );
 }
@@ -210,11 +210,11 @@ function ProjectCreateTool({ part }: ToolProps) {
         {displayName}
       </span>
       {path && (
-        <span className="text-[10px] text-muted-foreground/40 font-mono truncate hidden group-hover:inline">
+        <span className="text-[10px] text-muted-foreground/60 font-mono truncate hidden group-hover:inline">
           {path}
         </span>
       )}
-      <ChevronRight className="size-3 text-muted-foreground/20 group-hover:text-muted-foreground/40 flex-shrink-0" />
+      <ChevronRight className="size-3 text-muted-foreground/60 group-hover:text-muted-foreground/60 flex-shrink-0" />
     </div>
   );
 }

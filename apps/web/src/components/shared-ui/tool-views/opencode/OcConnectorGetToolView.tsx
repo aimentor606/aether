@@ -127,7 +127,7 @@ export function OcConnectorGetToolView({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full py-12 px-6">
-            <Plug className="h-8 w-8 text-muted-foreground/30 mb-3" />
+            <Plug className="h-8 w-8 text-muted-foreground/60 mb-3" />
             <p className="text-sm text-muted-foreground">No connector data</p>
           </div>
         )}

@@ -482,7 +482,7 @@ export default function APIKeysPage() {
 
         {/* ── Sandbox Token ───────────────────────────────────────────── */}
         {!isLoading && activeSandboxKey && (
-          <div className="flex items-center justify-between gap-4 rounded-2xl border bg-card px-4 py-3">
+          <div className="flex items-center justify-between gap-4 rounded-lg border bg-card px-4 py-3">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
                 <Bot className="w-4 h-4 text-muted-foreground" />
@@ -642,7 +642,7 @@ export default function APIKeysPage() {
 
           {/* Created link callout */}
           {publicUrlResult && (
-            <div className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
+            <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
@@ -665,7 +665,7 @@ export default function APIKeysPage() {
           )}
 
           {/* Active links list */}
-          <div className="rounded-2xl border bg-card overflow-hidden">
+          <div className="rounded-lg border bg-card overflow-hidden">
             {!activeSandboxExternalId ? (
               <div className="px-4 py-12 text-center space-y-2">
                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
@@ -880,7 +880,7 @@ export default function APIKeysPage() {
           </div>
 
           {/* Keys list */}
-          <div className="rounded-2xl border bg-card overflow-hidden">
+          <div className="rounded-lg border bg-card overflow-hidden">
             {!activeSandboxId ? (
               <div className="px-4 py-12 text-center space-y-2">
                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
@@ -1058,7 +1058,7 @@ export default function APIKeysPage() {
         </div>
 
         {/* ── Usage hint ──────────────────────────────────────────────── */}
-        <div className="rounded-2xl border bg-card px-4 py-3">
+        <div className="rounded-lg border bg-card px-4 py-3">
           <div className="flex items-start gap-3">
             <Shield className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
             <div className="text-xs text-muted-foreground space-y-1">

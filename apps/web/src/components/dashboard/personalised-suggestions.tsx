@@ -143,7 +143,7 @@ export function PersonalisedSuggestions({ onSuggestionClick }: PersonalisedSugge
               transition={{ duration: 0.15 }}
               className="flex flex-col items-center"
             >
-              <p className="text-sm text-muted-foreground/40">{greeting}</p>
+              <p className="text-sm text-muted-foreground/60">{greeting}</p>
             </motion.div>
           ) : (
             <motion.div
@@ -190,11 +190,11 @@ export function PersonalisedSuggestions({ onSuggestionClick }: PersonalisedSugge
                         'cursor-pointer select-none',
                       )}
                     >
-                      <Icon className="h-4 w-4 shrink-0 text-muted-foreground/40 group-hover:text-muted-foreground/70 transition-colors duration-200" />
+                      <Icon className="h-4 w-4 shrink-0 text-muted-foreground/60 group-hover:text-muted-foreground/70 transition-colors duration-200" />
                       <span className="flex-1 text-muted-foreground group-hover:text-foreground/80 transition-colors duration-200 truncate">
                         {item.text}
                       </span>
-                      <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/0 group-hover:text-muted-foreground/30 translate-x-[-4px] group-hover:translate-x-0 transition-colors duration-200" />
+                      <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/0 group-hover:text-muted-foreground/60 translate-x-[-4px] group-hover:translate-x-0 transition-colors duration-200" />
                     </motion.button>
                   );
                 })}

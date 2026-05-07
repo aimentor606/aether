@@ -332,7 +332,7 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
           <h1 className="text-[17px] font-medium text-foreground/90 tracking-tight">
             Create owner account
           </h1>
-          <p className="text-[13px] text-foreground/40 mt-0.5">
+          <p className="text-[13px] text-foreground/60 mt-0.5">
             Set up the first admin account for this instance
           </p>
         </div>
@@ -363,7 +363,7 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
         <h1 className="text-[17px] font-medium text-foreground/90 tracking-tight">
           Sign in to Aether
         </h1>
-        <p className="text-[13px] text-foreground/40 mt-0.5">
+        <p className="text-[13px] text-foreground/60 mt-0.5">
           Your AI Computer
         </p>
       </div>

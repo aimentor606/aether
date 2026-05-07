@@ -435,7 +435,7 @@ export const UnifiedAgentCard: React.FC<UnifiedAgentCardProps> = ({
   const renderDashboardCard = () => (
     <div
       className={cn(
-        'group h-38 relative bg-muted/80 dark:bg-muted/20 rounded-3xl overflow-hidden transition-colors duration-300 border cursor-pointer flex flex-col w-full border-border/50',
+        'group h-38 relative bg-muted/80 dark:bg-muted/20 rounded-lg overflow-hidden transition-colors duration-300 border cursor-pointer flex flex-col w-full border-border/50',
         'hover:border-primary/20',
         className,
       )}
@@ -588,7 +588,11 @@ export const UnifiedAgentCard: React.FC<UnifiedAgentCardProps> = ({
     const renderActions = () => {
       if (variant === 'marketplace') {
         return (
-          <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+          <div
+            role="group"
+            className="flex gap-2"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Button
               onClick={(e) => {
                 e.stopPropagation();

@@ -192,7 +192,7 @@ export function DCPNotificationCard({
                   key={i}
                   className="flex items-center gap-2 text-[11px] text-muted-foreground/80"
                 >
-                  <span className="text-muted-foreground/40">&rarr;</span>
+                  <span className="text-muted-foreground/60">&rarr;</span>
                   <span className="font-mono text-[10px] px-1 py-0.5 rounded bg-muted/50 text-muted-foreground/70">
                     {item.tool}
                   </span>

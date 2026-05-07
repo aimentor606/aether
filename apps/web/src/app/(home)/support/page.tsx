@@ -18,7 +18,7 @@ function FAQItem({ question, answer }: { question: string; answer: React.ReactNo
       >
         <span className="text-base text-foreground/70">{question}</span>
         <ChevronDown
-          className={cn('size-4 text-muted-foreground/40 shrink-0 transition-transform duration-200', 
+          className={cn('size-4 text-muted-foreground/60 shrink-0 transition-transform duration-200', 
             isOpen ? 'rotate-180' : ''
           )}
         />
@@ -68,7 +68,7 @@ function SupportPageContent() {
         {/* FAQ */}
         <Reveal>
           <div className="mt-14">
-            <h2 className="text-xs uppercase tracking-widest text-muted-foreground/40 mb-5">
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-5">
               Frequently Asked Questions
             </h2>
             <div>
@@ -103,7 +103,7 @@ function SupportPageContent() {
         {/* Account Deletion */}
         <Reveal>
           <div ref={accountDeleteRef} id="account-delete" className="mt-14">
-            <h2 className="text-xs uppercase tracking-widest text-muted-foreground/40 mb-5">
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-5">
               Account Deletion
             </h2>
             <p className="text-base text-muted-foreground/60 leading-relaxed mb-4">
@@ -117,7 +117,7 @@ function SupportPageContent() {
               <li>Choose 14-day grace period or immediate deletion</li>
               <li>Type &quot;delete&quot; to confirm</li>
             </ol>
-            <p className="text-xs text-muted-foreground/40 mt-4">
+            <p className="text-xs text-muted-foreground/60 mt-4">
               All agents, sessions, credentials, and billing data will be permanently removed. This cannot be undone.
             </p>
           </div>
@@ -126,7 +126,7 @@ function SupportPageContent() {
         {/* Legal */}
         <Reveal>
           <div className="mt-14">
-            <h2 className="text-xs uppercase tracking-widest text-muted-foreground/40 mb-5">
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-5">
               Legal
             </h2>
             <div className="flex flex-col gap-1.5">
@@ -170,7 +170,7 @@ export default function SupportPage() {
     <Suspense fallback={
       <main className="min-h-screen bg-background">
         <div className="max-w-3xl mx-auto px-6 pt-24 sm:pt-32">
-          <div className="text-sm text-muted-foreground/40">Loading...</div>
+          <div className="text-sm text-muted-foreground/60">Loading...</div>
         </div>
       </main>
     }>

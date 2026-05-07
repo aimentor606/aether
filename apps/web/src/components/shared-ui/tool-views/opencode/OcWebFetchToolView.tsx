@@ -243,7 +243,7 @@ export function OcWebFetchToolView({
                       ) : (
                         <AlertTriangle className="size-3.5 text-amber-500/70" />
                       )}
-                      <ExternalLink className="size-3.5 text-muted-foreground/20 group-hover:text-muted-foreground/80 transition-colors" />
+                      <ExternalLink className="size-3.5 text-muted-foreground/60 group-hover:text-muted-foreground/80 transition-colors" />
                     </div>
                   </a>
                 );

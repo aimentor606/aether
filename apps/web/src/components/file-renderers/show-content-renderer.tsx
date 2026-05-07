@@ -145,7 +145,7 @@ const BLOB_TYPES = new Set(['image', 'video', 'audio', 'pdf', 'docx', 'pptx']);
 function RendererFallback() {
   return (
     <div className="flex items-center justify-center h-[420px]">
-      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" />
+      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/60" />
     </div>
   );
 }
@@ -153,7 +153,7 @@ function RendererFallback() {
 function LoadError({ message }: { message: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-[300px] gap-2 p-8 text-center">
-      <FileWarning className="h-6 w-6 text-muted-foreground/30" />
+      <FileWarning className="h-6 w-6 text-muted-foreground/60" />
       <p className="text-xs text-muted-foreground/60 max-w-sm">{message}</p>
     </div>
   );
@@ -171,7 +171,7 @@ function FileCard({
   return (
     <div className="flex items-center gap-4 px-5 py-5">
       <div className="flex items-center justify-center size-12 rounded-xl bg-muted/20">
-        <FileText className="size-6 text-muted-foreground/40" />
+        <FileText className="size-6 text-muted-foreground/60" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-foreground truncate">
@@ -293,7 +293,7 @@ export function ShowContentRenderer({
       return (
         <div className="flex items-center gap-4 px-5 py-5 h-full">
           <div className="flex items-center justify-center size-12 rounded-xl bg-muted/20">
-            <FileText className="size-6 text-muted-foreground/40" />
+            <FileText className="size-6 text-muted-foreground/60" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-medium text-foreground truncate">
@@ -381,7 +381,7 @@ export function ShowContentRenderer({
               </div>
             )}
           </div>
-          <ExternalLink className="size-4 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0" />
+          <ExternalLink className="size-4 text-muted-foreground/60 group-hover:text-muted-foreground/60 transition-colors flex-shrink-0" />
         </a>
       </div>
     );
@@ -432,7 +432,7 @@ export function ShowContentRenderer({
       return (
         <div className="flex flex-col items-center justify-center py-10 gap-5">
           <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
-            <Music className="size-6 text-muted-foreground/40" />
+            <Music className="size-6 text-muted-foreground/60" />
           </div>
           {(title || fileName) && (
             <p className="text-xs text-muted-foreground/60">

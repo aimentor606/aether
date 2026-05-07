@@ -58,7 +58,7 @@ export default function ProvidersPage() {
             />
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed border-border/60 py-16 flex flex-col items-center gap-4">
+          <div className="rounded-lg border border-dashed border-border/60 py-16 flex flex-col items-center gap-4">
             <p className="text-sm text-muted-foreground/60">
               No providers connected yet
             </p>

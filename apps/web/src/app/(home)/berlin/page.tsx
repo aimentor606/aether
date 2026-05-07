@@ -92,7 +92,7 @@ export default function BerlinPage() {
                 <span className="text-sm font-medium text-primary">Berlin, Germany</span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tighter text-balance text-center px-4 sm:px-2">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl font-medium tracking-tighter text-balance text-center px-4 sm:px-2">
                 Aether.
               </h1>
               

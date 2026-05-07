@@ -262,7 +262,7 @@ export function FileBreadcrumbs() {
               onClick={handleDoubleClick}
               className={cn(
                 'flex items-center justify-center h-6 w-6 rounded transition-colors cursor-pointer shrink-0 ml-1',
-                'text-muted-foreground/40 hover:text-foreground hover:bg-muted',
+                'text-muted-foreground/60 hover:text-foreground hover:bg-muted',
               )}
               title="Edit path"
             >

@@ -286,7 +286,7 @@ export function OcWebSearchToolView({
                         {qr.sources.length > 0 && (
                           <div className="space-y-1.5">
                             {qr.answer && (
-                              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/40 mb-2">
+                              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2">
                                 Sources
                               </div>
                             )}
@@ -323,12 +323,12 @@ export function OcWebSearchToolView({
                                         {domain}
                                       </span>
                                       {src.author && (
-                                        <span className="text-xs text-muted-foreground/40 truncate">
+                                        <span className="text-xs text-muted-foreground/60 truncate">
                                           {src.author}
                                         </span>
                                       )}
                                       {src.publishedDate && (
-                                        <span className="text-[10px] text-muted-foreground/40">
+                                        <span className="text-[10px] text-muted-foreground/60">
                                           {src.publishedDate.split('T')[0]}
                                         </span>
                                       )}
@@ -339,7 +339,7 @@ export function OcWebSearchToolView({
                                       </p>
                                     )}
                                   </div>
-                                  <ExternalLink className="size-3.5 text-muted-foreground/20 group-hover:text-muted-foreground/50 flex-shrink-0 mt-1 transition-colors" />
+                                  <ExternalLink className="size-3.5 text-muted-foreground/60 group-hover:text-muted-foreground/50 flex-shrink-0 mt-1 transition-colors" />
                                 </a>
                               );
                             })}
@@ -365,7 +365,7 @@ export function OcWebSearchToolView({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full py-12 px-6">
-            <Search className="h-8 w-8 text-muted-foreground/30 mb-3" />
+            <Search className="h-8 w-8 text-muted-foreground/60 mb-3" />
             <p className="text-sm text-muted-foreground">No results found</p>
           </div>
         )}

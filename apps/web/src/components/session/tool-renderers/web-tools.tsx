@@ -344,7 +344,7 @@ function WebSearchTool({ part, defaultOpen, forceOpen, locked }: ToolProps) {
                     )}
                     <ChevronRight
                       className={cn(
-                        'size-3 text-muted-foreground/40 flex-shrink-0 transition-transform',
+                        'size-3 text-muted-foreground/60 flex-shrink-0 transition-transform',
                         (isExpanded || !isMulti) && 'rotate-90',
                       )}
                     />
@@ -367,7 +367,7 @@ function WebSearchTool({ part, defaultOpen, forceOpen, locked }: ToolProps) {
                     {qr.sources.length > 0 && (
                       <div className="space-y-1">
                         {qr.answer && (
-                          <div className="text-[0.5625rem] font-semibold uppercase tracking-wider text-muted-foreground/40 mb-1.5">
+                          <div className="text-[0.5625rem] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-1.5">
                             Sources
                           </div>
                         )}
@@ -409,7 +409,7 @@ function WebSearchTool({ part, defaultOpen, forceOpen, locked }: ToolProps) {
                                     {domain}
                                   </span>
                                   {src.author && (
-                                    <span className="text-[10px] text-muted-foreground/40 truncate">
+                                    <span className="text-[10px] text-muted-foreground/60 truncate">
                                       {src.author}
                                     </span>
                                   )}
@@ -420,7 +420,7 @@ function WebSearchTool({ part, defaultOpen, forceOpen, locked }: ToolProps) {
                                   </p>
                                 )}
                               </div>
-                              <ExternalLink className="size-3 text-muted-foreground/30 group-hover:text-muted-foreground/60 flex-shrink-0 mt-1 transition-colors" />
+                              <ExternalLink className="size-3 text-muted-foreground/60 group-hover:text-muted-foreground/60 flex-shrink-0 mt-1 transition-colors" />
                             </a>
                           );
                         })}
@@ -622,7 +622,7 @@ function ScrapeWebpageTool({
                     ) : (
                       <AlertTriangle className="size-3 text-amber-500/70" />
                     )}
-                    <ExternalLink className="size-3 text-muted-foreground/20 group-hover:text-muted-foreground/50 transition-colors" />
+                    <ExternalLink className="size-3 text-muted-foreground/60 group-hover:text-muted-foreground/50 transition-colors" />
                   </div>
                 </a>
               );

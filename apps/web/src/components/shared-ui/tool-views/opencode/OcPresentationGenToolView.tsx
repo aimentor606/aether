@@ -222,7 +222,7 @@ export function OcPresentationGenToolView({
                         localhost:3210
                       </p>
                     </div>
-                    <ExternalLink className="w-4 h-4 text-muted-foreground/40 flex-shrink-0" />
+                    <ExternalLink className="w-4 h-4 text-muted-foreground/60 flex-shrink-0" />
                   </a>
                 )}
                 {parsed.message && (

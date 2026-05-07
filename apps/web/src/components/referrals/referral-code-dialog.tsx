@@ -42,7 +42,7 @@ export function ReferralCodeDialog({ open, onOpenChange, referralCode = '', onCo
             <DialogTitle className="text-sm font-medium text-foreground/85 tracking-tight">
               {t('yourReferralCode')}
             </DialogTitle>
-            <p className="text-xs text-foreground/40 mt-0.5">
+            <p className="text-xs text-foreground/60 mt-0.5">
               {t('enterCodeDescription')}
             </p>
           </div>
@@ -63,7 +63,7 @@ export function ReferralCodeDialog({ open, onOpenChange, referralCode = '', onCo
             <Button
               variant="ghost"
               size="sm"
-              className="flex-1 text-[13px] text-foreground/40 hover:text-foreground/70 "
+              className="flex-1 text-[13px] text-foreground/60 hover:text-foreground/70 "
               onClick={() => onOpenChange(false)}
             >
               {tCommon('cancel')}

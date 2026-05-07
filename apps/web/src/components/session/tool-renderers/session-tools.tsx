@@ -149,10 +149,10 @@ function SessionSpawnTool({ part, forceOpen }: ToolProps) {
 
         {/* Right side */}
         {running && (
-          <Loader2 className="size-3 animate-spin text-muted-foreground/40 flex-shrink-0" />
+          <Loader2 className="size-3 animate-spin text-muted-foreground/60 flex-shrink-0" />
         )}
         {childSessionId && !running && (
-          <ExternalLink className="size-3 flex-shrink-0 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />
+          <ExternalLink className="size-3 flex-shrink-0 text-muted-foreground/60 group-hover:text-muted-foreground/60 transition-colors" />
         )}
       </div>
 
@@ -359,7 +359,7 @@ function SessionSearchTool({
                 <span className="text-[11px] font-medium text-foreground truncate flex-1">
                   {h.title || '(untitled)'}
                 </span>
-                <span className="text-[0.5625rem] font-mono text-muted-foreground/40 bg-muted/40 px-1 rounded flex-shrink-0">
+                <span className="text-[0.5625rem] font-mono text-muted-foreground/60 bg-muted/40 px-1 rounded flex-shrink-0">
                   {h.score}
                 </span>
               </div>
@@ -368,7 +368,7 @@ function SessionSearchTool({
                   {h.snippet}
                 </p>
               )}
-              <div className="flex items-center gap-2 text-[0.5625rem] text-muted-foreground/40 mt-0.5">
+              <div className="flex items-center gap-2 text-[0.5625rem] text-muted-foreground/60 mt-0.5">
                 <span className="font-mono">{h.id.slice(-12)}</span>
                 <span>{h.updated}</span>
               </div>
@@ -572,7 +572,7 @@ function SessionListBackgroundTool({
               <span className="text-[10px] text-muted-foreground/50 truncate flex-1">
                 {w.project}
               </span>
-              <span className="text-[0.5625rem] text-muted-foreground/40">
+              <span className="text-[0.5625rem] text-muted-foreground/60">
                 {w.status}
               </span>
             </div>
@@ -603,7 +603,7 @@ function ProjectDeleteTool({ part }: ToolProps) {
   const input = partInput(part);
   const project = (input.project as string) || '';
   return (
-    <div className="flex items-center gap-2 px-2.5 py-1 text-xs text-muted-foreground/40">
+    <div className="flex items-center gap-2 px-2.5 py-1 text-xs text-muted-foreground/60">
       <Trash2 className="size-3 flex-shrink-0" />
       <span>Deleted {project}</span>
     </div>

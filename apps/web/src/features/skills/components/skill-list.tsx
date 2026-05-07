@@ -108,7 +108,7 @@ export function SkillList() {
             </div>
           ) : !skills || skills.length === 0 ? (
             <div className="rounded-lg border border-dashed p-12 text-center">
-              <Sparkles className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
+              <Sparkles className="h-10 w-10 text-muted-foreground/60 mx-auto mb-3" />
               <p className="text-sm text-muted-foreground">No skills found</p>
               <p className="text-xs text-muted-foreground/60 mt-1">
                 Add SKILL.md files to .opencode/skills/ to get started.
@@ -159,7 +159,7 @@ export function SkillList() {
               {/* Skill cards */}
               {filteredSkills.length === 0 ? (
                 <div className="rounded-lg border border-dashed p-10 text-center">
-                  <Search className="h-8 w-8 text-muted-foreground/20 mx-auto mb-3" />
+                  <Search className="h-8 w-8 text-muted-foreground/60 mx-auto mb-3" />
                   <p className="text-sm text-muted-foreground">
                     No skills match your filters
                   </p>

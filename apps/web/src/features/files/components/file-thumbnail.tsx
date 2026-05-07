@@ -324,7 +324,7 @@ function HtmlThumbnail({ filePath }: { filePath: string }) {
     <div ref={containerRef} className="absolute inset-0 overflow-hidden select-none pointer-events-none">
       {!ready || scale === 0 ? (
         <div className="flex items-center justify-center h-full">
-          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/30" />
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/60" />
         </div>
       ) : (
         <iframe

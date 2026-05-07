@@ -228,7 +228,7 @@ function ReconnectPill({
 
         <span className="text-xs text-muted-foreground whitespace-nowrap">
           Reconnecting
-          {elapsed && <span className="text-muted-foreground/40"> · {elapsed}</span>}
+          {elapsed && <span className="text-muted-foreground/60"> · {elapsed}</span>}
         </span>
 
         <Button

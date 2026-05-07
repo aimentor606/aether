@@ -465,7 +465,7 @@ function IntegrationActionsTool({
                   {hasDetails && (
                     <ChevronRight
                       className={cn(
-                        'size-3 text-muted-foreground/40 flex-shrink-0 transition-transform',
+                        'size-3 text-muted-foreground/60 flex-shrink-0 transition-transform',
                         isOpen && 'rotate-90',
                       )}
                     />
@@ -481,7 +481,7 @@ function IntegrationActionsTool({
                     {action.required_params &&
                       action.required_params.length > 0 && (
                         <div>
-                          <div className="text-[0.5625rem] font-semibold uppercase tracking-wider text-muted-foreground/40 mb-1">
+                          <div className="text-[0.5625rem] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-1">
                             Required
                           </div>
                           <div className="flex flex-wrap gap-1">
@@ -499,7 +499,7 @@ function IntegrationActionsTool({
                     {action.optional_params &&
                       action.optional_params.length > 0 && (
                         <div>
-                          <div className="text-[0.5625rem] font-semibold uppercase tracking-wider text-muted-foreground/40 mb-1">
+                          <div className="text-[0.5625rem] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-1">
                             Optional
                           </div>
                           <div className="flex flex-wrap gap-1">
@@ -849,7 +849,7 @@ function IntegrationExecTool({
           {/* Code input */}
           {!!input.code && (
             <div className="px-3 pt-2.5 pb-1">
-              <div className="text-[0.5625rem] font-semibold uppercase tracking-wider text-muted-foreground/40 mb-1">
+              <div className="text-[0.5625rem] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-1">
                 Code
               </div>
               <div
@@ -867,7 +867,7 @@ function IntegrationExecTool({
           {/* stdout */}
           {stdout && (
             <div className="px-3 pt-1.5 pb-1">
-              <div className="text-[0.5625rem] font-semibold uppercase tracking-wider text-muted-foreground/40 mb-1">
+              <div className="text-[0.5625rem] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-1">
                 Output
               </div>
               <div className="rounded-lg bg-muted/40 border border-border/40 p-2 max-h-[200px] overflow-auto">

@@ -77,7 +77,7 @@ export function ProvisioningProgress({
                   </div>
                   <span
                     className={cn('text-[13px] transition-colors duration-500', 
-                      isActive ? 'text-foreground/90 font-medium' : isDone ? 'text-foreground/25' : 'text-foreground/15'
+                      isActive ? 'text-foreground/90 font-medium' : isDone ? 'text-foreground/60' : 'text-foreground/15'
                     )}
                   >
                     {ps.message}
@@ -97,7 +97,7 @@ export function ProvisioningProgress({
               {stageDisplayText}
             </h2>
           </div>
-          <p className="mt-1 text-xs text-foreground/20">This can take a couple of minutes — we&apos;ll notify you when it&apos;s ready</p>
+          <p className="mt-1 text-xs text-foreground/60">This can take a couple of minutes — we&apos;ll notify you when it&apos;s ready</p>
         </>
       )}
 
@@ -134,7 +134,7 @@ export function ProvisioningProgress({
           className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/[0.03] border border-foreground/[0.06] animate-setting-up-fade-in-slow"
         >
           <div className="h-1.5 w-1.5 rounded-full bg-primary/50" />
-          <span className="text-[11px] text-foreground/30 font-mono tracking-wide">
+          <span className="text-[11px] text-foreground/60 font-mono tracking-wide">
             {machineInfo.location?.toLowerCase().includes('us') || machineInfo.location?.toLowerCase().includes('hil')
               ? 'US'
               : 'EU'}{' '}

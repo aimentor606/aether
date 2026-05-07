@@ -21,7 +21,7 @@ function DoctrineItem({
   return (
     <Reveal>
       <div className="flex gap-5">
-        <span className="text-[11px] font-mono text-muted-foreground/25 pt-0.5 shrink-0 w-6 text-right">
+        <span className="text-[11px] font-mono text-muted-foreground/60 pt-0.5 shrink-0 w-6 text-right">
           {number}
         </span>
         <div>
@@ -40,7 +40,7 @@ function Stat({ value, label }: { value: string; label: string }) {
       <span className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground/80">
         {value}
       </span>
-      <span className="text-xs text-muted-foreground/40 leading-snug">{label}</span>
+      <span className="text-xs text-muted-foreground/60 leading-snug">{label}</span>
     </div>
   );
 }
@@ -52,7 +52,7 @@ export default function FactoryPageClient() {
 
         {/* ── Opening thesis ── */}
         <Reveal>
-          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground/30 mb-6">
+          <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground/60 mb-6">
             The Autonomy Factory
           </p>
         </Reveal>
@@ -76,7 +76,7 @@ export default function FactoryPageClient() {
 
         {/* ── The ratio ── */}
         <Reveal>
-          <h2 className="text-xs uppercase tracking-widest text-muted-foreground/30 mb-8">
+          <h2 className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-8">
             The ratio
           </h2>
         </Reveal>
@@ -101,7 +101,7 @@ export default function FactoryPageClient() {
 
         {/* ── The factory ── */}
         <Reveal>
-          <h2 className="text-xs uppercase tracking-widest text-muted-foreground/30 mb-6">
+          <h2 className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-6">
             What we mean by factory
           </h2>
         </Reveal>
@@ -126,7 +126,7 @@ export default function FactoryPageClient() {
 
         {/* ── The playbook ── */}
         <Reveal>
-          <h2 className="text-xs uppercase tracking-widest text-muted-foreground/30 mb-8">
+          <h2 className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-8">
             The playbook
           </h2>
         </Reveal>
@@ -168,7 +168,7 @@ export default function FactoryPageClient() {
 
         {/* ── Why we prove it on ourselves ── */}
         <Reveal>
-          <h2 className="text-xs uppercase tracking-widest text-muted-foreground/30 mb-6">
+          <h2 className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-6">
             Highest conviction from highest exposure
           </h2>
         </Reveal>
@@ -193,7 +193,7 @@ export default function FactoryPageClient() {
 
         {/* ── The migration ── */}
         <Reveal>
-          <h2 className="text-xs uppercase tracking-widest text-muted-foreground/30 mb-6">
+          <h2 className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-6">
             The migration
           </h2>
         </Reveal>

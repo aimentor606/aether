@@ -101,7 +101,7 @@ ${streamingContent}
               {slideTitle}
             </span>
           ) : (
-            <span className="text-sm text-muted-foreground/40">
+            <span className="text-sm text-muted-foreground/60">
               —
             </span>
           )}

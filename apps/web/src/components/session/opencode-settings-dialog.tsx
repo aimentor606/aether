@@ -230,7 +230,7 @@ function ProvidersSection({
   return (
     <div className="space-y-3 overflow-y-auto">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-medium text-muted-foreground/40 uppercase tracking-wider">
+        <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
           Connected ({connectedProviders.length})
         </span>
         <Button

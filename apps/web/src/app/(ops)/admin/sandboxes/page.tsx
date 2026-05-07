@@ -784,7 +784,7 @@ function PoolTab() {
                         </span>
                         <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground/60">
                           <span>{formatMemory(t.memory)} RAM</span>
-                          <span className="text-muted-foreground/20">
+                          <span className="text-muted-foreground/60">
                             {'\u00B7'}
                           </span>
                           <span>{formatDisk(t.disk)} SSD</span>
@@ -800,7 +800,7 @@ function PoolTab() {
                           className={cn(
                             'w-8 h-8 rounded-full border flex items-center justify-center transition-colors',
                             qty === 0
-                              ? 'border-border/30 text-muted-foreground/30 cursor-not-allowed'
+                              ? 'border-border/30 text-muted-foreground/60 cursor-not-allowed'
                               : 'border-border hover:bg-muted cursor-pointer',
                           )}
                         >
@@ -816,7 +816,7 @@ function PoolTab() {
                           className={cn(
                             'w-8 h-8 rounded-full border flex items-center justify-center transition-colors',
                             qty >= 20
-                              ? 'border-border/30 text-muted-foreground/30 cursor-not-allowed'
+                              ? 'border-border/30 text-muted-foreground/60 cursor-not-allowed'
                               : 'border-border hover:bg-muted cursor-pointer',
                           )}
                         >

@@ -1143,7 +1143,7 @@ function SlashCommandPopover({
               /{cmd.name}
             </span>
             {cmd.description && (
-              <span className="text-xs text-muted-foreground/40 line-clamp-2">
+              <span className="text-xs text-muted-foreground/60 line-clamp-2">
                 {cmd.description}
               </span>
             )}
@@ -1246,7 +1246,7 @@ function MentionPopover({
                     {item.label}
                   </span>
                   {item.description && (
-                    <span className="text-muted-foreground/40 truncate text-[10px]">
+                    <span className="text-muted-foreground/60 truncate text-[10px]">
                       {item.description}
                     </span>
                   )}
@@ -1282,7 +1282,7 @@ function MentionPopover({
                     {item.label}
                   </span>
                   {item.description && (
-                    <span className="text-[10px] text-muted-foreground/35 truncate ml-auto">
+                    <span className="text-[10px] text-muted-foreground/60 truncate ml-auto">
                       {item.description}
                     </span>
                   )}
@@ -1326,7 +1326,7 @@ function MentionPopover({
                     <span className="truncate text-sm font-medium">
                       {fileName}
                     </span>
-                    <span className="text-[10px] text-muted-foreground/35 font-mono truncate flex-shrink min-w-0">
+                    <span className="text-[10px] text-muted-foreground/60 font-mono truncate flex-shrink min-w-0">
                       {cleanPath}
                     </span>
                   </div>
@@ -1394,7 +1394,7 @@ function TodoChip({ sessionId }: { sessionId: string }) {
         </span>
         <ChevronDown
           className={cn(
-            'size-3 text-muted-foreground/40 transition-transform',
+            'size-3 text-muted-foreground/60 transition-transform',
             expanded && 'rotate-180',
           )}
         />

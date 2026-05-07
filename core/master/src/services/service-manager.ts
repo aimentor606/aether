@@ -7,172 +7,42 @@ import {
   rmSync,
   writeFileSync,
 } from 'fs'
-import { join, dirname, resolve } from 'path'
+import { join, dirname } from 'path'
 
-export type ServiceAdapter = 'spawn' | 's6'
-export type ServiceScope = 'bootstrap' | 'core' | 'project' | 'session'
-export type ServiceStatus = 'starting' | 'running' | 'stopped' | 'failed' | 'backoff'
-export type ServiceRestartPolicy = 'always' | 'on-failure' | 'never'
-export type ServiceHealthType = 'none' | 'tcp' | 'http'
+// Re-export types for backward compatibility
+export type {
+  ServiceAdapter, ServiceScope, ServiceStatus, ServiceRestartPolicy, ServiceHealthType,
+  ServiceHealthCheck, RegisteredServiceSpec, ServiceStateSnapshot, ManagedService,
+  ServiceRegistryFile, FrameworkCommands, LegacyDeploymentConfig, DeployResult,
+  ServiceActionResult, RegisterServiceInput, ServiceTemplate,
+} from './service-types'
 
-export interface ServiceHealthCheck {
-  type: ServiceHealthType
-  path?: string
-  timeoutMs?: number
-}
+// Re-export extracted modules for backward compatibility
+export { detectFramework, getFrameworkCommands, shouldRunInstall, SERVICE_TEMPLATES } from './service-framework'
+export {
+  nowIso, cloneServiceSpec, buildNodeOptions, resolveSourcePath, sortServices,
+  splitCommand, normalizeCommandParts, runShell, testPortAvailable, findAvailablePort,
+  probeTcpPort, waitForPort, waitForPortToClose, findPidByPattern, findPidByPort,
+  getInnerNsPid, WORKSPACE_ROOT, SERVICE_STATE_DIR, REGISTRY_FILE, LOG_DIR,
+  INSTALL_TIMEOUT_MS, BUILD_TIMEOUT_MS, START_WAIT_MS,
+} from './service-utils'
 
-export interface RegisteredServiceSpec {
-  id: string
-  name: string
-  adapter: ServiceAdapter
-  scope: ServiceScope
-  description?: string
-  builtin: boolean
-  userVisible: boolean
-  projectId?: string | null
-  template?: string | null
-  framework?: string | null
-  sourcePath?: string | null
-  sourceType?: 'git' | 'code' | 'files' | 'tar'
-  sourceRef?: string | null
-  startCommand?: string | null
-  installCommand?: string | null
-  buildCommand?: string | null
-  envVarKeys: string[]
-  deps: string[]
-  port?: number | null
-  desiredState: 'running' | 'stopped'
-  autoStart: boolean
-  restartPolicy: ServiceRestartPolicy
-  restartDelayMs: number
-  s6ServiceName?: string | null
-  processPatterns: string[]
-  healthCheck: ServiceHealthCheck
-  createdAt: string
-  updatedAt: string
-}
-
-export interface ServiceStateSnapshot {
-  id: string
-  name: string
-  adapter: ServiceAdapter
-  scope: ServiceScope
-  status: ServiceStatus
-  desiredState: 'running' | 'stopped'
-  builtin: boolean
-  userVisible: boolean
-  pid: number | null
-  port: number | null
-  framework: string | null
-  sourcePath: string | null
-  projectId: string | null
-  template: string | null
-  autoStart: boolean
-  restarts: number
-  startedAt: string | null
-  stoppedAt: string | null
-  lastError: string | null
-  managed: true
-}
-
-interface ManagedService {
-  spec: RegisteredServiceSpec
-  proc: Bun.Subprocess<any, any, any> | null
-  state: ServiceStateSnapshot
-  intentionallyStopped: boolean
-}
-
-interface ServiceRegistryFile {
-  version: number
-  services: RegisteredServiceSpec[]
-}
-
-interface FrameworkCommands {
-  install: string | null
-  build: string | null
-  start: string
-}
-
-export interface LegacyDeploymentConfig {
-  deploymentId: string
-  sourceType: 'git' | 'code' | 'files' | 'tar'
-  sourceRef?: string
-  sourcePath: string
-  framework?: string
-  envVarKeys?: string[]
-  buildConfig?: Record<string, unknown>
-  entrypoint?: string
-}
-
-export interface DeployResult {
-  success: boolean
-  service?: ServiceStateSnapshot
-  port?: number
-  pid?: number
-  framework?: string
-  error?: string
-  logs: string[]
-  buildDuration?: number
-  startDuration?: number
-}
-
-export interface ServiceActionResult {
-  ok: boolean
-  output: string
-  service?: ServiceStateSnapshot
-}
-
-export interface RegisterServiceInput {
-  id: string
-  name?: string
-  adapter?: ServiceAdapter
-  scope?: ServiceScope
-  description?: string
-  projectId?: string | null
-  template?: string | null
-  framework?: string | null
-  sourcePath?: string | null
-  startCommand?: string | null
-  installCommand?: string | null
-  buildCommand?: string | null
-  envVarKeys?: string[]
-  deps?: string[]
-  port?: number | null
-  desiredState?: 'running' | 'stopped'
-  autoStart?: boolean
-  restartPolicy?: ServiceRestartPolicy
-  restartDelayMs?: number
-  s6ServiceName?: string | null
-  processPatterns?: string[]
-  userVisible?: boolean
-  healthCheck?: Partial<ServiceHealthCheck>
-}
-
-export interface ServiceTemplate {
-  id: string
-  name: string
-  description: string
-  adapter: ServiceAdapter
-  framework?: string
-  startCommand?: string
-  installCommand?: string | null
-  buildCommand?: string | null
-  defaultPort?: number
-}
+import type {
+  RegisteredServiceSpec, ServiceStateSnapshot, ManagedService, ServiceRegistryFile,
+  ServiceAdapter, ServiceScope, ServiceTemplate, LegacyDeploymentConfig, DeployResult,
+  ServiceActionResult, RegisterServiceInput,
+} from './service-types'
+import { SERVICE_TEMPLATES } from './service-framework'
+import { detectFramework, getFrameworkCommands, shouldRunInstall } from './service-framework'
+import {
+  nowIso, cloneServiceSpec, buildNodeOptions, resolveSourcePath, sortServices,
+  runShell, findAvailablePort, findPidByPort, findPidByPattern, getInnerNsPid,
+  probeTcpPort, waitForPort, waitForPortToClose,
+  WORKSPACE_ROOT, REGISTRY_FILE, LOG_DIR,
+  INSTALL_TIMEOUT_MS, BUILD_TIMEOUT_MS, START_WAIT_MS,
+} from './service-utils'
 
 const REGISTRY_VERSION = 1
-const WORKSPACE_ROOT = process.env.AETHER_WORKSPACE || '/workspace'
-const SERVICE_STATE_DIR = join(WORKSPACE_ROOT, '.kortix', 'services')
-const REGISTRY_FILE = join(SERVICE_STATE_DIR, 'registry.json')
-const LOG_DIR = join(SERVICE_STATE_DIR, 'logs')
-
-const INSTALL_TIMEOUT_MS = 120_000
-const BUILD_TIMEOUT_MS = 120_000
-const START_WAIT_MS = 30_000  // Must cover run-opencode-serve.sh waits (~20s worst case) + startup
-const PORT_MIN = 10_000
-const PORT_MAX = 60_000
-const PERSISTED_SOURCE_ROOT = WORKSPACE_ROOT
-const ECONNRESET_GUARD_PATH = '/ephemeral/master/econnreset-guard.cjs'
 
 function s6svc(id: string, name: string, scope: ServiceScope, s6Name: string, opts: Partial<RegisteredServiceSpec> = {}): RegisteredServiceSpec {
   return {
@@ -187,7 +57,6 @@ function s6svc(id: string, name: string, scope: ServiceScope, s6Name: string, op
 }
 
 const BUILTIN_SERVICES: RegisteredServiceSpec[] = [
-  // opencode-serve is spawn — managed directly by Master (not s6)
   {
     id: 'opencode-serve', name: 'Agent Runtime API', adapter: 'spawn', scope: 'core', description: '', builtin: true,
     userVisible: false, projectId: null, template: 'opencode-serve', framework: 'node',
@@ -198,7 +67,6 @@ const BUILTIN_SERVICES: RegisteredServiceSpec[] = [
     s6ServiceName: null, processPatterns: ['opencode serve --port 4096'],
     healthCheck: { type: 'none' }, createdAt: '', updatedAt: '',
   },
-  // All other system services: s6 supervised, controlled via s6-svc
   s6svc('chromium-persistent', 'Chromium', 'core', 'svc-chromium-persistent',
     { port: 9222, processPatterns: ['chromium-browser'] }),
   s6svc('agent-browser-session', 'Agent Browser Session', 'core', 'svc-agent-browser-session',
@@ -214,383 +82,6 @@ const BUILTIN_SERVICES: RegisteredServiceSpec[] = [
   s6svc('docker', 'Docker Daemon', 'bootstrap', 'svc-docker',
     { processPatterns: ['dockerd'] }),
 ]
-
-const SERVICE_TEMPLATES: ServiceTemplate[] = [
-  {
-    id: 'custom-command',
-    name: 'Custom command',
-    description: 'Run any custom command from a project directory',
-    adapter: 'spawn',
-  },
-  {
-    id: 'nextjs',
-    name: 'Next.js app',
-    description: 'Install, build, and start a Next.js application',
-    adapter: 'spawn',
-    framework: 'nextjs',
-    installCommand: 'npm install',
-    buildCommand: 'npm run build',
-    startCommand: 'npm start',
-    defaultPort: 3000,
-  },
-  {
-    id: 'vite',
-    name: 'Vite app',
-    description: 'Install, build, and preview a Vite application',
-    adapter: 'spawn',
-    framework: 'vite',
-    installCommand: 'npm install',
-    buildCommand: 'npm run build',
-    startCommand: 'npx vite preview --host 0.0.0.0 --port __PORT__',
-    defaultPort: 4173,
-  },
-  {
-    id: 'node',
-    name: 'Node app',
-    description: 'Install and start a Node/Bun application',
-    adapter: 'spawn',
-    framework: 'node',
-    installCommand: 'npm install',
-    buildCommand: null,
-    startCommand: 'npm start',
-    defaultPort: 3000,
-  },
-  {
-    id: 'python',
-    name: 'Python app',
-    description: 'Install Python dependencies and start the app',
-    adapter: 'spawn',
-    framework: 'python',
-    installCommand: 'pip install -r requirements.txt',
-    buildCommand: null,
-    startCommand: 'python app.py',
-    defaultPort: 8080,
-  },
-  {
-    id: 'static',
-    name: 'Static site',
-    description: 'Serve static files from a project directory',
-    adapter: 'spawn',
-    framework: 'static',
-    installCommand: null,
-    buildCommand: null,
-    startCommand: 'npx serve -s . -l __PORT__',
-    defaultPort: 3000,
-  },
-]
-
-function nowIso(): string {
-  return new Date().toISOString()
-}
-
-function cloneServiceSpec(spec: RegisteredServiceSpec): RegisteredServiceSpec {
-  return {
-    ...spec,
-    envVarKeys: [...spec.envVarKeys],
-    deps: [...spec.deps],
-    processPatterns: [...spec.processPatterns],
-    healthCheck: { ...spec.healthCheck },
-  }
-}
-
-function buildNodeOptions(): string {
-  const existing = process.env.NODE_OPTIONS || ''
-  const guardRequire = `--require=${ECONNRESET_GUARD_PATH}`
-  if (existing.includes(guardRequire)) return existing
-  return `${existing} ${guardRequire}`.trim()
-}
-
-function resolveSourcePath(sourcePath?: string | null): string {
-  if (!sourcePath) return PERSISTED_SOURCE_ROOT
-  if (sourcePath.startsWith('/')) return sourcePath
-  return resolve(PERSISTED_SOURCE_ROOT, sourcePath)
-}
-
-function sortServices(specs: RegisteredServiceSpec[]): RegisteredServiceSpec[] {
-  const byId = new Map(specs.map((service) => [service.id, service]))
-  const visited = new Set<string>()
-  const visiting = new Set<string>()
-  const ordered: RegisteredServiceSpec[] = []
-
-  function visit(id: string): void {
-    if (visited.has(id)) return
-    if (visiting.has(id)) throw new Error(`Cycle detected in service dependencies at ${id}`)
-    const spec = byId.get(id)
-    if (!spec) throw new Error(`Service dependency not found: ${id}`)
-    visiting.add(id)
-    for (const dep of spec.deps) visit(dep)
-    visiting.delete(id)
-    visited.add(id)
-    ordered.push(spec)
-  }
-
-  for (const spec of specs) visit(spec.id)
-  return ordered
-}
-
-function splitCommand(command: string): string[] {
-  const matches = command.match(/"[^"]*"|'[^']*'|[^\s]+/g) || []
-  return matches.map((token) => token.replace(/^['"]|['"]$/g, ''))
-}
-
-function normalizeCommandParts(parts: string[]): string[] {
-  if (parts[0] === 'bun') {
-    return [process.execPath, ...parts.slice(1)]
-  }
-  return parts
-}
-
-async function runShell(
-  cmd: string,
-  cwd: string,
-  env?: Record<string, string>,
-  timeoutMs: number = 60_000,
-): Promise<{ ok: boolean; output: string }> {
-  const mergedEnv: Record<string, string> = {
-    ...process.env as Record<string, string>,
-    ...env,
-    CI: '1',
-    FORCE_COLOR: '0',
-  }
-
-  if (!cmd.trim()) return { ok: false, output: 'Empty command' }
-
-  let proc: ReturnType<typeof Bun.spawn>
-  try {
-    proc = Bun.spawn(['/bin/sh', '-c', cmd], {
-      cwd,
-      env: mergedEnv,
-      stdout: 'pipe',
-      stderr: 'pipe',
-    })
-  } catch (err) {
-    return { ok: false, output: String(err) }
-  }
-
-  let timedOut = false
-  const timer = setTimeout(() => {
-    timedOut = true
-    try { proc.kill() } catch {}
-  }, timeoutMs)
-
-  try {
-    const [stdoutBuf, stderrBuf] = await Promise.all([
-      new Response(proc.stdout as ReadableStream<Uint8Array> | null).text(),
-      new Response(proc.stderr as ReadableStream<Uint8Array> | null).text(),
-    ])
-    const exitCode = await proc.exited
-    clearTimeout(timer)
-    const output = `${stdoutBuf}\n${stderrBuf}`.trim()
-    if (timedOut) return { ok: false, output: `${output}\n[TIMEOUT after ${timeoutMs}ms]`.trim() }
-    return { ok: exitCode === 0, output }
-  } catch (err) {
-    clearTimeout(timer)
-    return { ok: false, output: String(err) }
-  }
-}
-
-async function testPortAvailable(port: number): Promise<boolean> {
-  return new Promise((resolve) => {
-    try {
-      const server = Bun.serve({
-        port,
-        fetch() {
-          return new Response('')
-        },
-      })
-      server.stop(true)
-      resolve(true)
-    } catch {
-      resolve(false)
-    }
-  })
-}
-
-async function findAvailablePort(): Promise<number> {
-  for (let attempt = 0; attempt < 50; attempt++) {
-    const port = PORT_MIN + Math.floor(Math.random() * (PORT_MAX - PORT_MIN))
-    if (await testPortAvailable(port)) return port
-  }
-  throw new Error('Could not find an available port after 50 attempts')
-}
-
-async function probeTcpPort(port: number, timeoutMs: number = 2000): Promise<boolean> {
-  try {
-    const res = await fetch(`http://127.0.0.1:${port}`, { signal: AbortSignal.timeout(timeoutMs) })
-    await res.arrayBuffer().catch(() => {})
-    return true
-  } catch {
-    try {
-      const net = require('net')
-      return await new Promise<boolean>((resolve) => {
-        const socket = net.createConnection({ host: '127.0.0.1', port })
-        const timer = setTimeout(() => {
-          socket.destroy()
-          resolve(false)
-        }, timeoutMs)
-        socket.once('connect', () => {
-          clearTimeout(timer)
-          socket.end()
-          resolve(true)
-        })
-        socket.once('error', () => {
-          clearTimeout(timer)
-          resolve(false)
-        })
-      })
-    } catch {
-      return false
-    }
-  }
-}
-
-async function waitForPort(port: number, timeoutMs: number = START_WAIT_MS): Promise<boolean> {
-  const start = Date.now()
-  while ((Date.now() - start) < timeoutMs) {
-    if (await probeTcpPort(port, 1500)) return true
-    await Bun.sleep(500)
-  }
-  return false
-}
-
-async function waitForPortToClose(port: number, timeoutMs: number = 10_000): Promise<boolean> {
-  const start = Date.now()
-  while ((Date.now() - start) < timeoutMs) {
-    if (!(await probeTcpPort(port, 1000))) return true
-    await Bun.sleep(300)
-  }
-  return false
-}
-
-async function findPidByPattern(pattern: string): Promise<number | null> {
-  const result = await runShell(`pgrep -f ${JSON.stringify(pattern)}`, WORKSPACE_ROOT, undefined, 5000)
-  if (!result.ok || !result.output) return null
-  const value = parseInt(result.output.split(/\s+/)[0] || '', 10)
-  return Number.isFinite(value) && value > 0 ? value : null
-}
-
-async function findPidByPort(port: number): Promise<number | null> {
-  const commands = [
-    `lsof -ti tcp:${port} -sTCP:LISTEN`,
-    `fuser -n tcp ${port}`,
-  ]
-
-  for (const command of commands) {
-    const result = await runShell(command, WORKSPACE_ROOT, undefined, 5000)
-    if (!result.ok || !result.output) continue
-    const value = parseInt(result.output.split(/\s+/)[0] || '', 10)
-    if (Number.isFinite(value) && value > 0) return value
-  }
-
-  return null
-}
-
-function getInnerNsPid(procPid: number): number | null {
-  try {
-    const status = readFileSync(`/proc/${procPid}/status`, 'utf-8')
-    const nspidLine = status.split('\n').find((line) => line.startsWith('NSpid:'))
-    if (!nspidLine) return null
-    const nspids = nspidLine.split(/\s+/).slice(1).map(Number)
-    const innerPid = nspids[nspids.length - 1]
-    return (!Number.isNaN(innerPid) && innerPid > 0) ? innerPid : null
-  } catch {
-    return null
-  }
-}
-
-export function detectFramework(sourcePath: string): string {
-  const pkgPath = join(sourcePath, 'package.json')
-  if (existsSync(pkgPath)) {
-    try {
-      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
-      const allDeps: Record<string, string> = {
-        ...(pkg.dependencies || {}),
-        ...(pkg.devDependencies || {}),
-      }
-
-      if (allDeps.next) return 'nextjs'
-      if (allDeps.vite || Object.keys(allDeps).some((k) => k.startsWith('@vitejs'))) return 'vite'
-      if (allDeps['react-scripts']) return 'cra'
-      if (allDeps.express || allDeps.hono || allDeps.fastify || allDeps.koa) return 'node'
-      if (pkg.scripts?.start) return 'node'
-    } catch {
-      // ignore invalid json
-    }
-  }
-
-  if (existsSync(join(sourcePath, 'requirements.txt')) || existsSync(join(sourcePath, 'pyproject.toml'))) {
-    return 'python'
-  }
-
-  if (existsSync(join(sourcePath, 'index.html'))) {
-    return 'static'
-  }
-
-  return 'unknown'
-}
-
-export function getFrameworkCommands(
-  framework: string,
-  sourcePath: string,
-  entrypoint?: string,
-): FrameworkCommands {
-  switch (framework) {
-    case 'nextjs':
-      return {
-        install: 'npm install',
-        build: 'npm run build',
-        start: entrypoint || 'npm start',
-      }
-    case 'vite':
-      return {
-        install: 'npm install',
-        build: 'npm run build',
-        start: entrypoint || 'npx vite preview --host 0.0.0.0 --port __PORT__',
-      }
-    case 'cra':
-      return {
-        install: 'npm install',
-        build: 'npm run build',
-        start: entrypoint || 'npx serve -s build -l __PORT__',
-      }
-    case 'node':
-      return {
-        install: 'npm install',
-        build: null,
-        start: entrypoint || 'npm start',
-      }
-    case 'python': {
-      const hasRequirements = existsSync(join(sourcePath, 'requirements.txt'))
-      return {
-        install: hasRequirements ? 'pip install -r requirements.txt' : null,
-        build: null,
-        start: entrypoint || 'python app.py',
-      }
-    }
-    case 'static':
-      return {
-        install: null,
-        build: null,
-        start: entrypoint || 'npx serve -s . -l __PORT__',
-      }
-    default:
-      return {
-        install: null,
-        build: null,
-        start: entrypoint || 'npm start',
-      }
-  }
-}
-
-function shouldRunInstall(installCommand: string, sourcePath: string): boolean {
-  if (installCommand.includes('npm ') || installCommand.includes('bun ') || installCommand.includes('yarn') || installCommand.includes('pnpm')) {
-    return existsSync(join(sourcePath, 'package.json'))
-  }
-  if (installCommand.includes('pip ')) {
-    return existsSync(join(sourcePath, 'requirements.txt'))
-  }
-  return true
-}
 
 export class ServiceManager {
   private services = new Map<string, ManagedService>()
@@ -700,9 +191,6 @@ export class ServiceManager {
 
   private async probeS6Service(item: ManagedService): Promise<void> {
     const { spec, state } = item
-
-    // s6-svstat requires root access to supervise dirs.
-    // Instead, probe by port (if service has one) or by process pattern.
     if (spec.port) {
       const portOk = await probeTcpPort(spec.port, spec.healthCheck.timeoutMs || 1500)
       if (portOk) {
@@ -712,8 +200,6 @@ export class ServiceManager {
         return
       }
     }
-
-    // No port or port not bound — check by process pattern
     if (spec.processPatterns.length > 0) {
       const pid = await findPidByPattern(spec.processPatterns[0])
       if (pid) {
@@ -722,19 +208,15 @@ export class ServiceManager {
         return
       }
     }
-
     state.pid = null
     state.status = state.status === 'failed' ? 'failed' : 'stopped'
   }
 
   private async probeManagedService(item: ManagedService): Promise<void> {
     const { spec, state } = item
-
     if (spec.adapter === 's6') {
       return this.probeS6Service(item)
     }
-
-    // Spawn adapter
     if (!item.proc) {
       const persistedPid = this.readPidFile(spec.id)
       const adoptedPid = (spec.port ? await findPidByPort(spec.port) : null)
@@ -948,12 +430,9 @@ export class ServiceManager {
     return { ok: true, output: exited ? 'stopped' : 'killed', service: { ...state } }
   }
 
-  // ── s6 adapter: system services supervised by s6, controlled via s6-svc ──
-
   private async startS6Service(item: ManagedService): Promise<ServiceActionResult> {
     const spec = item.spec
     if (!spec.s6ServiceName) return { ok: false, output: `No s6ServiceName for ${spec.id}` }
-    // s6-svc -u brings up a supervised longrun. Idempotent if already up.
     try { Bun.spawnSync(['/usr/bin/s6-svc', '-u', `/run/service/${spec.s6ServiceName}`]) } catch {}
     await Bun.sleep(1000)
     await this.probeS6Service(item)
@@ -1220,7 +699,6 @@ export class ServiceManager {
         continue
       }
       if (spec.desiredState === 'running') {
-        // s6 services are auto-started by s6 — just probe status
         if (spec.adapter === 's6') {
           await this.probeManagedService(item)
           continue

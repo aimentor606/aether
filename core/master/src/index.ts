@@ -38,7 +38,7 @@ import { agentsRouter } from './routes/agents'
 import { config } from './config'
 import { HealthResponse, PortsResponse } from './schemas/common'
 
-const { secretStore } = await boot()
+await boot()
 const app = new Hono()
 
 // Cron scheduling + webhook routing handled by unified triggers plugin.
@@ -162,7 +162,7 @@ app.get('/docs/openapi.json',
   describeRoute({ hide: true, responses: { 200: { description: 'OpenAPI spec' } } }),
   async (c) => {
     // Generate master's own spec
-    constSpec = await generateSpecs(app)
+    const kortixSpec = await generateSpecs(app)
     // Merge with OpenCode's spec (fetched from localhost, cached 30s)
     const merged = await buildMergedSpec(kortixSpec as any)
 

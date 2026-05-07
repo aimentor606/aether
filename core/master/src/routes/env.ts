@@ -1,43 +1,25 @@
 import { Hono } from 'hono'
 import { describeRoute, resolver } from 'hono-openapi'
-import { mkdir, rm } from 'fs/promises'
-import { existsSync, readFileSync, readdirSync } from 'fs'
+import { readFileSync, readdirSync } from 'fs'
 import { SecretStore } from '../services/secret-store'
-import { syncSecretToAuth } from '../services/auth-sync'
-import { updateBootstrapKey } from '../services/bootstrap-env'
+import { EnvSync } from '../services/env-sync'
 import {
   ErrorResponse,
   UnauthorizedResponse,
   SecretsListResponse,
-  SetBulkEnvBody,
   SetBulkEnvResponse,
-  SetSingleEnvBody,
   SetSingleEnvResponse,
   DeleteEnvResponse,
-  RotateTokenBody,
   RotateTokenResponse,
 } from '../schemas/common'
 
 const envRouter = new Hono()
-const secretStore = new SecretStore()
-
-const S6_ENV_DIR = process.env.S6_ENV_DIR || '/run/s6/container_environment'
+const envSync = new EnvSync(new SecretStore())
 
 // NOTE: Per-route auth middleware removed — global auth in index.ts now
 // always enforces INTERNAL_SERVICE_KEY on all routes (auto-generated if not set).
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-async function writeS6Env(key: string, value: string): Promise<void> {
-  if (!existsSync(S6_ENV_DIR)) {
-    await mkdir(S6_ENV_DIR, { recursive: true })
-  }
-  await Bun.write(`${S6_ENV_DIR}/${key}`, value)
-}
-
-async function deleteS6Env(key: string): Promise<void> {
-  try { await rm(`${S6_ENV_DIR}/${key}`) } catch {}
-}
 
 async function safeJsonBody(c: any): Promise<any | null> {
   try {
@@ -142,7 +124,7 @@ envRouter.get('/',
   }),
   async (c) => {
     try {
-      const envVars = await secretStore.getAll()
+      const envVars = await envSync.getAll()
       return c.json({ secrets: envVars })
     } catch (error) {
       console.error('[ENV API] Error listing:', error)
@@ -178,10 +160,7 @@ envRouter.post('/',
       let updated = 0
       for (const [key, value] of Object.entries(keys as Record<string, unknown>)) {
         if (typeof value !== 'string') continue
-        await secretStore.setEnv(key, value)
-        await writeS6Env(key, value)
-        await syncSecretToAuth(key, value)  // sync provider keys → auth.json
-        updateBootstrapKey(key, value)  // persist core vars for bootstrap recovery
+        await envSync.set(key, value)
         updated++
       }
       return c.json({ ok: true, updated, restarted: false })
@@ -208,7 +187,7 @@ envRouter.get('/:key',
     try {
       const key = c.req.param('key')
       if (!isValidEnvKey(key)) return c.json({ error: 'Invalid key' }, 400)
-      const value = await secretStore.get(key)
+      const value = await envSync.get(key)
       // Return 200 with null value when key doesn't exist — avoids 404 retry loops
       // in the frontend (e.g. ONBOARDING_COMPLETE before first onboarding).
       return c.json({ [key]: value })
@@ -244,11 +223,7 @@ envRouter.post('/rotate-token',
       }
 
       // Update token — encryption is decoupled, no re-encryption needed
-      const result = await secretStore.rotateToken(newToken)
-
-      // Persist new token to s6 env dir + bootstrap so it survives service/container restarts
-      await writeS6Env('AETHER_TOKEN', newToken)
-      updateBootstrapKey('AETHER_TOKEN', newToken)
+      const result = await envSync.rotateToken(newToken)
 
       // Restart OpenCode to pick up the new token
       await restartServices(['opencode'])
@@ -285,10 +260,7 @@ envRouter.post('/:key',
       if (!body || typeof body.value !== 'string') {
         return c.json({ error: 'Request body must contain a "value" field' }, 400)
       }
-      await secretStore.setEnv(key, body.value)
-      await writeS6Env(key, body.value)
-      await syncSecretToAuth(key, body.value)  // sync provider keys → auth.json
-      updateBootstrapKey(key, body.value)  // persist core vars for bootstrap recovery
+      await envSync.set(key, body.value)
       return c.json({ ok: true, key, restarted: false })
     } catch (error) {
       console.error('[ENV API] Error setting key:', error)
@@ -320,10 +292,7 @@ envRouter.put('/:key',
       if (!body || typeof body.value !== 'string') {
         return c.json({ error: 'Request body must contain a "value" field' }, 400)
       }
-      await secretStore.setEnv(key, body.value)
-      await writeS6Env(key, body.value)
-      await syncSecretToAuth(key, body.value)  // sync provider keys → auth.json
-      updateBootstrapKey(key, body.value)  // persist core vars for bootstrap recovery
+      await envSync.set(key, body.value)
       return c.json({ ok: true, key, restarted: false })
     } catch (error) {
       console.error('[ENV API] Error setting key:', error)
@@ -350,9 +319,7 @@ envRouter.delete('/:key',
     try {
       const key = c.req.param('key')
       if (!isValidEnvKey(key)) return c.json({ error: 'Invalid key' }, 400)
-      await secretStore.deleteEnv(key)
-      await deleteS6Env(key)
-      await syncSecretToAuth(key, '')  // clear provider key from auth.json
+      await envSync.delete(key)
       return c.json({ ok: true, key })
     } catch (error) {
       console.error('[ENV API] Error deleting key:', error)

@@ -272,7 +272,9 @@ function LoginContent() {
   const isPasswordMode = searchParams.get('auth') === 'password';
   const t = useTranslations('auth');
 
-  const [phase, setPhase] = useState<AuthPhase>('lock');
+  const [phase, setPhase] = useState<AuthPhase>(
+    searchParams.get('phase') === 'form' ? 'form' : 'lock',
+  );
   const [referralCode, setReferralCode] = useState(referralCodeParam);
   const [showReferralDialog, setShowReferralDialog] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -1169,7 +1171,9 @@ function SelfHostedLoginContent() {
   const returnUrl = rawReturnUrl?.match(/^\/instances\/[^/]+/)
     ? '/instances'
     : rawReturnUrl;
-  const [phase, setPhase] = useState<'lock' | 'form'>('lock');
+  const [phase, setPhase] = useState<'lock' | 'form'>(
+    searchParams.get('phase') === 'form' ? 'form' : 'lock',
+  );
 
   // After auth, redirect to /instances. The /instances page handles
   // sandbox creation, and /instances/[id] handles setup (provider, keys).

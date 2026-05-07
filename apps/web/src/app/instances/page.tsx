@@ -322,6 +322,7 @@ export default function InstancesPage() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [autoCreating, setAutoCreating] = useState(false);
   const [autoCreateFailed, setAutoCreateFailed] = useState(false);
+  const [autoCreateError, setAutoCreateError] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
   const isCloud = isBillingEnabled();
   const {
@@ -378,7 +379,9 @@ export default function InstancesPage() {
         .then(() => refetch())
         .catch((err) => {
           console.error('[instances] Auto-create sandbox failed:', err);
-          toast.error('Failed to create sandbox. Please try again.');
+          const msg = err instanceof Error ? err.message : String(err);
+          setAutoCreateError(msg);
+          toast.error('Failed to create sandbox.');
           setAutoCreateFailed(true);
         })
         .finally(() => setAutoCreating(false));
@@ -667,19 +670,46 @@ export default function InstancesPage() {
                 data-testid="instances-empty"
               >
                 <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-muted/50">
-                  <Server className="h-7 w-7 text-muted-foreground/40" />
+                  {autoCreateFailed ? (
+                    <AlertCircle className="h-7 w-7 text-red-400/60" />
+                  ) : (
+                    <Server className="h-7 w-7 text-muted-foreground/40" />
+                  )}
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-medium text-foreground/80">
-                    No instances yet
+                    {autoCreateFailed
+                      ? 'Sandbox creation failed'
+                      : 'No instances yet'}
                   </p>
                   <p className="text-xs text-muted-foreground/60 mt-1">
-                    Create your first Aether instance to get started.
+                    {autoCreateFailed
+                      ? 'Your workspace could not be created automatically.'
+                      : 'Create your first Aether instance to get started.'}
                   </p>
                 </div>
-                <Button onClick={handleCreateInstance} className="gap-1.5">
+                {autoCreateFailed && autoCreateError && (
+                  <div className="w-full rounded-lg border border-red-500/15 bg-red-500/[0.04] px-4 py-3">
+                    <p className="text-[13px] text-red-400/90 text-center break-words leading-relaxed">
+                      {autoCreateError}
+                    </p>
+                  </div>
+                )}
+                {autoCreateFailed && !isCloud && (
+                  <p className="text-xs text-muted-foreground/50 text-center">
+                    Make sure Docker is running and try again.
+                  </p>
+                )}
+                <Button
+                  onClick={() => {
+                    setAutoCreateFailed(false);
+                    setAutoCreateError(null);
+                    handleCreateInstance();
+                  }}
+                  className="gap-1.5"
+                >
                   <Plus className="h-3.5 w-3.5" />
-                  New Aether
+                  {autoCreateFailed ? 'Retry' : 'New Aether'}
                 </Button>
               </div>
             )}

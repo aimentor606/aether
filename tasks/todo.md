@@ -95,13 +95,13 @@
 - [x] Add ErrorBoundary to SessionTabsContainer — prevent single tab crash from killing all tabs
 
 ### P1 — Medium Impact
-- [ ] Skip lock screen for direct navigation: `/auth?phase=form` URL parameter
-- [ ] Tab state save failure feedback: Toast when localStorage save fails during instance switch
-- [ ] Auto-create failure diagnostics: Error details + recovery steps when sandbox creation fails
-- [ ] Fix error page "Return Home" destination: `/instances` instead of `/` for authenticated users
+- [x] Skip lock screen for direct navigation: `/auth?phase=form` URL parameter
+- [x] Tab state save failure feedback: Toast when localStorage save fails during instance switch
+- [x] Auto-create failure diagnostics: Error details + recovery steps when sandbox creation fails
+- [x] Fix error page "Return Home" destination: `/instances` instead of `/` for authenticated users
 - [x] Fix hero CTA routing inconsistency: Use `router.push` everywhere, not `window.location.href`
-- [ ] Add cancel provisioning button
-- [ ] Health gate feedback: Show "Waiting for services to start..." instead of silent spinner
+- [x] Add cancel provisioning button
+- [x] Health gate feedback: Show "Waiting for services to start..." instead of silent spinner
 
 ### P2 — Lower Impact
 - [ ] Right sidebar discoverability: Onboarding tooltip after first dashboard load
@@ -119,4 +119,4 @@
 - [ ] Refactor landing page with new design system
 - [ ] Refactor dashboard layout with new design system
 - [ ] Implement P0 UX fixes
-- [ ] Implement P1 UX fixes
+- [x] Implement P1 UX fixes

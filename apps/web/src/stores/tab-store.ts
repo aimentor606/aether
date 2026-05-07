@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useServerStore } from '@/stores/server-store';
+import { toast } from 'sonner';
 import {
   getCurrentInstanceIdFromWindow,
   toInstanceAwarePath,
@@ -476,7 +477,11 @@ export const useTabStore = create<TabState>()(
               'aether-tabs-per-server',
               JSON.stringify(cache),
             );
-          } catch {}
+          } catch {
+            toast.error(
+              'Failed to save tab state. Your tabs may not be restored after switching.',
+            );
+          }
         }
 
         // Restore the full tab state for the new server
@@ -494,7 +499,9 @@ export const useTabStore = create<TabState>()(
             });
             return;
           }
-        } catch {}
+        } catch {
+          // Restore failed — start fresh (no toast, this is expected for new servers)
+        }
 
         // No saved state for new server — start with just the dashboard tab
         const ensured = ensureDashboardTab({}, []);
@@ -608,6 +615,12 @@ useTabStore.subscribe((state) => {
         tabFocusHistory: state.tabFocusHistory,
       };
       localStorage.setItem('aether-tabs-per-server', JSON.stringify(cache));
-    } catch {}
+    } catch (e) {
+      // Background sync failure — warn once per session rather than toast spam
+      if (!(globalThis as Record<string, unknown>).__tabSyncWarned) {
+        console.warn('[tab-store] Failed to sync tab state:', e);
+        (globalThis as Record<string, unknown>).__tabSyncWarned = true;
+      }
+    }
   }, 500);
 });

@@ -399,6 +399,18 @@ export default function InstanceDetailPage() {
               />
             ))}
 
+          {/* Cancel button during provisioning / health gate */}
+          {(phase === 'provisioning' || showHealthGate) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push('/instances')}
+              className="mt-4 text-muted-foreground/40 hover:text-foreground"
+            >
+              Cancel
+            </Button>
+          )}
+
           {showHealthGate && <WakingInstanceView label={serverLabel} />}
 
           {/* Active / Redirecting */}

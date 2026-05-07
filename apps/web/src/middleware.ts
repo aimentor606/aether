@@ -13,12 +13,7 @@ import {
 } from '@/lib/instance-routes';
 
 // Marketing pages that support locale routing for SEO (/de, /it, etc.)
-const MARKETING_ROUTES = [
-  '/',
-  '/legal',
-  '/support',
-  '/templates',
-];
+const MARKETING_ROUTES = ['/', '/legal', '/support', '/templates'];
 
 // Routes that don't require authentication
 const PUBLIC_ROUTES = [
@@ -37,7 +32,7 @@ const PUBLIC_ROUTES = [
   '/support', // Support page should be public
   '/help', // Help center and documentation should be public
   '/credits-explained', // Credits explained page should be public
-  '/about', // About page should be public 
+  '/about', // About page should be public
   '/milano', // Milano page should be public
   '/berlin', // Berlin page should be public
   '/app', // App download page should be public,
@@ -53,15 +48,13 @@ const PUBLIC_ROUTES = [
   '/countryerror', // Country restriction error page should be public
   '/landing', // Three.js landing page should be public
   '/variant-2', // Landing page variant should be public
-  ...locales.flatMap(locale => MARKETING_ROUTES.map(route => `/${locale}${route === '/' ? '' : route}`)),
+  ...locales.flatMap((locale) =>
+    MARKETING_ROUTES.map((route) => `/${locale}${route === '/' ? '' : route}`),
+  ),
 ];
 
 // Routes that require authentication but are related to billing/trials/setup
-const BILLING_ROUTES = [
-  '/activate-trial',
-  '/subscription',
-  '/instances',
-];
+const BILLING_ROUTES = ['/activate-trial', '/subscription', '/instances'];
 
 // Routes that require authentication and active subscription
 const PROTECTED_ROUTES = [
@@ -114,7 +107,7 @@ const ADMIN_ROLE_COOKIE_MAX_AGE = 5 * 60; // 5 minutes
 
 function isAdminRoute(pathname: string): boolean {
   return ADMIN_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(route + '/')
+    (route) => pathname === route || pathname.startsWith(route + '/'),
   );
 }
 
@@ -131,16 +124,24 @@ export async function middleware(request: NextRequest) {
   // Only treat as instance-scoped if the inner path is in INSTANCE_SCOPED_ROUTES.
   // Routes with dedicated files under /instances/[id]/ (like /onboarding) are NOT
   // instance-scoped — they handle their own routing via Next.js dynamic segments.
-  const isInstanceScopedRoute = !!instanceRoute && !!instanceRoute.innerPath && isInstanceScopedAppPath(instanceRoute.innerPath);
-  const effectivePathname = isInstanceScopedRoute ? instanceRoute.innerPath : pathname;
-  const activeInstanceId = request.cookies.get(ACTIVE_INSTANCE_COOKIE)?.value || null;
+  const isInstanceScopedRoute =
+    !!instanceRoute &&
+    !!instanceRoute.innerPath &&
+    isInstanceScopedAppPath(instanceRoute.innerPath);
+  const effectivePathname = isInstanceScopedRoute
+    ? instanceRoute.innerPath
+    : pathname;
+  const activeInstanceId =
+    request.cookies.get(ACTIVE_INSTANCE_COOKIE)?.value || null;
 
   // Block access to WIP /thread/new route - redirect to dashboard
   if (pathname.includes('/thread/new')) {
-    const target = activeInstanceId ? buildInstancePath(activeInstanceId, '/dashboard') : '/instances';
+    const target = activeInstanceId
+      ? buildInstancePath(activeInstanceId, '/dashboard')
+      : '/instances';
     return NextResponse.redirect(new URL(target, request.url));
   }
-  
+
   // Skip middleware for static files, API routes, and telemetry endpoints
   if (
     pathname.startsWith('/_next') ||
@@ -148,8 +149,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/v1/') ||
     pathname.includes('.') ||
     pathname.startsWith('/api/') ||
-    pathname.startsWith('/monitoring') ||    // Sentry error tracking tunnel (Better Stack)
-    pathname.startsWith('/_betterstack')     // Better Stack browser telemetry proxy
+    pathname.startsWith('/monitoring') || // Sentry error tracking tunnel (Better Stack)
+    pathname.startsWith('/_betterstack') // Better Stack browser telemetry proxy
   ) {
     return NextResponse.next();
   }
@@ -163,18 +164,20 @@ export async function middleware(request: NextRequest) {
     const token = searchParams.get('token');
     const type = searchParams.get('type');
     const error = searchParams.get('error');
-    
+
     // If we have Supabase auth parameters, redirect to /auth/callback
     // Note: Mobile apps use direct deep links and bypass this route
     if (code || token || type || error) {
       const callbackUrl = new URL('/auth/callback', request.url);
-      
+
       // Preserve all query parameters
       searchParams.forEach((value, key) => {
         callbackUrl.searchParams.set(key, value);
       });
-      
-      console.log('🔄 Redirecting Supabase verification from root to /auth/callback');
+
+      console.log(
+        '🔄 Redirecting Supabase verification from root to /auth/callback',
+      );
       return NextResponse.redirect(callbackUrl);
     }
   }
@@ -182,39 +185,41 @@ export async function middleware(request: NextRequest) {
   // Extract path segments
   const pathSegments = pathname.split('/').filter(Boolean);
   const firstSegment = pathSegments[0];
-  
+
   // Check if first segment is a locale (e.g., /de, /it)
   if (firstSegment && locales.includes(firstSegment as Locale)) {
     const locale = firstSegment as Locale;
     const remainingPath = '/' + pathSegments.slice(1).join('/') || '/';
-    
+
     // Verify remaining path is a marketing route
-    const isRemainingPathMarketing = MARKETING_ROUTES.some(route => {
+    const isRemainingPathMarketing = MARKETING_ROUTES.some((route) => {
       if (route === '/') {
         return remainingPath === '/' || remainingPath === '';
       }
       return remainingPath === route || remainingPath.startsWith(route + '/');
     });
-    
+
     if (isRemainingPathMarketing) {
       // Rewrite /de to /, etc.
-      const response = NextResponse.rewrite(new URL(remainingPath, request.url));
+      const response = NextResponse.rewrite(
+        new URL(remainingPath, request.url),
+      );
       response.cookies.set('locale', locale, {
         path: '/',
         maxAge: 31536000, // 1 year
         sameSite: 'lax',
       });
-      
+
       // Store locale in headers so next-intl can pick it up
       response.headers.set('x-locale', locale);
-      
+
       return response;
     }
   }
-  
+
   // Check if this is a marketing route (without locale prefix)
-  const isMarketingRoute = MARKETING_ROUTES.some(route => 
-    pathname === route || pathname.startsWith(route + '/')
+  const isMarketingRoute = MARKETING_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + '/'),
   );
 
   // Create a single Supabase client instance that we'll reuse
@@ -230,33 +235,38 @@ export async function middleware(request: NextRequest) {
   // used for server-side auth calls. SUPABASE_URL / NEXT_PUBLIC_SUPABASE_URL is the
   // public-facing URL that the browser uses. The middleware runs server-side inside
   // the Docker container, so it needs the internal URL to reach Supabase.
-  const supabaseUrl = process.env.SUPABASE_SERVER_URL || process.env.SUPABASE_URL || process.env.AETHER_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.AETHER_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookieOptions: {
-        name: AETHER_SUPABASE_AUTH_COOKIE,
-        path: '/',
-        sameSite: 'lax',
+  const supabaseUrl =
+    process.env.SUPABASE_SERVER_URL ||
+    process.env.SUPABASE_URL ||
+    process.env.AETHER_PUBLIC_SUPABASE_URL ||
+    process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey =
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.AETHER_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookieOptions: {
+      name: AETHER_SUPABASE_AUTH_COOKIE,
+      path: '/',
+      sameSite: 'lax',
+    },
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
       },
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value),
+        );
+        supabaseResponse = NextResponse.next({
+          request,
+        });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          supabaseResponse.cookies.set(name, value, options),
+        );
       },
-    }
-  );
+    },
+  });
 
   // Fetch user ONCE and reuse for both locale detection and auth checks.
   // IMPORTANT: Skip getUser() for auth routes — the auth page handles its
@@ -268,12 +278,15 @@ export async function middleware(request: NextRequest) {
   // stale (revoked) refresh token → "Refresh Token Not Found" on the next request.
   let user: { id: string; user_metadata?: { locale?: string } } | null = null;
   let authError: Error | null = null;
-  
+
   const isAuthRoute = pathname === '/auth' || pathname.startsWith('/auth/');
-  
+
   if (!isAuthRoute) {
     try {
-      const { data: { user: fetchedUser }, error: fetchedError } = await supabase.auth.getUser();
+      const {
+        data: { user: fetchedUser },
+        error: fetchedError,
+      } = await supabase.auth.getUser();
       user = fetchedUser;
       authError = fetchedError as Error | null;
     } catch (error) {
@@ -286,7 +299,9 @@ export async function middleware(request: NextRequest) {
   // to /dashboard. This avoids the old client-side redirect chain that caused
   // a white flash (render null → useAuth resolves → router.replace → skeleton).
   if (pathname === '/' && user) {
-    const target = activeInstanceId ? buildInstancePath(activeInstanceId, '/dashboard') : '/instances?reason=no-instance';
+    const target = activeInstanceId
+      ? buildInstancePath(activeInstanceId, '/dashboard')
+      : '/instances?reason=no-instance';
     return NextResponse.redirect(new URL(target, request.url));
   }
 
@@ -295,32 +310,40 @@ export async function middleware(request: NextRequest) {
   // 1. User is visiting a marketing route without locale prefix
   // 2. User doesn't have an explicit preference (no cookie, no user metadata)
   // 3. Detected locale is not English (default)
-  if (isMarketingRoute && (!firstSegment || !locales.includes(firstSegment as Locale))) {
+  if (
+    isMarketingRoute &&
+    (!firstSegment || !locales.includes(firstSegment as Locale))
+  ) {
     // Check if user has explicit preference in cookie
     const localeCookie = request.cookies.get('locale')?.value;
-    const hasExplicitPreference = !!localeCookie && locales.includes(localeCookie as Locale);
-    
+    const hasExplicitPreference =
+      !!localeCookie && locales.includes(localeCookie as Locale);
+
     // Check user metadata (if authenticated) - reuse the user we already fetched
     let userLocale: Locale | null = null;
-    if (!hasExplicitPreference && user?.user_metadata?.locale && locales.includes(user.user_metadata.locale as Locale)) {
+    if (
+      !hasExplicitPreference &&
+      user?.user_metadata?.locale &&
+      locales.includes(user.user_metadata.locale as Locale)
+    ) {
       userLocale = user.user_metadata.locale as Locale;
     }
-    
+
     // Only auto-redirect if:
     // - No explicit preference (no cookie, no user metadata)
     // - Detected locale is not English (default)
     // This prevents unnecessary redirects for English speakers and users with preferences
     if (!hasExplicitPreference && !userLocale) {
       const acceptLanguage = request.headers.get('accept-language');
-      
+
       const detectedLocale = detectBestLocaleFromHeaders(acceptLanguage);
-      
+
       // Only redirect if detected locale is not English (default)
       // This prevents unnecessary redirects for English speakers
       if (detectedLocale !== defaultLocale) {
         const redirectUrl = new URL(request.url);
         redirectUrl.pathname = `/${detectedLocale}${pathname === '/' ? '' : pathname}`;
-        
+
         const redirectResponse = NextResponse.redirect(redirectUrl);
         // Set cookie so we don't redirect again on next visit
         redirectResponse.cookies.set('locale', detectedLocale, {
@@ -337,13 +360,16 @@ export async function middleware(request: NextRequest) {
   // so that any cookie updates from getUser() token refresh are preserved.
   // Returning a fresh NextResponse.next() would discard refreshed auth cookies,
   // causing the session to break on the next navigation.
-  if (PUBLIC_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+  if (
+    PUBLIC_ROUTES.some(
+      (route) => pathname === route || pathname.startsWith(route + '/'),
+    )
+  ) {
     return supabaseResponse;
   }
 
   // Everything else requires authentication - reuse the user we already fetched
   try {
-    
     // Redirect to auth if not authenticated (using the user we already fetched)
     if (authError || !user) {
       const url = request.nextUrl.clone();
@@ -381,8 +407,7 @@ export async function middleware(request: NextRequest) {
               process.env.BACKEND_URL ||
               process.env.AETHER_PUBLIC_BACKEND_URL ||
               'http://localhost:8008/v1';
-            const { data: sessionData } =
-              await supabase.auth.getSession();
+            const { data: sessionData } = await supabase.auth.getSession();
             const accessToken = sessionData?.session?.access_token;
 
             if (accessToken) {
@@ -411,8 +436,11 @@ export async function middleware(request: NextRequest) {
         if (!adminCookie) {
           supabaseResponse.cookies.set(
             ADMIN_ROLE_COOKIE,
-            JSON.stringify({ isAdmin: true, exp: Date.now() + ADMIN_ROLE_COOKIE_MAX_AGE * 1000 }),
-            { path: '/', maxAge: ADMIN_ROLE_COOKIE_MAX_AGE, sameSite: 'lax' }
+            JSON.stringify({
+              isAdmin: true,
+              exp: Date.now() + ADMIN_ROLE_COOKIE_MAX_AGE * 1000,
+            }),
+            { path: '/', maxAge: ADMIN_ROLE_COOKIE_MAX_AGE, sameSite: 'lax' },
           );
         }
       }
@@ -425,7 +453,10 @@ export async function middleware(request: NextRequest) {
       const rewriteUrl = request.nextUrl.clone();
       rewriteUrl.pathname = effectivePathname;
       const response = NextResponse.rewrite(rewriteUrl);
-      response.cookies.set(ACTIVE_INSTANCE_COOKIE, instanceRoute.instanceId, { path: '/', sameSite: 'lax' });
+      response.cookies.set(ACTIVE_INSTANCE_COOKIE, instanceRoute.instanceId, {
+        path: '/',
+        sameSite: 'lax',
+      });
       return response;
     }
 
@@ -433,8 +464,15 @@ export async function middleware(request: NextRequest) {
     if (isInstanceDetailRoute || pathname === '/instances') {
       return supabaseResponse;
     }
-    if (instanceRoute?.instanceId && instanceRoute.innerPath === '/onboarding') {
-      supabaseResponse.cookies.set(ACTIVE_INSTANCE_COOKIE, instanceRoute.instanceId, { path: '/', sameSite: 'lax' });
+    if (
+      instanceRoute?.instanceId &&
+      instanceRoute.innerPath === '/onboarding'
+    ) {
+      supabaseResponse.cookies.set(
+        ACTIVE_INSTANCE_COOKIE,
+        instanceRoute.instanceId,
+        { path: '/', sameSite: 'lax' },
+      );
       return supabaseResponse;
     }
 
@@ -443,12 +481,14 @@ export async function middleware(request: NextRequest) {
     // otherwise send to /instances to pick one.
     if (isInstanceScopedAppPath(pathname)) {
       const url = request.nextUrl.clone();
-      url.pathname = activeInstanceId ? buildInstancePath(activeInstanceId, pathname) : '/instances?reason=no-instance';
+      url.pathname = activeInstanceId
+        ? buildInstancePath(activeInstanceId, pathname)
+        : '/instances?reason=no-instance';
       return NextResponse.redirect(url);
     }
 
     // ── Billing-related routes (subscription, activate-trial, etc.) ──────
-    if (BILLING_ROUTES.some(route => pathname.startsWith(route))) {
+    if (BILLING_ROUTES.some((route) => pathname.startsWith(route))) {
       return supabaseResponse;
     }
 
@@ -472,4 +512,4 @@ export const config = {
      */
     '/((?!_next/static|_next/image|favicon.ico|monitoring|_betterstack|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
-}; 
+};

@@ -53,7 +53,7 @@ export default function HomeError({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1, duration: 0.6 }}
           >
-{`  ___  ___  ___
+            {`  ___  ___  ___
  | __|| _ \\| _ \\
  | _| |   /|   /
  |___|_|_\\|_|_\\`}
@@ -67,7 +67,8 @@ export default function HomeError({
 
         {/* Description */}
         <p className="px-2 text-center text-sm leading-relaxed text-foreground/60 sm:text-base">
-          We encountered an unexpected error. Please try again or return to the homepage.
+          We encountered an unexpected error. Please try again or return to the
+          homepage.
         </p>
 
         {/* Status pill */}
@@ -94,7 +95,15 @@ export default function HomeError({
             Try Again
           </Button>
           <Button size="lg" variant="outline" className="h-12 flex-1" asChild>
-            <Link href="/" className="flex items-center justify-center gap-2">
+            <Link
+              href={
+                typeof document !== 'undefined' &&
+                document.cookie.includes('aether-auth-token')
+                  ? '/instances'
+                  : '/'
+              }
+              className="flex items-center justify-center gap-2"
+            >
               <ArrowLeft className="h-4 w-4" />
               Return Home
             </Link>
